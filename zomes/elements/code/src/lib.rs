@@ -112,6 +112,9 @@ fn format_entry () -> ValidatingEntryType {
                 let get_result = hdk::get_entry(&address);
                 match get_result {
                     Ok(Some(Entry::App(entry_type, _))) => {
+                        // TODO: Is this doing what I hope it is?
+                        // I want to continue if and only if the entry type at
+                        // this address is a Component entry
                         if entry_type == "component".into() {
                             continue
                         } else {
