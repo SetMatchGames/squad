@@ -8,9 +8,10 @@
     "webpack-cli": "^3.1.0"
   },
   "dependencies": {
-    "tape": "^4.9.1",
+    "@holochain/hc-web-client": "^0.1.0",
+    "faucet": "0.0.1",
     "json3": "*",
-    "faucet": "0.0.1"
+    "tape": "^4.9.1"
   },
   "scripts": {
     "build": "webpack",
