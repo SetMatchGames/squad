@@ -9,6 +9,8 @@ extern crate serde_derive;
 #[macro_use]
 extern crate holochain_core_types_derive;
 
+use std::convert::TryInto;
+
 use hdk::{
     entry_definition::ValidatingEntryType,
     error::ZomeApiResult,
@@ -25,181 +27,118 @@ use hdk::{
 struct ComponentType(String);
 
 #[derive(Serialize, Deserialize, Debug, DefaultJson)]
-struct Game {
-    cmd: String,
-    required_component_types: Vec<ComponentType>,
-    optional_component_types: Vec<ComponentType>,
+enum SMGElement {
+    Game {
+        cmd: String,
+        // TODO probably want more expressive component requirements specs
+        required_component_types: Vec<ComponentType>,
+        optional_component_types: Vec<ComponentType>,
+    },
+    Mode {
+        cmd: String,
+    },
+    Component {
+        name: String,
+        type_: ComponentType,
+        data: String,
+    },
+    Format {
+        name: String,
+        components: Vec<Address>,
+    },
 }
 
-fn game_entry () -> ValidatingEntryType {
+fn element_entry () -> ValidatingEntryType {
     entry! {
-        name: "game",
-        description: "Base rules that don't change between playings",
+        name: "SMGElement",
+        description: "Elements that make up the Set Match Games system",
         sharing: Sharing::Public,
-        native_type: Game,
+        native_type: SMGElement,
+
         validation_package: || {
             hdk::ValidationPackageDefinition::Entry
         },
-        validation: |_game: Game, _ctx: hdk::ValidationData| {
-            Ok(())
-        },
-        links: []
-    }
-}
 
-#[derive(Serialize, Deserialize, Debug, DefaultJson)]
-struct Mode {
-    cmd: String,
-}
+        validation: |element: SMGElement, _ctx: hdk::ValidationData| {
+            match element {
+                SMGElement::Format{name: _, components} => {
+                    // TODO refactor this nested match iterator mess
+                    // look for functional ways to handle this better
 
-fn mode_entry () -> ValidatingEntryType {
-    entry! {
-        name: "mode",
-        description: "Intrepretation of game results",
-        sharing: Sharing::Public,
-        native_type: Mode,
-        validation_package: || {
-            hdk::ValidationPackageDefinition::Entry
-        },
-        validation: |_mode: Mode, _ctx: hdk::ValidationData| {
-            Ok(())
-        },
-        links: []
-    }
-}
+                    // not valid if any address is not a component
+                    for address in components.iter() {
+                        match hdk::get_entry(&address)? {
+                            Some(Entry::App(_, api_result)) => {
+                                match api_result.try_into()? {
+                                    SMGElement::Component{
+                                        name: _,
+                                        type_: _,
+                                        data: _
+                                    } => continue,
+                                    _ => return Err(String::from(
+                                        "Non-component address found in componenets"
+                                    )),
+                                }
+                            },
 
-#[derive(Serialize, Deserialize, Debug, DefaultJson)]
-struct Component {
-    name: String,
-    type_: ComponentType,
-    data: String,
-}
-
-fn component_entry () -> ValidatingEntryType {
-    entry! {
-        name: "component",
-        description: "Those elements that change between playings",
-        sharing: Sharing::Public,
-        native_type: Component,
-        validation_package: || {
-            hdk::ValidationPackageDefinition::Entry
-        },
-        validation: |_component: Component, _ctx: hdk::ValidationData| {
-            Ok(())
-        },
-        links: []
-    }
-}
-
-#[derive(Serialize, Deserialize, Debug, DefaultJson)]
-struct Format {
-    name: String,
-    components: Vec<Address>,
-}
-
-fn format_entry () -> ValidatingEntryType {
-    entry! {
-        name: "format",
-        description: "Set of components allowed for a specific playing",
-        sharing: Sharing::Public,
-        native_type: Format,
-        validation_package: || {
-            hdk::ValidationPackageDefinition::Entry
-        },
-        validation: |format: Format, _ctx: hdk::ValidationData| {
-            // all component addresses must be components
-            for address in format.components.iter() {
-                let get_result = hdk::get_entry(&address);
-                match get_result {
-                    Ok(Some(Entry::App(entry_type, _))) => {
-                        // TODO: Is this doing what I hope it is?
-                        // I want to continue if and only if the entry type at
-                        // this address is a Component entry
-                        if entry_type == "component".into() {
-                            continue
-                        } else {
-                            return Err(String::from("Non-component found in components"));
+                            _ => return Err(String::from(
+                                "Non-component address found in components"
+                            )),
                         }
                     }
-                    _ => return Err(
-                        String::from("Non-component found in components")
-                    ),
-                }
+                    Ok(())
+                },
+                _ => Ok(())
             }
-            Ok(())
         },
+
         links: []
     }
 }
 
-fn handle_contribute_game(game: Game) -> ZomeApiResult<Address> {
-    hdk::debug(format!("contributing game {:?}", game))?;
-    let game_entry = Entry::App("game".into(), game.into());
-    let address = hdk::commit_entry(&game_entry)?;
+fn handle_contribute_element(element: SMGElement) -> ZomeApiResult<Address> {
+    hdk::debug(format!("contributing {:?} ", element))?;
+    let new_entry = Entry::App("SMGElement".into(), element.into());
+    let address = hdk::commit_entry(&new_entry)?;
+
+    // TODO create a curved bond
+
+    // TODO create a DAO
+
     Ok(address)
 }
 
-fn handle_contribute_mode(mode: Mode) -> ZomeApiResult<Address> {
-    hdk::debug(format!("contributing mode {:?}", mode))?;
-    let mode_entry = Entry::App("mode".into(), mode.into());
-    let address = hdk::commit_entry(&mode_entry)?;
-    Ok(address)
-}
-
-fn handle_contribute_component(component: Component) -> ZomeApiResult<Address> {
-    hdk::debug(format!("contributing component {:?}", component))?;
-    let component_entry = Entry::App("component".into(), component.into());
-    let address = hdk::commit_entry(&component_entry)?;
-    Ok(address)
-}
-
-fn handle_contribute_format(format: Format) -> ZomeApiResult<Address> {
-    hdk::debug(format!("contributing format {:?}", format))?;
-    let format_entry = Entry::App("format".into(), format.into());
-    let address = hdk::commit_entry(&format_entry)?;
-    Ok(address)
+fn handle_get_element(address: Address) -> ZomeApiResult<SMGElement> {
+    match hdk::get_entry(&address) {
+        Ok(Some(Entry::App(_, api_result))) => Ok(api_result.try_into()?),
+        _ => Err(String::from("No element found").into())
+    }
 }
 
 define_zome! {
     entries: [
-        game_entry(),
-        mode_entry(),
-        component_entry(),
-        format_entry()
+        element_entry()
     ]
 
     genesis: || { Ok(()) }
 
     functions: [
-        contribute_game: {
-            inputs: |game: Game|,
+        contribute_element: {
+            inputs: |element: SMGElement|,
             outputs: |address: ZomeApiResult<Address>|,
-            handler: handle_contribute_game
+            handler: handle_contribute_element
         }
-        contribute_mode: {
-            inputs: |mode: Mode|,
-            outputs: |address: ZomeApiResult<Address>|,
-            handler: handle_contribute_mode
-        }
-        contribute_component: {
-            inputs: |component: Component|,
-            outputs: |address: ZomeApiResult<Address>|,
-            handler: handle_contribute_component
-        }
-        contribute_format: {
-            inputs: |format: Format|,
-            outputs: |address: ZomeApiResult<Address>|,
-            handler: handle_contribute_format
+        get_element: {
+            inputs: |address: Address|,
+            outputs: |element: ZomeApiResult<SMGElement>|,
+            handler: handle_get_element
         }
     ]
 
     traits: {
         hc_public [
-            contribute_game,
-            contribute_mode,
-            contribute_component,
-            contribute_format
+            contribute_element,
+            get_element
         ]
     }
 }
-
