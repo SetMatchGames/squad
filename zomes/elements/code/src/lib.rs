@@ -29,12 +29,20 @@ struct ComponentType(String);
 #[derive(Serialize, Deserialize, Debug, DefaultJson)]
 enum SMGElement {
     Game {
+        name: String,
+        // TODO what is this? cmd is probably wrong, might be more general
+        // could be a URL, could be simple instructions?
+        // needs to be at least a game result validator...
         cmd: String,
         // TODO probably want more expressive component requirements specs
         required_component_types: Vec<ComponentType>,
         optional_component_types: Vec<ComponentType>,
     },
     Mode {
+        name: String,
+        // TODO what is this? cmd is probably wrong
+        // probably needs to have something of a function signature
+        // [GameResult] -> View... something, not sure
         cmd: String,
     },
     Component {
@@ -46,6 +54,13 @@ enum SMGElement {
         name: String,
         components: Vec<Address>,
     },
+}
+
+fn check_string(name: String, message: &str) -> Result<(), String> {
+    match name.len() {
+        0 => Err(String::from(message)),
+        _ => Ok(())
+    }
 }
 
 fn element_entry () -> ValidatingEntryType {
@@ -61,10 +76,31 @@ fn element_entry () -> ValidatingEntryType {
 
         validation: |element: SMGElement, _ctx: hdk::ValidationData| {
             match element {
-                SMGElement::Format{name: _, components} => {
+                SMGElement::Game{
+                    name,
+                    cmd,
+                    required_component_types: _,
+                    optional_component_types: _,
+                } => {
+                    check_string(name, "Empty game name")?;
+                    check_string(cmd, "Empty game cmd")
+                }
+
+                SMGElement::Mode{name, cmd} => {
+                    check_string(name, "Empty mode name")?;
+                    check_string(cmd, "Empty mode cmd")
+                }
+
+                SMGElement::Component{name, type_, data: _} => {
+                    check_string(name, "Empty component name")?;
+                    let ComponentType(type_name) = type_;
+                    check_string(type_name, "Empty component type")
+                }
+
+                SMGElement::Format{name, components} => {
+                    check_string(name, "Empty format name")?;
                     // TODO refactor this nested match iterator mess
                     // look for functional ways to handle this better
-
                     // not valid if any address is not a component
                     for address in components.iter() {
                         match hdk::get_entry(&address)? {
@@ -76,19 +112,18 @@ fn element_entry () -> ValidatingEntryType {
                                         data: _
                                     } => continue,
                                     _ => return Err(String::from(
-                                        "Non-component address found in componenets"
+                                        "Non-component component address"
                                     )),
                                 }
                             },
 
                             _ => return Err(String::from(
-                                "Non-component address found in components"
+                                "Component does not exist"
                             )),
                         }
                     }
                     Ok(())
-                },
-                _ => Ok(())
+                }
             }
         },
 
