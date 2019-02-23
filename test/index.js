@@ -9,7 +9,7 @@ const dna = Config.dna(dnaPath)
 const instanceAlice = Config.instance(agentAlice, dna)
 const scenario = new Scenario([instanceAlice])
 
-scenario.runTape("Alice can contribute valid elements", (t, { alice }) => {
+scenario.runTape("Alice can contribute and get valid elements", (t, { alice }) => {
   let componentAddresses = []
   let componentModeAddresses = []
 
