@@ -17,38 +17,31 @@ scenario.runTape("Alice can contribute and get valid elements", (t, { alice }) =
     // Games
     {
       element: {Game: {
-        name: "good shooter",
-        cmd: "shooter.exe",
-        required_component_types: ["gun", "ammo", "map"],
-        optional_component_types: ["class", "power-up"]
+        name: "Mock Valid Game",
+        runner: `{"Mock": {"run_count": 0, "run_args": []}}`
       }},
       valid: true
-    }, {
-      element: {Game: {
-        name: "cards",
-        cmd: "http://cards.com/cardgame",
-        required_component_types: [],
-        optional_component_types: []
-      }},
-      valid: true
-    }, {
-      element: {Game: {
-        name: "good shooter",
-        cmd: "",
-        required_component_types: ["gun", "ammo", "map"],
-        optional_component_types: ["class", "power-up"]
-      }},
-      valid: false,
-      error: "Empty game cmd"
     }, {
       element: {Game: {
         name: "",
-        cmd: "http://cards.com/cardgame",
-        required_component_types: [],
-        optional_component_types: []
+        runner: `{"Mock": {"run_count": 0, "run_args": []}}`
       }},
       valid: false,
       error: "Empty game name"
+    }, {
+      element: {Game: {
+        name: "Mock invalid runner game",
+        runner: `{"Invalid": {"run_count": 0, "run_args": []}}`
+      }},
+      valid: false,
+      error: "Invalid runner"
+    }, {
+      element: {Game: {
+        name: "Mock empty runner game",
+        runner: ""
+      }},
+      valid: false,
+      error: "Invalid runner"
     },
 
     // Modes
@@ -92,7 +85,10 @@ scenario.runTape("Alice can contribute and get valid elements", (t, { alice }) =
 
     // Formats
     {
-      element: {Format: {name: "Standard", components: componentAddresses}},
+      element: {Format: {
+        name: "Standard",
+        components: componentAddresses
+      }},
       valid: true
     }, {
       element: {Format: {
@@ -109,7 +105,10 @@ scenario.runTape("Alice can contribute and get valid elements", (t, { alice }) =
       valid: false,
       error: "Component does not exist"
     }, {
-      element: {Format: {name: "", components: componentAddresses}},
+      element: {Format: {
+        name: "",
+        components: componentAddresses
+      }},
       valid: false,
       error: "Empty format name"
     }
@@ -120,8 +119,9 @@ scenario.runTape("Alice can contribute and get valid elements", (t, { alice }) =
     const contributeResult = alice.call(
       "elements",
       "contribute_element",
-      {"element": c.element}
+      {element: c.element}
     )
+
     if (c.valid) {
       t.equal(contributeResult.Err, undefined)
       const getResult = alice.call(

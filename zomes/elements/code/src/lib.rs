@@ -11,10 +11,14 @@ extern crate holochain_core_types_derive;
 
 use std::convert::TryInto;
 
+use crate::Runner::{Mock, DNA};
+use crate::Element::{Game, Mode, Format, Component};
+
 use hdk::{
     entry_definition::ValidatingEntryType,
     error::ZomeApiResult,
     holochain_core_types::{
+        agent::AgentId,
         error::HolochainError,
         dna::entry_types::Sharing,
         json::JsonString,
@@ -27,33 +31,129 @@ use hdk::{
 struct ComponentType(String);
 
 #[derive(Serialize, Deserialize, Debug, DefaultJson)]
-enum SMGElement {
-    Game {
-        name: String,
-        // TODO what is this? cmd is probably wrong, might be more general
-        // could be a URL, could be simple instructions?
-        // needs to be at least a game result validator...
-        cmd: String,
-        // TODO probably want more expressive component requirements specs
-        required_component_types: Vec<ComponentType>,
-        optional_component_types: Vec<ComponentType>,
+enum GameOutcome {
+    // Outcome in which there is a single winner
+    Win {
+        winner_id: AgentId,
+        loser_ids: Vec<AgentId>,
     },
-    Mode {
-        name: String,
-        // TODO what is this? cmd is probably wrong
-        // probably needs to have something of a function signature
-        // [GameResult] -> View... something, not sure
-        cmd: String,
+
+    // Outcome of a game that sorts all players into 1st..N place
+    Sorting {
+        sorted_player_ids: Vec<AgentId>,
     },
-    Component {
-        name: String,
-        type_: ComponentType,
-        data: String,
+    // Outcome with no winner and no loser
+    Draw { player_ids: Vec<AgentId> },
+    // Outcome where some number of players have forfeited the game
+    Forfeit {
+        forfeited_player_ids: Vec<AgentId>,
+        other_player_ids: Vec<AgentId>,
     },
-    Format {
-        name: String,
-        components: Vec<Address>,
+    // Outcome where the game has been abandoned
+    Abandoned {
+        player_ids: Vec<AgentId>
     },
+}
+
+#[derive(Serialize, Deserialize, Debug, DefaultJson)]
+struct GameResult {
+    game: GameElem,
+    active_mode: ModeElem,
+    format: FormatElem,
+    outcome: GameOutcome,
+    // TODO consider start and end time
+}
+
+#[derive(Serialize, Deserialize, Debug, DefaultJson)]
+struct DNARunner {
+    dna_url: String,
+    ui_url: String,
+}
+
+impl DNARunner {
+    fn run(&self, format_address: String) -> GameResult {
+        unimplemented!()
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, DefaultJson)]
+struct MockRunner {
+    run_count: i32,
+    run_args: Vec<String>,
+}
+
+impl MockRunner {
+    fn run(&mut self, format_address: String) -> GameResult {
+        self.run_count += 1;
+        self.run_args.push(format_address);
+        return GameResult{
+            game: GameElem{
+                name: "Mock Game".to_string(),
+                runner: "MockRunner".to_string(),
+            },
+            active_mode: ModeElem{
+                name: "Mock Mode".to_string(),
+                cmd: "Mock cmd".to_string(),
+            },
+            format: FormatElem{
+                name: "Mock Format".to_string(),
+                components: vec![],
+            },
+            outcome: GameOutcome::Draw { player_ids: vec![] },
+        };
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, DefaultJson)]
+enum Runner {
+    Mock(MockRunner),
+    DNA(DNARunner),
+}
+
+impl Runner {
+    fn run(&mut self, format_address: String) -> GameResult {
+        match self {
+            Mock(r) => r.run(format_address),
+            DNA(r) => r.run(format_address),
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, DefaultJson)]
+struct GameElem {
+    name: String,
+    runner: String,
+}
+
+#[derive(Serialize, Deserialize, Debug, DefaultJson)]
+struct ModeElem {
+    name: String,
+    // TODO what is this? cmd is probably wrong
+    // probably needs to have something of a function signature
+    // [GameResult] -> View... something, not sure
+    // something like the game runner, maybe modes are Runners too
+    cmd: String,
+}
+
+#[derive(Serialize, Deserialize, Debug, DefaultJson)]
+struct ComponentElem {
+    name: String,
+    type_: ComponentType,
+    data: String,
+}
+
+#[derive(Serialize, Deserialize, Debug, DefaultJson)]
+struct FormatElem {
+    name: String,
+    components: Vec<Address>,
+}
+
+#[derive(Serialize, Deserialize, Debug, DefaultJson)]
+enum Element {
+    Game(GameElem),
+    Mode(ModeElem),
+    Component(ComponentElem),
+    Format(FormatElem),
 }
 
 fn check_string(name: String, message: &str) -> Result<(), String> {
@@ -65,39 +165,38 @@ fn check_string(name: String, message: &str) -> Result<(), String> {
 
 fn element_entry () -> ValidatingEntryType {
     entry! {
-        name: "SMGElement",
+        name: "Element",
         description: "Elements that make up the Set Match Games system",
         sharing: Sharing::Public,
-        native_type: SMGElement,
+        native_type: Element,
 
         validation_package: || {
             hdk::ValidationPackageDefinition::Entry
         },
 
-        validation: |element: SMGElement, _ctx: hdk::ValidationData| {
+        validation: |element: Element, _ctx: hdk::ValidationData| {
             match element {
-                SMGElement::Game{
-                    name,
-                    cmd,
-                    required_component_types: _,
-                    optional_component_types: _,
-                } => {
+                Game(GameElem{name, runner}) => {
                     check_string(name, "Empty game name")?;
-                    check_string(cmd, "Empty game cmd")
+                    let runner: Result<Runner, _> = serde_json::from_str(&*runner);
+                    if let Ok(_) = runner {
+                        return Ok(());
+                    }
+                    Err(String::from("Invalid runner"))
                 }
 
-                SMGElement::Mode{name, cmd} => {
+                Mode(ModeElem{name, cmd}) => {
                     check_string(name, "Empty mode name")?;
                     check_string(cmd, "Empty mode cmd")
                 }
 
-                SMGElement::Component{name, type_, data: _} => {
+                Component(ComponentElem{name, type_, data: _}) => {
                     check_string(name, "Empty component name")?;
                     let ComponentType(type_name) = type_;
                     check_string(type_name, "Empty component type")
                 }
 
-                SMGElement::Format{name, components} => {
+                Format(FormatElem{name, components}) => {
                     check_string(name, "Empty format name")?;
                     // TODO refactor this nested match iterator mess
                     // look for functional ways to handle this better
@@ -106,15 +205,15 @@ fn element_entry () -> ValidatingEntryType {
                         match hdk::get_entry(&address)? {
                             Some(Entry::App(_, api_result)) => {
                                 match api_result.try_into()? {
-                                    SMGElement::Component{
+                                    Component(ComponentElem{
                                         name: _,
                                         type_: _,
-                                        data: _
-                                    } => continue,
+                                        data: _,
+                                    }) => continue,
                                     _ => return Err(String::from(
                                         "Non-component component address"
                                     )),
-                                }
+                                };
                             },
 
                             _ => return Err(String::from(
@@ -131,9 +230,9 @@ fn element_entry () -> ValidatingEntryType {
     }
 }
 
-fn handle_contribute_element(element: SMGElement) -> ZomeApiResult<Address> {
+fn handle_contribute_element(element: Element) -> ZomeApiResult<Address> {
     hdk::debug(format!("contributing {:?} ", element))?;
-    let new_entry = Entry::App("SMGElement".into(), element.into());
+    let new_entry = Entry::App("Element".into(), element.into());
     let address = hdk::commit_entry(&new_entry)?;
 
     // TODO create a curved bond
@@ -143,7 +242,7 @@ fn handle_contribute_element(element: SMGElement) -> ZomeApiResult<Address> {
     Ok(address)
 }
 
-fn handle_get_element(address: Address) -> ZomeApiResult<SMGElement> {
+fn handle_get_element(address: Address) -> ZomeApiResult<Element> {
     match hdk::get_entry(&address) {
         Ok(Some(Entry::App(_, api_result))) => Ok(api_result.try_into()?),
         _ => Err(String::from("No element found").into())
@@ -159,13 +258,13 @@ define_zome! {
 
     functions: [
         contribute_element: {
-            inputs: |element: SMGElement|,
+            inputs: |element: Element|,
             outputs: |address: ZomeApiResult<Address>|,
             handler: handle_contribute_element
         }
         get_element: {
             inputs: |address: Address|,
-            outputs: |element: ZomeApiResult<SMGElement>|,
+            outputs: |element: ZomeApiResult<Element>|,
             handler: handle_get_element
         }
     ]
