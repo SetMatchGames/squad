@@ -103,7 +103,7 @@ scenario.runTape("Alice can contribute and get valid elements", (t, { alice }) =
         components: componentAddresses.concat(["not an address"])
       }},
       valid: false,
-      error: "Component does not exist"
+      error: "Invalid app entry address"
     }, {
       element: {Format: {
         name: "",

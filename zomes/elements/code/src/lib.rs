@@ -11,7 +11,7 @@ extern crate holochain_core_types_derive;
 
 mod elements;
 
-use elements::Element;
+use elements::{Element, valid_element};
 use hdk::{
     entry_definition::ValidatingEntryType,
     error::ZomeApiResult,
@@ -36,12 +36,7 @@ fn element_entry () -> ValidatingEntryType {
             hdk::ValidationPackageDefinition::Entry
         },
         validation: |element: Element, _ctx: hdk::ValidationData| {
-            match element {
-                Element::Game(game)           => game.valid(),
-                Element::Mode(mode)           => mode.valid(),
-                Element::Component(component) => component.valid(),
-                Element::Format(format)       => format.valid(),
-            }
+            valid_element(&element)
         },
         links: []
     }
