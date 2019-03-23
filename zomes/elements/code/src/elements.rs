@@ -1,5 +1,3 @@
-mod runners;
-
 use hdk::{
     entry_definition::ValidatingEntryType,
     error::ZomeApiResult,
@@ -12,7 +10,7 @@ use hdk::{
         entry::Entry,
     }
 };
-use runners::Runner;
+
 use std::convert::TryInto;
 
 fn non_empty_string(name: &String, message: &str) -> Result<(), String> {
@@ -26,15 +24,8 @@ fn non_empty_string(name: &String, message: &str) -> Result<(), String> {
 pub enum Element {
     Game{
         name: String,
-        runner: String,
-    },
-    Mode{
-        name: String,
-        // TODO what is this? cmd is probably wrong
-        // probably needs to have something of a function signature
-        // [GameResult] -> View... something, not sure
-        // something like the game runner, maybe modes are Runners too
-        cmd: String,
+        type_: String,
+        data: String,
     },
     Component{
         name: String,
@@ -47,24 +38,15 @@ pub enum Element {
     },
 }
 
-fn valid_game_fields(name: &String, runner: &String) -> Result<(), String> {
+fn valid_game_fields(name: &String, type_: &String) -> Result<(), String> {
     non_empty_string(name, "Empty game name")?;
-    let runner: Result<Runner, _> = serde_json::from_str(&*runner);
-    if let Ok(_) = runner {
-        return Ok(());
-    }
-    Err(String::from("Invalid runner"))
-}
-
-fn valid_mode_fields(name: &String, cmd: &String) -> Result<(), String> {
-    non_empty_string(name, "Empty mode name")?;
-    non_empty_string(cmd, "Empty mode cmd")
+    non_empty_string(type_, "Empty game type")
 }
 
 fn valid_component_fields(
     name: &String,
     type_: &String,
-    data: &String
+    _data: &String,
 ) -> Result<(), String> {
     non_empty_string(name, "Empty component name")?;
     non_empty_string(type_, "Empty component type")
@@ -101,13 +83,8 @@ fn valid_format_fields(
 
 pub fn valid_element(element: &Element) -> Result<(), String> {
     match element {
-        Element::Game{name, runner}           => valid_game_fields(&name, &runner),
-        Element::Mode{name, cmd}              => valid_mode_fields(&name, &cmd),
+        Element::Game{name, type_, data: _}   => valid_game_fields(&name, &type_),
         Element::Component{name, type_, data} => valid_component_fields(&name, &type_, &data),
         Element::Format{name, components}     => valid_format_fields(&name, &components),
     }
 }
-
-
-
-
