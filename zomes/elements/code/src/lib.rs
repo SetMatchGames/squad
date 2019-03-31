@@ -1,5 +1,6 @@
 #![feature(try_from)]
-
+extern crate serde;
+extern crate serde_json;
 #[macro_use]
 extern crate hdk;
 
@@ -16,7 +17,6 @@ use hdk::{
     entry_definition::ValidatingEntryType,
     error::ZomeApiResult,
     holochain_core_types::{
-        agent::AgentId,
         error::HolochainError,
         dna::entry_types::Sharing,
         json::JsonString,
@@ -82,9 +82,6 @@ define_zome! {
     ]
 
     traits: {
-        hc_public [
-            contribute_element,
-            get_element
-        ]
+        hc_public [contribute_element, get_element]
     }
 }

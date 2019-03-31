@@ -1,10 +1,6 @@
 use hdk::{
-    entry_definition::ValidatingEntryType,
-    error::ZomeApiResult,
     holochain_core_types::{
-        agent::AgentId,
         error::HolochainError,
-        dna::entry_types::Sharing,
         json::JsonString,
         cas::content::Address,
         entry::Entry,
@@ -12,6 +8,7 @@ use hdk::{
 };
 
 use std::convert::TryInto;
+use std::fmt;
 
 fn non_empty_string(name: &String, message: &str) -> Result<(), String> {
     match name.len() {

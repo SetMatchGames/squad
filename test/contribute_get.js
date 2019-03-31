@@ -1,11 +1,11 @@
 const { Config, Scenario } = require("@holochain/holochain-nodejs")
 Scenario.setTape(require("tape"))
 
-const dnaPath = "./dist/bundle.json"
+const dnaPath = "./dist/squad.dna.json"
 const agentAlice = Config.agent("alice")
 const dna = Config.dna(dnaPath)
 const instanceAlice = Config.instance(agentAlice, dna)
-const scenario = new Scenario([instanceAlice])
+const scenario = new Scenario([instanceAlice], {debugLog: true})
 
 const test_func = (t, { alice }) => {
   let componentAddresses = []
@@ -14,82 +14,82 @@ const test_func = (t, { alice }) => {
   const testCases = [
     // Games
     {
-      element: {Game: {
+      Game: {
         name: "Mock Valid Game",
         type_: "Mock",
         data: ""
-      }},
+      },
       valid: true
     }, {
-      element: {Game: {
+      Game: {
         name: "",
         type_: "Mock",
         data: ""
-      }},
+      },
       valid: false,
       error: "Empty game name"
     }, {
-      element: {Game: {
+      Game: {
         name: "Mock empty runner game",
         type_: "",
         data: ""
-      }},
+      },
       valid: false,
       error: "Empty game type"
     },
 
     // Components
     {
-      element: {Component: {
+      Component: {
         name: "Rock",
         type_: "roshambo",
         data: "<Paper, >Scissors"
-      }},
+      },
       valid: true
     }, {
-      element: {Component: {
+      Component: {
         name: "",
         type_: "roshambo",
         data: "<Paper, >Scissors"
-      }},
+      },
       valid: false,
       error: "Empty component name"
     }, {
-      element: {Component: {
+      Component: {
         name: "Rock",
         type_: "",
         data: "<Paper, >Scissors"
-      }},
+      },
       valid: false,
       error: "Empty component type"
     },
 
     // Formats
     {
-      element: {Format: {
+      Format: {
         name: "Standard",
         components: componentAddresses
-      }},
+      },
       valid: true
     }, {
-      element: {Format: {
+      Format: {
         name: "Standard+Game",
         components: componentGameAddresses
-      }},
+      },
       valid: false,
       error: "Non-component component address"
     }, {
-      element: {Format: {
+      Format: {
         name: "Standard",
         components: componentAddresses.concat(["not an address"])
-      }},
+      },
       valid: false,
       error: "Invalid app entry address"
     }, {
-      element: {Format: {
+      Format: {
         name: "",
         components: componentAddresses
-      }},
+      },
       valid: false,
       error: "Empty format name"
     }
@@ -102,6 +102,7 @@ const test_func = (t, { alice }) => {
       "contribute_element",
       {element: c.element}
     )
+    console.log(contributeResult)
 
     if (c.valid) {
       t.equal(contributeResult.Err, undefined)
