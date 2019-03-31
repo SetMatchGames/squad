@@ -5,34 +5,41 @@ const dnaPath = "./dist/squad.dna.json"
 const agentAlice = Config.agent("alice")
 const dna = Config.dna(dnaPath)
 const instanceAlice = Config.instance(agentAlice, dna)
-const scenario = new Scenario([instanceAlice], {debugLog: true})
+const debug = false
+const scenario = new Scenario([instanceAlice], {debugLog: debug})
 
-const test_func = (t, { alice }) => {
+const test_func = async (t, { alice }) => {
   let componentAddresses = []
   let componentGameAddresses = []
 
   const testCases = [
     // Games
     {
-      Game: {
-        name: "Mock Valid Game",
-        type_: "Mock",
-        data: ""
+      element: {
+        Game: {
+          name: "Mock Valid Game",
+          type_: "Mock",
+          data: ""
+        }
       },
       valid: true
     }, {
-      Game: {
-        name: "",
-        type_: "Mock",
-        data: ""
+      element: {
+        Game: {
+          name: "",
+          type_: "Mock",
+          data: ""
+        }
       },
       valid: false,
       error: "Empty game name"
     }, {
-      Game: {
-        name: "Mock empty runner game",
-        type_: "",
-        data: ""
+      element: {
+        Game: {
+          name: "Mock empty runner game",
+          type_: "",
+          data: ""
+        }
       },
       valid: false,
       error: "Empty game type"
@@ -40,25 +47,31 @@ const test_func = (t, { alice }) => {
 
     // Components
     {
-      Component: {
-        name: "Rock",
-        type_: "roshambo",
-        data: "<Paper, >Scissors"
+      element: {
+        Component: {
+          name: "Rock",
+          type_: "roshambo",
+          data: "<Paper, >Scissors"
+        }
       },
       valid: true
     }, {
-      Component: {
-        name: "",
-        type_: "roshambo",
-        data: "<Paper, >Scissors"
+      element: {
+        Component: {
+          name: "",
+          type_: "roshambo",
+          data: "<Paper, >Scissors"
+        }
       },
       valid: false,
       error: "Empty component name"
     }, {
-      Component: {
-        name: "Rock",
-        type_: "",
-        data: "<Paper, >Scissors"
+      element: {
+        Component: {
+          name: "Rock",
+          type_: "",
+          data: "<Paper, >Scissors"
+        }
       },
       valid: false,
       error: "Empty component type"
@@ -66,29 +79,37 @@ const test_func = (t, { alice }) => {
 
     // Formats
     {
-      Format: {
-        name: "Standard",
-        components: componentAddresses
+      element: {
+        Format: {
+          name: "Standard",
+          components: componentAddresses
+        }
       },
       valid: true
     }, {
-      Format: {
-        name: "Standard+Game",
-        components: componentGameAddresses
+      element: {
+        Format: {
+          name: "Standard+Game",
+          components: componentGameAddresses
+        }
       },
       valid: false,
       error: "Non-component component address"
     }, {
-      Format: {
-        name: "Standard",
-        components: componentAddresses.concat(["not an address"])
+      element: {
+        Format: {
+          name: "Standard",
+          components: componentAddresses.concat(["not an address"])
+        }
       },
       valid: false,
       error: "Invalid app entry address"
     }, {
-      Format: {
-        name: "",
-        components: componentAddresses
+      element: {
+        Format: {
+          name: "",
+          components: componentAddresses
+        }
       },
       valid: false,
       error: "Empty format name"
@@ -102,10 +123,9 @@ const test_func = (t, { alice }) => {
       "contribute_element",
       {element: c.element}
     )
-    console.log(contributeResult)
 
     if (c.valid) {
-      t.equal(contributeResult.Err, undefined)
+      t.notEqual(contributeResult.Ok, undefined)
       const getResult = alice.call(
         "elements",
         "get_element",
