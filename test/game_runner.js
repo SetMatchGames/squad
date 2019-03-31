@@ -3,7 +3,7 @@ let ui = require("./ui.js")
 
 Scenario.setTape(require("tape"))
 
-const dnaPath = "./dist/bundle.json"
+const dnaPath = "./dist/squad.dna.json"
 const agentAlice = Config.agent("alice")
 const dna = Config.dna(dnaPath)
 const instanceAlice = Config.instance(agentAlice, dna)
