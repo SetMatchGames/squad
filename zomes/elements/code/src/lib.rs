@@ -31,19 +31,26 @@ fn element_entry () -> ValidatingEntryType {
         name: "Element",
         description: "Elements that make up the Set Match Games system",
         sharing: Sharing::Public,
-        native_type: Element,
+
         validation_package: || {
             hdk::ValidationPackageDefinition::Entry
         },
-        validation: |element: Element, _ctx: hdk::ValidationData| {
+
+        validation: |validation_data: hdk::EntryValidationData<Element>| {
+            let element = match validation_data {
+                hdk::EntryValidationData::Create{
+                    entry,
+                    validation_data: _
+                } => entry,
+                _ => return Err("Cannot modify or delete Elements".to_string())
+            };
             valid_element(&element)
-        },
-        links: []
+        }
     }
 }
 
 fn handle_contribute_element(element: Element) -> ZomeApiResult<Address> {
-    hdk::debug(format!("contributing {:?} ", element))?;
+    hdk::debug(format!("handle_contribute_element({:?})", element))?;
     let new_entry = Entry::App("Element".into(), element.into());
     let address = hdk::commit_entry(&new_entry)?;
 

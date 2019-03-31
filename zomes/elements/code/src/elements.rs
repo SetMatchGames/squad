@@ -8,7 +8,6 @@ use hdk::{
 };
 
 use std::convert::TryInto;
-use std::fmt;
 
 fn non_empty_string(name: &String, message: &str) -> Result<(), String> {
     match name.len() {
@@ -17,7 +16,7 @@ fn non_empty_string(name: &String, message: &str) -> Result<(), String> {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, DefaultJson)]
+#[derive(Serialize, Deserialize, Debug, DefaultJson, Clone)]
 pub enum Element {
     Game{
         name: String,
