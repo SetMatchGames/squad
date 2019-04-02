@@ -12,7 +12,7 @@ const runGame = (agent, gameAddress, formatAddress) => {
     throw result
   }
   const runner = runners[result.Ok.Game.type_]
-  runner(formatAddress, result.Ok.Game.data)
+  return runner(agent, formatAddress, result.Ok.Game.data)
 }
 
 module.exports = {

@@ -11,14 +11,34 @@ const scenario = new Scenario([instanceAlice])
 
 const mockRunnerCalls = []
 
-const mockRunner = (format, data) => {
-  mockRunnerCalls.push([format, data])
+const baseMockRunner = (agent, formatAddress, data, calls) => {
+  // register the call
+  calls.push([agent, formatAddress, data])
+
+  // show that this game can get the components from the  format
+  const format = agent.call(
+    "elements",
+    "get_element",
+    {address: formatAddress}
+  ).Ok.Format
+  const components = format.components.map(c => {
+    return agent.call("elements", "get_element", {address: c}).Ok
+  })
+  return {
+    formatName: format.name,
+    agentAddress: agent.agentId,
+    components: components
+  }
+}
+
+const mockRunner = (agent, format, data) => {
+  return baseMockRunner(agent, format, data, mockRunnerCalls)
 }
 
 const testRunnerCalls = []
 
-const testRunner = (format, data) => {
-  testRunnerCalls.push([format, data])
+const testRunner = (agent, format, data) => {
+  return baseMockRunner(agent, format, data, testRunnerCalls)
 }
 
 squad.registerRunner("Mock", mockRunner)
@@ -33,7 +53,7 @@ const test_func = async (t, { alice }) => {
       Game: {
         name: "Mock Valid Game",
         type_: "Mock",
-        data: "mock data"
+        data: "mock game data"
       }
     }}
   ).Ok
@@ -50,16 +70,17 @@ const test_func = async (t, { alice }) => {
     }}
   ).Ok
 
-  const componentAddress = alice.call(
-    "elements",
-    "contribute_element",
-    {element: {
+  const component = {
       Component: {
         name: "Mock component",
         type_: "mock",
         data: `{"some": "data"}`
       }
-    }}
+  }
+  const componentAddress = alice.call(
+    "elements",
+    "contribute_element",
+    {element: component}
   ).Ok
 
   const formatAddress = alice.call(
@@ -78,18 +99,30 @@ const test_func = async (t, { alice }) => {
       gameAddress: mockAddress,
       calls: mockRunnerCalls,
       formatAddress: formatAddress,
-      data: "mock data"
+      gameData: "mock game data"
     }, {
       gameAddress: testAddress,
       calls: testRunnerCalls,
       formatAddress: formatAddress,
-      data: "test data"
+      gameData: "test data"
     }
   ]
 
   testCases.forEach(c => {
-    squad.runGame(alice, c.gameAddress, c.formatAddress)
-    t.deepEqual(c.calls.pop(), [c.formatAddress, c.data])
+    const {
+      formatName,
+      agentAddress,
+      components
+    } = squad.runGame(alice, c.gameAddress, c.formatAddress)
+
+    // confirm that the right runner was called with the right stuff
+    t.deepEqual(c.calls.pop(), [alice, c.formatAddress, c.gameData])
+
+    // confirm that the game was able to get the format and agent
+    // NOTE we used the same format for both runs so check for that every time
+    t.equal(formatName, "Mock Format")
+    t.equal(agentAddress, alice.agentId)
+    t.deepEqual(components, [component])
   })
 }
 
