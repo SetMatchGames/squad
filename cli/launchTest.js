@@ -4,17 +4,15 @@ let WebSocket = require('rpc-websockets').Client
 // instantiate Client and connect to an RPC server
 let holochainUri = 'ws://localhost:8888'
 let ws = new WebSocket(holochainUri)
+
+const runScriptURI = "https://raw.githubusercontent.com/setmatchgames/squad/app_spec/run_and_install.sh"
 const roshambo = {
     "Game": {
         "name": "Roshambo",
         "type_": "linux-bash-game-v0",
         "data": JSON.stringify({
-            "cmd": "git",
-            "options": [
-                "clone",
-                "https://github.com/SetMatchGames/smg-proof-of-concept.git"
-            ],
-            "folder": "smg-proof-of-concept"
+            "cmd": `curl ${runScriptURI} | sh`,
+            "options": []
         })
     }
 }
@@ -33,10 +31,13 @@ ws.on('open', async () => {
       "zome": "elements",
       "function": "contribute_element",
       "params": {
-        "element": roshambo,
+        "element": roshambo
       }
   }
-  const roshamboAddress = JSON.parse(await ws.call(method, params).catch(console.log)).Ok
+  const roshamboAddress = JSON.parse(await ws.call(
+    method,
+    params
+  ).catch(console.log)).Ok
 
   // try running the game
   squad.runGame(ws, instanceId, roshamboAddress, "formatAddress", agentId)
