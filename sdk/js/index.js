@@ -1,27 +1,43 @@
-const { spawn } = require('child_process');
+const { spawn } = require('child_process')
+const fs = require('fs')
+const process = require('process')
 
 const runners = {
   "linux-bash-game-v0": async (agentId, formatAddress, gameData) => {
     // presume we are running a node linux bash squad client
     // start a process identified in the game data
 
-    // get the format from holochain 
+    // get the format from holochain
     const format = [formatAddress]
-    // pass the format into a new child process that takes in the format and starts the game (Formats not being passed yet)
-    const download = await spawn(gameData.cmd, gameData.options)
-    download.on('close', async () => {
-      const permissions = await spawn('chmod', ['u+x', `./${gameData.folder}/squad_launcher.sh`])
-      permissions.on('close', async () => {
-        const game = await spawn(`./${gameData.folder}/squad_launcher.sh`)
-        game.stdout.on('data', (data) => {
-          console.log(`game output: ${data}`)
-        })
-        game.on('close', (data) => {
-          console.log(`game output: ${data}`)
-        })
-      })
+    // pass the format into a new child process that takes in the format and
+    // starts the game (Formats not being passed yet)
+
+    // TODO resolve the format and all components in the format
+    const components = '[{"fake": "component"}]'
+
+    // save those components to a file
+    const componentsPath = __dirname + "squad_components.json"
+    fs.writeFile(componentsPath, components, e => {
+      if (e) {
+        console.log(`could not write components to ${componentsPath}`)
+        throw e
+      }
     })
+
+    // pass that file location to the game process through an environment
+    // variable (in future versions this method of passing component data could
+    // get more sophistocated, perhaps with macros in the command for passing as
+    // command line arguments)
+    const componentsPathEnvar = "SQUAD_COMPONENTS_PATH"
+    process.env[componentsPathEnvar] = componentsPath
+
+    const game = await spawn(
+      gameData.cmd,
+      gameData.options,
+      {shell: true, stdio: "inherit"},
+    )
   },
+
   "web-game-v0": (agent, formatAddress, gameData) => {
     if (!window) {
       console.log("web-game-v0 needs to launch from web squad")
