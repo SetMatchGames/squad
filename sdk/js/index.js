@@ -1,8 +1,26 @@
+const { spawn } = require('child_process');
+
 const runners = {
-  "linux-bash-game-v0": (agent, formatAddress, gameData) => {
+  "linux-bash-game-v0": async (agentId, formatAddress, gameData) => {
     // presume we are running a node linux bash squad client
     // start a process identified in the game data
-    
+
+    // get the format from holochain 
+    const format = [formatAddress]
+    // pass the format into a new child process that takes in the format and starts the game (Formats not being passed yet)
+    const download = await spawn(gameData.cmd, gameData.options)
+    download.on('close', async () => {
+      const permissions = await spawn('chmod', ['u+x', `./${gameData.folder}/squad_launcher.sh`])
+      permissions.on('close', async () => {
+        const game = await spawn(`./${gameData.folder}/squad_launcher.sh`)
+        game.stdout.on('data', (data) => {
+          console.log(`game output: ${data}`)
+        })
+        game.on('close', (data) => {
+          console.log(`game output: ${data}`)
+        })
+      })
+    })
   },
   "web-game-v0": (agent, formatAddress, gameData) => {
     if (!window) {
@@ -30,8 +48,16 @@ const registerRunner = (type_, runner) => {
   runners[type_] = runner
 }
 
-const runGame = (agent, gameAddress, formatAddress) => {
-  const result = agent.call("elements", "get_element", {address: gameAddress})
+const runGame = async (websocket, instanceId, gameAddress, formatAddress, agentId) => {
+  let params = {
+    "instance_id": instanceId,
+    "zome": "elements",
+    "function": "get_element",
+    "params": {
+      "address": gameAddress,
+    }
+  }
+  const result = JSON.parse(await websocket.call('call', params))
   // TODO add a test case for when there is an error, like incorrect address
   if (result.Ok === undefined) {
     console.log(result)
@@ -44,7 +70,7 @@ const runGame = (agent, gameAddress, formatAddress) => {
   // very large?
   // - no, game contributors have the ability to factor address game
   // data however they want but they don't have that ability with formats
-  return runner(agent, formatAddress, result.Ok.Game.data)
+  return runner(agentId, formatAddress, JSON.parse(result.Ok.Game.data))
 }
 
 module.exports = {
