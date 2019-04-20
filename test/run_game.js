@@ -12,23 +12,7 @@ const scenario = new Scenario([instanceAlice])
 const mockRunnerCalls = []
 
 const baseMockRunner = (agent, formatAddress, data, calls) => {
-  // register the call
   calls.push([agent, formatAddress, data])
-
-  // show that this game can get the components from the  format
-  const format = agent.call(
-    "elements",
-    "get_element",
-    {address: formatAddress}
-  ).Ok.Format
-  const components = format.components.map(c => {
-    return agent.call("elements", "get_element", {address: c}).Ok
-  })
-  return {
-    formatName: format.name,
-    agentAddress: agent.agentId,
-    components: components
-  }
 }
 
 const mockRunner = (agent, format, data) => {
@@ -41,93 +25,95 @@ const testRunner = (agent, format, data) => {
   return baseMockRunner(agent, format, data, testRunnerCalls)
 }
 
-squad.registerRunner("Mock", mockRunner)
-squad.registerRunner("Test", testRunner)
-
-const test_func = async (t, { alice }) => {
-
-  const mockAddress = alice.call(
-    "elements",
-    "contribute_element",
-    {element: {
+const mockGames = {
+  mockGameAddress: {
+    Ok: {
       Game: {
         name: "Mock Valid Game",
         type_: "Mock",
         data: "mock game data"
       }
-    }}
-  ).Ok
-
-  const testAddress = alice.call(
-    "elements",
-    "contribute_element",
-    {element: {
+    }
+  },
+  testGameAddress: {
+    Ok: {
       Game: {
         name: "Test Valid Game",
         type_: "Test",
         data: "test data"
       }
-    }}
-  ).Ok
-
-  const component = {
-      Component: {
-        name: "Mock component",
-        type_: "mock",
-        data: `{"some": "data"}`
-      }
+    }
   }
-  const componentAddress = alice.call(
-    "elements",
-    "contribute_element",
-    {element: component}
-  ).Ok
+}
 
-  const formatAddress = alice.call(
-    "elements",
-    "contribute_element",
-    {element: {
-      Format: {
-        name: "Mock Format",
-        components: [componentAddress]
+const mockConductor = (validateCall) => {
+  return {
+    on: (_, f) => f(),
+    call: (method, params) => {
+      if (method === "info/instances") {
+        return [{id: "mockInstanceId", agent: "mockAgent"}]
       }
-    }}
-  ).Ok
+      validateCall(method, params)
+      return new Promise((resolve, reject) => {
+        resolve(JSON.stringify(mockGames[params.params.address]))
+      })
+    }
+  }
+}
+
+squad.registerRunner("Mock", mockRunner)
+squad.registerRunner("Test", testRunner)
+
+// TODO this doesn't need holochain's test harness anymore
+//      we are mocking the holochain connection
+const test_func = async (t, { alice }) => {
 
   const testCases = [
     {
-      gameAddress: mockAddress,
+      gameAddress: "mockGameAddress",
       calls: mockRunnerCalls,
-      formatAddress: formatAddress,
+      formatAddress: "mockFormatAddress",
       gameData: "mock game data"
     }, {
-      gameAddress: testAddress,
+      gameAddress: "testGameAddress",
       calls: testRunnerCalls,
-      formatAddress: formatAddress,
+      formatAddress: "mockFormatAddress",
       gameData: "test data"
     }
   ]
 
-  testCases.forEach(c => {
-    const {
-      formatName,
-      agentAddress,
-      components
-    } = squad.runGame(alice, c.gameAddress, c.formatAddress)
+  const checkTestCase = async c => {
+
+    // register a mock connection that will test the correct
+    // call values when called
+    squad.mockConnection(mockConductor((method, params) => {
+      t.equal(method, 'call', "connection call method")
+      t.deepEqual(params, {
+        instance_id: 'mockInstanceId',
+        zome: 'elements',
+        function: 'get_element',
+        params: {
+          address: c.gameAddress
+        }
+      }, "connection call params")
+    }))
+
+    await squad.runGame(c.gameAddress, c.formatAddress)
 
     // confirm that the right runner was called with the right stuff
-    t.deepEqual(c.calls.pop(), [alice, c.formatAddress, c.gameData])
+    t.deepEqual(
+      c.calls.pop(),
+      ["mockAgent", c.formatAddress, c.gameData],
+      "runner call",
+    )
+  }
 
-    // confirm that the game was able to get the format and agent
-    // NOTE we used the same format for both runs so check for that every time
-    t.equal(formatName, "Mock Format")
-    t.equal(agentAddress, alice.agentId)
-    t.deepEqual(components, [component])
-  })
+  await checkTestCase(testCases[0])
+  await checkTestCase(testCases[1])
 }
 
 module.exports = {
   scenario: scenario,
-  descripion: "Alice can contribute and get valid elements",
+  descripion: "runGame runs the right game with the right data",
   func: test_func
 }
