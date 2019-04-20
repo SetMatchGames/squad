@@ -1,6 +1,8 @@
 const { spawn } = require('child_process')
 const fs = require('fs')
 const process = require('process')
+const WebSocket = require('rpc-websockets').Client
+const path = require('path')
 
 const runners = {
   "linux-bash-game-v0": async (agentId, formatAddress, gameData) => {
@@ -16,7 +18,7 @@ const runners = {
     const components = '[{"fake": "component"}]'
 
     // save those components to a file
-    const componentsPath = __dirname + "squad_components.json"
+    const componentsPath = path.resolve(__dirname, "squad_components.json")
     fs.writeFile(componentsPath, components, e => {
       if (e) {
         console.log(`could not write components to ${componentsPath}`)
@@ -31,9 +33,10 @@ const runners = {
     const componentsPathEnvar = "SQUAD_COMPONENTS_PATH"
     process.env[componentsPathEnvar] = componentsPath
 
-    const game = await spawn(
-      gameData.cmd,
-      gameData.options,
+    const game = JSON.parse(gameData)
+    await spawn(
+      game.cmd,
+      game.options,
       {shell: true, stdio: "inherit"},
     )
   },
@@ -64,29 +67,43 @@ const registerRunner = (type_, runner) => {
   runners[type_] = runner
 }
 
-const runGame = async (websocket, instanceId, gameAddress, formatAddress, agentId) => {
-  let params = {
-    "instance_id": instanceId,
-    "zome": "elements",
-    "function": "get_element",
-    "params": {
-      "address": gameAddress,
-    }
-  }
-  const result = JSON.parse(await websocket.call('call', params))
-  // TODO add a test case for when there is an error, like incorrect address
-  if (result.Ok === undefined) {
-    console.log(result)
-    throw result
-  }
-  const runner = runners[result.Ok.Game.type_]
+const runGame = async (
+  holochainUri,
+  gameAddress,
+  formatAddress,
+) => {
 
-  // Runners unpack the format and present it to the game in a consistent way
-  // should this be done with the game data as well? what if the game data is
-  // very large?
-  // - no, game contributors have the ability to factor address game
-  // data however they want but they don't have that ability with formats
-  return runner(agentId, formatAddress, JSON.parse(result.Ok.Game.data))
+  // TODO handle the case that a REST holochain uri is passed in
+  const ws = new WebSocket(holochainUri)
+  ws.on('open', async () => {
+    const info = await ws.call('info/instances', {})
+    const instanceId = info[0].id
+    const agentId = info[0].agent
+
+    const params = {
+      "instance_id": instanceId,
+      "zome": "elements",
+      "function": "get_element",
+      "params": {
+        "address": gameAddress
+      }
+    }
+
+    const result = JSON.parse(await ws.call('call', params))
+    // TODO add a test case for when there is an error, like incorrect address
+    if (result.Ok === undefined) {
+      console.log(result)
+      throw result
+    }
+    const runner = runners[result.Ok.Game.type_]
+
+    // Runners unpack the format and present it to the game in a consistent way
+    // should this be done with the game data as well? what if the game data is
+    // very large?
+    // - no, game contributors have the ability to factor address game
+    // data however they want but they don't have that ability with formats
+    return runner(agentId, formatAddress, result.Ok.Game.data)
+  })
 }
 
 module.exports = {
