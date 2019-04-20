@@ -4,6 +4,8 @@ const process = require('process')
 const WebSocket = require('rpc-websockets').Client
 const path = require('path')
 
+const squad = {}
+
 const runners = {
   "linux-bash-game-v0": async (agentId, formatAddress, gameData) => {
     // presume we are running a node linux bash squad client
@@ -68,15 +70,13 @@ const registerRunner = (type_, runner) => {
 }
 
 const runGame = async (
-  holochainUri,
   gameAddress,
   formatAddress,
 ) => {
 
   // TODO handle the case that a REST holochain uri is passed in
-  const ws = new WebSocket(holochainUri)
-  ws.on('open', async () => {
-    const info = await ws.call('info/instances', {})
+  await squad.connection.on('open', async () => {
+    const info = await squad.connection.call('info/instances', {})
     const instanceId = info[0].id
     const agentId = info[0].agent
 
@@ -89,13 +89,14 @@ const runGame = async (
       }
     }
 
-    const result = JSON.parse(await ws.call('call', params))
+    const result = JSON.parse(await squad.connection.call('call', params))
     // TODO add a test case for when there is an error, like incorrect address
     if (result.Ok === undefined) {
       console.log(result)
       throw result
     }
     const runner = runners[result.Ok.Game.type_]
+
 
     // Runners unpack the format and present it to the game in a consistent way
     // should this be done with the game data as well? what if the game data is
@@ -106,7 +107,17 @@ const runGame = async (
   })
 }
 
+const webSocketConnection = (uri) => {
+  squad.connection = new WebSocket(uri)
+}
+
+const mockConnection = (mock) => {
+  squad.connection = mock
+}
+
 module.exports = {
+  webSocketConnection,
+  mockConnection,
   runGame,
   registerRunner
 }

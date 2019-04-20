@@ -123,7 +123,6 @@ const test_func = async (t, { alice }) => {
       "contribute_element",
       {element: c.element}
     )
-
     if (c.valid) {
       t.notEqual(contributeResult.Ok, undefined)
       const getResult = alice.call(
