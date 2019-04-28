@@ -13,7 +13,8 @@ const componentsArray = jsonfile.readFileSync(
 // Format the components in a more convinient way
 const components = {}
 componentsArray.forEach(c => {
-  components[c.name] = c
+  components[c.Component.name] = c.Component
+  components[c.Component.name].data = JSON.parse(c.Component.data)
 })
 
 const q = readlineSync.question
@@ -46,16 +47,16 @@ const findWinner = ([p1Name, p1], [p2Name, p2]) => {
   console.log(p1Name, p1, p2Name, p2)
   // Check all the options of which choice wins and loses against the other
   // choice
-  if (p1.rules.winsAgainst.includes(p2.choice)) {
+  if (p1.data.winsAgainst.includes(p2.name)) {
     return p1Name
   }
-  if (p2.rules.winsAgainst.includes(p1.choice)) {
+  if (p2.data.winsAgainst.includes(p1.name)) {
     return p2Name
   }
-  if (p1.rules.losesAgainst.includes(p2.choice)) {
+  if (p1.data.losesAgainst.includes(p2.name)) {
     return p2Name
   }
-  if (p2.rules.losesAgainst.includes(p1.choice)) {
+  if (p2.data.losesAgainst.includes(p1.name)) {
     return p1Name
   }
 
@@ -88,19 +89,16 @@ const actions = {
       // they answered yes (or default)
       const myMove = q("Choose a component: ")
       // TODO make this aware of the format, validate that the move is in the format
-      const acceptMessage = makeAcceptMessage(components[myMove])
+      const acceptMessage = makeAcceptMessage(message.firstMove, components[myMove])
       connection.write(acceptMessage)
-      // the game is done, display the results
-      const yourMove = acceptMessage.secondMove
-      const theirMove = acceptMessage.firstMove
-      console.log(gameResult(yourMove, theirMove))
+      // the game is done, display the result
+      console.log(gameResult(message.firstMove, components[myMove]))
     }
   },
   accept: (connection, acceptMessage) => {
     // someone has accepted our offer, the game is done, let's see is the result
     const yourMove = acceptMessage.firstMove
     const theirMove = acceptMessage.secondMove
-    console.log(acceptMessage)
     console.log(gameResult(yourMove, theirMove))
   }
 }
