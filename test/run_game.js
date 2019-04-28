@@ -11,18 +11,18 @@ const scenario = new Scenario([instanceAlice])
 
 const mockRunnerCalls = []
 
-const baseMockRunner = (agent, formatAddress, data, calls) => {
-  calls.push([agent, formatAddress, data])
+const baseMockRunner = (formatAddress, data, calls) => {
+  calls.push([formatAddress, data])
 }
 
-const mockRunner = (agent, format, data) => {
-  return baseMockRunner(agent, format, data, mockRunnerCalls)
+const mockRunner = (format, data) => {
+  return baseMockRunner(format, data, mockRunnerCalls)
 }
 
 const testRunnerCalls = []
 
-const testRunner = (agent, format, data) => {
-  return baseMockRunner(agent, format, data, testRunnerCalls)
+const testRunner = (format, data) => {
+  return baseMockRunner(format, data, testRunnerCalls)
 }
 
 const mockGames = {
@@ -103,7 +103,7 @@ const test_func = async (t, { alice }) => {
     // confirm that the right runner was called with the right stuff
     t.deepEqual(
       c.calls.pop(),
-      ["mockAgent", c.formatAddress, c.gameData],
+      [c.formatAddress, c.gameData],
       "runner call",
     )
   }
