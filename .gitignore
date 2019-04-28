@@ -5,3 +5,4 @@ target/
 bundle.json
 
 *secret*
+squad_components.json

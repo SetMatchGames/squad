@@ -6,22 +6,46 @@ const path = require('path')
 
 const squad = {}
 
+const getElement = async (address) => {
+  const info = await squad.connection.call('info/instances', {})
+  const instanceId = info[0].id
+  const agentId = info[0].agent
+
+  const params = {
+    "instance_id": instanceId,
+    "zome": "elements",
+    "function": "get_element",
+    "params": {
+      "address": address
+    }
+  }
+
+  const result = JSON.parse(await squad.connection.call('call', params))
+  // TODO add a test case for when there is an error, like incorrect address
+  if (result.Ok === undefined) {
+    console.log(result)
+    throw result
+  }
+  return result.Ok
+}
+
 const runners = {
-  "linux-bash-game-v0": async (agentId, formatAddress, gameData) => {
+  "linux-bash-game-v0": async (formatAddress, gameData) => {
+    console.log(formatAddress, gameData)
     // presume we are running a node linux bash squad client
     // start a process identified in the game data
 
     // get the format from holochain
-    const format = [formatAddress]
-    // pass the format into a new child process that takes in the format and
-    // starts the game (Formats not being passed yet)
-
-    // TODO resolve the format and all components in the format
-    const components = '[{"fake": "component"}]'
+    const format = (await getElement(formatAddress)).Format
+    const components = await Promise.all(
+      format.components.map(a => {
+        return getElement(a)
+      })
+    )
 
     // save those components to a file
     const componentsPath = path.resolve(__dirname, "squad_components.json")
-    fs.writeFile(componentsPath, components, e => {
+    fs.writeFile(componentsPath, JSON.stringify(components), e => {
       if (e) {
         console.log(`could not write components to ${componentsPath}`)
         throw e
@@ -43,25 +67,8 @@ const runners = {
     )
   },
 
-  "web-game-v0": (agent, formatAddress, gameData) => {
-    if (!window) {
-      console.log("web-game-v0 needs to launch from web squad")
-      return
-    }
-    // web-game-v0 requires a url for where the game is
-    // TODO how do we document (or self document) the game data
-    // requirements for the different game types
-    // Consider adding macros for formatAddress, agent.id, agent addr
-    // etc. This would allow us to create a large number of options
-    // for passing context to the web game
-    let gameURL = new URL(gameData.__webGameV0.gameURL)
-    gameURL.searchParams.append("squad-web-game-v0-format", formatAddress)
-    gameURL.searchParams.append("squad-web-game-v0-agent-nick", agent.id)
-    gameURL.searchParams.append(
-      "squad-web-game-v0-agent-addr",
-      agent.agentId,
-    )
-    window.open(gameURL, "_blank")
+  "web-game-v0": (formatAddress, gameData) => {
+    throw "web-game-v0 not implemented"
   }
 }
 
@@ -73,38 +80,11 @@ const runGame = async (
   gameAddress,
   formatAddress,
 ) => {
-
   // TODO handle the case that a REST holochain uri is passed in
-  await squad.connection.on('open', async () => {
-    const info = await squad.connection.call('info/instances', {})
-    const instanceId = info[0].id
-    const agentId = info[0].agent
-
-    const params = {
-      "instance_id": instanceId,
-      "zome": "elements",
-      "function": "get_element",
-      "params": {
-        "address": gameAddress
-      }
-    }
-
-    const result = JSON.parse(await squad.connection.call('call', params))
-    // TODO add a test case for when there is an error, like incorrect address
-    if (result.Ok === undefined) {
-      console.log(result)
-      throw result
-    }
-    const runner = runners[result.Ok.Game.type_]
-
-
-    // Runners unpack the format and present it to the game in a consistent way
-    // should this be done with the game data as well? what if the game data is
-    // very large?
-    // - no, game contributors have the ability to factor address game
-    // data however they want but they don't have that ability with formats
-    return runner(agentId, formatAddress, result.Ok.Game.data)
-  })
+  console.log("squad.runGame", gameAddress, formatAddress)
+  const game = (await getElement(gameAddress)).Game
+  const runner = runners[game.type_]
+  return runner(formatAddress, game.data)
 }
 
 const webSocketConnection = (uri) => {
@@ -115,9 +95,19 @@ const mockConnection = (mock) => {
   squad.connection = mock
 }
 
+const on = (message, f) => {
+  return squad.connection.on(message, f)
+}
+
+const call = (method, data) => {
+  return squad.connection.call(method, data)
+}
+
 module.exports = {
   webSocketConnection,
   mockConnection,
   runGame,
-  registerRunner
+  registerRunner,
+  on,
+  call
 }
