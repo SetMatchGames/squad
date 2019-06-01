@@ -53,11 +53,6 @@ fn handle_contribute_element(element: Element) -> ZomeApiResult<Address> {
     hdk::debug(format!("handle_contribute_element({:?})", element))?;
     let new_entry = Entry::App("Element".into(), element.into());
     let address = hdk::commit_entry(&new_entry)?;
-
-    // TODO Enter it into the curation market
-
-    // TODO create a DAO
-
     Ok(address)
 }
 

@@ -31,6 +31,9 @@ const getElement = async (address) => {
 
 const runners = {
   "linux-bash-game-v0": async (formatAddress, gameData) => {
+    // TODO: move all of the format stuff into sdk methods and let the game
+    // handle it.
+    // this function would end up just taking in game data and running the game
     console.log(formatAddress, gameData)
     // presume we are running a node linux bash squad client
     // start a process identified in the game data
@@ -67,7 +70,7 @@ const runners = {
     )
   },
 
-  "web-game-v0": (formatAddress, gameData) => {
+  "web-game-v0": (gameData) => {
     throw "web-game-v0 not implemented"
   }
 }
@@ -76,15 +79,12 @@ const registerRunner = (type_, runner) => {
   runners[type_] = runner
 }
 
-const runGame = async (
-  gameAddress,
-  formatAddress,
-) => {
+const runGame = async (gameAddress) => {
   // TODO handle the case that a REST holochain uri is passed in
-  console.log("squad.runGame", gameAddress, formatAddress)
+  console.log("squad.runGame", gameAddress)
   const game = (await getElement(gameAddress)).Game
   const runner = runners[game.type_]
-  return runner(formatAddress, game.data)
+  return runner(game.data)
 }
 
 const webSocketConnection = (uri) => {
