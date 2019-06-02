@@ -3,13 +3,49 @@ let squad = require('../sdk/js')
 // connect squad Client
 squad.webSocketConnection('ws://localhost:8888')
 
+const indices = [
+  { 
+    "name": "SMG Game Index",
+    "type_": {
+      Game: {
+        name: "Roshambo",
+        type_: "linux-bash-game-v0",
+        data: JSON.stringify({
+          cmd: `cat ../app_spec/install_and_run.sh | bash`,
+          options: []
+        })
+      }
+    }
+  }, { 
+    name: "SMG Format Index",
+    type_: {
+      Format: {
+        name: "Standard",
+        components: [],
+      }
+    }
+  }, { 
+    name: "SMG Component Index",
+    type_: {
+      Component: {
+        name: "Rock",
+        type_: "Roshambo",
+        data: JSON.stringify({
+          winsAgainst: ["Scissors"],
+          losesAgainst: ["Paper"]
+        })
+      }
+    }
+  }
+]
+
 const roshambo = {
-  "Game": {
-    "name": "Roshambo",
-    "type_": "linux-bash-game-v0",
-    "data": JSON.stringify({
-      "cmd": `cat ../app_spec/install_and_run.sh | bash`,
-      "options": []
+  Game: {
+    name: "Roshambo",
+    type_: "linux-bash-game-v0",
+    data: JSON.stringify({
+      cmd: `cat ../app_spec/install_and_run.sh | bash`,
+      options: []
     })
   }
 }
@@ -29,8 +65,8 @@ const components = [
       name: "Paper",
       type_: "Roshambo",
       data: JSON.stringify({
-        "winsAgainst": ["Rock"],
-        "losesAgainst": ["Scissors"]
+        winsAgainst: ["Rock"],
+        losesAgainst: ["Scissors"]
       })
     }
   }, {
@@ -38,8 +74,8 @@ const components = [
       name: "Scissors",
       type_: "Roshambo",
       data: JSON.stringify({
-        "winsAgainst": ["Paper"],
-        "losesAgainst": ["Rock"]
+        winsAgainst: ["Paper"],
+        losesAgainst: ["Rock"]
       })
     }
   }
@@ -51,8 +87,8 @@ const extraComponents = [
       name: "Lizard",
       type_: "Roshambo",
       data: JSON.stringify({
-        "winsAgainst": ["Spock", "Paper"],
-        "losesAgainst": ["Rock", "Scissors"]
+        winsAgainst: ["Spock", "Paper"],
+        losesAgainst: ["Rock", "Scissors"]
       })
     }
   }, {
@@ -60,8 +96,8 @@ const extraComponents = [
       name: "Spock",
       type_: "Roshambo",
       data: JSON.stringify({
-        "winsAgainst": ["Rock", "Scissors"],
-        "losesAgainst": ["Paper", "Lizard"]
+        winsAgainst: ["Rock", "Scissors"],
+        losesAgainst: ["Paper", "Lizard"]
       })
     }
   }
@@ -74,38 +110,65 @@ squad.on('open', async () => {
   const instanceId = info[0].id
   const agentId = info[0].agent
 
-  const contribute = async e => {
+  const contributeIndex = async i => {
+    const result = JSON.parse(await squad.call(
+      'call',
+      {
+        "instance_id": instanceId,
+        "zome": "elements",
+        "function": "contribute_element_index",
+        "args": {
+          "index:": i
+        }
+      }
+    ))
+    return result
+  }
+
+  const contributeElement = async (e, i) => {
     const result = JSON.parse(await squad.call(
       'call',
       {
         "instance_id": instanceId,
         "zome": "elements",
         "function": "contribute_element",
-        "params": {
-          "element": e
+        "args": {
+          "element:": e,
+          "index_address": i
         }
       }
     ))
-    return result.Ok
+    return result
   }
 
+  // TODO add all the indices
+  const a = await contributeElement(components[0])
+  console.log(a)
+
+  /*
+  const indexAddresses = await Promise.all(
+    indices.map(contributeIndex)
+  )
+  console.log(indexAddresses)
   // add a game element
-  const roshamboAddress = await contribute(roshambo)
+  const roshamboAddress = await contributeElement(roshambo, indexAddresses[0])
   // add all the components
   const standardComponentAddresses = await Promise.all(
-    components.map(contribute)
+    components.map(contributeElement, indexAddresses[2])
   )
 
-  const standardFormat = await contribute(
+  const standardFormat = await contributeElement(
     {
       Format: {
         name: "Standard",
         components: standardComponentAddresses
       }
-    }
+    },
+    indexAddresses[1]
   )
 
   console.log("running the game", roshamboAddress, standardFormat)
   // try running the game
   squad.runGame(roshamboAddress, standardFormat)
+  */
 })
