@@ -9,11 +9,11 @@ use hdk::{
 
 use std::convert::TryInto;
 
-fn non_empty_string(name: &String, message: &str) -> Result<(), String> {
-    match name.len() {
-        0 => Err(String::from(message)),
-        _ => Ok(())
-    }
+#[derive(Serialize, Deserialize, Debug, DefaultJson, Clone)]
+pub struct ElementIndex {
+    name: String,
+    pub type_: Element
+    // TODO Why is "pub" needed here? (Why is type_ is private without it?)
 }
 
 #[derive(Serialize, Deserialize, Debug, DefaultJson, Clone)]
@@ -32,6 +32,13 @@ pub enum Element {
         name: String,
         components: Vec<Address>,
     },
+}
+
+fn non_empty_string(name: &String, message: &str) -> Result<(), String> {
+    match name.len() {
+        0 => Err(String::from(message)),
+        _ => Ok(())
+    }
 }
 
 fn valid_game_fields(name: &String, type_: &String) -> Result<(), String> {
