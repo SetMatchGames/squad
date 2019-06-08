@@ -87,12 +87,16 @@ const runGame = async (gameAddress) => {
   return runner(game.data)
 }
 
-const webSocketConnection = (uri) => {
+const webSocketConnection = async (uri) => {
   squad.connection = new WebSocket(uri)
+  return await on("open", () => {
+    return squad.connection
+  })
 }
 
 const mockConnection = (mock) => {
   squad.connection = mock
+  return squad.connection
 }
 
 const on = (message, f) => {
@@ -103,11 +107,21 @@ const call = (method, data) => {
   return squad.connection.call(method, data)
 }
 
+const contributeElement = async (element) => {
+  return await call("contribute_element", {element})
+}
+
+const getIndex = async (baseAddress, tag) => {
+  return await call("get_index", {baseAddress, tag})
+}
+
 module.exports = {
   webSocketConnection,
   mockConnection,
-  runGame,
   registerRunner,
   on,
-  call
+  call,
+  runGame,
+  contributeElement,
+  getIndex
 }

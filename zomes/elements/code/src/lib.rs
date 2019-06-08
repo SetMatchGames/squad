@@ -63,6 +63,17 @@ fn handle_get_element(address: Address) -> ZomeApiResult<Element> {
     }
 }
 
+fn handle_get_index(
+    baseAddress: Address,
+    tag: Option<String>,
+) -> ZomeApiResult<Vec<Element>> {
+    let elements = get_links_and_load(baseAddress, tag);
+    match elements {
+        Vec<Element> => elements,
+        _ => Err(String::from("Not an index of Elements"))
+    }
+}
+
 define_zome! {
     entries: [
         element_entry()
@@ -81,9 +92,14 @@ define_zome! {
             outputs: |element: ZomeApiResult<Element>|,
             handler: handle_get_element
         }
+        get_index: {
+            inputs: |baseAddress: Address, tag: Option(String)|,
+            outputs: |elements: ZomeApiResult<Vec<Element>>|,
+            handler: handle_get_index
+        }
     ]
 
     traits: {
-        hc_public [contribute_element, get_element]
+        hc_public [contribute_element, get_element, get_index]
     }
 }

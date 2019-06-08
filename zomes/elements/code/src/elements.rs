@@ -20,6 +20,7 @@ fn non_empty_string(name: &String, message: &str) -> Result<(), String> {
 pub enum Element {
     Game{
         name: String,
+        // TODO rename Game.type to Game.runner
         type_: String,
         data: String,
     },
