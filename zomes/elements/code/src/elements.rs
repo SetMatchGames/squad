@@ -17,6 +17,9 @@ pub struct ElementIndex {
 }
 
 #[derive(Serialize, Deserialize, Debug, DefaultJson, Clone)]
+pub struct ElementIndexLink {}
+
+#[derive(Serialize, Deserialize, Debug, DefaultJson, Clone)]
 pub enum Element {
     Game{
         name: String,
