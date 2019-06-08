@@ -22,6 +22,7 @@ use hdk::{
         json::JsonString,
         cas::content::Address,
         entry::Entry,
+        link::link_data::LinkData,
     }
 };
 use std::convert::TryInto;
@@ -45,21 +46,7 @@ fn element_entry () -> ValidatingEntryType {
                 _ => return Err("Cannot modify or delete Elements".to_string())
             };
             valid_element(&element)
-        },
-
-        links: [
-            to! {
-                "ElementIndex",
-                link_type: "ElementIndexLink",
-
-                validation_package : || {
-                    hdk::ValidationPackageDefinition::Entry
-                },
-                validation: |_validation_data: hdk::LinkValidationData| {
-                    Ok(())
-                }
-            }
-        ]
+        }
     }
 }
 
@@ -75,31 +62,53 @@ fn element_index_entry () -> ValidatingEntryType {
 
         validation: |_validation_data: hdk::EntryValidationData<ElementIndex>| {
             Ok(())
-        }
+        },
+
+        links: [
+            to! {
+                "Element",
+                link_type: "Index",
+
+                validation_package : || {
+                    hdk::ValidationPackageDefinition::Entry
+                },
+                validation: |validation_data: hdk::LinkValidationData| {
+                    if let hdk::LinkValidationData::LinkAdd(LinkData(link), _) = validation_data {
+                        let base = handle_get_element_index(link.base)?;
+                        let target = handle_get_element(link.target)?;
+                        return valid_base_and_target(&base, &target);
+                    } else {
+                       return Err("Cannot remove links at this time".to_string()),
+                    }
+                }
+            }
+        ]
     }
 }
 
-fn handle_contribute_element(element: Element, index_address: Address) -> ZomeApiResult<Address> {
+fn handle_create_element(element: Element) -> ZomeApiResult<Address> {
     let new_entry = Entry::App("Element".into(), element.into());
     let address: Address = hdk::commit_entry(&new_entry)?;
-    hdk::debug(format!("handle_contribute_element({:?})", address))?;
+    hdk::debug(format!("handle_create_element({:?})", address))?;
 
-    // link the element to an appropriate index
-    let base: Address = valid_element_index_address(address.clone(), index_address)?;
-    hdk::debug(format!("handle_contribute_element, validated index address: {:?}", base))?;
-    let link: Address = hdk::api::link_entries(&base, &address, "ElementIndexLink", "")?;
-    hdk::debug(format!("handle_contribute_element, link: {:?}", link))?;
+    let index_address: Address = match element {
+        Element::Game => handle_create_element_index("Games", "Game"),
+        Element::Format => handle_create_element_index("Formats", "Format"),
+        Element::Component => handle_create_element_index("Components", "Component"),
+    };
 
-    // TODO Enter it into the curation market
-
-    // TODO create a DAO
-
+    hdk::api::link_entries(&index_address, &address, "Index", "")?;
+    
     Ok(address)
 }
 
-fn handle_contribute_element_index(index: ElementIndex) -> ZomeApiResult<Address> {
-    let new_entry = Entry::App("ElementIndex".into(), index.into());
-    let address = hdk::commit_entry(&new_entry)?;
+fn handle_create_element_index(name_: &str, type_str: &str) -> ZomeApiResult<Address> {
+    let element_index: ElementIndex = {
+        name: String::from(name_),
+        type_: String::from(type_str)
+    }
+    let new_entry = Entry::App("ElementIndex".into(), element_index);
+    let address: Address = hdk::commit_entry(&new_entry)?;
     Ok(address)
 }
 
@@ -117,17 +126,6 @@ fn handle_get_element_index(address: Address) -> ZomeApiResult<ElementIndex> {
     }
 }
 
-fn valid_element_index_address(element_address: Address, index_address: Address) -> ZomeApiResult<Address> {
-    let element: Element = handle_get_element(element_address)?;
-    let index: ElementIndex = handle_get_element_index(index_address.clone())?;
-    match (index.type_, element) {
-        (Element::Game{..}, Element::Game{..}) => Ok(index_address),
-        (Element::Format{..}, Element::Format{..}) => Ok(index_address),
-        (Element::Component{..}, Element::Component{..}) => Ok(index_address),
-        _ => Err(String::from("Element type does not match index type.").into())
-    }
-}
-
 define_zome! {
     entries: [
         element_entry(),
@@ -137,16 +135,18 @@ define_zome! {
     genesis: || { Ok(()) }
 
     functions: [
-        contribute_element: {
+        create_element: {
             inputs: |element: Element, index_address: Address|,
             outputs: |address: ZomeApiResult<Address>|,
-            handler: handle_contribute_element
+            handler: handle_create_element
         }
-        contribute_element_index: {
+        /*
+        create_element_index: {
             inputs: |index: ElementIndex|,
             outputs: |address: ZomeApiResult<Address>|,
-            handler: handle_contribute_element_index
+            handler: handle_create_element_index
         }
+        */
         get_element: {
             inputs: |address: Address|,
             outputs: |element: ZomeApiResult<Element>|,
@@ -161,8 +161,8 @@ define_zome! {
 
     traits: {
         hc_public [
-            contribute_element, 
-            contribute_element_index, 
+            create_element, 
+            // create_element_index, 
             get_element, 
             get_element_index
         ]
