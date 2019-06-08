@@ -12,7 +12,7 @@ extern crate holochain_core_types_derive;
 
 mod elements;
 
-use elements::{Element, ElementIndex, ElementIndexLink, valid_element};
+use elements::{ Element, ElementIndex, valid_element, valid_base_and_target };
 use hdk::{
     entry_definition::ValidatingEntryType,
     error::ZomeApiResult,
@@ -73,12 +73,18 @@ fn element_index_entry () -> ValidatingEntryType {
                     hdk::ValidationPackageDefinition::Entry
                 },
                 validation: |validation_data: hdk::LinkValidationData| {
-                    if let hdk::LinkValidationData::LinkAdd(LinkData(link), _) = validation_data {
-                        let base = handle_get_element_index(link.base)?;
-                        let target = handle_get_element(link.target)?;
+                    if let hdk::LinkValidationData::LinkAdd{
+                            link: LinkData{
+                                link: link_,
+                                action_kind: _
+                            }, 
+                            validation_data: _
+                        } = validation_data {
+                        let base = handle_get_element_index(link_.base().to_owned())?;
+                        let target = handle_get_element(link_.target().to_owned())?;
                         return valid_base_and_target(&base, &target);
                     } else {
-                       return Err("Cannot remove links at this time".to_string()),
+                       return Err("Cannot remove links at this time".to_string());
                     }
                 }
             }
@@ -87,14 +93,14 @@ fn element_index_entry () -> ValidatingEntryType {
 }
 
 fn handle_create_element(element: Element) -> ZomeApiResult<Address> {
-    let new_entry = Entry::App("Element".into(), element.into());
+    let new_entry = Entry::App("Element".into(), element.clone().into());
     let address: Address = hdk::commit_entry(&new_entry)?;
     hdk::debug(format!("handle_create_element({:?})", address))?;
 
     let index_address: Address = match element {
-        Element::Game => handle_create_element_index("Games", "Game"),
-        Element::Format => handle_create_element_index("Formats", "Format"),
-        Element::Component => handle_create_element_index("Components", "Component"),
+        Element::Game{..} => handle_create_element_index("Games", "Game").unwrap(),
+        Element::Format{..} => handle_create_element_index("Formats", "Format").unwrap(),
+        Element::Component{..} => handle_create_element_index("Components", "Component").unwrap(),
     };
 
     hdk::api::link_entries(&index_address, &address, "Index", "")?;
@@ -102,12 +108,12 @@ fn handle_create_element(element: Element) -> ZomeApiResult<Address> {
     Ok(address)
 }
 
-fn handle_create_element_index(name_: &str, type_str: &str) -> ZomeApiResult<Address> {
-    let element_index: ElementIndex = {
-        name: String::from(name_),
+fn handle_create_element_index(name_str: &str, type_str: &str) -> ZomeApiResult<Address> {
+    let element_index = ElementIndex {
+        name: String::from(name_str),
         type_: String::from(type_str)
-    }
-    let new_entry = Entry::App("ElementIndex".into(), element_index);
+    };
+    let new_entry = Entry::App("ElementIndex".into(), element_index.into());
     let address: Address = hdk::commit_entry(&new_entry)?;
     Ok(address)
 }
@@ -136,7 +142,7 @@ define_zome! {
 
     functions: [
         create_element: {
-            inputs: |element: Element, index_address: Address|,
+            inputs: |element: Element|,
             outputs: |address: ZomeApiResult<Address>|,
             handler: handle_create_element
         }
@@ -146,7 +152,7 @@ define_zome! {
             outputs: |address: ZomeApiResult<Address>|,
             handler: handle_create_element_index
         }
-        */
+        */ 
         get_element: {
             inputs: |address: Address|,
             outputs: |element: ZomeApiResult<Element>|,

@@ -11,8 +11,8 @@ use std::convert::TryInto;
 
 #[derive(Serialize, Deserialize, Debug, DefaultJson, Clone)]
 pub struct ElementIndex {
-    name: String,
-    type_: String
+    pub name: String,
+    pub type_: String
 }
 
 #[derive(Serialize, Deserialize, Debug, DefaultJson, Clone)]
@@ -93,20 +93,20 @@ pub fn valid_element(element: &Element) -> Result<(), String> {
 
 pub fn valid_base_and_target(base: &ElementIndex, target: &Element) -> Result<(), String> {
     match target {
-        Element::Game => { 
-            if "Game" == base.type_.as_ref() { 
+        Element::Game{..} => { 
+            if "Game" == &base.type_ { 
                 return Ok(()) 
             }
             Err(format!("Expected base to be a format, but was {}", base.type_)) 
         },
-        Element::Format => {
-            if "Format" == base.type_.as_ref() { 
+        Element::Format{..} => {
+            if "Format" == &base.type_ { 
                 return Ok(()) 
             }
             Err(format!("Expected base to be a format, but was {}", base.type_))
         },
-        Element::Component => {
-            if "Component" == base.type_.as_ref() { 
+        Element::Component{..} => {
+            if "Component" == &base.type_ { 
                 return Ok(()) 
             }
             Err(format!("Expected base to be a component, but was {}", base.type_))
