@@ -12,7 +12,7 @@ extern crate holochain_core_types_derive;
 
 mod elements;
 
-use elements::{Element, ElementIndex, valid_element};
+use elements::{Element, ElementIndex, ElementIndexLink, valid_element};
 use hdk::{
     entry_definition::ValidatingEntryType,
     error::ZomeApiResult,
@@ -50,7 +50,7 @@ fn element_entry () -> ValidatingEntryType {
         links: [
             to! {
                 "ElementIndex",
-                link_type: "Index",
+                link_type: "ElementIndexLink",
 
                 validation_package : || {
                     hdk::ValidationPackageDefinition::Entry
@@ -80,13 +80,15 @@ fn element_index_entry () -> ValidatingEntryType {
 }
 
 fn handle_contribute_element(element: Element, index_address: Address) -> ZomeApiResult<Address> {
-    hdk::debug(format!("handle_contribute_element({:?})", element))?;
     let new_entry = Entry::App("Element".into(), element.into());
-    let address = hdk::commit_entry(&new_entry)?;
+    let address: Address = hdk::commit_entry(&new_entry)?;
+    hdk::debug(format!("handle_contribute_element({:?})", address))?;
 
     // link the element to an appropriate index
     let base: Address = valid_element_index_address(address.clone(), index_address)?;
-    hdk::api::link_entries(&base, &address, "Index", "")?;
+    hdk::debug(format!("handle_contribute_element, validated index address: {:?}", base))?;
+    let link: Address = hdk::api::link_entries(&base, &address, "ElementIndexLink", "")?;
+    hdk::debug(format!("handle_contribute_element, link: {:?}", link))?;
 
     // TODO Enter it into the curation market
 

@@ -114,27 +114,27 @@ squad.on('open', async () => {
     const result = JSON.parse(await squad.call(
       'call',
       {
-        "instance_id": instanceId,
-        "zome": "elements",
-        "function": "contribute_element_index",
-        "args": {
-          "index:": i
+        instance_id: instanceId,
+        zome: "elements",
+        function: "contribute_element_index",
+        args: {
+          index: i
         }
       }
     ))
-    return result
+    return result.Ok
   }
 
   const contributeElement = async (e, i) => {
     const result = JSON.parse(await squad.call(
       'call',
       {
-        "instance_id": instanceId,
-        "zome": "elements",
-        "function": "contribute_element",
-        "args": {
-          "element:": e,
-          "index_address": i
+        instance_id: instanceId,
+        zome: "elements",
+        function: "contribute_element",
+        args: {
+          element: e,
+          index_address: i
         }
       }
     ))
@@ -142,8 +142,10 @@ squad.on('open', async () => {
   }
 
   // TODO add all the indices
-  const a = await contributeElement(components[0])
+  const a = await contributeIndex(indices[0])
   console.log(a)
+  const b = await contributeElement(roshambo, a)
+  console.log(b)
 
   /*
   const indexAddresses = await Promise.all(
