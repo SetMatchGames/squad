@@ -12,12 +12,8 @@ use std::convert::TryInto;
 #[derive(Serialize, Deserialize, Debug, DefaultJson, Clone)]
 pub struct ElementIndex {
     name: String,
-    pub type_: Element
-    // TODO Why is "pub" needed here? (Why is type_ is private without it?)
+    type_: String
 }
-
-#[derive(Serialize, Deserialize, Debug, DefaultJson, Clone)]
-pub struct ElementIndexLink {}
 
 #[derive(Serialize, Deserialize, Debug, DefaultJson, Clone)]
 pub enum Element {
@@ -78,7 +74,7 @@ fn valid_format_fields(
             } = entry.try_into()? {
                 continue;
             } else {
-                return  Err(String::from("Non-component component address"));
+                return Err(String::from("Non-component component address"));
             }
         } else {
             return Err(String::from("Invalid app entry address"));
@@ -92,5 +88,28 @@ pub fn valid_element(element: &Element) -> Result<(), String> {
         Element::Game{name, type_, data: _}   => valid_game_fields(&name, &type_),
         Element::Component{name, type_, data} => valid_component_fields(&name, &type_, &data),
         Element::Format{name, components}     => valid_format_fields(&name, &components),
+    }
+}
+
+pub fn valid_base_and_target(base: &ElementIndex, target: &Element) -> Result<(), String> {
+    match target {
+        Element::Game => { 
+            if "Game" == base.type_.as_ref() { 
+                return Ok(()) 
+            }
+            Err(format!("Expected base to be a format, but was {}", base.type_)) 
+        },
+        Element::Format => {
+            if "Format" == base.type_.as_ref() { 
+                return Ok(()) 
+            }
+            Err(format!("Expected base to be a format, but was {}", base.type_))
+        },
+        Element::Component => {
+            if "Component" == base.type_.as_ref() { 
+                return Ok(()) 
+            }
+            Err(format!("Expected base to be a component, but was {}", base.type_))
+        },
     }
 }
