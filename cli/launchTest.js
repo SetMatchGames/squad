@@ -3,42 +3,6 @@ let squad = require('../sdk/js')
 // connect squad Client
 squad.webSocketConnection('ws://localhost:8888')
 
-const indices = [
-  { 
-    "name": "SMG Game Index",
-    "type_": {
-      Game: {
-        name: "Roshambo",
-        type_: "linux-bash-game-v0",
-        data: JSON.stringify({
-          cmd: `cat ../app_spec/install_and_run.sh | bash`,
-          options: []
-        })
-      }
-    }
-  }, { 
-    name: "SMG Format Index",
-    type_: {
-      Format: {
-        name: "Standard",
-        components: [],
-      }
-    }
-  }, { 
-    name: "SMG Component Index",
-    type_: {
-      Component: {
-        name: "Rock",
-        type_: "Roshambo",
-        data: JSON.stringify({
-          winsAgainst: ["Scissors"],
-          losesAgainst: ["Paper"]
-        })
-      }
-    }
-  }
-]
-
 const roshambo = {
   Game: {
     name: "Roshambo",
@@ -107,44 +71,28 @@ squad.on('open', async () => {
   // get basic instance information
   let method = 'info/instances'
   let info = await squad.call(method, {})
+  console.log(info)
   const instanceId = info[0].id
   const agentId = info[0].agent
 
-  const contributeIndex = async i => {
+  const contributeElement = async e => {
+    console.log("contributing...")
     const result = JSON.parse(await squad.call(
       'call',
       {
         instance_id: instanceId,
         zome: "elements",
-        function: "contribute_element_index",
+        function: "create_element",
         args: {
-          index: i
+          element: e
         }
       }
     ))
     return result.Ok
   }
 
-  const contributeElement = async (e, i) => {
-    const result = JSON.parse(await squad.call(
-      'call',
-      {
-        instance_id: instanceId,
-        zome: "elements",
-        function: "contribute_element",
-        args: {
-          element: e,
-          index_address: i
-        }
-      }
-    ))
-    return result
-  }
-
   // TODO add all the indices
-  const a = await contributeIndex(indices[0])
-  console.log(a)
-  const b = await contributeElement(roshambo, a)
+  const b = await contributeElement(roshambo)
   console.log(b)
 
   /*
