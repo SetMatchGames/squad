@@ -6,29 +6,6 @@ const path = require('path')
 
 const squad = {}
 
-const getElement = async (address) => {
-  const info = await squad.connection.call('info/instances', {})
-  const instanceId = info[0].id
-  const agentId = info[0].agent
-
-  const params = {
-    "instance_id": instanceId,
-    "zome": "elements",
-    "function": "get_element",
-    "params": {
-      "address": address
-    }
-  }
-
-  const result = JSON.parse(await squad.connection.call('call', params))
-  // TODO add a test case for when there is an error, like incorrect address
-  if (result.Ok === undefined) {
-    console.log(result)
-    throw result
-  }
-  return result.Ok
-}
-
 const runners = {
   "linux-bash-game-v0": async (formatAddress, gameData) => {
     console.log(formatAddress, gameData)
@@ -99,8 +76,36 @@ const on = (message, f) => {
   return squad.connection.on(message, f)
 }
 
-const call = (method, data) => {
-  return squad.connection.call(method, data)
+const call = async (zome, method, inputs) => {
+  const info = await squad.connection.call('info/instances', {})
+  const instanceId = info[0].id
+
+  const params = {
+    "instance_id": instanceId,
+    "zome": zome,
+    "function": method,
+    "args": inputs
+  }
+
+  const result = JSON.parse(await squad.connection.call('call', params))
+
+  if (result.Ok === undefined) {
+    console.log(result)
+    throw result
+  }
+  return result.Ok
+}
+
+const createElement = async (element) => {
+  return await call("elements", "create_element", {"element": element})
+}
+
+const getElement = async (address) => {
+  return await call("elements", "get_element", {"address": address})
+}
+
+const getAllGames = async () => {
+  return await call("elements", "get_games", {})
 }
 
 module.exports = {
@@ -109,5 +114,8 @@ module.exports = {
   runGame,
   registerRunner,
   on,
-  call
+  call,
+  createElement,
+  getElement,
+  getAllGames
 }
