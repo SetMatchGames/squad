@@ -68,57 +68,14 @@ const extraComponents = [
 ]
 
 squad.on('open', async () => {
-  // get basic instance information
-  let method = 'info/instances'
-  let info = await squad.call(method, {})
-  console.log(info)
-  const instanceId = info[0].id
-  const agentId = info[0].agent
 
-  const contributeElement = async e => {
-    console.log("contributing...")
-    const result = JSON.parse(await squad.call(
-      'call',
-      {
-        instance_id: instanceId,
-        zome: "elements",
-        function: "create_element",
-        args: {
-          element: e
-        }
-      }
-    ))
-    return result.Ok
-  }
+  const a = await squad.createElement(roshambo)
+  console.log("roshambo address:", a)
 
-  // TODO add all the indices
-  const b = await contributeElement(roshambo)
-  console.log(b)
+  const r = await squad.getElement(a)
+  console.log("roshambo retrieved:", r)
 
-  /*
-  const indexAddresses = await Promise.all(
-    indices.map(contributeIndex)
-  )
-  console.log(indexAddresses)
-  // add a game element
-  const roshamboAddress = await contributeElement(roshambo, indexAddresses[0])
-  // add all the components
-  const standardComponentAddresses = await Promise.all(
-    components.map(contributeElement, indexAddresses[2])
-  )
+  const g = await squad.getAllGames()
+  console.log("all games:", g)
 
-  const standardFormat = await contributeElement(
-    {
-      Format: {
-        name: "Standard",
-        components: standardComponentAddresses
-      }
-    },
-    indexAddresses[1]
-  )
-
-  console.log("running the game", roshamboAddress, standardFormat)
-  // try running the game
-  squad.runGame(roshamboAddress, standardFormat)
-  */
 })

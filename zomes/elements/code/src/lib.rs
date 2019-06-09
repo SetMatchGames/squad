@@ -23,6 +23,10 @@ use hdk::{
         cas::content::Address,
         entry::Entry,
         link::link_data::LinkData,
+    },
+    api::{
+        link_entries,
+        get_links,
     }
 };
 use std::convert::TryInto;
@@ -103,7 +107,7 @@ fn handle_create_element(element: Element) -> ZomeApiResult<Address> {
         Element::Component{..} => handle_create_element_index("Components", "Component").unwrap(),
     };
 
-    hdk::api::link_entries(&index_address, &address, "Index", "")?;
+    link_entries(&index_address, &address, "Index", "")?;
     
     Ok(address)
 }
@@ -130,6 +134,15 @@ fn handle_get_element_index(address: Address) -> ZomeApiResult<ElementIndex> {
         Ok(Some(Entry::App(_, api_result))) => Ok(api_result.try_into()?),
         _ => Err(String::from("No element index found").into())
     }
+}
+
+fn handle_get_games() -> ZomeApiResult<Vec<Element>> {
+    let index_address: Address = handle_create_element_index("Games", "Game").unwrap();
+    let links: Vec<Address> = get_links(&index_address, Some("Index".to_string()), None)?.addresses();
+    let games: Vec<Element> = links.into_iter().map(|address| {
+        handle_get_element(address).unwrap()
+    }).collect();
+    Ok(games)
 }
 
 define_zome! {
@@ -163,6 +176,11 @@ define_zome! {
             outputs: |element: ZomeApiResult<ElementIndex>|,
             handler: handle_get_element_index
         }
+        get_games: {
+            inputs: | |,
+            outputs: |games: ZomeApiResult<Vec<Element>>|,
+            handler: handle_get_games
+        }
     ]
 
     traits: {
@@ -170,7 +188,8 @@ define_zome! {
             create_element, 
             // create_element_index, 
             get_element, 
-            get_element_index
+            get_element_index,
+            get_games
         ]
     }
 }
