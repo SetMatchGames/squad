@@ -97,7 +97,7 @@ pub fn valid_base_and_target(base: &ElementIndex, target: &Element) -> Result<()
             if "Game" == &base.type_ { 
                 return Ok(()) 
             }
-            Err(format!("Expected base to be a format, but was {}", base.type_)) 
+            Err(format!("Expected base to be a game, but was {}", base.type_)) 
         },
         Element::Format{..} => {
             if "Format" == &base.type_ { 

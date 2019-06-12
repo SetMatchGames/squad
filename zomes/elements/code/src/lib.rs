@@ -88,7 +88,8 @@ fn element_index_entry () -> ValidatingEntryType {
                         let target = handle_get_element(link_.target().to_owned())?;
                         return valid_base_and_target(&base, &target);
                     } else {
-                       return Err("Cannot remove links at this time".to_string());
+                        // LinkRemove is the other type that can be found here, but it isn't implemented.
+                        return Err("Cannot remove links at this time.".to_string());
                     }
                 }
             }
@@ -136,7 +137,7 @@ fn handle_get_element_index(address: Address) -> ZomeApiResult<ElementIndex> {
     }
 }
 
-fn handle_get_games() -> ZomeApiResult<Vec<Element>> {
+fn handle_get_all_games() -> ZomeApiResult<Vec<Element>> {
     let index_address: Address = handle_create_element_index("Games", "Game").unwrap();
     let links: Vec<Address> = get_links(&index_address, Some("Index".to_string()), None)?.addresses();
     let games: Vec<Element> = links.into_iter().map(|address| {
@@ -176,7 +177,7 @@ define_zome! {
             outputs: |element: ZomeApiResult<ElementIndex>|,
             handler: handle_get_element_index
         }
-        get_games: {
+        get_all_games: {
             inputs: | |,
             outputs: |games: ZomeApiResult<Vec<Element>>|,
             handler: handle_get_games
@@ -189,7 +190,7 @@ define_zome! {
             // create_element_index, 
             get_element, 
             get_element_index,
-            get_games
+            get_all_games
         ]
     }
 }
