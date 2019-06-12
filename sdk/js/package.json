@@ -9,6 +9,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "rpc-websockets": "^4.3.5"
+    "rpc-websockets": "^4.4.0"
   }
 }
