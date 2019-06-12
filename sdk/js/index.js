@@ -97,11 +97,11 @@ const call = async (zome, method, inputs) => {
 }
 
 const createElement = async (element) => {
-  return await call("elements", "create_element", {"element": element})
+  return await call("elements", "create_element", {element})
 }
 
 const getElement = async (address) => {
-  return await call("elements", "get_element", {"address": address})
+  return await call("elements", "get_element", {address})
 }
 
 const getAllGames = async () => {
