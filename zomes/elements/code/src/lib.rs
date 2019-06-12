@@ -180,7 +180,7 @@ define_zome! {
         get_all_games: {
             inputs: | |,
             outputs: |games: ZomeApiResult<Vec<Element>>|,
-            handler: handle_get_games
+            handler: handle_get_all_games
         }
     ]
 
