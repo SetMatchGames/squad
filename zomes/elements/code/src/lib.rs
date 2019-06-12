@@ -12,7 +12,7 @@ extern crate holochain_core_types_derive;
 
 mod elements;
 
-use elements::{Element, valid_element};
+use elements::{ Element, ElementIndex, valid_element, valid_base_and_target };
 use hdk::{
     entry_definition::ValidatingEntryType,
     error::ZomeApiResult,
@@ -22,6 +22,11 @@ use hdk::{
         json::JsonString,
         cas::content::Address,
         entry::Entry,
+        link::link_data::LinkData,
+    },
+    api::{
+        link_entries,
+        get_links,
     }
 };
 use std::convert::TryInto;
@@ -49,10 +54,72 @@ fn element_entry () -> ValidatingEntryType {
     }
 }
 
-fn handle_contribute_element(element: Element) -> ZomeApiResult<Address> {
-    hdk::debug(format!("handle_contribute_element({:?})", element))?;
-    let new_entry = Entry::App("Element".into(), element.into());
-    let address = hdk::commit_entry(&new_entry)?;
+fn element_index_entry () -> ValidatingEntryType {
+    entry! {
+        name: "ElementIndex",
+        description: "Entries that link to all elements of a type",
+        sharing: Sharing::Public,
+
+        validation_package: || {
+            hdk::ValidationPackageDefinition::Entry
+        },
+
+        validation: |_validation_data: hdk::EntryValidationData<ElementIndex>| {
+            Ok(())
+        },
+
+        links: [
+            to! {
+                "Element",
+                link_type: "Index",
+
+                validation_package : || {
+                    hdk::ValidationPackageDefinition::Entry
+                },
+                validation: |validation_data: hdk::LinkValidationData| {
+                    if let hdk::LinkValidationData::LinkAdd{
+                            link: LinkData{
+                                link: link_,
+                                action_kind: _
+                            },
+                            validation_data: _
+                        } = validation_data {
+                        let base = handle_get_element_index(link_.base().to_owned())?;
+                        let target = handle_get_element(link_.target().to_owned())?;
+                        return valid_base_and_target(&base, &target);
+                    } else {
+                        // LinkRemove is the other type that can be found here, but it isn't implemented.
+                        return Err("Cannot remove links at this time.".to_string());
+                    }
+                }
+            }
+        ]
+    }
+}
+
+fn handle_create_element(element: Element) -> ZomeApiResult<Address> {
+    let new_entry = Entry::App("Element".into(), element.clone().into());
+    let address: Address = hdk::commit_entry(&new_entry)?;
+    hdk::debug(format!("handle_create_element({:?})", address))?;
+
+    let index_address: Address = match element {
+        Element::Game{..} => handle_create_element_index("Games", "Game").unwrap(),
+        Element::Format{..} => handle_create_element_index("Formats", "Format").unwrap(),
+        Element::Component{..} => handle_create_element_index("Components", "Component").unwrap(),
+    };
+
+    link_entries(&index_address, &address, "Index", "")?;
+
+    Ok(address)
+}
+
+fn handle_create_element_index(name_str: &str, type_str: &str) -> ZomeApiResult<Address> {
+    let element_index = ElementIndex {
+        name: String::from(name_str),
+        type_: String::from(type_str)
+    };
+    let new_entry = Entry::App("ElementIndex".into(), element_index.into());
+    let address: Address = hdk::commit_entry(&new_entry)?;
     Ok(address)
 }
 
@@ -63,43 +130,68 @@ fn handle_get_element(address: Address) -> ZomeApiResult<Element> {
     }
 }
 
-fn handle_get_index(
-    baseAddress: Address,
-    tag: Option<String>,
-) -> ZomeApiResult<Vec<Element>> {
-    let elements = get_links_and_load(baseAddress, tag);
-    match elements {
-        Vec<Element> => elements,
-        _ => Err(String::from("Not an index of Elements"))
+fn handle_get_element_index(address: Address) -> ZomeApiResult<ElementIndex> {
+    match hdk::get_entry(&address) {
+        Ok(Some(Entry::App(_, api_result))) => Ok(api_result.try_into()?),
+        _ => Err(String::from("No element index found").into())
     }
 }
 
+fn handle_get_all_games() -> ZomeApiResult<Vec<Element>> {
+    let index_address: Address = handle_create_element_index("Games", "Game").unwrap();
+    let links: Vec<Address> = get_links(&index_address, Some("Index".to_string()), None)?.addresses();
+    let games: Vec<Element> = links.into_iter().map(|address| {
+        handle_get_element(address).unwrap()
+    }).collect();
+    Ok(games)
+}
+
+>>>>>>> c77a115c40dc319db3e97b325f3c061f4cc59f1e
 define_zome! {
     entries: [
-        element_entry()
+        element_entry(),
+        element_index_entry()
     ]
 
     genesis: || { Ok(()) }
 
     functions: [
-        contribute_element: {
+        create_element: {
             inputs: |element: Element|,
             outputs: |address: ZomeApiResult<Address>|,
-            handler: handle_contribute_element
+            handler: handle_create_element
         }
+        /*
+        create_element_index: {
+            inputs: |index: ElementIndex|,
+            outputs: |address: ZomeApiResult<Address>|,
+            handler: handle_create_element_index
+        }
+        */
         get_element: {
             inputs: |address: Address|,
             outputs: |element: ZomeApiResult<Element>|,
             handler: handle_get_element
         }
-        get_index: {
-            inputs: |baseAddress: Address, tag: Option(String)|,
-            outputs: |elements: ZomeApiResult<Vec<Element>>|,
-            handler: handle_get_index
+        get_element_index: {
+            inputs: |address: Address|,
+            outputs: |element: ZomeApiResult<ElementIndex>|,
+            handler: handle_get_element_index
+        }
+        get_all_games: {
+            inputs: | |,
+            outputs: |games: ZomeApiResult<Vec<Element>>|,
+            handler: handle_get_all_games
         }
     ]
 
     traits: {
-        hc_public [contribute_element, get_element, get_index]
+        hc_public [
+            create_element,
+            // create_element_index,
+            get_element,
+            get_element_index,
+            get_all_games
+        ]
     }
 }
