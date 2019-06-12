@@ -105,7 +105,7 @@ const getElement = async (address) => {
 }
 
 const getAllGames = async () => {
-  return await call("elements", "get_games", {})
+  return await call("elements", "get_all_games", {})
 }
 
 module.exports = {
