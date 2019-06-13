@@ -108,6 +108,14 @@ const getAllGames = async () => {
   return await call("elements", "get_all_games", {})
 }
 
+const getAllFormats = async () => {
+  return await call("elements", "get_all_formats", {})
+}
+
+const getAllComponents = async () => {
+  return await call("elements", "get_all_components", {})
+}
+
 module.exports = {
   webSocketConnection,
   mockConnection,
@@ -117,5 +125,7 @@ module.exports = {
   call,
   createElement,
   getElement,
-  getAllGames
+  getAllGames,
+  getAllFormats,
+  getAllComponents
 }
