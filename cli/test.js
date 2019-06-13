@@ -75,7 +75,7 @@ squad.on('open', async () => {
   const r = await squad.getElement(a)
   console.log("roshambo retrieved:", r)
 
-  const g = await squad.getAllGames()
+  const g = await squad.getAllElementsOfType("Game")
   console.log("all games:", g)
 
   const componentAdds = await Promise.all(
@@ -86,7 +86,7 @@ squad.on('open', async () => {
 
   console.log("component addresses:", componentAdds)
 
-  const c = await squad.getAllComponents()
+  const c = await squad.getAllElementsOfType("Component")
   console.log("all components:", c)
 
   const standard = {
@@ -99,7 +99,7 @@ squad.on('open', async () => {
   const f = await squad.createElement(standard)
   console.log("format address:", f)
 
-  const h = await squad.getAllFormats()
+  const h = await squad.getAllElementsOfType("Format")
   console.log("all formats:", h)
 
   console.log("standard format components addresses:", h[0].Format.components)
