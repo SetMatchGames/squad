@@ -107,7 +107,6 @@ fn handle_create_element(element: Element) -> ZomeApiResult<Address> {
         Element::Format{..} => handle_create_element_index("Formats", "Format").unwrap(),
         Element::Component{..} => handle_create_element_index("Components", "Component").unwrap(),
     };
-
     link_entries(&index_address, &address, "Index", "")?;
     
     Ok(address)
@@ -146,6 +145,24 @@ fn handle_get_all_games() -> ZomeApiResult<Vec<Element>> {
     Ok(games)
 }
 
+fn handle_get_all_formats() -> ZomeApiResult<Vec<Element>> {
+    let index_address: Address = handle_create_element_index("Formats", "Format").unwrap();
+    let links: Vec<Address> = get_links(&index_address, Some("Index".to_string()), None)?.addresses();
+    let formats: Vec<Element> = links.into_iter().map(|address| {
+        handle_get_element(address).unwrap()
+    }).collect();
+    Ok(formats)
+}
+
+fn handle_get_all_components() -> ZomeApiResult<Vec<Element>> {
+    let index_address: Address = handle_create_element_index("Components", "Component").unwrap();
+    let links: Vec<Address> = get_links(&index_address, Some("Index".to_string()), None)?.addresses();
+    let components: Vec<Element> = links.into_iter().map(|address| {
+        handle_get_element(address).unwrap()
+    }).collect();
+    Ok(components)
+}
+
 define_zome! {
     entries: [
         element_entry(),
@@ -182,6 +199,16 @@ define_zome! {
             outputs: |games: ZomeApiResult<Vec<Element>>|,
             handler: handle_get_all_games
         }
+        get_all_formats: {
+            inputs: | |,
+            outputs: |formats: ZomeApiResult<Vec<Element>>|,
+            handler: handle_get_all_formats
+        }
+        get_all_components: {
+            inputs: | |,
+            outputs: |components: ZomeApiResult<Vec<Element>>|,
+            handler: handle_get_all_components
+        }
     ]
 
     traits: {
@@ -190,7 +217,9 @@ define_zome! {
             // create_element_index, 
             get_element, 
             get_element_index,
-            get_all_games
+            get_all_games,
+            get_all_formats,
+            get_all_components
         ]
     }
 }

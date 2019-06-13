@@ -78,4 +78,30 @@ squad.on('open', async () => {
   const g = await squad.getAllGames()
   console.log("all games:", g)
 
+  const componentAdds = await Promise.all(
+    components.map(async c => {
+      return await squad.createElement(c) 
+    })
+  )
+
+  console.log("component addresses:", componentAdds)
+
+  const c = await squad.getAllComponents()
+  console.log("all components:", c)
+
+  const standard = {
+    Format: {
+      name: "Standard",
+      components: componentAdds,
+    }
+  }
+
+  const f = await squad.createElement(standard)
+  console.log("format address:", f)
+
+  const h = await squad.getAllFormats()
+  console.log("all formats:", h)
+
+  console.log("standard format components addresses:", h[0].Format.components)
+
 })
