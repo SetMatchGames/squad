@@ -163,7 +163,6 @@ fn handle_get_all_components() -> ZomeApiResult<Vec<Element>> {
     Ok(components)
 }
 
->>>>>>> origin/master
 define_zome! {
     entries: [
         element_entry(),
