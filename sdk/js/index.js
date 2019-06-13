@@ -112,12 +112,12 @@ const getAllGames = async () => {
   return await call("elements", "get_all_games", {})
 }
 
-const contributeElement = async (element) => {
-  return await call("contribute_element", {element})
+const getAllFormats = async () => {
+  return await call("elements", "get_all_formats", {})
 }
 
-const getIndex = async (baseAddress, tag) => {
-  return await call("get_index", {baseAddress, tag})
+const getAllComponents = async () => {
+  return await call("elements", "get_all_components", {})
 }
 
 module.exports = {
@@ -131,5 +131,7 @@ module.exports = {
   getIndex,
   createElement,
   getElement,
-  getAllGames
+  getAllGames,
+  getAllFormats,
+  getAllComponents
 }
