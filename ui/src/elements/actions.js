@@ -1,3 +1,10 @@
+/**
+ * Element metadata is stored on holochain
+ * There are indexes for each of the element types (Game, Format, Component)
+ * We should have actions for any zome functions we'll be using which is only
+ * get_all_`elementType` for now
+ */
+
 export const CONTRIBUTE = "CONTRIBUTE"
 export const CONTRIBUTING = "CONTRIBUTING"
 export const FETCH_ELEMENT_SUCCESS = "FETCH_ELEMENT_SUCCESS"
