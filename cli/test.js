@@ -80,7 +80,7 @@ squad.on('open', async () => {
 
   const componentAdds = await Promise.all(
     components.map(async c => {
-      return await squad.createElement(c) 
+      return squad.createElement(c) 
     })
   )
 
