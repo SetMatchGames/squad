@@ -75,7 +75,7 @@ squad.on('open', async () => {
   const r = await squad.getElement(a)
   console.log("roshambo retrieved:", r)
 
-  const g = await squad.getAllElementsOfType("Game")
+  const g = await squad.getElementsFromIndex("Game", "Game Index")
   console.log("all games:", g)
 
   const componentAdds = await Promise.all(
@@ -98,6 +98,9 @@ squad.on('open', async () => {
 
   const f = await squad.createElement(standard)
   console.log("format address:", f)
+
+  const z = await squad.getElement(f)
+  console.log("standard format retrieved:", z)
 
   const h = await squad.getAllElementsOfType("Format")
   console.log("all formats:", h)

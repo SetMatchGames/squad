@@ -104,8 +104,12 @@ const getElement = async (address) => {
   return await call("elements", "get_element", {address})
 }
 
-const getAllElementsOfType = async (index_type) => {
+const getAllElementsOfType = async (index_type, index_name) => {
   return await call("elements", "get_all_elements_of_type", {index_type})
+}
+
+const getElementsFromIndex = async (index_type, index_name) => {
+  return await call("elements", "get_elements_from_index", {index_type, index_name})
 }
 
 module.exports = {
@@ -117,5 +121,6 @@ module.exports = {
   call,
   createElement,
   getElement,
-  getAllElementsOfType
+  getAllElementsOfType,
+  getElementsFromIndex
 }
