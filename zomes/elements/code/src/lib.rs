@@ -138,7 +138,23 @@ fn handle_get_element_index(address: Address) -> ZomeApiResult<ElementIndex> {
 }
 
 fn handle_get_all_elements_of_type(index_type: String) -> ZomeApiResult<Vec<Element>> {
-    let index_name: String = format!("{} Index", index_type.clone());
+    let index_name: String = index_type.clone() + " Index";
+    let index = ElementIndex {
+        name: index_name.clone(),
+        type_: index_type
+    };
+
+    let index_entry = Entry::App("ElementIndex".into(), index.into());
+    let address: Address = entry_address(&index_entry)?;
+
+    let links: Vec<Address> = get_links(&address, Some("Index".to_string()), None)?.addresses();
+    let elements: Vec<Element> = links.into_iter().map(|address| {
+        handle_get_element(address).unwrap()
+    }).collect();
+    Ok(elements)
+}
+
+fn handle_get_elements_from_index(index_type: String, index_name: String) -> ZomeApiResult<Vec<Element>> {
     let index = ElementIndex {
         name: index_name.clone(),
         type_: index_type
@@ -190,6 +206,11 @@ define_zome! {
             outputs: |linked_elements: ZomeApiResult<Vec<Element>>|,
             handler: handle_get_all_elements_of_type
         }
+        get_elements_from_index: {
+            inputs: |index_type: String, index_name: String|,
+            outputs: |linked_elements: ZomeApiResult<Vec<Element>>|,
+            handler: handle_get_elements_from_index
+        }
     ]
 
     traits: {
@@ -198,7 +219,8 @@ define_zome! {
             // create_element_index, 
             get_element, 
             get_element_index,
-            get_all_elements_of_type
+            get_all_elements_of_type,
+            get_elements_from_index
         ]
     }
 }
