@@ -129,6 +129,7 @@ fn handle_get_element(address: Address) -> ZomeApiResult<Element> {
     }
 }
 
+// TODO consider removing
 fn handle_get_element_index(address: Address) -> ZomeApiResult<ElementIndex> {
     match hdk::get_entry(&address) {
         Ok(Some(Entry::App(_, api_result))) => Ok(api_result.try_into()?),
@@ -163,6 +164,15 @@ fn handle_get_all_components() -> ZomeApiResult<Vec<Element>> {
     Ok(components)
 }
 
+fn handle_get_index(element_index: ElementIndex) -> ZomeApiResult<Vec<Element>> {
+    let index_address: Address = hdk::entry_address(&element_index)?;
+    let links: Vec<Address> = get_links(&index_address, Some("Index".to_string()), None)?.addresses();
+    let elements: Vec<Element> = links.into_iter().map(|address| {
+        handle_get_element(address).unwrap()
+    }).collect();
+    Ok(elements)
+}
+
 define_zome! {
     entries: [
         element_entry(),
@@ -194,6 +204,11 @@ define_zome! {
             outputs: |element: ZomeApiResult<ElementIndex>|,
             handler: handle_get_element_index
         }
+        get_index: {
+            inputs: |element_index: ElementIndex|,
+            outputs: |elements: ZomeApiResult<Vec<Element>>|,
+            handler: handle_get_index
+        }
         get_all_games: {
             inputs: | |,
             outputs: |games: ZomeApiResult<Vec<Element>>|,
@@ -217,6 +232,7 @@ define_zome! {
             // create_element_index,
             get_element,
             get_element_index,
+            get_index,
             get_all_games,
             get_all_formats,
             get_all_components

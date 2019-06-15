@@ -1,19 +1,35 @@
-import React from 'react';
-import './App.css';
+import React from 'react'
+import './App.css'
 
-import { Elements } from 'elements/Elements'
+import { connect } from 'react-redux'
 
-function App() {
+import { ElementIndex } from 'elements/ElementIndex'
+
+function App(props) {
+  const elementIndexComponents = Object.keys(props.elementIndexes).map(
+    (elementType) => {
+      return (
+        <ul className='elementIndex'>
+          <ElementIndex title={props.elementIndexes[elementType].name},
+                        elementType={elementType} />
+        </ul>
+      )
+    }
+  )
   return (
     <div>
       <div className="App-header">
         SQUAD
       </div>
-      <Elements elementType="Game" title="Games"/>
-      <Elements elementType="Format" title="Formats"/>
-      <Elements elementType="Component" title="Components"/>
+      {elementIndexComponents}
     </div>
-  );
+  )
 }
 
-export default App;
+function mapProps(state) {
+  return state
+}
+
+const mapDispatch = {}
+
+export default connect(mapProps, mapDispatch)(App)

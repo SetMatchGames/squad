@@ -1,11 +1,10 @@
 import React from 'react'
+import { connect } from 'react-redux'
 
 import { Element } from 'elements/Element'
 import { ContributeElementButton } from 'elements/ContributeElementButton'
-import { store } from 'store'
 
-export function Elements(props) {
-  console.log(store.getState())
+function ElementIndex(props) {
   const elementList = [].map(
     element => {
       element.elementType = props.elementType
@@ -24,3 +23,11 @@ export function Elements(props) {
     </div>
   )
 }
+
+function mapState(state, ownProps) {
+
+}
+
+const mapDispatch = {}
+
+export default connect(mapState, mapDispatch)(ElementIndex)
