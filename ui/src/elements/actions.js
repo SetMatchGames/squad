@@ -1,38 +1,53 @@
 /**
  * Element metadata is stored on holochain
  * There are indexes for each of the element types (Game, Format, Component)
- * We should have actions for any zome functions we'll be using which is only
- * get_all_`elementType` for now
  */
 
-export const CONTRIBUTE = "CONTRIBUTE"
-export const CONTRIBUTING = "CONTRIBUTING"
-export const FETCH_ELEMENT_SUCCESS = "FETCH_ELEMENT_SUCCESS"
-export const FETCH_ELEMENT_FAIL = "FETCH_ELEMENT_FAIL"
-export const FETCH_ELEMENT_LISTS = "FETCH_ELEMENT_LISTS"
+import { getIndex, createElement } from "squad-sdk"
 
-export function contributeElement (element) {
-  return {type: CONTRIBUTE, element}
+export const CREATE_ELEMENT = "CREATE_ELEMENT"
+export const CREATE_ELEMENT_SUCCESS = "CREATE_ELEMENT_SUCCESS"
+export const CREATE_ELEMENT_FAILURE = "CREATE_ELEMENT_FAILURE"
+export const REQUEST_INDEX = "REQUEST_INDEX"
+export const RECEIVE_INDEX = "RECEIVE_INDEX"
+export const INDEX_FAILURE = "INDEX_FAILURE"
+
+export function contributeElement(element) {
+  return (dispatch) => {
+    dispatch(createElement(element))
+    createElement(element).then(
+      (address) => createElementSuccess(address, element),
+      (error) => createElementFailure(error, element)
+    )
+  }
 }
 
-export function contributeGame (name, runner, data) {
-  return contributeElement({Game: {name, runner, data}})
+export function createElementSuccess(address, element) {
+  return {type: CREATE_ELEMENT_SUCCESS, address, element}
 }
 
-export function contributeFormat (name, components) {
-  return contributeElement({Format: {name, components}})
+export function createElementFailure(address, error) {
+  return {type: CREATE_ELEMENT_FAILURE, address, error}
 }
 
-export function contributeComponent(name, type_, data) {
-  return contributeElement({Component: {name, type_, data}})
+export function fetchIndex(name, elementType) {
+  return (dispatch) => {
+    dispatch(requestIndex(name, elementType))
+    getIndex(name, elementType).then(
+      elements => receiveIndex(name, elementType, elements),
+      error => indexFailure(name, elementType, error)
+    )
+  }
 }
 
-export function fetchElementLists() {
-  return {type: FETCH_ELEMENT_LISTS}
+export function requestIndex(name, elementType) {
+  return {type: REQUEST_INDEX, name, elementType}
 }
 
-export function contributing(element) {
-  return {type: CONTRIBUTING, element}
+export function receiveIndex(name, elementType, elements) {
+  return {type: RECEIVE_INDEX, name, elementType, elements}
 }
 
-
+export function indexFailure(name, elementType, error) {
+  return {type: INDEX_FAILURE, name, elementType, error}
+}

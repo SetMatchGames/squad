@@ -24,12 +24,10 @@ function status(state = 'INITIAL', action) {
   case CONNECT_TO_SQUAD:
     return async dispatch => {
       dispatch(connecting())
-      try {
-        const connection = await webSocketConnection("ws://localhost:8888")
-        dispatch(connectSuccess(connection))
-      } catch (e) {
-        dispatch(connectFail(e))
-      }
+      webSocketConnection("ws://localhost:8888").then(
+        connection => dispatch(connectSuccess(connection)),
+        error => dispatch(connectFail(e))
+      )
     }
   case CONNECTING_TO_SQUAD:
     return "CONNECTING"
@@ -52,6 +50,7 @@ function error(state = null, action) {
     return null
   default:
     return state
+  }
 }
 
 export const squad = combineReducers({connection, status, error})

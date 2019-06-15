@@ -1,35 +1,66 @@
-import { combineReducers } from 'redux'
+import {
+  REQUEST_INDEX,
+  RECEIVE_INDEX,
+  INDEX_FAILURE,
+} from 'elements/actions'
 
-import store from 'store'
-import { getAllAddresses } from 'squad-sdk'
-import { FETCH_ELEMENT_LISTS } from 'elements/actions'
-
-function initialElementList(title, type) {
+function newElementIndex() {
   return {
-    title,
-    type,
-    isFetching: false,
-    elements: []
+    title: "",
+    type: "",
+    isGetting: false,
+    elements: [],
+    status: "INITIAL"
   }
 }
 
-function makeElementListReducer(type, title) {
-  return (state = initialElementList(title), action) => {
-    switch(action.type) {
-    case FETCH_ELEMENT_LISTS:
-
-    default:
-      return state
+function elementIndex(state = newElementIndex(), action) {
+  function actionInfo(action) {
+    return {
+      name: action.name,
+      elementType: action.elementType,
+      status: action.type
     }
   }
+
+  switch(action.type) {
+  case REQUEST_INDEX:
+    return Object.assign({}, state, actionInfo(action), {waiting: true})
+    break
+  case RECEIVE_INDEX:
+    return Object.assign(
+      {},
+      state,
+      actionInfo(action),
+      {waiting: false, elements: action.elements}
+    )
+    break
+  case INDEX_FAILURE:
+    return Object.assign(
+      {},
+      state,
+      actionInfo(action),
+      {waiting: false, error: action.error}
+    )
+    break
+  default:
+    return state
+    break
+  }
 }
 
-const Game = makeElementListReducer('Game', 'Games')
-const Format = makeElementListReducer('Format', 'Formats')
-const Component = makeElementListReducer('Component', 'Components')
-
-export const elementLists = combineReducers({
-  Game,
-  Format,
-  Component
-})
+export function elementIndexes(state = {}, action) {
+  switch(action.type) {
+  case REQUEST_INDEX:
+    // initialize a new element index if one isn't there
+    const et = action.elementType
+    state[et] = state[et] ? state[et] : newElementIndex()
+  }
+  // reduce all indexes
+  for(const elementType in Object.keys(state)) {
+    state[elementType] = Object.assign(
+      {},
+      elementIndex(state[elementType], action)
+    )
+  }
+}

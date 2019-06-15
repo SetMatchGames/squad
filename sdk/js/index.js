@@ -52,11 +52,11 @@ const runners = {
   }
 }
 
-const registerRunner = (type_, runner) => {
+export function registerRunner(type_, runner) {
   runners[type_] = runner
 }
 
-const runGame = async (gameAddress) => {
+export async function runGame(gameAddress) {
   // TODO handle the case that a REST holochain uri is passed in
   console.log("squad.runGame", gameAddress)
   const game = (await getElement(gameAddress)).Game
@@ -64,23 +64,23 @@ const runGame = async (gameAddress) => {
   return runner(game.data)
 }
 
-const webSocketConnection = async (uri) => {
+export async function webSocketConnection(uri) {
   squad.connection = new WebSocket(uri)
   return await on("open", () => {
     return squad.connection
   })
 }
 
-const mockConnection = (mock) => {
+export function mockConnection(mock) {
   squad.connection = mock
   return squad.connection
 }
 
-const on = (message, f) => {
+export function on(message, f) {
   return squad.connection.on(message, f)
 }
 
-const call = async (zome, method, inputs) => {
+export async function call(zome, method, inputs) {
   const info = await squad.connection.call('info/instances', {})
   const instanceId = info[0].id
 
@@ -100,38 +100,37 @@ const call = async (zome, method, inputs) => {
   return result.Ok
 }
 
-const createElement = async (element) => {
+export async function createElement(element) {
   return await call("elements", "create_element", {element})
 }
 
-const getElement = async (address) => {
+/*
+export async function getElement(address) {
   return await call("elements", "get_element", {address})
 }
 
-const getAllGames = async () => {
+export async function getAllGames() {
   return await call("elements", "get_all_games", {})
 }
 
-const getAllFormats = async () => {
+export async function getAllFormats() {
   return await call("elements", "get_all_formats", {})
 }
 
-const getAllComponents = async () => {
+export async function getAllComponents () {
   return await call("elements", "get_all_components", {})
 }
+*/
 
-module.exports = {
-  webSocketConnection,
-  mockConnection,
-  registerRunner,
-  on,
-  call,
-  runGame,
-  contributeElement,
-  getIndex,
-  createElement,
-  getElement,
-  getAllGames,
-  getAllFormats,
-  getAllComponents
+export async function getIndex(name, type_) {
+  return await call(
+    "elements",
+    "get_index",
+    {
+      element_index: {
+        ElementIndex: {name, type_}
+      }
+    }
+  )
 }
+

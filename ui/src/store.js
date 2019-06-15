@@ -1,15 +1,13 @@
-import { createStore, combineReducers } from 'redux'
-import { squad } from 'squad'
-import { lastGameLaunched } from 'runners/reducers'
-import { elementLists } from 'elements/reducers'
+import { createStore, combineReducers, applyMiddleware } from 'redux'
+import { thunk } from 'redux-thunk'
+import { squad } from 'squad/reducersc'
+import { elementIndexes } from 'elements/reducer'
 
-const initialState = {
-  squad: {},
-  lastGameLaunched: {},
-  elementLists: []
-}
-
+const rootReducer = combineReducers({squad, elementIndexes})
+const initialState = rootReducer(undefined, {type: undefined})
 export const store = createStore(
-  combineReducers({squad, lastGameLaunched, elementLists}),
-  initialState
+  rootReducer,
+  initialState,
+  applyMiddleware(thunk)
 )
+

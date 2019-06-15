@@ -1,4 +1,5 @@
 import React from 'react'
+//import { connect } from 'react-redux'
 
 import { runGame } from 'squad-sdk'
 
@@ -34,3 +35,7 @@ export function Element(props) {
     "Component": Component
   }[props.elementType](props)
 }
+
+
+
+
