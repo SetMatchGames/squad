@@ -10,7 +10,7 @@ function App(props) {
     (elementType) => {
       return (
         <ul className='elementIndex'>
-          <ElementIndex title={props.elementIndexes[elementType].name},
+          <ElementIndex title={props.elementIndexes[elementType].name}
                         elementType={elementType} />
         </ul>
       )
