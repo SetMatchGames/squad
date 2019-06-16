@@ -5,16 +5,6 @@ import { Element } from 'elements/Element'
 import { ContributeElementButton } from 'elements/ContributeElementButton'
 
 function ElementIndex(props) {
-  const elementList = [].map(
-    element => {
-      element.elementType = props.elementType
-      return (
-      <li key={element.address}>
-        {Element(element)}
-      </li>
-    )}
-  )
-  console.log(elementList)
   return (
     <div className="App-body">
       <h1>{props.title}</h1>
@@ -24,10 +14,33 @@ function ElementIndex(props) {
   )
 }
 
-function mapState(state, ownProps) {
+/**
 
+state = {
+  ...
+  elementIndexes: {
+    Games-Game: {
+      title: String,
+      elements: {
+        elementAddress: { ...element }
+      }
+    }
+    Formats-Format: {
+      title: String,
+      element: {...}
+    }
+  }
+  ...
 }
 
-const mapDispatch = {}
+ */
 
-export default connect(mapState, mapDispatch)(ElementIndex)
+function mapState(state, ownProps) {
+  const indexKey = `${ownProps.title}-${ownProps.elementType}`
+  return {
+    title: state.title,
+    elements: state.elementIndexes
+  }
+}
+
+export default connect(mapState)(ElementIndex)
