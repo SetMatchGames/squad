@@ -75,19 +75,24 @@ squad.on('open', async () => {
   const r = await squad.getElement(a)
   console.log("roshambo retrieved:", r)
 
-  const g = await squad.getElementsFromIndex("Game", "Game Index")
-  console.log("all games:", g)
+  setTimeout(async () => {
+    const g = await squad.getElementsFromIndex("Game", "Game Index")
+    console.log("all games:", g)
+  },
+  1000)
 
   const componentAdds = await Promise.all(
     components.map(async c => {
       return squad.createElement(c) 
     })
   )
-
   console.log("component addresses:", componentAdds)
 
-  const c = await squad.getAllElementsOfType("Component")
-  console.log("all components:", c)
+  setTimeout(async () => {
+    const c = await squad.getAllElementsOfType("Component")
+    console.log("all components:", c)
+  },
+  1000)
 
   const standard = {
     Format: {
@@ -102,9 +107,11 @@ squad.on('open', async () => {
   const z = await squad.getElement(f)
   console.log("standard format retrieved:", z)
 
-  const h = await squad.getAllElementsOfType("Format")
-  console.log("all formats:", h)
-
-  console.log("standard format components addresses:", h[0].Format.components)
+  setTimeout(async () => {
+    const h = await squad.getAllElementsOfType("Format")
+    console.log("all formats:", h)
+    console.log("standard format components addresses:", h[0].Format.components)
+  },
+  1000)
 
 })

@@ -145,7 +145,7 @@ fn handle_get_all_elements_of_type(index_type: String) -> ZomeApiResult<Vec<Elem
     };
 
     let index_entry = Entry::App("ElementIndex".into(), index.into());
-    let address: Address = hdk::commit_entry(&index_entry)?;
+    let address: Address = entry_address(&index_entry)?;
 
     let links: Vec<Address> = get_links(&address, Some("Index".to_string()), None)?.addresses();
     let elements: Vec<Element> = links.into_iter().map(|address| {
@@ -161,7 +161,7 @@ fn handle_get_elements_from_index(index_type: String, index_name: String) -> Zom
     };
 
     let index_entry = Entry::App("ElementIndex".into(), index.into());
-    let address: Address = hdk::commit_entry(&index_entry)?;
+    let address: Address = entry_address(&index_entry)?;
 
     let links: Vec<Address> = get_links(&address, Some("Index".to_string()), None)?.addresses();
     let elements: Vec<Element> = links.into_iter().map(|address| {
