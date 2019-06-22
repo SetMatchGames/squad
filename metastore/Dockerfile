@@ -14,4 +14,4 @@ COPY . ./squad-holochain
 WORKDIR /squad-holochain
 
 RUN hc package
-CMD hc run --logging
+CMD hc run

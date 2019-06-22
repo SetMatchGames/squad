@@ -1,6 +1,7 @@
 version: '3'
 services:
-  holochain:
-    image: "squad/holochain:latest"
-  ethereum:
+  metastore:
+    image: "squad/metastore"
+    tty: true
+  curation:
     image: "trufflesuite/ganache-cli:latest"
