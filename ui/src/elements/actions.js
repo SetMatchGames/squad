@@ -33,10 +33,13 @@ export function createElementFailure(address, error) {
 export function fetchIndex(name, elementType) {
   return (dispatch) => {
     dispatch(requestIndex(name, elementType))
-    getIndex(name, elementType).then(
-      elements => receiveIndex(name, elementType, elements),
-      error => indexFailure(name, elementType, error)
-    )
+    getIndex(name, elementType)
+      .then(elements => {
+        dispatch(receiveIndex(name, elementType, elements))
+      })
+      .catch(error => {
+        dispatch(indexFailure(name, elementType, error))
+      })
   }
 }
 
