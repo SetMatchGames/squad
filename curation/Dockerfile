@@ -1,8 +1,10 @@
 FROM trufflesuite/ganache-cli:latest
 
-RUN npm i -g npm
+RUN mkdir /app
+WORKDIR /app
 
-COPY . ./squad-curation
-WORKDIR ./squad-curation
+COPY ./package.json ./package.json
 
-RUN npm install --no-package-lock
+RUN npm install
+
+COPY . .
