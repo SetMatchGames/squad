@@ -3,16 +3,17 @@ import './App.css'
 
 import { connect } from 'react-redux'
 
-import { ElementIndex } from 'elements/ElementIndex'
+import ElementIndex from 'elements/ElementIndex'
 
 function App(props) {
+  console.log("calculating App", props)
   const elementIndexComponents = Object.keys(props.elementIndexes).map(
-    (elementType) => {
+    (indexKey) => {
       return (
-        <ul className='elementIndex'>
-          <ElementIndex title={props.elementIndexes[elementType].name}
-                        elementType={elementType} />
-        </ul>
+        <ElementIndex
+          key={indexKey}
+          mapState={s => s.elementIndexes[indexKey]}
+        />
       )
     }
   )
@@ -26,10 +27,4 @@ function App(props) {
   )
 }
 
-function mapProps(state) {
-  return state
-}
-
-const mapDispatch = {}
-
-export default connect(mapProps, mapDispatch)(App)
+export default connect(x => x)(App)

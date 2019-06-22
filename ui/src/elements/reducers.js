@@ -4,11 +4,13 @@ import {
   INDEX_FAILURE,
 } from 'elements/actions'
 
+import { indexKey } from 'elements/utils'
+
 function newElementIndex() {
   return {
-    title: "",
-    type: "",
-    isGetting: false,
+    name: "",
+    elementType: "",
+    waiting: false,
     elements: [],
     status: "INITIAL"
   }
@@ -23,12 +25,13 @@ function elementIndex(state = newElementIndex(), action) {
     }
   }
 
+  let newState
   switch(action.type) {
   case REQUEST_INDEX:
-    return Object.assign({}, state, actionInfo(action), {waiting: true})
+    newState = Object.assign({}, state, actionInfo(action), {waiting: true})
     break
   case RECEIVE_INDEX:
-    return Object.assign(
+    newState = Object.assign(
       {},
       state,
       actionInfo(action),
@@ -36,7 +39,7 @@ function elementIndex(state = newElementIndex(), action) {
     )
     break
   case INDEX_FAILURE:
-    return Object.assign(
+    newState = Object.assign(
       {},
       state,
       actionInfo(action),
@@ -45,22 +48,26 @@ function elementIndex(state = newElementIndex(), action) {
     break
   default:
     return state
-    break
   }
+  return newState
 }
 
 export function elementIndexes(state = {}, action) {
   switch(action.type) {
   case REQUEST_INDEX:
     // initialize a new element index if one isn't there
-    const et = action.elementType
-    state[et] = state[et] ? state[et] : newElementIndex()
+    const key = indexKey(action.name, action.elementType)
+    state[key] = state[key] ? state[key] : newElementIndex()
+    break
+  default:
+    break
   }
   // reduce all indexes
-  for(const elementType in Object.keys(state)) {
+  Object.keys(state).forEach(elementType => {
     state[elementType] = Object.assign(
       {},
       elementIndex(state[elementType], action)
     )
-  }
+  })
+  return Object.assign({}, state)
 }

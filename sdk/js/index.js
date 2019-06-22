@@ -66,9 +66,6 @@ export async function runGame(gameAddress) {
 
 export async function webSocketConnection(uri) {
   squad.connection = new WebSocket(uri)
-  return await on("open", () => {
-    return squad.connection
-  })
 }
 
 export function mockConnection(mock) {
@@ -81,9 +78,11 @@ export function on(message, f) {
 }
 
 export async function call(zome, method, inputs) {
-  const info = await squad.connection.call('info/instances', {})
+  console.log("call", zome, method, inputs)
+  const info = await on("open", async () => {
+    await squad.connection.call('info/instances', {})
+  })
   const instanceId = info[0].id
-
   const params = {
     "instance_id": instanceId,
     "zome": zome,
@@ -91,7 +90,9 @@ export async function call(zome, method, inputs) {
     "args": inputs
   }
 
-  const result = JSON.parse(await squad.connection.call('call', params))
+  const result = await on("open", async () => {
+    JSON.parse(await squad.connection.call('call', params))
+  })
 
   if (result.Ok === undefined) {
     console.log(result)

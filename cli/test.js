@@ -80,7 +80,7 @@ squad.on('open', async () => {
 
   const componentAdds = await Promise.all(
     components.map(async c => {
-      return squad.createElement(c) 
+      return squad.createElement(c)
     })
   )
 
@@ -92,7 +92,7 @@ squad.on('open', async () => {
   const standard = {
     Format: {
       name: "Standard",
-      components: componentAdds,
+      components: componentAdds
     }
   }
 

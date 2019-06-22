@@ -1,13 +1,30 @@
 import { createStore, combineReducers, applyMiddleware } from 'redux'
-import { thunk } from 'redux-thunk'
-import { squad } from 'squad/reducersc'
-import { elementIndexes } from 'elements/reducer'
+import thunk from 'redux-thunk'
+import { squad } from 'squad/reducers'
+import { elementIndexes } from 'elements/reducers'
 
-const rootReducer = combineReducers({squad, elementIndexes})
-const initialState = rootReducer(undefined, {type: undefined})
-export const store = createStore(
-  rootReducer,
-  initialState,
+/**
+state = {
+  squad: {...},
+  elementIndexes: {
+    Games-Game: {
+      title: String,
+      elements: {
+        elementAddress: { ...element }
+      }
+    }
+    Formats-Format: {
+      title: String,
+      element: {...}
+    }
+  }
+  ...
+}
+
+*/
+
+export default createStore(
+  combineReducers({squad, elementIndexes}),
   applyMiddleware(thunk)
 )
 
