@@ -105,33 +105,28 @@ export async function createElement(element) {
   return await call("elements", "create_element", {element})
 }
 
-/*
 export async function getElement(address) {
   return await call("elements", "get_element", {address})
 }
 
-export async function getAllGames() {
-  return await call("elements", "get_all_games", {})
+const getAllElementsOfType = async (index_type) => {
+  return await call("elements", "get_all_elements_of_type", {index_type})
 }
 
-export async function getAllFormats() {
-  return await call("elements", "get_all_formats", {})
+const getElementsFromIndex = async (index_type, index_name) => {
+  return await call("elements", "get_elements_from_index", {index_type, index_name})
 }
 
-export async function getAllComponents () {
-  return await call("elements", "get_all_components", {})
-}
-*/
-
-export async function getIndex(name, type_) {
-  return await call(
-    "elements",
-    "get_index",
-    {
-      element_index: {
-        ElementIndex: {name, type_}
-      }
-    }
-  )
+module.exports = {
+  webSocketConnection,
+  mockConnection,
+  runGame,
+  registerRunner,
+  on,
+  call,
+  createElement,
+  getElement,
+  getAllElementsOfType,
+  getElementsFromIndex
 }
 
