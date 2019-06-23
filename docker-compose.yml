@@ -1,0 +1,8 @@
+version: '3'
+services:
+  metastore:
+    build: ./metastore
+    tty: true
+  curation:
+    build: ./curation
+

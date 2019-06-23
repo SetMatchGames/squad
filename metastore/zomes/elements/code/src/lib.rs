@@ -27,6 +27,7 @@ use hdk::{
     api::{
         link_entries,
         get_links,
+        entry_address,
     }
 };
 use std::convert::TryInto;
@@ -103,9 +104,9 @@ fn handle_create_element(element: Element) -> ZomeApiResult<Address> {
     hdk::debug(format!("handle_create_element({:?})", address))?;
 
     let index_address: Address = match element {
-        Element::Game{..} => handle_create_element_index("Games", "Game").unwrap(),
-        Element::Format{..} => handle_create_element_index("Formats", "Format").unwrap(),
-        Element::Component{..} => handle_create_element_index("Components", "Component").unwrap(),
+        Element::Game{..} => handle_create_element_index("Game Index", "Game").unwrap(),
+        Element::Format{..} => handle_create_element_index("Format Index", "Format").unwrap(),
+        Element::Component{..} => handle_create_element_index("Component Index", "Component").unwrap(),
     };
     link_entries(&index_address, &address, "Index", "")?;
 
@@ -137,31 +138,37 @@ fn handle_get_element_index(address: Address) -> ZomeApiResult<ElementIndex> {
     }
 }
 
-fn handle_get_all_games() -> ZomeApiResult<Vec<Element>> {
-    let index_address: Address = handle_create_element_index("Games", "Game").unwrap();
-    let links: Vec<Address> = get_links(&index_address, Some("Index".to_string()), None)?.addresses();
-    let games: Vec<Element> = links.into_iter().map(|address| {
+fn handle_get_all_elements_of_type(index_type: String) -> ZomeApiResult<Vec<Element>> {
+    let index_name: String = index_type.clone() + " Index";
+    let index = ElementIndex {
+        name: index_name.clone(),
+        type_: index_type
+    };
+
+    let index_entry = Entry::App("ElementIndex".into(), index.into());
+    let address: Address = entry_address(&index_entry)?;
+
+    let links: Vec<Address> = get_links(&address, Some("Index".to_string()), None)?.addresses();
+    let elements: Vec<Element> = links.into_iter().map(|address| {
         handle_get_element(address).unwrap()
     }).collect();
-    Ok(games)
+    Ok(elements)
 }
 
-fn handle_get_all_formats() -> ZomeApiResult<Vec<Element>> {
-    let index_address: Address = handle_create_element_index("Formats", "Format").unwrap();
-    let links: Vec<Address> = get_links(&index_address, Some("Index".to_string()), None)?.addresses();
-    let formats: Vec<Element> = links.into_iter().map(|address| {
-        handle_get_element(address).unwrap()
-    }).collect();
-    Ok(formats)
-}
+fn handle_get_elements_from_index(index_type: String, index_name: String) -> ZomeApiResult<Vec<Element>> {
+    let index = ElementIndex {
+        name: index_name.clone(),
+        type_: index_type
+    };
 
-fn handle_get_all_components() -> ZomeApiResult<Vec<Element>> {
-    let index_address: Address = handle_create_element_index("Components", "Component").unwrap();
-    let links: Vec<Address> = get_links(&index_address, Some("Index".to_string()), None)?.addresses();
-    let components: Vec<Element> = links.into_iter().map(|address| {
+    let index_entry = Entry::App("ElementIndex".into(), index.into());
+    let address: Address = entry_address(&index_entry)?;
+
+    let links: Vec<Address> = get_links(&address, Some("Index".to_string()), None)?.addresses();
+    let elements: Vec<Element> = links.into_iter().map(|address| {
         handle_get_element(address).unwrap()
     }).collect();
-    Ok(components)
+    Ok(elements)
 }
 
 fn handle_get_index(element_index: ElementIndex) -> ZomeApiResult<Vec<Element>> {
@@ -190,7 +197,7 @@ define_zome! {
         /*
         create_element_index: {
             inputs: |index: ElementIndex|,
-            outputs: |address: ZomeApiResult<Address>|,
+             outputs: |address: ZomeApiResult<Address>|,
             handler: handle_create_element_index
         }
         */
@@ -204,25 +211,15 @@ define_zome! {
             outputs: |element: ZomeApiResult<ElementIndex>|,
             handler: handle_get_element_index
         }
-        get_index: {
-            inputs: |element_index: ElementIndex|,
-            outputs: |elements: ZomeApiResult<Vec<Element>>|,
-            handler: handle_get_index
+        get_all_elements_of_type: {
+            inputs: |index_type: String|,
+            outputs: |linked_elements: ZomeApiResult<Vec<Element>>|,
+            handler: handle_get_all_elements_of_type
         }
-        get_all_games: {
-            inputs: | |,
-            outputs: |games: ZomeApiResult<Vec<Element>>|,
-            handler: handle_get_all_games
-        }
-        get_all_formats: {
-            inputs: | |,
-            outputs: |formats: ZomeApiResult<Vec<Element>>|,
-            handler: handle_get_all_formats
-        }
-        get_all_components: {
-            inputs: | |,
-            outputs: |components: ZomeApiResult<Vec<Element>>|,
-            handler: handle_get_all_components
+        get_elements_from_index: {
+            inputs: |index_type: String, index_name: String|,
+            outputs: |linked_elements: ZomeApiResult<Vec<Element>>|,
+            handler: handle_get_elements_from_index
         }
     ]
 
@@ -232,10 +229,8 @@ define_zome! {
             // create_element_index,
             get_element,
             get_element_index,
-            get_index,
-            get_all_games,
-            get_all_formats,
-            get_all_components
+            get_all_elements_of_type,
+            get_elements_from_index
         ]
     }
 }
