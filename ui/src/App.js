@@ -3,10 +3,10 @@ import './App.css'
 
 import { connect } from 'react-redux'
 
+import CreateElementForm from 'elements/CreateElementForm'
 import ElementIndex from 'elements/ElementIndex'
 
 function App(props) {
-  console.log("calculating App", props)
   const elementIndexComponents = Object.keys(props.elementIndexes).map(
     (indexKey) => {
       return (
@@ -22,6 +22,7 @@ function App(props) {
       <div className="App-header">
         SQUAD
       </div>
+      <CreateElementForm />
       {elementIndexComponents}
     </div>
   )

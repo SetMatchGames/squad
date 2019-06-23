@@ -45,6 +45,7 @@ function elementIndex(state = newElementIndex(), action) {
       actionInfo(action),
       {waiting: false, error: action.error}
     )
+    console.error(action.error)
     break
   default:
     return state

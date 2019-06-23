@@ -18,14 +18,16 @@ ReactDOM.render(
 )
 
 store.dispatch(connectToSquad(
-  'ws://localhost:8888',
+  'ws://localhost:8888', // TODO make this configurable
   (connection, dispatch) => {
-    console.log("connectedToSquad dispatching indexes")
     dispatch(fetchIndex("Games", "Game"))
     dispatch(fetchIndex("Formats", "Format"))
     dispatch(fetchIndex("Components", "Component"))
   },
-  console.log("connection failure")
+  (error, dispatch) => {
+    console.warn(error)
+  },
+  console.log // messageCallback
 ))
 
 // If you want your app to work offline and load faster, you can change

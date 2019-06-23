@@ -1,12 +1,13 @@
 import { combineReducers } from 'redux'
+import { on as squadOn } from 'squad-sdk'
 import {
   CONNECTING_TO_SQUAD,
   CONNECT_TO_SQUAD_FAIL,
   CONNECT_TO_SQUAD_SUCCESS,
 } from 'squad/actions'
 
-function connection(state = {}, action) {
-  return (action.type === CONNECT_TO_SQUAD_SUCCESS) ? action.type : state
+function on(state = null, action) {
+  return (action.type === CONNECT_TO_SQUAD_SUCCESS) ? squadOn : state
 }
 
 function status(state = 'INITIAL', action) {
@@ -20,17 +21,4 @@ function status(state = 'INITIAL', action) {
   return state
 }
 
-function error(state = null, action) {
-  switch(action.type) {
-  case CONNECT_TO_SQUAD_FAIL:
-    return action.error
-  case CONNECT_TO_SQUAD_SUCCESS:
-    return null
-  case CONNECTING_TO_SQUAD:
-    return null
-  default:
-    return state
-  }
-}
-
-export const squad = combineReducers({connection, status, error})
+export const squad = combineReducers({on, status})
