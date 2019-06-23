@@ -76,33 +76,24 @@ function mockConnection(mock) {
 }
 
 function on(message, f) {
-  return new Promise((resolve, reject) => {
-    squad.connection.on(message, () => {
-      try {
-        resolve(f())
-      } catch(error) {
-        reject(error)
-      }
-    })
-  })
+  squad.connection.on(message, f)
 }
 
 async function call(zome, method, inputs) {
   console.log("squad.call", zome, method, inputs)
-  let result = await on("open", async () => {
-    console.log("connection open")
-    const instanceInfo = await squad.connection.call('info/instances', {})
-    console.log('instanceInfo', instanceInfo)
-    const params = {
-      "instance_id": instanceInfo[0].id,
-      "zome": zome,
-      "function": method,
-      "args": inputs
-    }
-    console.log("calling")
-    return JSON.parse(await squad.connection.call('call', params))
-  })
-  console.log("squad.call result", result)
+
+  const instanceInfo = await squad.connection.call('info/instances', {})
+  console.log('instanceInfo', instanceInfo)
+
+  const params = {
+    "instance_id": instanceInfo[0].id,
+    "zome": zome,
+    "function": method,
+    "args": inputs
+  }
+  console.log("calling")
+  const result = JSON.parse(await squad.connection.call('call', params))
+
   if (result.Ok === undefined) {
     throw result
   }
@@ -110,7 +101,11 @@ async function call(zome, method, inputs) {
 }
 
 async function createElement(element) {
-  return await call("elements", "create_element", {element})
+  try {
+    return await call("elements", "create_element", {element})
+  } catch(e) {
+    console.log("createE", e)
+  }
 }
 
 async function getElement(address) {
@@ -122,6 +117,7 @@ const getAllElementsOfType = async (index_type) => {
 }
 
 const getElementsFromIndex = async (index_type, index_name) => {
+  console.log("getElementsFromIndex called with", index_type, index_name)
   return await call("elements", "get_elements_from_index", {index_type, index_name})
 }
 
