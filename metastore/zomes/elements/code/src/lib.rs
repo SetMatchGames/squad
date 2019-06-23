@@ -171,15 +171,6 @@ fn handle_get_elements_from_index(index_type: String, index_name: String) -> Zom
     Ok(elements)
 }
 
-fn handle_get_index(element_index: ElementIndex) -> ZomeApiResult<Vec<Element>> {
-    let index_address: Address = hdk::entry_address(&element_index)?;
-    let links: Vec<Address> = get_links(&index_address, Some("Index".to_string()), None)?.addresses();
-    let elements: Vec<Element> = links.into_iter().map(|address| {
-        handle_get_element(address).unwrap()
-    }).collect();
-    Ok(elements)
-}
-
 define_zome! {
     entries: [
         element_entry(),
