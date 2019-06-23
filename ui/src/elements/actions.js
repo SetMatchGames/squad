@@ -37,27 +37,27 @@ export function createElementFailure(address, error) {
   return {type: CREATE_ELEMENT_FAILURE, address, error}
 }
 
-export function fetchIndex(name, elementType) {
+export function fetchIndex(elementType, name) {
   return (dispatch) => {
-    dispatch(requestIndex(name, elementType))
-    getElementsFromIndex(name, elementType)
+    dispatch(requestIndex(elementType, name))
+    getElementsFromIndex(elementType, name)
       .then(elements => {
-        dispatch(receiveIndex(name, elementType, elements))
+        dispatch(receiveIndex(elementType, name, elements))
       })
       .catch(error => {
-        dispatch(indexFailure(name, elementType, error))
+        dispatch(indexFailure(elementType, name, error))
       })
   }
 }
 
-export function requestIndex(name, elementType) {
-  return {type: REQUEST_INDEX, name, elementType}
+export function requestIndex(elementType, name) {
+  return {type: REQUEST_INDEX, elementType, name}
 }
 
-export function receiveIndex(name, elementType, elements) {
-  return {type: RECEIVE_INDEX, name, elementType, elements}
+export function receiveIndex(elementType, name, elements) {
+  return {type: RECEIVE_INDEX, elementType, name, elements}
 }
 
-export function indexFailure(name, elementType, error) {
-  return {type: INDEX_FAILURE, name, elementType, error}
+export function indexFailure(elementType, name, error) {
+  return {type: INDEX_FAILURE, elementType, name, error}
 }

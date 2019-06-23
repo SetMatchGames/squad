@@ -20,9 +20,9 @@ ReactDOM.render(
 store.dispatch(connectToSquad(
   'ws://localhost:8888', // TODO make this configurable
   (connection, dispatch) => {
-    dispatch(fetchIndex("Games", "Game"))
-    dispatch(fetchIndex("Formats", "Format"))
-    dispatch(fetchIndex("Components", "Component"))
+    dispatch(fetchIndex("Game", "Game Index"))
+    dispatch(fetchIndex("Format", "Format Index"))
+    dispatch(fetchIndex("Component", "Component Index"))
   },
   (error, dispatch) => {
     console.warn(error)

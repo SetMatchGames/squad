@@ -5,7 +5,7 @@ import { submitElement } from 'elements/actions'
 
 const handleCreateElement = (_) => {
   const textarea = document.getElementById(`element-text`)
-  store.dispatch(submitElement(textarea.value))
+  store.dispatch(submitElement(JSON.parse(textarea.value)))
 }
 
 export default function CreateElementForm(props) {
