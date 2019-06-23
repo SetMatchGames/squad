@@ -1,7 +1,8 @@
 version: '3'
 services:
   metastore:
-    image: "squad/metastore"
+    build: ./metastore
     tty: true
   curation:
-    image: "trufflesuite/ganache-cli:latest"
+    build: ./curation
+
