@@ -52,11 +52,11 @@ const runners = {
   }
 }
 
-export function registerRunner(type_, runner) {
+function registerRunner(type_, runner) {
   runners[type_] = runner
 }
 
-export async function runGame(gameAddress) {
+async function runGame(gameAddress) {
   // TODO handle the case that a REST holochain uri is passed in
   console.log("squad.runGame", gameAddress)
   const game = (await getElement(gameAddress)).Game
@@ -64,48 +64,56 @@ export async function runGame(gameAddress) {
   return runner(game.data)
 }
 
-export async function webSocketConnection(uri) {
+function webSocketConnection(uri) {
   squad.connection = new WebSocket(uri)
+  return squad.connection
+//  return await on('open', () => { return squad.connection })
 }
 
-export function mockConnection(mock) {
+function mockConnection(mock) {
   squad.connection = mock
   return squad.connection
 }
 
-export function on(message, f) {
-  return squad.connection.on(message, f)
+function on(message, f) {
+  return new Promise((resolve, reject) => {
+    squad.connection.on(message, () => {
+      try {
+        resolve(f())
+      } catch(error) {
+        reject(error)
+      }
+    })
+  })
 }
 
-export async function call(zome, method, inputs) {
-  console.log("call", zome, method, inputs)
-  const info = await on("open", async () => {
-    await squad.connection.call('info/instances', {})
+async function call(zome, method, inputs) {
+  console.log("squad.call", zome, method, inputs)
+  let result = await on("open", async () => {
+    console.log("connection open")
+    const instanceInfo = await squad.connection.call('info/instances', {})
+    console.log('instanceInfo', instanceInfo)
+    const params = {
+      "instance_id": instanceInfo[0].id,
+      "zome": zome,
+      "function": method,
+      "args": inputs
+    }
+    console.log("calling")
+    return JSON.parse(await squad.connection.call('call', params))
   })
-  const instanceId = info[0].id
-  const params = {
-    "instance_id": instanceId,
-    "zome": zome,
-    "function": method,
-    "args": inputs
-  }
-
-  const result = await on("open", async () => {
-    JSON.parse(await squad.connection.call('call', params))
-  })
-
+  console.log("squad.call result", result)
   if (result.Ok === undefined) {
-    console.log(result)
     throw result
   }
   return result.Ok
 }
 
-export async function createElement(element) {
+async function createElement(element) {
   return await call("elements", "create_element", {element})
 }
 
-export async function getElement(address) {
+async function getElement(address) {
   return await call("elements", "get_element", {address})
 }
 

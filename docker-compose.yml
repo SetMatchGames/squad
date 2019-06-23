@@ -3,6 +3,7 @@ services:
   metastore:
     build: ./metastore
     tty: true
+    ports:
+      - 8888:8888
   curation:
     build: ./curation
-

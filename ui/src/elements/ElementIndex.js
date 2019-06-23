@@ -7,7 +7,7 @@ function ElementIndex(props) {
   const elementList = props.elements.map(e => Element(e))
   return (
     <div className="App-body">
-      <h1>{props.title}</h1>
+      <h1>{props.name}</h1>
       <ul>{elementList}</ul>
     </div>
   )
