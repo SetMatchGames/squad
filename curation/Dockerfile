@@ -1,7 +1,7 @@
 FROM trufflesuite/ganache-cli:latest
 
-RUN mkdir /app
-WORKDIR /app
+RUN mkdir /curation
+WORKDIR /curation
 
 COPY ./package.json ./package.json
 

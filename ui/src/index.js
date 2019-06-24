@@ -8,7 +8,7 @@ import { Provider } from 'react-redux'
 import store from './store'
 
 import { connectToSquad } from 'squad/actions'
-import { fetchIndex } from 'elements/actions'
+import { fetchCatalog } from 'definitions/actions'
 
 ReactDOM.render(
   <Provider store={store}>
@@ -20,9 +20,9 @@ ReactDOM.render(
 store.dispatch(connectToSquad(
   'ws://localhost:8888', // TODO make this configurable
   (connection, dispatch) => {
-    dispatch(fetchIndex("Game", "Game Index"))
-    dispatch(fetchIndex("Format", "Format Index"))
-    dispatch(fetchIndex("Component", "Component Index"))
+    dispatch(fetchCatalog("Game", "Game Catalog"))
+    dispatch(fetchCatalog("Format", "Format Catalog"))
+    dispatch(fetchCatalog("Component", "Component Catalog"))
   },
   (error, dispatch) => {
     console.warn(error)

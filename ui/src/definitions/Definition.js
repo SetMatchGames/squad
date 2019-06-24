@@ -3,8 +3,8 @@ import React from 'react'
 
 import { runGame } from 'squad-sdk'
 
-export function Element(props) {
-  console.log("Element component", props)
+export function Definition(props) {
+  console.log("Definition component", props)
   return (
     <div>
       {JSON.stringify(props)}

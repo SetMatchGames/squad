@@ -16,10 +16,10 @@ const runners = {
     // start a process identified in the game data
 
     // get the format from holochain
-    const format = (await getElement(formatAddress)).Format
+    const format = (await getDefinition(formatAddress)).Format
     const components = await Promise.all(
       format.components.map(a => {
-        return getElement(a)
+        return getDefinition(a)
       })
     )
 
@@ -59,7 +59,7 @@ function registerRunner(type_, runner) {
 async function runGame(gameAddress) {
   // TODO handle the case that a REST holochain uri is passed in
   console.log("squad.runGame", gameAddress)
-  const game = (await getElement(gameAddress)).Game
+  const game = (await getDefinition(gameAddress)).Game
   const runner = runners[game.type_]
   return runner(game.data)
 }
@@ -100,25 +100,21 @@ async function call(zome, method, inputs) {
   return result.Ok
 }
 
-async function createElement(element) {
-  try {
-    return await call("elements", "create_element", {element})
-  } catch(e) {
-    console.log("createE", e)
-  }
+async function createDefinition(definition) {
+  return await call("definitions", "create_definition", {definition})
 }
 
-async function getElement(address) {
-  return await call("elements", "get_element", {address})
+async function getDefinition(address) {
+  return await call("definitions", "get_definition", {address})
 }
 
-const getAllElementsOfType = async (index_type) => {
-  return await call("elements", "get_all_elements_of_type", {index_type})
+const getAllDefinitionsOfType = async (catalog_type) => {
+  return await call("definitions", "get_all_definitions_of_type", {catalog_type})
 }
 
-const getElementsFromIndex = async (index_type, index_name) => {
-  console.log("getElementsFromIndex called with", index_type, index_name)
-  return await call("elements", "get_elements_from_index", {index_type, index_name})
+const getDefinitionsFromCatalog = async (catalog_type, catalog_name) => {
+  console.log("getDefinitionsFromCatalog called with", catalog_type, catalog_name)
+  return await call("definitions", "get_definitions_from_catalog", {catalog_type, catalog_name})
 }
 
 module.exports = {
@@ -128,9 +124,9 @@ module.exports = {
   registerRunner,
   on,
   call,
-  createElement,
-  getElement,
-  getAllElementsOfType,
-  getElementsFromIndex
+  createDefinition,
+  getDefinition,
+  getAllDefinitionsOfType,
+  getDefinitionsFromCatalog
 }
 

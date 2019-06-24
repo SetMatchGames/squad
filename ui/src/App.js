@@ -3,16 +3,16 @@ import './App.css'
 
 import { connect } from 'react-redux'
 
-import CreateElementForm from 'elements/CreateElementForm'
-import ElementIndex from 'elements/ElementIndex'
+import CreateDefintionForm from 'definitions/CreateDefinitionForm'
+import Catalog from 'definitions/Catalog'
 
 function App(props) {
-  const elementIndexComponents = Object.keys(props.elementIndexes).map(
-    (indexKey) => {
+  const catalogComponents = Object.keys(props.catalogs).map(
+    (catalogKey) => {
       return (
-        <ElementIndex
-          key={indexKey}
-          mapState={s => s.elementIndexes[indexKey]}
+        <Catalog
+          key={catalogKey}
+          mapState={s => s.catalogs[catalogKey]}
         />
       )
     }
@@ -22,8 +22,8 @@ function App(props) {
       <div className="App-header">
         SQUAD
       </div>
-      <CreateElementForm />
-      {elementIndexComponents}
+      <CreateDefintionForm />
+      {catalogComponents}
     </div>
   )
 }
