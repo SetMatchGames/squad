@@ -1,21 +1,21 @@
 import { createStore, combineReducers, applyMiddleware, compose } from 'redux'
 import thunk from 'redux-thunk'
 import { squad } from 'squad/reducers'
-import { elementIndexes } from 'elements/reducers'
+import { catalogs } from 'definitions/reducers'
 
 /**
 state = {
   squad: {...},
-  elementIndexes: {
-    Games-Game: {
+  catalogs: {
+    Game-Game Catalog: {
       title: String,
-      elements: {
-        elementAddress: { ...element }
+      definitions: {
+        definitionAddress: { ...definition }
       }
     }
-    Formats-Format: {
+    Format-Format Catalog: {
       title: String,
-      element: {...}
+      definition: {...}
     }
   }
   ...
@@ -26,7 +26,7 @@ state = {
 const composeEnhansers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
 export default createStore(
-  combineReducers({squad, elementIndexes}),
+  combineReducers({squad, catalogs}),
   composeEnhansers(applyMiddleware(thunk))
 )
 

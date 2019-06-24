@@ -10,13 +10,13 @@ use hdk::{
 use std::convert::TryInto;
 
 #[derive(Serialize, Deserialize, Debug, DefaultJson, Clone)]
-pub struct ElementIndex {
+pub struct Catalog {
     pub name: String,
     pub type_: String
 }
 
 #[derive(Serialize, Deserialize, Debug, DefaultJson, Clone)]
-pub enum Element {
+pub enum Definition {
     Game{
         name: String,
         // TODO rename Game.type to Game.runner
@@ -68,7 +68,7 @@ fn valid_format_fields(
         let api_result = hdk::get_entry(&address)?;
         if let Some(Entry::App(_, entry)) = api_result {
             // confirm it's a component
-            if let Element::Component{
+            if let Definition::Component{
                 name: _,
                 type_: _,
                 data: _
@@ -84,29 +84,29 @@ fn valid_format_fields(
     Ok(())
 }
 
-pub fn valid_element(element: &Element) -> Result<(), String> {
-    match element {
-        Element::Game{name, type_, data: _}   => valid_game_fields(&name, &type_),
-        Element::Component{name, type_, data} => valid_component_fields(&name, &type_, &data),
-        Element::Format{name, components}     => valid_format_fields(&name, &components),
+pub fn valid_definition(definition: &Definition) -> Result<(), String> {
+    match definition {
+        Definition::Game{name, type_, data: _}   => valid_game_fields(&name, &type_),
+        Definition::Component{name, type_, data} => valid_component_fields(&name, &type_, &data),
+        Definition::Format{name, components}     => valid_format_fields(&name, &components),
     }
 }
 
-pub fn valid_base_and_target(base: &ElementIndex, target: &Element) -> Result<(), String> {
+pub fn valid_base_and_target(base: &Catalog, target: &Definition) -> Result<(), String> {
     match target {
-        Element::Game{..} => { 
+        Definition::Game{..} => { 
             if "Game" == &base.type_ { 
                 return Ok(()) 
             }
             Err(format!("Expected base to be a game, but was {}", base.type_)) 
         },
-        Element::Format{..} => {
+        Definition::Format{..} => {
             if "Format" == &base.type_ { 
                 return Ok(()) 
             }
             Err(format!("Expected base to be a format, but was {}", base.type_))
         },
-        Element::Component{..} => {
+        Definition::Component{..} => {
             if "Component" == &base.type_ { 
                 return Ok(()) 
             }
