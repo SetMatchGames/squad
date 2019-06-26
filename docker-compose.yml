@@ -5,5 +5,12 @@ services:
     tty: true
     ports:
       - 8888:8888
+  ganache:
+    image: trufflesuite/ganache-cli:latest
+    command: ganache-cli -h 0.0.0.0
+    ports:
+      - 8545:8545
   curation:
     build: ./curation
+    depends_on:
+      - ganache

@@ -1,5 +1,5 @@
 const { Config, Scenario } = require("@holochain/holochain-nodejs")
-let squad = require("../sdk/js")
+let squad = require("../../sdk/js")
 
 Scenario.setTape(require("tape"))
 

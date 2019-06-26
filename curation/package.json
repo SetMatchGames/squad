@@ -15,6 +15,7 @@
     "deploy-rinkeby": "npm run _deploy rinkeby",
     "deploy-kovan": "npm run _deploy kovan",
     "deploy-local": "npm run _deploy local",
+    "deploy-docker": "npm run _deploy docker",
     "test": "./node_modules/.bin/truffle test",
     "develop": "./node_modules/.bin/truffle develop"
   },
@@ -25,6 +26,7 @@
     "truffle": "^4.1.13"
   },
   "dependencies": {
-    "jsonfile": "^5.0.0"
+    "jsonfile": "^5.0.0",
+    "truffle-hdwallet-provider": "^1.0.11"
   }
 }

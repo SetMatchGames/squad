@@ -1,4 +1,4 @@
-let squad = require('../sdk/js')
+let squad = require('..')
 
 // connect squad Client
 squad.webSocketConnection('ws://localhost:8888')
