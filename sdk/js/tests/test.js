@@ -1,7 +1,7 @@
 let squad = require('../index')
 
 // connect squad Client
-squad.webSocketConnection('ws://localhost:8888')
+squad.metastore.webSocketConnection('ws://localhost:8888')
 
 const roshambo = {
   Game: {
@@ -68,31 +68,31 @@ const extraComponents = [
 ]
 
 
-squad.on('open', async () => {
+squad.metastore.on('open', async () => {
 
-  // holochain test
+  // metastore tests
 
-  const a = await squad.createDefinition(roshambo)
+  const a = await squad.metastore.createDefinition(roshambo)
   console.log("roshambo address:", a)
 
-  const r = await squad.getDefinition(a)
+  const r = await squad.metastore.getDefinition(a)
   console.log("roshambo retrieved:", r)
 
   setTimeout(async () => {
-    const g = await squad.getDefinitionsFromCatalog("Game", "Game Catalog")
+    const g = await squad.metastore.getDefinitionsFromCatalog("Game", "Game Catalog")
     console.log("all games:", g)
   },
   1000)
 
   const componentAdds = await Promise.all(
     components.map(async c => {
-      return squad.createDefinition(c)
+      return squad.metastore.createDefinition(c)
     })
   )
   console.log("component addresses:", componentAdds)
 
   setTimeout(async () => {
-    const c = await squad.getAllDefinitionsOfType("Component")
+    const c = await squad.metastore.getAllDefinitionsOfType("Component")
     console.log("all components:", c)
   },
   1000)
@@ -104,20 +104,20 @@ squad.on('open', async () => {
     }
   }
 
-  const f = await squad.createDefinition(standard)
+  const f = await squad.metastore.createDefinition(standard)
   console.log("format address:", f)
 
-  const z = await squad.getDefinition(f)
+  const z = await squad.metastore.getDefinition(f)
   console.log("standard format retrieved:", z)
 
   setTimeout(async () => {
-    const h = await squad.getAllDefinitionsOfType("Format")
+    const h = await squad.metastore.getAllDefinitionsOfType("Format")
     console.log("all formats:", h)
     console.log("standard format components addresses:", h[0].Format.components)
   },
   1000)
 
-  // eth test
+  // curation market tests
 
   web3 = await squad.curationMarket.makeWeb3('ws://localhost:8545')
   console.log("web3")
