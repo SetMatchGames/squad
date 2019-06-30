@@ -1,4 +1,4 @@
-let squad = require('..')
+let squad = require('../index')
 
 // connect squad Client
 squad.webSocketConnection('ws://localhost:8888')
@@ -67,29 +67,32 @@ const extraComponents = [
   }
 ]
 
+
 squad.on('open', async () => {
 
-  const a = await squad.createElement(roshambo)
+  // holochain test
+
+  const a = await squad.createDefinition(roshambo)
   console.log("roshambo address:", a)
 
-  const r = await squad.getElement(a)
+  const r = await squad.getDefinition(a)
   console.log("roshambo retrieved:", r)
 
   setTimeout(async () => {
-    const g = await squad.getElementsFromIndex("Game", "Game Index")
+    const g = await squad.getDefinitionsFromCatalog("Game", "Game Catalog")
     console.log("all games:", g)
   },
   1000)
 
   const componentAdds = await Promise.all(
     components.map(async c => {
-      return squad.createElement(c)
+      return squad.createDefinition(c)
     })
   )
   console.log("component addresses:", componentAdds)
 
   setTimeout(async () => {
-    const c = await squad.getAllElementsOfType("Component")
+    const c = await squad.getAllDefinitionsOfType("Component")
     console.log("all components:", c)
   },
   1000)
@@ -101,17 +104,46 @@ squad.on('open', async () => {
     }
   }
 
-  const f = await squad.createElement(standard)
+  const f = await squad.createDefinition(standard)
   console.log("format address:", f)
 
-  const z = await squad.getElement(f)
+  const z = await squad.getDefinition(f)
   console.log("standard format retrieved:", z)
 
   setTimeout(async () => {
-    const h = await squad.getAllElementsOfType("Format")
+    const h = await squad.getAllDefinitionsOfType("Format")
     console.log("all formats:", h)
     console.log("standard format components addresses:", h[0].Format.components)
   },
   1000)
+
+  // eth test
+
+  web3 = await squad.curationMarket.makeWeb3('ws://localhost:8545')
+  console.log("web3")
+
+  const factory = squad.curationMarket.makeFactory('0x2a19231a3ac5e2867be42981b2d26e1ffb6ac8a4')
+  console.log("factory")
+
+  const bond = await squad.curationMarket.makeBond(factory)
+  console.log("bond")
+
+  var price = await squad.curationMarket.priceToMint(bond, 50)
+  console.log(price)
+
+  await squad.curationMarket.mint(bond, 50, price)
+
+  var price = await squad.curationMarket.priceToMint(bond, 50)
+  console.log(price)
+
+  await squad.curationMarket.mint(bond, 50, price)
+
+  var price = await squad.curationMarket.priceToMint(bond, 50)
+  console.log(price)
+
+  await squad.curationMarket.mint(bond, 50, price)
+
+  var price = await squad.curationMarket.priceToMint(bond, 50)
+  console.log(price)
 
 })
