@@ -3,6 +3,7 @@ const fs = require('fs')
 const process = require('process')
 const WebSocket = require('rpc-websockets').Client
 const path = require('path')
+const curationMarket = require('./curation-contracts/sdk-module')
 
 const squad = {}
 
@@ -108,11 +109,11 @@ async function getDefinition(address) {
   return await call("definitions", "get_definition", {address})
 }
 
-const getAllDefinitionsOfType = async (catalog_type) => {
+async function getAllDefinitionsOfType(catalog_type) {
   return await call("definitions", "get_all_definitions_of_type", {catalog_type})
 }
 
-const getDefinitionsFromCatalog = async (catalog_type, catalog_name) => {
+async function getDefinitionsFromCatalog(catalog_type, catalog_name) {
   console.log("getDefinitionsFromCatalog called with", catalog_type, catalog_name)
   return await call("definitions", "get_definitions_from_catalog", {catalog_type, catalog_name})
 }
@@ -127,6 +128,7 @@ module.exports = {
   createDefinition,
   getDefinition,
   getAllDefinitionsOfType,
-  getDefinitionsFromCatalog
+  getDefinitionsFromCatalog,
+  curationMarket // methods: makeDefaults(account), makeBond(factory, defaults, bondABI)
 }
 
