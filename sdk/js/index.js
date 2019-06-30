@@ -1,11 +1,9 @@
 const { spawn } = require('child_process')
 const fs = require('fs')
 const process = require('process')
-const WebSocket = require('rpc-websockets').Client
 const path = require('path')
-const curationMarket = require('./curation-contracts/sdk-module')
-
-const squad = {}
+const curationMarket = require('./curation/api')
+const metastore = require('./metastore-api')
 
 const runners = {
   "linux-bash-game-v0": async (formatAddress, gameData) => {
@@ -65,70 +63,12 @@ async function runGame(gameAddress) {
   return runner(game.data)
 }
 
-function webSocketConnection(uri) {
-  squad.connection = new WebSocket(uri)
-  return squad.connection
-//  return await on('open', () => { return squad.connection })
-}
-
-function mockConnection(mock) {
-  squad.connection = mock
-  return squad.connection
-}
-
-function on(message, f) {
-  squad.connection.on(message, f)
-}
-
-async function call(zome, method, inputs) {
-  console.log("squad.call", zome, method, inputs)
-
-  const instanceInfo = await squad.connection.call('info/instances', {})
-  console.log('instanceInfo', instanceInfo)
-
-  const params = {
-    "instance_id": instanceInfo[0].id,
-    "zome": zome,
-    "function": method,
-    "args": inputs
-  }
-  console.log("calling")
-  const result = JSON.parse(await squad.connection.call('call', params))
-
-  if (result.Ok === undefined) {
-    throw result
-  }
-  return result.Ok
-}
-
-async function createDefinition(definition) {
-  return await call("definitions", "create_definition", {definition})
-}
-
-async function getDefinition(address) {
-  return await call("definitions", "get_definition", {address})
-}
-
-async function getAllDefinitionsOfType(catalog_type) {
-  return await call("definitions", "get_all_definitions_of_type", {catalog_type})
-}
-
-async function getDefinitionsFromCatalog(catalog_type, catalog_name) {
-  console.log("getDefinitionsFromCatalog called with", catalog_type, catalog_name)
-  return await call("definitions", "get_definitions_from_catalog", {catalog_type, catalog_name})
-}
+console.log(metastore)
 
 module.exports = {
-  webSocketConnection,
-  mockConnection,
   runGame,
   registerRunner,
-  on,
-  call,
-  createDefinition,
-  getDefinition,
-  getAllDefinitionsOfType,
-  getDefinitionsFromCatalog,
+  metastore,
   curationMarket // methods: makeDefaults(account), makeBond(factory, defaults, bondABI)
 }
 
