@@ -1,5 +1,5 @@
 import { combineReducers } from 'redux'
-import { on as squadOn } from 'squad-sdk'
+import { metastore } from 'squad-sdk'
 import {
   CONNECTING_TO_SQUAD,
   CONNECT_TO_SQUAD_FAIL,
@@ -7,7 +7,7 @@ import {
 } from 'squad/actions'
 
 function on(state = null, action) {
-  return (action.type === CONNECT_TO_SQUAD_SUCCESS) ? squadOn : state
+  return (action.type === CONNECT_TO_SQUAD_SUCCESS) ? metastore.on : state
 }
 
 function status(state = 'INITIAL', action) {

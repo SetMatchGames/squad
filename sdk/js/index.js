@@ -2,7 +2,7 @@ const { spawn } = require('child_process')
 const fs = require('fs')
 const process = require('process')
 const path = require('path')
-const curationMarket = require('./curation/api')
+const curationMarket = require('../../curation/api')
 const metastore = require('./metastore-api')
 
 const runners = {

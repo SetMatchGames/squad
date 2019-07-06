@@ -6,12 +6,8 @@ import { runGame } from 'squad-sdk'
 export function Definition(props) {
   console.log("Definition component", props)
   return (
-    <div>
+    <div key={props.key}>
       {JSON.stringify(props)}
     </div>
   )
 }
-
-
-
-
