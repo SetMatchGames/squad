@@ -3,10 +3,7 @@
  * There are catalogs for each of the definition types (Game, Format, Component)
  */
 
-import {
-  getDefinitionsFromCatalog,
-  createDefinition as squadCreateDefinition
-} from "squad-sdk"
+import { metastore } from "squad-sdk"
 
 export const CREATE_DEFINITION = "CREATE_DEFINITION"
 export const CREATE_DEFINITION_SUCCESS = "CREATE_DEFINITION_SUCCESS"
@@ -18,7 +15,7 @@ export const CATALOG_FAILURE = "CATALOG_FAILURE"
 export function submitDefinition(definition) {
   return (dispatch) => {
     dispatch(createDefinition(definition))
-    squadCreateDefinition(definition).then(
+    metastore.createDefinition(definition).then(
       (address) => createDefinitionSuccess(address, definition),
       (error) => createDefinitionFailure(error, definition)
     )
@@ -40,7 +37,7 @@ export function createDefinitionFailure(address, error) {
 export function fetchCatalog(definitionType, name) {
   return (dispatch) => {
     dispatch(requestCatalog(definitionType, name))
-    getDefinitionsFromCatalog(definitionType, name)
+    metastore.getDefinitionsFromCatalog(definitionType, name)
       .then(definitions => {
         dispatch(receiveCatalog(definitionType, name, definitions))
       })

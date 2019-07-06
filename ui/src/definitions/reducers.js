@@ -54,21 +54,19 @@ function catalog(state = newCatalog(), action) {
 }
 
 export function catalogs(state = {}, action) {
+  const key = catalogKey(action.name, action.definitionType)
   switch(action.type) {
   case REQUEST_CATALOG:
     // initialize a new definition catalog if one isn't there
-    const key = catalogKey(action.name, action.definitionType)
     state[key] = state[key] ? state[key] : newCatalog()
     break
   default:
     break
   }
-  // reduce all catalogs
-  Object.keys(state).forEach(definitionType => {
-    state[definitionType] = Object.assign(
-      {},
-      catalog(state[definitionType], action)
-    )
-  })
+  // reduce the requested catalog
+  state[key] = Object.assign(
+    {},
+    catalog(state[key], action)
+  )
   return Object.assign({}, state)
 }
