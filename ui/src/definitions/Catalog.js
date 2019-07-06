@@ -4,7 +4,10 @@ import { connect } from 'react-redux'
 import { Definition } from 'definitions/Definition'
 
 function Catalog(props) {
-  const definitionList = props.definitions.map(e => Definition(e))
+  let k = 0
+  const definitionList = props.definitions.map(e => Definition(
+    Object.assign(e, { key: k++ })
+  ))
   return (
     <div className="App-body">
       <h1>{props.name}</h1>

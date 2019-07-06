@@ -122,7 +122,7 @@ squad.metastore.on('open', async () => {
   web3 = await squad.curationMarket.makeWeb3('ws://localhost:8545')
   console.log("web3")
 
-  const factory = squad.curationMarket.makeFactory('0x2a19231a3ac5e2867be42981b2d26e1ffb6ac8a4')
+  const factory = squad.curationMarket.makeFactory(process.env.FACTORY_ADDR)
   console.log("factory")
 
   const bond = await squad.curationMarket.makeBond(factory)

@@ -3,6 +3,8 @@ node_modules/
 target/
 
 bundle.json
+ganache.log
+holochain.log
 
 *secret*
 squad_components.json

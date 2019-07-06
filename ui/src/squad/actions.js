@@ -1,4 +1,4 @@
-import { webSocketConnection } from 'squad-sdk'
+import { metastore } from 'squad-sdk'
 
 export const CONNECTING_TO_SQUAD = "CONNECTING_TO_SQUAD"
 export const CONNECT_TO_SQUAD_FAIL = "CONNECT_TO_SQUAD_FAIL"
@@ -12,7 +12,7 @@ export function connectToSquad(
 ) {
   return dispatch => {
     dispatch(connecting())
-    const connection = webSocketConnection(uri)
+    const connection = metastore.webSocketConnection(uri)
     console.log(connection)
     connection.on("open", () => {
       dispatch(connectSuccess(connection.on))
