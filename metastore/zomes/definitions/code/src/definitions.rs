@@ -1,9 +1,13 @@
 use hdk::{
     holochain_core_types::{
-        error::HolochainError,
-        json::JsonString,
-        cas::content::Address,
         entry::Entry,
+    },
+    holochain_persistence_api::{
+        cas::content::Address,
+    },
+    holochain_json_api::{
+        json::JsonString,
+        error::JsonError 
     }
 };
 

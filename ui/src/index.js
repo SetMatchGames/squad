@@ -7,8 +7,8 @@ import * as serviceWorker from './serviceWorker'
 import { Provider } from 'react-redux'
 import store from './store'
 
-import { connectToSquad } from 'squad/actions'
-import { fetchCatalog } from 'definitions/actions'
+import { connectToSquad } from './squad/actions'
+import { fetchCatalog } from './definitions/actions'
 
 ReactDOM.render(
   <Provider store={store}>

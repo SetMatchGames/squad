@@ -3,8 +3,8 @@ import './App.css'
 
 import { connect } from 'react-redux'
 
-import CreateDefintionForm from 'definitions/CreateDefinitionForm'
-import Catalog from 'definitions/Catalog'
+import CreateDefintionForm from './definitions/CreateDefinitionForm'
+import Catalog from './definitions/Catalog'
 
 function App(props) {
   const catalogComponents = Object.keys(props.catalogs).map(
