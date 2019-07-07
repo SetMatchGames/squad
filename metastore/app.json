@@ -1,6 +1,6 @@
 {
-  "name": "Holochain App Name",
-  "description": "A Holochain app",
+  "name": "Squad Metastore",
+  "description": "Stores definitions for Squad",
   "authors": [
     {
       "indentifier": "Author Name <author@name.com>",

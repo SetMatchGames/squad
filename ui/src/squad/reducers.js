@@ -4,7 +4,7 @@ import {
   CONNECTING_TO_SQUAD,
   CONNECT_TO_SQUAD_FAIL,
   CONNECT_TO_SQUAD_SUCCESS,
-} from 'squad/actions'
+} from './actions'
 
 function on(state = null, action) {
   return (action.type === CONNECT_TO_SQUAD_SUCCESS) ? metastore.on : state

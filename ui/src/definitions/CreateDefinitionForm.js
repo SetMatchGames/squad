@@ -1,7 +1,7 @@
 import React from 'react'
 
-import store from 'store'
-import { submitDefinition } from 'definitions/actions'
+import store from '../store'
+import { submitDefinition } from './actions'
 
 const handleCreateDefinition = (_) => {
   const textarea = document.getElementById(`definition-text`)
