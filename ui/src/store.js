@@ -1,7 +1,7 @@
 import { createStore, combineReducers, applyMiddleware, compose } from 'redux'
 import thunk from 'redux-thunk'
-import { squad } from 'squad/reducers'
-import { catalogs } from 'definitions/reducers'
+import { squad } from './squad/reducers'
+import { catalogs } from './definitions/reducers'
 
 /**
 state = {

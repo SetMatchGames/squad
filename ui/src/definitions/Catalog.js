@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { Definition } from 'definitions/Definition'
+import { Definition } from './Definition'
 
 function Catalog(props) {
   let k = 0

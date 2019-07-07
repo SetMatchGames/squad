@@ -8,7 +8,7 @@ extern crate hdk;
 extern crate serde_derive;
 
 #[macro_use]
-extern crate holochain_core_types_derive;
+extern crate holochain_json_derive;
 
 mod definitions;
 
@@ -17,17 +17,24 @@ use hdk::{
     entry_definition::ValidatingEntryType,
     error::ZomeApiResult,
     holochain_core_types::{
-        error::HolochainError,
         dna::entry_types::Sharing,
-        json::JsonString,
-        cas::content::Address,
         entry::Entry,
-        link::link_data::LinkData,
+        link::{
+            link_data::LinkData,
+            LinkMatch
+        }
     },
     api::{
         link_entries,
         get_links,
         entry_address,
+    },
+    holochain_persistence_api::{
+        cas::content::Address,
+    },
+    holochain_json_api::{
+        json::JsonString,
+        error::JsonError 
     }
 };
 use std::convert::TryInto;
@@ -79,10 +86,7 @@ fn catalog_entry () -> ValidatingEntryType {
                 },
                 validation: |validation_data: hdk::LinkValidationData| {
                     if let hdk::LinkValidationData::LinkAdd{
-                            link: LinkData{
-                                link: link_,
-                                action_kind: _
-                            },
+                            link: LinkData{link: link_, .. },
                             validation_data: _
                         } = validation_data {
                         let base = handle_get_catalog(link_.base().to_owned())?;
@@ -148,7 +152,7 @@ fn handle_get_all_definitions_of_type(catalog_type: String) -> ZomeApiResult<Vec
     let catalog_entry = Entry::App("Catalog".into(), catalog.into());
     let address: Address = entry_address(&catalog_entry)?;
 
-    let links: Vec<Address> = get_links(&address, Some("Catalog".to_string()), None)?.addresses();
+    let links: Vec<Address> = get_links(&address, LinkMatch::Exactly("Catalog"), LinkMatch::Any)?.addresses();
     let definitions: Vec<Definition> = links.into_iter().map(|address| {
         handle_get_definition(address).unwrap()
     }).collect();
@@ -164,7 +168,7 @@ fn handle_get_definitions_from_catalog(catalog_type: String, catalog_name: Strin
     let catalog_entry = Entry::App("Catalog".into(), catalog.into());
     let address: Address = entry_address(&catalog_entry)?;
 
-    let links: Vec<Address> = get_links(&address, Some("Catalog".to_string()), None)?.addresses();
+    let links: Vec<Address> = get_links(&address, LinkMatch::Exactly("Catalog"), LinkMatch::Any)?.addresses();
     let definitions: Vec<Definition> = links.into_iter().map(|address| {
         handle_get_definition(address).unwrap()
     }).collect();

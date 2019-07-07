@@ -2,9 +2,9 @@ import {
   REQUEST_CATALOG,
   RECEIVE_CATALOG,
   CATALOG_FAILURE,
-} from 'definitions/actions'
+} from './actions'
 
-import { catalogKey } from 'definitions/utils'
+import { catalogKey } from './utils'
 
 function newCatalog() {
   return {
