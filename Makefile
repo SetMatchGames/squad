@@ -10,11 +10,14 @@ develop:
 	cd curation && npm run deploy-local
 	echo 'Packaging holochain DNA...'
 	cd metastore && hc package
-	echo 'Installing and linking ui packages...'
-	cd sdk/js && npm link
-	cd ui && npm link squad-sdk
-	cd ui && npm install
 	echo 'Starting holochain test conductor...'
 	-cd metastore && hc run &> ../holochain.log
 	# echo 'Starting React app...'
 	# cd ui && npm run start
+
+.PHONY: react
+react:
+	echo 'Installing ui packages...'
+	cd ui && npm install
+	echo 'Linking ui to sdk, adding holochain test entries, and starting React app...'
+	cd sdk/js && npm link && cd ../../ui && npm link squad-sdk && cd test && node makeEntries && cd .. && npm run start

@@ -55,6 +55,10 @@ async function getDefinitionsFromCatalog(catalog_type, catalog_name) {
   return await call("definitions", "get_definitions_from_catalog", {catalog_type, catalog_name})
 }
 
+function close() {
+  squad.connection.close()
+}
+
 module.exports = {
   webSocketConnection,
   mockConnection,
@@ -63,5 +67,6 @@ module.exports = {
   createDefinition,
   getDefinition,
   getAllDefinitionsOfType,
-  getDefinitionsFromCatalog
+  getDefinitionsFromCatalog,
+  close
 }

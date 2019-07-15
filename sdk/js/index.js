@@ -63,12 +63,9 @@ async function runGame(gameAddress) {
   return runner(game.data)
 }
 
-console.log(metastore)
-
 module.exports = {
   runGame,
   registerRunner,
   metastore,
   curationMarket // methods: makeDefaults(account), makeBond(factory, defaults, bondABI)
 }
-
