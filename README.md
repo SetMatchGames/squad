@@ -12,10 +12,10 @@ Squad is the platform where game players and creators submit their contributions
 
 2. Restart your terminal (or source bash) to make sure nix is now in your path.
 
-3. Start the holochain nix shell: `nix-shell https://holochain.love`
+3. Start the holochain nix shell: `nix-shell https://holochain.love` or `nix-shell https://github.com/holochain/holonix/archive/0.0.3.tar.gz` for a stable version.
 
 4. Run `make develop` to set up the rest of the environment. This includes:
- - ganache-cli, a local test net for Ethereum, which will be logged in ganache.log
- - holochain's test conductor, which will be logged in holochain.log
+ - ganache-cli, a local test net for Ethereum, which will be logged in `ganache.log` in the squad folder.
+ - holochain's test conductor, which will be logged in `holochain.log` in the squad folder.
 
-5. In a command line in a new tab, start the nix shell (step 3) and then start the React app with `cd ui && npm run start`
+5. In a command line in a new tab, start the nix shell (step 3) and then start the React app with `make react`. (I believe using the `--pure` tag for the nix-shell will _not_ work here because react-scripts needs your local environment variables, such as default browser.)
