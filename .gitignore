@@ -9,7 +9,6 @@ holochain.log
 
 .cargo
 
-holonix-0.0.3/
 default.nix
 
 *secret*
