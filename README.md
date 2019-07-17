@@ -12,7 +12,7 @@ Squad is the platform where game players and creators submit their contributions
 
 2. Restart your terminal (or source bash) to make sure nix is now in your path.
 
-3. Start the holochain nix shell: `nix-shell https://holochain.love` or `nix-shell https://github.com/holochain/holonix/archive/0.0.3.tar.gz` for a stable version.
+3. Start the holochain nix shell: `nix-shell https://holochain.love` or `nix-shell ./holonix` for a stable version with the proper version of node.
 
 4. Run `make develop` to set up the rest of the environment. This includes:
  - ganache-cli, a local test net for Ethereum, which will be logged in `ganache.log` in the squad folder.
