@@ -89,8 +89,12 @@ fn catalog_entry () -> ValidatingEntryType {
                             link: LinkData{link: link_, .. },
                             validation_data: _
                         } = validation_data {
+                        // check that base and target exist
                         let base = handle_get_catalog(link_.base().to_owned())?;
                         let target = handle_get_definition(link_.target().to_owned())?;
+                        // check that this link hasn't already been made
+                        let links: Vec<Address> = get_links(link_.base(), LinkMatch::Exactly("Catalog"), LinkMatch::Any)?.addresses();
+                        if links.contains(link_.target()) { return Err("Catalog link already exists.".to_string()) };
                         return valid_base_and_target(&base, &target);
                     } else {
                         // LinkRemove is the other type that can be found here, but it isn't implemented.
