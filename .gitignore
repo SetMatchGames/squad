@@ -9,7 +9,7 @@ holochain.log
 
 .cargo
 
-default.nix
+./default.nix
 
 *secret*
 squad_components.json
