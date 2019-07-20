@@ -1,7 +1,7 @@
 import { createStore, combineReducers, applyMiddleware, compose } from 'redux'
 import thunk from 'redux-thunk'
 import { squad } from './squad/reducers'
-import { catalogs } from './definitions/reducers'
+import { catalogs, definitionForm } from './definitions/reducers'
 
 /**
 state = {
@@ -26,7 +26,7 @@ state = {
 const composeEnhansers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
 export default createStore(
-  combineReducers({squad, catalogs}),
+  combineReducers({squad, catalogs, definitionForm}),
   composeEnhansers(applyMiddleware(thunk))
 )
 
