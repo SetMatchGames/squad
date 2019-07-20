@@ -2,6 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import { Definition } from './Definition'
+import { mapState } from './utils'
 
 function Catalog(props) {
   let k = 0
@@ -14,10 +15,6 @@ function Catalog(props) {
       <ul>{definitionList}</ul>
     </div>
   )
-}
-
-function mapState(state, ownProps) {
-  return ownProps.mapState(state)
 }
 
 export default connect(mapState)(Catalog)

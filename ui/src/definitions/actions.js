@@ -11,13 +11,14 @@ export const CREATE_DEFINITION_FAILURE = "CREATE_DEFINITION_FAILURE"
 export const REQUEST_CATALOG = "REQUEST_CATALOG"
 export const RECEIVE_CATALOG = "RECEIVE_CATALOG"
 export const CATALOG_FAILURE = "CATALOG_FAILURE"
+export const SWITCH_DEFINITION_FORM = "SWITCH_DEFINITION_FORM"
 
 export function submitDefinition(definition) {
   return (dispatch) => {
     dispatch(createDefinition(definition))
     metastore.createDefinition(definition).then(
-      (address) => createDefinitionSuccess(address, definition),
-      (error) => createDefinitionFailure(error, definition)
+      (address) => dispatch(createDefinitionSuccess(address, definition)),
+      (error) => dispatch(createDefinitionFailure(error, definition))
     )
   }
 }
@@ -27,7 +28,15 @@ export function createDefinition(definition) {
 }
 
 export function createDefinitionSuccess(address, definition) {
-  return {type: CREATE_DEFINITION_SUCCESS, address, definition}
+  let definitionType = Object.keys(definition)[0]
+  let catalogName = `${definitionType} Catalog`
+  return {
+    type: CREATE_DEFINITION_SUCCESS, 
+    address, 
+    definition, 
+    name: catalogName, 
+    definitionType
+  }
 }
 
 export function createDefinitionFailure(address, error) {
@@ -57,4 +66,8 @@ export function receiveCatalog(definitionType, name, definitions) {
 
 export function catalogFailure(definitionType, name, error) {
   return {type: CATALOG_FAILURE, definitionType, name, error}
+}
+
+export function switchDefinitionForm(definitionType) {
+  return {type: SWITCH_DEFINITION_FORM, definitionType}
 }
