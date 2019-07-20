@@ -3,7 +3,7 @@ import './App.css'
 
 import { connect } from 'react-redux'
 
-import CreateDefintionForm from './definitions/CreateDefinitionForm'
+import DefintionForm from './definitions/DefinitionForm'
 import Catalog from './definitions/Catalog'
 
 function App(props) {
@@ -22,7 +22,7 @@ function App(props) {
       <div className="App-header">
         SQUAD
       </div>
-      <CreateDefintionForm />
+      <DefintionForm mapState={s => s.definitionForm} />
       {catalogComponents}
     </div>
   )

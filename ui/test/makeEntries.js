@@ -60,7 +60,7 @@ metastore.on('open', async () => {
       const g = await metastore.getDefinitionsFromCatalog("Game", "Game Catalog")
       console.log("all games:", g)
     },
-    100)
+    1000)
   
     const componentAdds = await Promise.all(
       components.map(async c => {
@@ -73,7 +73,7 @@ metastore.on('open', async () => {
       const c = await metastore.getAllDefinitionsOfType("Component")
       console.log("all components:", c)
     },
-    100)
+    1000)
   
     const standard = {
       Format: {
@@ -94,6 +94,6 @@ metastore.on('open', async () => {
       console.log("standard format components addresses:", h[0].Format.components)
       metastore.close()
     },
-    100)
+    1000)
   
   })
