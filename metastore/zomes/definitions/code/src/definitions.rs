@@ -38,6 +38,12 @@ pub enum Definition {
     },
 }
 
+#[derive(Serialize, Deserialize, Debug, DefaultJson)]
+pub struct DefWithAddr {
+    pub definition: Definition,
+    pub key: Address,
+}
+
 fn non_empty_string(name: &String, message: &str) -> Result<(), String> {
     match name.len() {
         0 => Err(String::from(message)),
