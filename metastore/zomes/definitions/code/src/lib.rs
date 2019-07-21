@@ -12,7 +12,7 @@ extern crate holochain_json_derive;
 
 mod definitions;
 
-use definitions::{ Definition, Catalog, valid_definition, valid_base_and_target };
+use definitions::{ Definition, Catalog, DefWithAddr, valid_definition, valid_base_and_target };
 use hdk::{
     entry_definition::ValidatingEntryType,
     error::ZomeApiResult,
@@ -91,10 +91,12 @@ fn catalog_entry () -> ValidatingEntryType {
                         } = validation_data {
                         // check that base and target exist
                         let base = handle_get_catalog(link_.base().to_owned())?;
-                        let target = handle_get_definition(link_.target().to_owned())?;
+                        let target = handle_get_definition(link_.target().to_owned())?.definition;
+
                         // check that this link hasn't already been made
                         let links: Vec<Address> = get_links(link_.base(), LinkMatch::Exactly("Catalog"), LinkMatch::Any)?.addresses();
                         if links.contains(link_.target()) { return Err("Catalog link already exists.".to_string()) };
+
                         return valid_base_and_target(&base, &target);
                     } else {
                         // LinkRemove is the other type that can be found here, but it isn't implemented.
@@ -131,9 +133,12 @@ fn handle_create_catalog(name_str: &str, type_str: &str) -> ZomeApiResult<Addres
     Ok(address)
 }
 
-fn handle_get_definition(address: Address) -> ZomeApiResult<Definition> {
+fn handle_get_definition(address: Address) -> ZomeApiResult<DefWithAddr> {
     match hdk::get_entry(&address) {
-        Ok(Some(Entry::App(_, api_result))) => Ok(api_result.try_into()?),
+        Ok(Some(Entry::App(_, api_result))) => Ok(DefWithAddr{
+                definition: api_result.try_into()?,
+                key: address
+            }),
         _ => Err(String::from("No definition found").into())
     }
 }
@@ -146,7 +151,7 @@ fn handle_get_catalog(address: Address) -> ZomeApiResult<Catalog> {
     }
 }
 
-fn handle_get_all_definitions_of_type(catalog_type: String) -> ZomeApiResult<Vec<Definition>> {
+fn handle_get_all_definitions_of_type(catalog_type: String) -> ZomeApiResult<Vec<DefWithAddr>> {
     let catalog_name: String = catalog_type.clone() + " Catalog";
     let catalog = Catalog {
         name: catalog_name.clone(),
@@ -157,13 +162,13 @@ fn handle_get_all_definitions_of_type(catalog_type: String) -> ZomeApiResult<Vec
     let address: Address = entry_address(&catalog_entry)?;
 
     let links: Vec<Address> = get_links(&address, LinkMatch::Exactly("Catalog"), LinkMatch::Any)?.addresses();
-    let definitions: Vec<Definition> = links.into_iter().map(|address| {
+    let definitions: Vec<DefWithAddr> = links.into_iter().map(|address| {
         handle_get_definition(address).unwrap()
     }).collect();
     Ok(definitions)
 }
 
-fn handle_get_definitions_from_catalog(catalog_type: String, catalog_name: String) -> ZomeApiResult<Vec<Definition>> {
+fn handle_get_definitions_from_catalog(catalog_type: String, catalog_name: String) -> ZomeApiResult<Vec<DefWithAddr>> {
     let catalog = Catalog {
         name: catalog_name.clone(),
         type_: catalog_type
@@ -173,7 +178,7 @@ fn handle_get_definitions_from_catalog(catalog_type: String, catalog_name: Strin
     let address: Address = entry_address(&catalog_entry)?;
 
     let links: Vec<Address> = get_links(&address, LinkMatch::Exactly("Catalog"), LinkMatch::Any)?.addresses();
-    let definitions: Vec<Definition> = links.into_iter().map(|address| {
+    let definitions: Vec<DefWithAddr> = links.into_iter().map(|address| {
         handle_get_definition(address).unwrap()
     }).collect();
     Ok(definitions)
@@ -202,7 +207,7 @@ define_zome! {
         */
         get_definition: {
             inputs: |address: Address|,
-            outputs: |definition: ZomeApiResult<Definition>|,
+            outputs: |definition: ZomeApiResult<DefWithAddr>|,
             handler: handle_get_definition
         }
         get_catalog: {
@@ -212,12 +217,12 @@ define_zome! {
         }
         get_all_definitions_of_type: {
             inputs: |catalog_type: String|,
-            outputs: |linked_definitions: ZomeApiResult<Vec<Definition>>|,
+            outputs: |linked_definitions: ZomeApiResult<Vec<DefWithAddr>>|,
             handler: handle_get_all_definitions_of_type
         }
         get_definitions_from_catalog: {
             inputs: |catalog_type: String, catalog_name: String|,
-            outputs: |linked_definitions: ZomeApiResult<Vec<Definition>>|,
+            outputs: |linked_definitions: ZomeApiResult<Vec<DefWithAddr>>|,
             handler: handle_get_definitions_from_catalog
         }
     ]
