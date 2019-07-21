@@ -12,7 +12,13 @@ const handleCreateDefinition = (_) => {
   const definition = {}
   definition[type] = {}
   for (let f of fields) {
-    definition[type][f.id] = f.value
+    switch(f.id) {
+      case "components":
+        definition[type][f.id] = f.value.replace(/\s/g, '').split(",")
+        break
+      default:
+        definition[type][f.id] = f.value
+    }
   }
   store.dispatch(submitDefinition(definition))
 }

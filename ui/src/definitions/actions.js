@@ -30,9 +30,9 @@ export function createDefinition(definition) {
 export function createDefinitionSuccess(address, definition) {
   let definitionType = Object.keys(definition)[0]
   let catalogName = `${definitionType} Catalog`
+  definition["key"] = address
   return {
     type: CREATE_DEFINITION_SUCCESS, 
-    address, 
     definition, 
     name: catalogName, 
     definitionType

@@ -31,6 +31,7 @@ async function call(zome, method, inputs) {
   }
   console.log("calling", params)
   const result = JSON.parse(await squad.connection.call('call', params))
+  console.log("RESULT", result)
 
   if (result.Ok === undefined) {
     throw result
@@ -51,7 +52,6 @@ async function getAllDefinitionsOfType(catalog_type) {
 }
   
 async function getDefinitionsFromCatalog(catalog_type, catalog_name) {
-  console.log("getDefinitionsFromCatalog called with", catalog_type, catalog_name)
   return await call("definitions", "get_definitions_from_catalog", {catalog_type, catalog_name})
 }
 
