@@ -8,7 +8,7 @@ Squad is the platform where game players and creators submit their contributions
 
 # Setting up a development environment
 
-1. Install nix shell: `curl https://nixos.org/nix | sh`
+1. Install nix shell: `curl https://nixos.org/nix/install | sh`
 
 2. Restart your terminal (or source bash) to make sure nix is now in your path.
 
