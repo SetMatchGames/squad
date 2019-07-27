@@ -1,4 +1,4 @@
-const { metastore } = require('squad-sdk')
+const { metastore } = require('../src/sdk/js')
 
 const roshambo = {
   Game: {
