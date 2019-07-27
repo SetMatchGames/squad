@@ -1,4 +1,4 @@
-import { metastore } from 'squad-sdk'
+import { metastore } from "../sdk/js"
 
 export const CONNECTING_TO_SQUAD = "CONNECTING_TO_SQUAD"
 export const CONNECT_TO_SQUAD_FAIL = "CONNECT_TO_SQUAD_FAIL"

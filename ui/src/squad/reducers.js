@@ -1,5 +1,5 @@
 import { combineReducers } from 'redux'
-import { metastore } from 'squad-sdk'
+import { metastore } from "../sdk/js"
 import {
   CONNECTING_TO_SQUAD,
   CONNECT_TO_SQUAD_FAIL,
