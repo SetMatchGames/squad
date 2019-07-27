@@ -1,8 +1,21 @@
-dist/
+*.env
+./dist/
+./metastore/dist/
 node_modules/
 target/
 
 bundle.json
+metastore.dna.json
+ganache.log
+holochain.log
+
+.cargo
+
+./default.nix
 
 *secret*
 squad_components.json
+
+sdk/sdk
+ui/src/sdk
+ui/src/squad/sdk
