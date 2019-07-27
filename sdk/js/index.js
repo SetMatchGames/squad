@@ -6,6 +6,9 @@ const path = require('path')
 const metastore = require('./metastore-api')
 
 const runners = {
+  "web-game-v0": async (formatAddress, gameData) => {
+
+  },
   "linux-bash-game-v0": async (formatAddress, gameData) => {
     // TODO: move all of the format stuff into sdk methods and let the game
     // handle it.
