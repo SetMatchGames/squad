@@ -5,6 +5,7 @@ node_modules/
 target/
 
 bundle.json
+metastore.dna.json
 ganache.log
 holochain.log
 
