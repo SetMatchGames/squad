@@ -1,7 +1,7 @@
 .PHONY: develop
 develop:
 	# Installing ganache...
-	cd curation && npm install && cd api && npm rebuild
+	cd curation && npm install && cd api && npm install
 	# Starting ganache...
 	-ganache-cli -b 1 &> ganache.log &
 	# Deploying contracts...
@@ -9,11 +9,15 @@ develop:
 	# Packaging holochain DNA...
 	cd metastore && hc package
 	# Starting holochain test conductor...
-	-cd metastore && hc run --logging
+	-cd metastore && hc run --logging &> holochain.log
 
 .PHONY: react
 react:
+	# Linking sdk
+	-ln -s ../../sdk ./ui/src/sdk
 	# Installing ui packages...
 	cd ui && npm install
-	# Linking ui to sdk, adding holochain test entries, and starting React app...
-	cd sdk/js && npm install && npm link && cd ../../ui && npm link squad-sdk && cd test && node makeEntries && cd .. && npm run start
+	# Adding holochain test data
+	cd ui/test && node makeEntries
+	# Starting react app
+	cd ui && npm run start

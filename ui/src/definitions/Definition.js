@@ -1,7 +1,7 @@
 import React from 'react'
 //import { connect } from 'react-redux'
 
-import { runGame } from 'squad-sdk'
+import { runGame } from "../sdk/js"
 
 export function Definition(props) {
   return (

@@ -93,10 +93,6 @@ fn catalog_entry () -> ValidatingEntryType {
                         let base = handle_get_catalog(link_.base().to_owned())?;
                         let target = handle_get_definition(link_.target().to_owned())?.definition;
 
-                        // check that this link hasn't already been made
-                        let links: Vec<Address> = get_links(link_.base(), LinkMatch::Exactly("Catalog"), LinkMatch::Any)?.addresses();
-                        if links.contains(link_.target()) { return Err("Catalog link already exists.".to_string()) };
-
                         return valid_base_and_target(&base, &target);
                     } else {
                         // LinkRemove is the other type that can be found here, but it isn't implemented.
@@ -118,8 +114,14 @@ fn handle_create_definition(definition: Definition) -> ZomeApiResult<Address> {
         Definition::Format{..} => handle_create_catalog("Format Catalog", "Format").unwrap(),
         Definition::Component{..} => handle_create_catalog("Component Catalog", "Component").unwrap(),
     };
-    link_entries(&catalog_address, &address, "Catalog", "")?;
 
+    // check that this link hasn't already been made
+    let links: Vec<Address> = get_links(&catalog_address, LinkMatch::Exactly("Catalog"), LinkMatch::Any)?.addresses();
+    if links.contains(&address) { 
+        return Ok(address)
+    };
+
+    link_entries(&catalog_address, &address, "Catalog", "")?;
     Ok(address)
 }
 
@@ -141,6 +143,10 @@ fn handle_get_definition(address: Address) -> ZomeApiResult<DefWithAddr> {
             }),
         _ => Err(String::from("No definition found").into())
     }
+}
+
+fn handle_get_entry_address(entry: Entry) -> ZomeApiResult<Address> {
+    Ok(entry_address(&entry)?)
 }
 
 // TODO consider removing
@@ -225,6 +231,11 @@ define_zome! {
             outputs: |linked_definitions: ZomeApiResult<Vec<DefWithAddr>>|,
             handler: handle_get_definitions_from_catalog
         }
+        get_entry_address: {
+            inputs: |entry: Entry|,
+            outputs: |address: ZomeApiResult<Address>|,
+            handler: handle_get_entry_address
+        }
     ]
 
     traits: {
@@ -234,7 +245,8 @@ define_zome! {
             get_definition,
             get_catalog,
             get_all_definitions_of_type,
-            get_definitions_from_catalog
+            get_definitions_from_catalog,
+            get_entry_address
         ]
     }
 }
