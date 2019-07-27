@@ -1,0 +1,17 @@
+version: '3'
+services:
+  metastore:
+    build: ./metastore
+    tty: true
+    ports:
+      - 8888:8888
+  ganache:
+    image: trufflesuite/ganache-cli:latest
+    command: ganache-cli --host=0.0.0.0 --deterministic
+    ports:
+      - 8545:8545
+  curation:
+    build: ./sdk/curation-contracts
+    depends_on:
+      - ganache
+    tty: true
