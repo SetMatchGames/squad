@@ -26,4 +26,4 @@ Squad is the platform where game players and creators submit their contributions
 
 2. Navigate to /app_spec/roshambo-web and run `npm run start` to start the web game's local host. Close out of the window that automatically opens in your browser.
 
-3. Go to the squad tab in your browser, look for the roshambo-web game in the Games catalog, and paste it's url into a new tab. If everything's working, you should see a working UI.
+3. Go to the squad tab in your browser, look for the roshambo-web game in the Games catalog, and paste its url into a new tab. If everything's working, you should see a working UI.
