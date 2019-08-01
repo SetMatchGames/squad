@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux'
 import { addActionToState } from '../utils'
-// import { metastore } from "../sdk/js"
+
 import {
   STORE_SQUAD_URI,
   CONNECTING_TO_SQUAD,
@@ -12,20 +12,16 @@ import {
   FORMAT_LIST_FAILURE,
 
   SELECT_FORMAT,
-  FORMAT_DATA_REQUEST,
-  FORMAT_DATA_RECIEVED,
-  FORMAT_DATA_FAILURE
+  FORMAT_COMPONENTS_REQUEST,
+  FORMAT_COMPONENTS_RECIEVED,
+  FORMAT_COMPONENTS_FAILURE,
+  GAME_STARTED,
+  GAME_FINISHED
 } from './actions'
 
 function uri(state = null, action) {
     return (action.type === STORE_SQUAD_URI) ? action.squadUri : state
 }
-
-/*
-function on(state = null, action) {
-  return (action.type === CONNECT_TO_SQUAD_SUCCESS) ? metastore.on : state
-}
-*/
 
 function status(state = 'INITIAL', action) {
   if ([
@@ -42,7 +38,9 @@ function formats(state = null, action) {
   if ([
     REQUEST_FORMAT_LIST,
     FORMAT_LIST_RECIEVED,
-    FORMAT_LIST_FAILURE
+    FORMAT_LIST_FAILURE,
+    GAME_STARTED,
+    GAME_FINISHED
   ].includes(action.type)) {
     return addActionToState(action, state)
   }
@@ -52,9 +50,9 @@ function formats(state = null, action) {
 function components(state = null, action) {
   if ([
     SELECT_FORMAT,
-    FORMAT_DATA_REQUEST,
-    FORMAT_DATA_RECIEVED,
-    FORMAT_DATA_FAILURE
+    FORMAT_COMPONENTS_REQUEST,
+    FORMAT_COMPONENTS_RECIEVED,
+    FORMAT_COMPONENTS_FAILURE
   ].includes(action.type)) {
     return addActionToState(action, state)
   }

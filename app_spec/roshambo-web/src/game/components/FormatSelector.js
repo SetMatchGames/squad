@@ -3,20 +3,16 @@ import { connect } from 'react-redux'
 
 import { selectFormat } from '../../squad/actions'
 import store from '../../store'
-import Components from './Components'
 
 function mapState(state) {
   const { formats } = state.squad
   return { formats }
 }
 
-const handleStartGame =(_) => {
-
-}
-
 function StartGameForm(props) {
   if (props.formats === null) { return null }
   if (!Array.isArray(props.formats.list)) { return null }
+  if (props.formats.status === "GAME_STARTED") { return null }
 
   const handleSelectFormat = (_) => {
     const select = document.getElementById('format-select-list')
@@ -38,9 +34,6 @@ function StartGameForm(props) {
           )
         })}
       </select>
-      <Components components={props.components}/>
-      <br/>
-      <input type="submit" value="Start Game" onClick={handleStartGame}/>
     </div>
   )
 }
