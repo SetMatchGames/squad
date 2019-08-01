@@ -8,11 +8,11 @@ function mapState(state) {
 
 function Components(props) {
   if (props.components === null) { return null }
-  if (!Array.isArray(props.components.definitions)) { return null }
+  if (!Array.isArray(props.components.list)) { return null }
   return (
     <div>
       <h3>Components:</h3>
-      {props.components.definitions.map((component) => {
+      {props.components.list.map((component) => {
         return (
           <div key={component.key}>
             <strong>{component.definition.Component.name}</strong>

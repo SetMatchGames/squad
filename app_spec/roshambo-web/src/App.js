@@ -3,18 +3,18 @@ import './App.css'
 
 import { connect } from 'react-redux'
 
-import StartGameForm from './game/components/StartGameForm'
+import FormatSelector from './game/components/FormatSelector'
 import Components from './game/components/Components'
+import GameBoard from './game/components/GameBoard'
 
 
 function App(props) {
   return (
     <div>
       <h1>Roshambo-Web</h1>
-      <StartGameForm 
-        formats={props.squad.formats} 
-        components={props.squad.components} 
-      />
+      <FormatSelector formats={props.squad.formats} />
+      <Components components={props.squad.components}/>
+      <GameBoard playSession={props.playSession} components={props.squad.components}/>
     </div>
   );
 }

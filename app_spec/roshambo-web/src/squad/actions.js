@@ -59,6 +59,8 @@ export function connectSuccess(connection) {
 export const REQUEST_FORMAT_LIST = "REQUEST_FORMAT_LIST"
 export const FORMAT_LIST_RECIEVED = "FORMAT_LIST_RECEIVED"
 export const FORMAT_LIST_FAILURE = "FORMAT_LIST_FAILURE"
+export const GAME_STARTED = "GAME_STARTED"
+export const GAME_FINISHED = "GAME_FINISHED"
 
 export function getFormatList() {
   return (dispatch) => {
@@ -66,7 +68,7 @@ export function getFormatList() {
     metastore.getAllDefinitionsOfType("Format").then(
       (list) => {
         dispatch(formatListRecieved(list))
-        dispatch(getFormatData(list[0]))
+        dispatch(getFormatComponents(list[0]))
       },
       (error) => dispatch(formatListFailure(error))
     )
@@ -85,40 +87,48 @@ export function formatListFailure(error) {
   return {type: FORMAT_LIST_FAILURE, error}
 }
 
+export function gameStarted() {
+  return {type: GAME_STARTED}
+}
+
+export function gameFinished() {
+  return {type: GAME_FINISHED}
+}
+
 // Getting components for a specific format action
 export const SELECT_FORMAT = "SELECT_FORMAT"
-export const FORMAT_DATA_REQUEST = "REQUEST_FORMAT_DATA"
-export const FORMAT_DATA_RECIEVED = "FORMAT_DATA_RECIEVED"
-export const FORMAT_DATA_FAILURE = "FORMAT_DATA_FAILURE"
+export const FORMAT_COMPONENTS_REQUEST = "FORMAT_COMPONENTS_REQUEST"
+export const FORMAT_COMPONENTS_RECIEVED = "FORMAT_COMPONENTS_RECIEVED"
+export const FORMAT_COMPONENTS_FAILURE = "FORMAT_COMPONENTS_FAILURE"
 
 export function selectFormat(selectedIndex, formats) {
   return (dispatch) => {
     let selectedFormat = formats[selectedIndex]
     dispatch({type: SELECT_FORMAT, selectedIndex})
-    dispatch(getFormatData(selectedFormat))
+    dispatch(getFormatComponents(selectedFormat))
   }
 }
 
-export function getFormatData(format) {
+export function getFormatComponents(format) {
   return (dispatch) => {
-    dispatch(requestFormatData(format))
+    dispatch(requestFormatComponents(format))
     getAllComponents(format.definition.Format.components).then(
-      (definitions) => dispatch(formatDataRecieved(definitions)),
-      (error) => dispatch(formatDataFailure(error))
+      (list) => dispatch(formatComponentsRecieved(list)),
+      (error) => dispatch(formatComponentsFailure(error))
     )
   }
 }
 
-export function requestFormatData(format) {
-  return {type: FORMAT_DATA_REQUEST, format}
+export function requestFormatComponents(format) {
+  return {type: FORMAT_COMPONENTS_REQUEST, format}
 }
 
-export function formatDataRecieved(definitions) {
-  return {type: FORMAT_DATA_RECIEVED, definitions}
+export function formatComponentsRecieved(list) {
+  return {type: FORMAT_COMPONENTS_RECIEVED, list}
 }
 
-export function formatDataFailure(error) {
-  return {type: FORMAT_DATA_FAILURE, error }
+export function formatComponentsFailure(error) {
+  return {type: FORMAT_COMPONENTS_FAILURE, error }
 }
 
 async function getAllComponents(addresses) {
