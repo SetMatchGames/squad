@@ -1,11 +1,11 @@
 import { createStore, combineReducers, applyMiddleware, compose } from 'redux'
 import thunk from 'redux-thunk'
 import { squad } from './squad/reducers'
-import {  } from './game/reducers'
+import { game } from './game/reducers'
 
 const composeEnhansers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
 export default createStore(
-  combineReducers({ squad }),
+  combineReducers({ squad, game }),
   composeEnhansers(applyMiddleware(thunk))
 )
