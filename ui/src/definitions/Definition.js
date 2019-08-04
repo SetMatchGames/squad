@@ -10,10 +10,15 @@ export function Definition(props) {
   }
 
   if (props.definition["Game"] !== undefined) {
+    let launchButton = null
+    if (props.definition["Game"]["type_"] === "web-game-v0") {
+      launchButton = <input type="submit" value="Launch" onClick={handleRunGame} />
+    }
+    
     return (
       <div key={props.key}>
         {JSON.stringify(props)}
-        <input type="submit" value="Launch" onClick={handleRunGame} />
+        {launchButton}
       </div>
     )
   }
