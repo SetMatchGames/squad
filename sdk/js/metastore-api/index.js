@@ -5,7 +5,6 @@ const squad = {}
 function webSocketConnection(uri) {
   squad.connection = new WebSocket(uri)
   return squad.connection
-  // return await on('open', () => { return squad.connection })
 }
   
 function mockConnection(mock) {
@@ -46,6 +45,14 @@ async function createDefinition(definition) {
 async function getDefinition(address) {
   return await call("definitions", "get_definition", {address})
 }
+
+async function getAddress(entry) {
+  return await call("definitions", "get_entry_address", {entry})
+}
+
+async function getCatalogAddresses(catalog_type, catalog_name) {
+  return await call("definitions", "get_catalog_links", {catalog_type, catalog_name})
+}
   
 async function getAllDefinitionsOfType(catalog_type) {
   return await call("definitions", "get_all_definitions_of_type", {catalog_type})
@@ -66,6 +73,8 @@ module.exports = {
   call,
   createDefinition,
   getDefinition,
+  getAddress,
+  getCatalogAddresses,
   getAllDefinitionsOfType,
   getDefinitionsFromCatalog,
   close
