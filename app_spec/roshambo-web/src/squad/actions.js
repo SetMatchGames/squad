@@ -66,9 +66,21 @@ export function getFormatList() {
   return (dispatch) => {
     dispatch(requestFormatList())
     metastore.getAllDefinitionsOfType("Format").then(
-      (list) => {
-        dispatch(formatListRecieved(list))
-        dispatch(getFormatComponents(list[0]))
+      (definitions) => {
+        metastore.getCatalogAddresses("Format", "Format Catalog")
+          .then(
+            (addresses) => {
+              let list = addresses.map(address => {
+                let li = {}
+                li["definition"] = definitions[addresses.indexOf(address)]
+                li["key"] = address
+                return li
+              })
+              dispatch(formatListRecieved(list))
+              dispatch(getFormatComponents(list[0]))
+            },
+            (error) => dispatch(formatListFailure(error))
+          )
       },
       (error) => dispatch(formatListFailure(error))
     )
@@ -134,7 +146,11 @@ export function formatComponentsFailure(error) {
 async function getAllComponents(addresses) {
   let definitions = []
   for (let i in addresses) {
-    definitions.push(await metastore.getDefinition(addresses[i]))
+    let definition = { 
+      definition: await metastore.getDefinition(addresses[i]),
+      key: addresses[i]
+    }
+    definitions.push(definition)
   }
   return definitions
 }

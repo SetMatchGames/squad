@@ -52,14 +52,16 @@ function GameBoard(props) {
     handleMove(2)
   }
 
-  function handleMove(n /* 1 or 2 */) {
-    let index = document.getElementById(`move-index`).value
-    let component = props.components.list[index].definition.Component
-    store.dispatch(moveRecieved(component, n))
-    if (n === 1) {
-      store.dispatch(requestMove(2))
-    } else {
-      handleRevealWinner(component)
+  function handleMove(n /* 1 or 2 */) { 
+    return (n) => {
+      let index = document.getElementById(`move-index`).value
+      let component = props.components.list[index].definition.Component
+      store.dispatch(moveRecieved(component, n))
+      if (n === 1) {
+        store.dispatch(requestMove(2))
+      } else {
+        handleRevealWinner(component)
+      }
     }
   }
 
@@ -118,7 +120,7 @@ function GameBoard(props) {
               )
             })}
           </select>
-          <input type="submit" value="Submit move" onClick={handleMove1Received}/>
+          <input type="submit" value="Submit move" onClick={handleMove(1)}/>
         </div>
       )
 
@@ -136,7 +138,7 @@ function GameBoard(props) {
               )
             })}
           </select>
-          <input type="submit" value="Submit move" onClick={handleMove2Received}/>
+          <input type="submit" value="Submit move" onClick={handleMove(2)}/>
         </div>
       )
 

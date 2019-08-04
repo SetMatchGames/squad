@@ -114,7 +114,7 @@ metastore.on('open', async () => {
     setTimeout(async () => {
       const h = await metastore.getAllDefinitionsOfType("Format")
       console.log("all formats:", h)
-      console.log("standard format components addresses:", h[0].definition.Format.components)
+      console.log("standard format components addresses:", h[0].Format.components)
       metastore.close()
     },
     1000)

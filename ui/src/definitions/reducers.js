@@ -61,7 +61,7 @@ function catalog(state = newCatalog(), action) {
       state,
       actionInfo(action)
     )
-    newState.definitions.push(action.definition)
+    newState.definitions.push({ definition: action.definition, key: action.key})
     break
 
   case CREATE_DEFINITION_FAILURE:

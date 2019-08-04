@@ -10,6 +10,7 @@ function mapState(state) {
 }
 
 function StartGameForm(props) {
+  console.log("start props", props)
   if (props.formats === null) { return null }
   if (!Array.isArray(props.formats.list)) { return null }
   if (props.formats.status === "GAME_STARTED") { return null }
