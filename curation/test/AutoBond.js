@@ -1,13 +1,27 @@
 const AutoBond = artifacts.require("AutoBond")
 const SimpleLinearCurve = artifacts.require("SimpleLinearCurve")
 
+class MissingError extends Error {
+  constructor(message) {
+    super(message); // (1)
+    this.name = "MissingError"; // (2)
+  }
+}
+
+async function throws(f, message) {
+  try {
+    await f()
+    throw new MissingError()
+  } catch(e) {
+    if (e instanceof MissingError) {
+      assert.fail(message)
+    }
+  }
+}
+
 contract("AutoBond", ([alice, bob, ...accounts]) => {
   let curve
   let autoBond
-
-  async function simpleCurvePrice(supply, units) {
-    return await curve.buyPrice(supply, units)
-  }
 
   beforeEach(async () => {
     autoBond = await AutoBond.new()
@@ -17,36 +31,58 @@ contract("AutoBond", ([alice, bob, ...accounts]) => {
   it("should know true is true", () => {
     assert.equal(true, true)
   })
-  
-  // alice can create bond A
+
   it("creates functioning SimplerLinear bonds", async () => {
-    const bondId1 = "0x12ad4"
-    const bondId2 = "0xfffff"
-    await autoBond.newBond(curve.address, bondId1, 0, {from: alice})
-    try {
-      await autoBond.buy(200, bondId1, {from: bob, value: await simpleCurvePrice(0, 199)})
-      assert.fail("Failed: Bought 200 from bond A for the price of 199.")
-    } catch(e) {}
-    await autoBond.buy(200, bondId1, {from: bob, value: await simpleCurvePrice(0, 200)})
-    await autoBond.newBond(curve.address, bondId2, 100, {from: bob, value: await simpleCurvePrice(0, 100)})
-    try {
-      await autoBond.buy(200, bondId2, {from: alice, value: await simpleCurvePrice(100, 199)})
-      assert.fail("Failed: Bought 200 from bond B for the price of 199.")
-    } catch(e) {}
-    await autoBond.buy(200, bondId2, {from: alice, value: await simpleCurvePrice(100, 200)})
+    const bondAId = "0x12ad4"
+    const bondBId = "0xfffff"
+
+    // Alice can create bond A
+    await autoBond.newBond(curve.address, bondAId, 0, {from: alice})
+    // Bob fails to buy 200 for the price of 199
+    throws(
+      async () => {
+        await autoBond.buy(
+          200,
+          bondAId,
+          {from: bob, value: await curve.buyPrice(0, 199)}
+        )
+      },
+      "Failed: Bought 200 from bond A for the price of 199."
+    )
+
+    // Bob buys 200 for the price of 200
+    await autoBond.buy(
+      200,
+      bondAId,
+      {from: bob, value: await curve.buyPrice(0, 200)}
+    )
+
+    // Bob creates bond B and buys 100 for the price of 100
+    await autoBond.newBond(
+      curve.address,
+      bondBId,
+      100,
+      {from: bob, value: await curve.buyPrice(0, 100)}
+    )
+
+    // Alice fails to buy 100 more for the price of 99 more
+    throws(
+      async () => {
+        await autoBond.buy(
+          100,
+          bondBId,
+          {from: alice, value: await curve.buyPrice(100, 99)}
+        )
+      },
+      "Failed: Bought 100 from bond B for the price of 99."
+    )
+
+    // Alice buys 100 more for the price of 100 more
+    await autoBond.buy(
+      100,
+      bondBId,
+      {from: alice, value: await curve.buyPrice(100, 100)}
+    )
+
   })
-
-  // bob can buy the first 2 units of bond A for 3 wei
-
-  // bob can create bond B buy the first 2 units for 3 wei
-
-  // alice can buy the next 2 units of bond B for 7 wei
-
-  // bob can sell a unit of bond B for 4 wei
-
-  // alice can sell 2 units of bond B for 5 wei
-
-  // bob can sell 1 unit of bond b for 1 wei
-
-  // neither alice nor bob can sell any more
 })
