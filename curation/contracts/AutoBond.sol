@@ -16,6 +16,18 @@ contract AutoBond {
   // mapping from definition address to it's bond
   mapping(bytes32 => Bond) public bonds;
 
+  function getBalance(bytes32 bondId, address holder) public view returns (uint256) {
+    return bonds[bondId].balances[holder];
+  }
+
+  function getSupply(bytes32 bondId) public view returns (uint256) {
+    return bonds[bondId].supply;
+  }
+
+  function getCurve(bytes32 bondId) public view returns (address) {
+    return bonds[bondId].curve;
+  }
+
   // newBond makes a new bond and buys the first set of units
   function newBond(address curve, bytes32 bondId, uint256 units) public payable {
     require(curve != address(0), "Must specify a curve address");
@@ -54,7 +66,7 @@ contract AutoBond {
     // depending on price
     require(units > 0, "cannot sell zero or fewer units");
     Bond storage b = bonds[bondId];
-    require(units >= b.balances[msg.sender], "Must own enough units to sell");
+    require(units <= b.balances[msg.sender], "Must own enough units to sell");
     uint256 price = Curve(b.curve).sellPrice(b.supply, units);
     b.supply = b.supply.sub(units);
     b.balances[msg.sender] = b.balances[msg.sender].sub(units);
