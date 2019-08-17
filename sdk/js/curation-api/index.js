@@ -26,37 +26,110 @@ async function addWeb3() {
     }
 }
 
-async function newBond(addressOfCurve, /* bytes32 */ bondId, initialBuyNumber) {
-    let web3
-    // Development env (non-browser)
-    if (process.env.DEVELOPMENT === 'true') {
-        // add ganache web3
-        const provider = new Web3.providers.WebsocketProvider('ws://127.0.0.1:8545')
-        web3 = new Web3(provider)
-    } else {
-        await addWeb3()
-        web3 = window.web3
+let web3
+let accounts
+let autoBond
+let options
+
+async function init(defaults) {
+  if (web3 !== undefined) { return }
+
+  // Development env (non-browser)
+  if (process.env.DEVELOPMENT === 'true') {
+    // add ganache web3
+    const provider = new Web3.providers.WebsocketProvider('ws://127.0.0.1:8545')
+    web3 = new Web3(provider)
+  } else {
+    await addWeb3()
+    web3 = window.web3
+  }
+
+  accounts = await web3.eth.getAccounts()
+
+  if (defaults === undefined) {
+    defaults = {
+      from: accounts[0],
+      gasPrice: '1000000'
     }
+  }
+  options = defaults
+  console.log("init", options)
+  console.log("the address is", AutoBond.address)
+  autoBond = await new web3.eth.Contract(
+    AutoBond.abi,
+    process.env.AUTOBOND_ADDR,
+    defaults
+  )
+}
 
-    const accounts = await web3.eth.getAccounts()
+async function newBond(addressOfCurve, bondId, initialBuyNumber) {
+  await init()
+  return await autoBond.methods.newBond(
+    addressOfCurve,
+    web3.utils.fromAscii(bondId),
+    initialBuyNumber,
+  ).send({})
+}
 
-    let autoBond = await new web3.eth.Contract(
-        AutoBond.abi,
-        process.env.AUTOBOND_ADDR,
-        {
-            from: accounts[0],
-            gasPrice: '1000000'
-        }
-    )
+async function getSupply(bondId) {
+  await init()
+  return await autoBond.methods.getSupply(
+    web3.utils.fromAscii(bondId)
+  ).call({})
+}
 
-    console.log(autoBond.methods)
+async function getBalance(bondId, address) {
+  await init()
+  return await autoBond.methods.getBalance(
+    web3.utils.fromAscii(bondId),
+    address,
+  )
+}
 
-    return await autoBond.methods.newBond(addressOfCurve, bondId, initialBuyNumber)
+async function buy(units, bondId, opts) {
+  await init()
+  let o = Object.assign(options, opts)
+  console.log("opts", opts, options)
+  console.log("options", o)
+  return await autoBond.methods.buy(
+    units,
+    web3.utils.fromAscii(bondId),
+  ).send(o)
+}
 
+async function sell(units, bondId) {
+  await init()
+  return await autoBond.methods.sell(
+    units,
+    web3.utils.fromAscii(bondId),
+  ).send({})
+}
+
+async function getBuyPrice(units, bondId) {
+  await init()
+  return await autoBond.methods.getBuyPrice(
+    units,
+    web3.utils.fromAscii(bondId),
+  ).call({})
+}
+
+async function getSellPrice(units, bondId) {
+  await init()
+  return await autoBond.methods.getSellPrice(
+    units,
+    web3.utils.fromAscii(bondId),
+  ).call({})
 }
 
 module.exports = {
-    newBond
+  init,
+  newBond,
+  getSupply,
+  getBalance,
+  getBuyPrice,
+  getSellPrice,
+  buy,
+  sell
 }
 
 

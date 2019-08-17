@@ -28,6 +28,16 @@ contract AutoBond {
     return bonds[bondId].curve;
   }
 
+  function getBuyPrice(uint256 units, bytes32 bondId) public view returns (uint256) {
+    Bond memory b = bonds[bondId];
+    return Curve(b.curve).buyPrice(b.supply, units);
+  }
+
+  function getSellPrice(uint256 units, bytes32 bondId) public view returns (uint256) {
+    Bond memory b = bonds[bondId];
+    return Curve(b.curve).sellPrice(b.supply, units);
+  }
+
   // newBond makes a new bond and buys the first set of units
   function newBond(address curve, bytes32 bondId, uint256 units) public payable {
     require(curve != address(0), "Must specify a curve address");
