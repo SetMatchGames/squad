@@ -13,6 +13,7 @@ function mockConnection(mock) {
 }
 
 function on(message, f) {
+  console.warn("let's depreciate the on function")
   squad.connection.on(message, f)
 }
 
@@ -51,15 +52,27 @@ async function getAddress(entry) {
 }
 
 async function getCatalogAddresses(catalog_type, catalog_name) {
-  return await call("definitions", "get_catalog_links", {catalog_type, catalog_name})
+  return await call(
+    "definitions",
+    "get_catalog_links",
+    {catalog_type, catalog_name}
+  )
 }
 
 async function getAllDefinitionsOfType(catalog_type) {
-  return await call("definitions", "get_all_definitions_of_type", {catalog_type})
+  return await call(
+    "definitions",
+    "get_all_definitions_of_type",
+    {catalog_type}
+  )
 }
 
 async function getDefinitionsFromCatalog(catalog_type, catalog_name) {
-  return await call("definitions", "get_definitions_from_catalog", {catalog_type, catalog_name})
+  return await call(
+    "definitions",
+    "get_definitions_from_catalog",
+    {catalog_type, catalog_name}
+  )
 }
 
 function close() {
