@@ -1,16 +1,16 @@
 {
-  "name": "tmp",
+  "name": "curation-api",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "ganache-cli": "^6.4.3",
-    "jsonfile": "^5.0.0",
-    "web3": "1.0.0-beta.37"
+    "dotenv": "^8.0.0",
+    "web3": "^1.2.1"
   }
 }
