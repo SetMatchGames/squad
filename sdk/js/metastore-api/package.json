@@ -1,5 +1,5 @@
 {
-  "name": "squad-sdk",
+  "name": "metastore-api",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -9,8 +9,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "curation-api": "file:curation-api",
-    "metastore-api": "file:metastore-api",
-    "rpc-websockets": "^4.4.0"
+    "rpc-websockets": "^4.6.1"
   }
 }
