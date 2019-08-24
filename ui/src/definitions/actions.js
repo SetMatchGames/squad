@@ -3,7 +3,7 @@
  * There are catalogs for each of the definition types (Game, Format, Component)
  */
 
-import { metastore } from "../sdk/js"
+import { metastore } from "squad-sdk"
 
 export const CREATE_DEFINITION = "CREATE_DEFINITION"
 export const CREATE_DEFINITION_SUCCESS = "CREATE_DEFINITION_SUCCESS"

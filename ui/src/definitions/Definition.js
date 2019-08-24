@@ -1,7 +1,7 @@
 import React from 'react'
 //import { connect } from 'react-redux'
 
-import { runGame } from "../sdk/js"
+import { runGame } from "squad-sdk"
 
 export function Definition(props) {
 
@@ -14,7 +14,7 @@ export function Definition(props) {
     if (props.definition["Game"]["type_"] === "web-game-v0") {
       launchButton = <input type="submit" value="Launch" onClick={handleRunGame} />
     }
-    
+
     return (
       <div key={props.key}>
         {JSON.stringify(props)}
