@@ -14,8 +14,6 @@ develop:
 
 .PHONY: react
 react:
-	# Linking sdk
-	#	-ln -s ../../sdk ./ui/src/sdk
 	# Installing ui packages...
 	cd ui && npm install
 	# Adding holochain test data
