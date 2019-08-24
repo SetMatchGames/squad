@@ -30,10 +30,10 @@ export function createDefinition(definition) {
 export function createDefinitionSuccess(address, definition) {
   let definitionType = Object.keys(definition)[0]
   let catalogName = `${definitionType} Catalog`
-  definition["key"] = address
   return {
     type: CREATE_DEFINITION_SUCCESS, 
-    definition, 
+    definition,
+    key: address, 
     name: catalogName, 
     definitionType
   }
@@ -48,7 +48,19 @@ export function fetchCatalog(definitionType, name) {
     dispatch(requestCatalog(definitionType, name))
     metastore.getDefinitionsFromCatalog(definitionType, name)
       .then(definitions => {
-        dispatch(receiveCatalog(definitionType, name, definitions))
+        metastore.getCatalogAddresses(definitionType, name)
+          .then(addresses => {
+            let withKeys = addresses.map(address => {
+              let entry = {}
+              entry["definition"] = definitions[addresses.indexOf(address)]
+              entry["key"] = address
+              return entry
+            })
+            dispatch(receiveCatalog(definitionType, name, withKeys))
+          })
+          .catch(error => {
+            dispatch(catalogFailure(definitionType, name, error))
+          })
       })
       .catch(error => {
         dispatch(catalogFailure(definitionType, name, error))
