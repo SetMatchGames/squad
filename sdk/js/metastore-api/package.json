@@ -1,5 +1,5 @@
 {
-  "name": "tmp",
+  "name": "metastore-api",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -9,8 +9,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "ganache-cli": "^6.4.3",
-    "jsonfile": "^5.0.0",
-    "web3": "1.0.0-beta.37"
+    "rpc-websockets": "^4.6.1"
   }
 }
