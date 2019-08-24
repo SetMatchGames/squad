@@ -9,6 +9,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "curation-api": "file:curation-api",
+    "metastore-api": "file:metastore-api",
     "rpc-websockets": "^4.4.0"
   }
 }

@@ -5,7 +5,6 @@ import { Definition } from './Definition'
 import { mapState } from './utils'
 
 function Catalog(props) {
-  // let k = 0
   const definitionList = props.definitions.map(d => Definition(d))
   return (
     <div className="App-body">
