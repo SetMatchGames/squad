@@ -11,6 +11,17 @@ const roshambo = {
   }
 }
 
+const roshamboWebTest = {
+  Game: {
+    name: "Roshambo",
+    type_: "web-game-v0",
+    data: JSON.stringify({
+      url: `http://localhost:3001/?squadUri=ws://localhost:8888`,
+      options: []
+    })
+  }
+}
+
 const components = [
   {
     Component: {
@@ -55,6 +66,8 @@ metastore.on('open', async () => {
   
     const r = await metastore.getDefinition(a)
     console.log("roshambo retrieved:", r)
+
+    await metastore.createDefinition(roshamboWebTest)
   
     setTimeout(async () => {
       const g = await metastore.getDefinitionsFromCatalog("Game", "Game Catalog")
@@ -81,9 +94,19 @@ metastore.on('open', async () => {
         components: componentAdds
       }
     }
+
+    const rockless = {
+      Format: {
+        name: "Rockless",
+        components: componentAdds.slice(1)
+      }
+    }
   
     const f = await metastore.createDefinition(standard)
     console.log("format address:", f)
+
+    const o = await metastore.createDefinition(rockless)
+    console.log("rockless format address:", o)
   
     const z = await metastore.getDefinition(f)
     console.log("standard format retrieved:", z)
@@ -91,7 +114,7 @@ metastore.on('open', async () => {
     setTimeout(async () => {
       const h = await metastore.getAllDefinitionsOfType("Format")
       console.log("all formats:", h)
-      console.log("standard format components addresses:", h[0].definition.Format.components)
+      console.log("standard format components addresses:", h[0].Format.components)
       metastore.close()
     },
     1000)
