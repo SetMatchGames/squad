@@ -16,6 +16,7 @@
     "readline-sync": "^1.4.9",
     "redux": "^4.0.1",
     "rtc-quickconnect": "^7.2.0",
-    "socket.io": "^2.2.0"
+    "socket.io": "^2.2.0",
+    "squad-sdk": "file:../sdk/js"
   }
 }
