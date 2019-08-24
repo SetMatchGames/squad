@@ -6,8 +6,9 @@ const path = require('path')
 const metastore = require('./metastore-api')
 
 const runners = {
-  "web-game-v0": async (formatAddress, gameData) => {
-
+  "web-game-v0": async (gameData) => {
+    let tab = window.open(gameData["url"])
+    tab.focus
   },
   "linux-bash-game-v0": async (formatAddress, gameData) => {
     // TODO: move all of the format stuff into sdk methods and let the game
@@ -47,10 +48,6 @@ const runners = {
       game.options,
       {shell: true, stdio: "inherit"},
     )
-  },
-
-  "web-game-v0": (gameData) => {
-    throw "web-game-v0 not implemented"
   }
 }
 
@@ -58,12 +55,11 @@ function registerRunner(type_, runner) {
   runners[type_] = runner
 }
 
-async function runGame(gameAddress) {
+async function runGame(definition) {
   // TODO handle the case that a REST holochain uri is passed in
-  console.log("squad.runGame", gameAddress)
-  const game = (await getDefinition(gameAddress)).Game
-  const runner = runners[game.type_]
-  return runner(game.data)
+  console.log("squad.runGame", definition)
+  const runner = runners[definition.Game.type_]
+  return runner(JSON.parse(definition.Game.data))
 }
 
 module.exports = {

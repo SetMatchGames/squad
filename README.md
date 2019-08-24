@@ -19,3 +19,13 @@ Squad is the platform where game players and creators submit their contributions
  - holochain's test conductor, which will be logged in `holochain.log` in the squad folder.
 
 5. In a command line in a new tab, start the nix shell (step 3) and then start the React app with `make react`. (I believe using the `--pure` tag for the nix-shell will _not_ work here because react-scripts needs your local environment variables, such as default browser.)
+
+# To test the roshambo-web game
+
+1. Set up the development environment with both `make develop` and `make react` running (see above).
+
+2. In a new command line, from the squad root folder, link the squad sdk into the roshambo-web folder: `$ ln -s ../../../sdk ./app_spec/roshambo-web/src/sdk`.
+
+3. Navigate to /app_spec/roshambo-web and run `npm run start` to start the web game's local host. Close out of the window that automatically opens in your browser.
+
+4. Go to the squad tab in your browser, look for the roshambo-web game in the Games catalog, and paste its url into a new tab. If everything's working, you should see a working UI.
