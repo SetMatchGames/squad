@@ -214,6 +214,5 @@ export async function discoverGameOpponents(game, cb) {
     {discover: true}
   )
   node.pubsub.publish(gameChannelKey(game), Buffer.from("message", 'utf8'))
-  console.log(node)
 }
 
