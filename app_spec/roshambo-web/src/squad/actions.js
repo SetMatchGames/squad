@@ -1,5 +1,6 @@
 import { metastore } from '../sdk/js'
 import { getUrlParams } from '../utils'
+import IPFS from 'ipfs'
 
 // TODO: move discoverGameOpponents to squad-sdk
 // implementing it here now to avoid merge conflicts
@@ -159,60 +160,122 @@ async function getAllComponents(addresses) {
   return definitions
 }
 
+// connect to lobby
+export const CONNECT_TO_LOBBY = "CONNECT_TO_LOBBY"
+export const LOBBY_FAILURE = "LOBBY_FAILURE"
+export const JOIN_LOBBY = "JOIN_LOBBY"
+
+// Set player
+export const SET_PLAYER = "SET_PLAYER"
+
 // getting opponents
-export const LISTEN_FOR_GAME_OPPONENTS = "LISTEN_FOR_GAME_OPPONENTS"
-export const FOUND_GAME_OPPONENT = "FOUND_GAME_OPPONENT"
-export const GAME_OPPONENTS_FAILURE = "GAME_OPPONENTS_FAILURE"
+export const LISTEN_FOR_OPPONENTS = "LISTEN_FOR_OPPONENTS"
+export const FOUND_OPPONENT = "FOUND_OPPONENT"
+export const OPPONENTS_FAILURE = "OPPONENTS_FAILURE"
 
+// selecting opponent
+export const SELECT_OPPONENT = "SELECT_OPPONENT"
+export const OPPONENT_CONFIRMED = "OPPONENT_CONFIRMED"
+export const OPPONENT_SELECT_FAILURE = "OPPONENT_SELECT_FAILURE"
 
-export const SELECT_GAME_OPPONENT = "SELECT_GAME_OPPONENT"
-export const GAME_OPPONENT_CONFIRMED = "GAME_OPPONENT_CONFIRMED"
-export const GAME_OPPONENT_DENIED = "GAME_OPPONENT_DENIED"
-export const GAME_OPPONENT_SELECT_FAILURE = "GAME_OPPONENT_SELECT_FAILURE"
-
-export function selectOpponent(opponent) {
-  return {type: SELECT_GAME_OPPONENT, opponent}
+function newIPFSNode(repo) {
+  return new IPFS({
+    repo: repo,
+    EXPERIMENTAL: {
+      pubsub: true
+    },
+    config: {
+      Addresses: {
+        Swarm: [
+          '/dns4/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-websocket-star'
+        ]
+      }
+    }
+  })
 }
 
-export function getGameOpponents(game) {
+function joinMessage(name) {
+  return Buffer.from(JSON.stringify({
+    name,
+    action: "join"
+  }))
+}
+
+export function connectToLobby(name, game) {
   return (dispatch) => {
-    dispatch(listenForGameOpponents(game))
-    discoverGameOpponents(game, (opponent) => {
-      foundGameOpponent(opponent)
-    })
+    const node = newIPFSNode(`ipfs/${name}`)
+    console.log("--->", node)
+    const chan = `squad.games/${game}`
+    node.on('error', console.error)
+    node.once('ready', () => node.id((err, info) => {
+      if (err) { throw err }
+
+      dispatch(setPlayer(name, info))
+      dispatch(joinLobby(node))
+      dispatch(listenForGameOpponents(game))
+
+      const knownOpponents = {}
+      knownOpponents[info.id] = true
+      node.pubsub.subscribe(chan, (msg) => {
+        if (knownOpponents[msg.from]) {
+          return
+        }
+        knownOpponents[msg.from] = true
+        dispatch(foundGameOpponent(Object.assign(
+          {id: msg.from, raw: msg},
+          JSON.parse(msg.data.toString())
+        )))
+      })
+
+      setInterval(
+        () => {
+          node.pubsub.publish(chan, joinMessage(name))
+        },
+        5000
+      )
+
+    }))
   }
 }
 
+// lobby is just an ipfs node right now, consider an interface
+export function joinLobby(lobby) {
+  return {type: JOIN_LOBBY, lobby}
+}
+
+export function setPlayer(name, info) {
+  return {type: SET_PLAYER, name, info}
+}
+
+async function connectToOpponent(opponent, lobby) {
+
+}
+
+export function offerGame(opponent, lobby) {
+  return async (dispatch) => {
+    dispatch(selectOpponent(opponent))
+    // send offer
+    const con = connectToOpponent(opponent, lobby)
+
+    // listen for offer
+    // confirm/fail
+  }
+}
+
+export function selectOpponent(opponent) {
+  return {type: SELECT_OPPONENT, opponent}
+}
+
 export function listenForGameOpponents(game) {
-  return {type: LISTEN_FOR_GAME_OPPONENTS, game}
+  return {type: LISTEN_FOR_OPPONENTS, game}
 }
 
 export function foundGameOpponent(opponent) {
-  return {type: FOUND_GAME_OPPONENT, opponent}
+  return {type: FOUND_OPPONENT, opponent}
 }
 
 export function gameOpponentsFailure(error) {
-  return {type: GAME_OPPONENTS_FAILURE, error}
+  return {type: OPPONENTS_FAILURE, error}
 }
 
-/**
- *  discover game opponents functionality will move to squad SDK
- */
-
-const IPFS = require('ipfs')
-
-function gameChannelKey(game) {
-  return `squad.games/${game.key}`
-}
-
-export async function discoverGameOpponents(game, cb) {
-  const node = await IPFS.create({EXPERIMENTAL: {pubsub: true}})
-  const chan = gameChannelKey(game)
-  node.pubsub.subscribe(
-    chan,
-    (msg) => { console.log(`message on ${chan}:`, msg) },
-    {discover: true}
-  )
-  node.pubsub.publish(gameChannelKey(game), Buffer.from("message", 'utf8'))
-}
 
