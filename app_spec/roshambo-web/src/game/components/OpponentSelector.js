@@ -63,6 +63,7 @@ function OpponentSelector(props) {
               )
             })
         }
+
       </select>
     </div>
   )
