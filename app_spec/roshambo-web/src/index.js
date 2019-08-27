@@ -10,7 +10,6 @@ import store from './store'
 import {
   connectToSquad,
   getFormatList,
-  connectToLobby,
 } from './squad/actions'
 
 ReactDOM.render(
