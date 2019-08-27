@@ -160,6 +160,7 @@ async function getAllComponents(addresses) {
   return definitions
 }
 
+
 // connect to lobby
 export const CONNECT_TO_LOBBY = "CONNECT_TO_LOBBY"
 export const LOBBY_FAILURE = "LOBBY_FAILURE"
@@ -277,5 +278,3 @@ export function foundGameOpponent(opponent) {
 export function gameOpponentsFailure(error) {
   return {type: OPPONENTS_FAILURE, error}
 }
-
-

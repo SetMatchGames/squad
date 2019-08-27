@@ -25,12 +25,22 @@ function mapState(state) {
   return state.game
 }
 
-function handlePlayer1Registered () {}
-function handlePlayer2Registered () {}
-
 // action functions
 const handleStartGame = (_) => {
+  store.dispatch(requestPlayerName(1))
   store.dispatch(gameStarted())
+}
+
+const handlePlayer1Registered = (_) => {
+  let name = document.getElementById(`player-name`).value
+  store.dispatch(playerRegistered(name, 1))
+  store.dispatch(requestPlayerName(2))
+}
+
+const handlePlayer2Registered = (_) => {
+  let name = document.getElementById(`player-name`).value
+  store.dispatch(playerRegistered(name, 2))
+  store.dispatch(requestMove(1))
 }
 
 function GameBoard(props) {
@@ -43,7 +53,7 @@ function GameBoard(props) {
     handleMove(2)
   }
 
-  function handleMove(n /* 1 or 2 */) {
+  function handleMove(n /* 1 or 2 */) { 
     return (n) => {
       let index = document.getElementById(`move-index`).value
       let component = props.components.list[index].definition.Component
@@ -57,7 +67,7 @@ function GameBoard(props) {
   }
 
   const handleRevealWinner = (move2) => {
-    let {
+    let { 
       player1,
       move1,
       player2

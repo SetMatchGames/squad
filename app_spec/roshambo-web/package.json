@@ -4,7 +4,6 @@
   "private": true,
   "dependencies": {
     "ipfs": "^0.37.1",
-    "ipfs-pubsub-room": "^1.4.1",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-redux": "^7.1.0",
