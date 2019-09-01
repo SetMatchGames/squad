@@ -52,6 +52,7 @@ function OpponentSelector(props) {
         id="opponent-select-list"
         onChange={handleSelectOpponent}
         >
+        <option>Select an Opponent</option>
         {
           Object.keys(props.opponents)
             .filter((id) => { return id !== props.player.info.id})
