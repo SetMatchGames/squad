@@ -1,7 +1,6 @@
 import React from 'react'
 
 import { runGame } from "squad-sdk"
-import { getComponentNamesFromStateCatalog } from "./utils"
 
 function DefinitionInfo(props) {
   return (
@@ -43,10 +42,6 @@ export function Definition(props) {
   }
 
   if (props.definition["Format"] !== undefined) {
-    props.definition.Format.components = getComponentNamesFromStateCatalog(
-      props.componentCatalog, 
-      props.definition.Format.components
-    )
     return (
       <div className="Definition" key={props.key}>
         <DefinitionInfo definition={props.definition.Format} address={props.key} />
