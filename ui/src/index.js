@@ -21,8 +21,8 @@ store.dispatch(connectToSquad(
   'ws://localhost:8888', // TODO make this configurable
   (connection, dispatch) => {
     dispatch(fetchCatalog("Game", "Game Catalog"))
-    dispatch(fetchCatalog("Format", "Format Catalog"))
     dispatch(fetchCatalog("Component", "Component Catalog"))
+    dispatch(fetchCatalog("Format", "Format Catalog"))
     dispatch(switchDefinitionForm("Game"))
   },
   (error, dispatch) => {

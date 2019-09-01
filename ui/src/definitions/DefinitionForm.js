@@ -71,6 +71,7 @@ function DefinitionFields(props) {
 function DefinitionForm(props) {
   return (
     <div>
+      <h2>Submit new definition</h2>
       <label>Definition type:</label><br/>
       <select id="definition-type" onChange={handleSwitchDefinitionForm}>
         <option value="Game">Game</option>
