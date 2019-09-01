@@ -82,7 +82,8 @@ function opponentStatus(state = null, action) {
 
 function opponent(state = {}, action) {
   if (action.type === SELECT_OPPONENT) {
-    state = Object.assign({}, action.opponent)
+    const newState = Object.assign({}, action.opponent)
+    return newState
   }
   return state
 }
