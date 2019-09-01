@@ -17,7 +17,3 @@ holochain.log
 
 *secret*
 squad_components.json
-
-sdk/sdk
-ui/src/sdk
-ui/src/squad/sdk

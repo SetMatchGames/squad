@@ -1,7 +1,25 @@
 import React from 'react'
-//import { connect } from 'react-redux'
 
 import { runGame } from "squad-sdk"
+import { getComponentNamesFromStateCatalog } from "./utils"
+
+function DefinitionInfo(props) {
+  return (
+    <div>
+      {Object.keys(props.definition).map((fieldName, n) => {
+        return (
+          <div key={n}>
+            <span><strong>{fieldName}</strong>: </span>
+            {JSON.stringify(props.definition[fieldName])}
+          </div>
+        )
+      })}
+      <div>
+        <strong>address</strong>: {props.address}
+      </div>
+    </div>
+  )
+}
 
 export function Definition(props) {
 
@@ -12,36 +30,44 @@ export function Definition(props) {
   if (props.definition["Game"] !== undefined) {
     let launchButton = null
     if (props.definition["Game"]["type_"] === "web-game-v0") {
-      launchButton = <input type="submit" value="Launch" onClick={handleRunGame} />
+      launchButton = <input type="submit" value="Launch" className="Launch-button" onClick={handleRunGame} />
     }
 
     return (
-      <div key={props.key}>
-        {JSON.stringify(props)}
+      <div className="Definition" key={props.key}>
+        <DefinitionInfo definition={props.definition.Game} address={props.key} />
         {launchButton}
+        <br/>
       </div>
     )
   }
 
   if (props.definition["Format"] !== undefined) {
+    props.definition.Format.components = getComponentNamesFromStateCatalog(
+      props.componentCatalog, 
+      props.definition.Format.components
+    )
     return (
-      <div key={props.key}>
-        {JSON.stringify(props)}
+      <div className="Definition" key={props.key}>
+        <DefinitionInfo definition={props.definition.Format} address={props.key} />
+        <br/>
       </div>
     )
   }
 
   if (props.definition["Component"] !== undefined) {
     return (
-      <div key={props.key}>
-        {JSON.stringify(props)}
+      <div className="Definition" key={props.key}>
+        <DefinitionInfo definition={props.definition.Component} address={props.key} />
+        <br/>
       </div>
     )
   }
 
   return (
-    <div key={props.key}>
+    <div className="Definition" key={props.key}>
       {JSON.stringify(props)}
+      <br/>
     </div>
   )
 }
