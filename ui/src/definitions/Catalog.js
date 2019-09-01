@@ -5,12 +5,7 @@ import { Definition } from './Definition'
 import { mapState } from './utils'
 
 function Catalog(props) {
-  const definitionList = props.definitions.map(d => {
-    if (Object.keys(d.definition)[0] === "Format") {
-      d.componentCatalog = props.componentCatalog
-    }
-    return Definition(d)
-  })
+  const definitionList = props.definitions.map(d => Definition(d))
   return (
     <div>
       <h1>{props.name}</h1>
