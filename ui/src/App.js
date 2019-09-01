@@ -7,11 +7,12 @@ import DefintionForm from './definitions/DefinitionForm'
 import Catalog from './definitions/Catalog'
 
 function App(props) {
-  const catalogComponents = Object.keys(props.catalogs).map(
+  const catalogs = Object.keys(props.catalogs).map(
     (catalogKey) => {
       return (
         <Catalog
           key={catalogKey}
+          componentCatalog = {props.catalogs["Component Catalog-Component"]}
           mapState={s => s.catalogs[catalogKey]}
         />
       )
@@ -22,8 +23,10 @@ function App(props) {
       <div className="App-header">
         SQUAD
       </div>
-      <DefintionForm mapState={s => s.definitionForm} />
-      {catalogComponents}
+      <div className="App-body">
+        <DefintionForm mapState={s => s.definitionForm} />
+        {catalogs}
+      </div>
     </div>
   )
 }
