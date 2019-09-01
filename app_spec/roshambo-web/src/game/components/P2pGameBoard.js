@@ -9,10 +9,18 @@ import {
 } from '../../squad/actions'
 
 function mapState(state) {
-  return state.game
+  const props = {
+    ...state.game,
+    opponent: state.squad.opponent,
+    lobby: state.squad.lobby
+  }
+  return props
 }
 
 function P2pGameBoard (props) {
+  if (props.opponent !== {} && props.lobby !== null) {
+    store.dispatch(offerGame(props.opponent, props.lobby.lobby))
+  }
   return <h3>Game not started</h3>
 }
 
