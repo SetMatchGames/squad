@@ -46,25 +46,20 @@ export function createDefinitionFailure(address, error) {
 export function fetchCatalog(definitionType, name) {
   return (dispatch) => {
     dispatch(requestCatalog(definitionType, name))
-    metastore.getDefinitionsFromCatalog(definitionType, name)
-      .then(definitions => {
-        metastore.getCatalogAddresses(definitionType, name)
-          .then(addresses => {
-            let withKeys = addresses.map(address => {
-              let entry = {}
-              entry["definition"] = definitions[addresses.indexOf(address)]
-              entry["key"] = address
-              return entry
-            })
-            dispatch(receiveCatalog(definitionType, name, withKeys))
-          })
-          .catch(error => {
-            dispatch(catalogFailure(definitionType, name, error))
-          })
-      })
-      .catch(error => {
-        dispatch(catalogFailure(definitionType, name, error))
-      })
+    catalogWithKeys(definitionType, name).then(withKeys => {
+      if (definitionType === "Format") {
+        withFormatComponentNames(withKeys).then(withKeysAndNames => {
+          dispatch(receiveCatalog(definitionType, name, withKeysAndNames))
+        })
+        .catch(error => {
+          dispatch(catalogFailure(definitionType, name, error))
+        })
+      }
+      dispatch(receiveCatalog(definitionType, name, withKeys))
+    })
+    .catch(error => {
+      dispatch(catalogFailure(definitionType, name, error))
+    })
   }
 }
 
@@ -82,4 +77,46 @@ export function catalogFailure(definitionType, name, error) {
 
 export function switchDefinitionForm(definitionType) {
   return {type: SWITCH_DEFINITION_FORM, definitionType}
+}
+
+async function getComponents(addresses) {
+  let definitions = []
+  for (let i in addresses) {
+    let definition = {
+      definition: await metastore.getDefinition(addresses[i]),
+      key: addresses[i]
+    }
+    definitions.push(definition)
+  }
+  return definitions
+}
+
+async function withFormatComponentNames(formatArray) {
+  let compAddrs = []
+  formatArray.forEach(item => {
+    compAddrs = compAddrs.concat(item.definition.Format.components)
+  })
+  let components = await getComponents(compAddrs)
+  let index = 0
+  formatArray.forEach((item, n) => {
+    let newComps = {}
+    item.definition.Format.components.forEach(address => {
+      newComps[address] = components[index].definition.Component.name
+      index += 1
+    })
+    formatArray[n].definition.Format.components = newComps
+  })
+  return formatArray
+}
+
+async function catalogWithKeys(definitionType, name) {
+  let definitions = await metastore.getDefinitionsFromCatalog(definitionType, name)
+  let addresses = await metastore.getCatalogAddresses(definitionType, name)
+  let withKeys = addresses.map(address => {
+    let entry = {}
+    entry["definition"] = definitions[addresses.indexOf(address)]
+    entry["key"] = address
+    return entry
+  })
+  return withKeys
 }
