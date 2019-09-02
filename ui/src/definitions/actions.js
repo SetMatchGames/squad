@@ -4,6 +4,7 @@
  */
 
 import { metastore } from "squad-sdk"
+import store from "../store"
 
 export const CREATE_DEFINITION = "CREATE_DEFINITION"
 export const CREATE_DEFINITION_SUCCESS = "CREATE_DEFINITION_SUCCESS"
@@ -17,14 +18,27 @@ export function submitDefinition(definition) {
   return (dispatch) => {
     dispatch(createDefinition(definition))
     metastore.createDefinition(definition).then(
-      (address) => dispatch(createDefinitionSuccess(address, definition)),
-      (error) => dispatch(createDefinitionFailure(error, definition))
+      (address) => {
+        if (checkForDuplicate(address, definition)) { 
+          dispatch(createDefinitionFailure(definition, "Duplicate definition"))
+        } else {
+          dispatch(createDefinitionSuccess(address, definition))
+        }
+      },
+      (error) => dispatch(createDefinitionFailure(definition, error))
     )
   }
 }
 
 export function createDefinition(definition) {
-  return {type: CREATE_DEFINITION, definition}
+  let definitionType = Object.keys(definition)[0]
+  let catalogName = `${definitionType} Catalog`
+  return {
+    type: CREATE_DEFINITION, 
+    definition,
+    name: catalogName, 
+    definitionType
+  }
 }
 
 export function createDefinitionSuccess(address, definition) {
@@ -39,8 +53,16 @@ export function createDefinitionSuccess(address, definition) {
   }
 }
 
-export function createDefinitionFailure(address, error) {
-  return {type: CREATE_DEFINITION_FAILURE, address, error}
+export function createDefinitionFailure(definition, error) {
+  let definitionType = Object.keys(definition)[0]
+  let catalogName = `${definitionType} Catalog`
+  return {
+    type: CREATE_DEFINITION_FAILURE, 
+    error,
+    definition, 
+    name: catalogName, 
+    definitionType
+  }
 }
 
 export function fetchCatalog(definitionType, name) {
@@ -54,8 +76,9 @@ export function fetchCatalog(definitionType, name) {
         .catch(error => {
           dispatch(catalogFailure(definitionType, name, error))
         })
+      } else {
+        dispatch(receiveCatalog(definitionType, name, withKeys))
       }
-      dispatch(receiveCatalog(definitionType, name, withKeys))
     })
     .catch(error => {
       dispatch(catalogFailure(definitionType, name, error))
@@ -75,8 +98,8 @@ export function catalogFailure(definitionType, name, error) {
   return {type: CATALOG_FAILURE, definitionType, name, error}
 }
 
-export function switchDefinitionForm(definitionType) {
-  return {type: SWITCH_DEFINITION_FORM, definitionType}
+export function switchDefinitionForm(definitionType, name) {
+  return {type: SWITCH_DEFINITION_FORM, definitionType, name}
 }
 
 async function getComponents(addresses) {
@@ -119,4 +142,12 @@ async function catalogWithKeys(definitionType, name) {
     return entry
   })
   return withKeys
+}
+
+function checkForDuplicate(address, definition) {
+  let name = Object.keys(definition)[0]
+  let keys = store.getState().catalogs[`${name} Catalog-${name}`].definitions.map(d => {
+    return d.key
+  })
+  return keys.includes(address)
 }
