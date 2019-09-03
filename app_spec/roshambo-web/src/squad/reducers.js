@@ -11,15 +11,6 @@ import {
   FORMAT_LIST_RECIEVED,
   FORMAT_LIST_FAILURE,
 
-  SET_PLAYER,
-  LISTEN_FOR_OPPONENTS,
-  FOUND_OPPONENT,
-  OPPONENTS_FAILURE,
-  SELECT_OPPONENT,
-  OPPONENT_CONFIRMED,
-  OPPONENT_SELECT_FAILURE,
-  JOIN_LOBBY,
-
   SELECT_FORMAT,
   FORMAT_COMPONENTS_REQUEST,
   FORMAT_COMPONENTS_RECIEVED,
@@ -68,58 +59,10 @@ function components(state = null, action) {
   return state
 }
 
-function opponentStatus(state = null, action) {
-  if ([
-    LISTEN_FOR_OPPONENTS,
-    OPPONENTS_FAILURE,
-    OPPONENT_CONFIRMED,
-    OPPONENT_SELECT_FAILURE,
-  ].includes(action.type)) {
-    return addActionToState(action, state)
-  }
-  return state
-}
-
-function opponent(state = {}, action) {
-  if (action.type === SELECT_OPPONENT) {
-    const newState = Object.assign({}, action.opponent)
-    return newState
-  }
-  return state
-}
-
-function opponents(state = {}, action) {
-  if (action.type === FOUND_OPPONENT) {
-    const opponentById = {}
-    opponentById[action.opponent.id] = action.opponent
-    return Object.assign({}, state, opponentById)
-  }
-  return state
-}
-
-function player(state = {}, action) {
-  if (action.type === SET_PLAYER) {
-    return Object.assign({}, action)
-  }
-  return state
-}
-
-function lobby(state = null, action) {
-  if (action.type === JOIN_LOBBY) {
-    return Object.assign({}, action)
-  }
-  return state
-}
-
 export const squad = combineReducers({
   uri,
   status,
   formats,
-  components,
-  player,
-  opponentStatus,
-  opponents,
-  opponent,
-  lobby
+  components
 })
 

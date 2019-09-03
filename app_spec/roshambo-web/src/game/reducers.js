@@ -2,11 +2,8 @@ import { combineReducers } from 'redux'
 import { addActionToState } from '../utils'
 
 import {
-  REQUEST_PLAYER_ONE,
-  PLAYER_ONE_REGISTERED,
-  REQUEST_PLAYER_TWO,
-  PLAYER_TWO_REGISTERED,
-
+  GAME_STARTED,
+  START_GAME_AGAINST,
   REQUEST_MOVE_ONE,
   MOVE_ONE_RECIEVED,
   REQUEST_MOVE_TWO,
@@ -17,11 +14,6 @@ import {
 
 function playSession(state = null, action) {
   if ([
-    REQUEST_PLAYER_ONE,
-    PLAYER_ONE_REGISTERED,
-    REQUEST_PLAYER_TWO,
-    PLAYER_TWO_REGISTERED,
-
     REQUEST_MOVE_ONE,
     MOVE_ONE_RECIEVED,
     REQUEST_MOVE_TWO,
@@ -34,4 +26,29 @@ function playSession(state = null, action) {
   return state
 }
 
-export const game = combineReducers({ playSession })
+function activeGames (state = {}, action) {
+  const games = {}
+  if (action.type === START_GAME_AGAINST) {
+    const gameId = `${action.opponent.from}${action.from}`
+    games[action.from] = gameId
+    games[action.opponent.from] = gameId
+    return Object.assign({}, state, games)
+  }
+  return state
+}
+
+function startedGames (state = {}, action) {
+  if (action.type === GAME_STARTED) {
+    const games = {}
+    const game = state[action.game.topic] ? state[action.game.topic] : {}
+    games[action.game.topic] = Object.assign({}, game, action.game)
+    return games
+  }
+  return state
+}
+
+export const game = combineReducers({
+  playSession,
+  activeGames,
+  startedGames
+})
