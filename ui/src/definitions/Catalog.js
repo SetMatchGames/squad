@@ -5,6 +5,7 @@ import { Definition } from './Definition'
 import { mapState } from './utils'
 
 function Catalog(props) {
+  if (props.status === "INITIAL") { return null }
   const definitionList = props.definitions.map(d => Definition(d))
   return (
     <div>

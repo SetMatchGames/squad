@@ -9,15 +9,6 @@ import Catalog from './definitions/Catalog'
 function App(props) {
   const catalogs = Object.keys(props.catalogs).map(
     (catalogKey) => {
-      if (catalogKey === "Format Catalog-Format") {
-        return (
-          <Catalog
-            key={catalogKey}
-            componentCatalog = {props.catalogs["Component Catalog-Component"]}
-            mapState={s => s.catalogs[catalogKey]}
-          />
-        )
-      }
       return (
         <Catalog
           key={catalogKey}
