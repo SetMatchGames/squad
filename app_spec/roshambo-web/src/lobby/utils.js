@@ -1,7 +1,7 @@
 import IPFS from 'ipfs'
 
-export function makeLobbyTopic(game) {
-  return `squad.games/${game}/lobby`
+export function makeLobbyTopic(game, format) {
+  return `squad.games/${game}/${format}/lobby`
 }
 
 export function newIPFSNode(repo) {

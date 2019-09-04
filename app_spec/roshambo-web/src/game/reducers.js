@@ -1,32 +1,10 @@
 import { combineReducers } from 'redux'
-import { addActionToState } from '../utils'
 
 import {
   GAME_STARTED,
   START_GAME_AGAINST,
-  REQUEST_MOVE_ONE,
-  MOVE_ONE_RECIEVED,
-  REQUEST_MOVE_TWO,
-  MOVE_TWO_RECIEVED,
-
-  REVEAL_WINNER,
-
   PLAY_MOVE
 } from './actions'
-
-function playSession(state = null, action) {
-  if ([
-    REQUEST_MOVE_ONE,
-    MOVE_ONE_RECIEVED,
-    REQUEST_MOVE_TWO,
-    MOVE_TWO_RECIEVED,
-
-    REVEAL_WINNER
-  ].includes(action.type)) {
-    return addActionToState(action, state)
-  }
-  return state
-}
 
 function activeGames (state = {}, action) {
   const games = {}
@@ -60,7 +38,6 @@ function startedGames (state = {}, action) {
 }
 
 export const game = combineReducers({
-  playSession,
   activeGames,
   startedGames
 })
