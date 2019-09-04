@@ -23,7 +23,7 @@ store.dispatch(connectToSquad(
     dispatch(fetchCatalog("Game", "Game Catalog"))
     dispatch(fetchCatalog("Component", "Component Catalog"))
     dispatch(fetchCatalog("Format", "Format Catalog"))
-    dispatch(switchDefinitionForm("Game"))
+    dispatch(switchDefinitionForm("Game", "Game Catalog"))
   },
   (error, dispatch) => {
     console.warn(error)
