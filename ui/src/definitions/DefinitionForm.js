@@ -25,7 +25,7 @@ const handleCreateDefinition = (_) => {
 
 const handleSwitchDefinitionForm = (_) => {
   const type = document.getElementById(`definition-type`).value
-  store.dispatch(switchDefinitionForm(type))
+  store.dispatch(switchDefinitionForm(type, `${type} Catalog`))
 }
 
 function FormField(props) {
