@@ -77,7 +77,7 @@ function OpponentSelector(props) {
   return (
     <div>
       <h3>{props.player.name}, choose an opponent.</h3>
-      <h4>Players in lobby: {Object.keys(props.opponents).length}</h4>
+      <h4>Other players in lobby: {Object.keys(props.opponents).length - 1}</h4>
       <label>Opponent: </label>
       <select
         id="opponent-select-list"
