@@ -9,7 +9,9 @@ import {
   REQUEST_MOVE_TWO,
   MOVE_TWO_RECIEVED,
 
-  REVEAL_WINNER
+  REVEAL_WINNER,
+
+  PLAY_MOVE
 } from './actions'
 
 function playSession(state = null, action) {
@@ -38,11 +40,21 @@ function activeGames (state = {}, action) {
 }
 
 function startedGames (state = {}, action) {
+  let game
   if (action.type === GAME_STARTED) {
     const games = {}
-    const game = state[action.game.topic] ? state[action.game.topic] : {}
+    game = state[action.game.topic] ? state[action.game.topic] : {}
     games[action.game.topic] = Object.assign({}, game, action.game)
     return games
+  }
+  if (action.type === PLAY_MOVE) {
+    game = Object.assign({}, state[action.gameTopic])
+    const move = {}
+    move[action.from] = action.move
+    game.moves = Object.assign({}, game.moves ? game.moves : {}, move)
+    const newState = {...state}
+    newState[action.gameTopic] = game
+    return newState
   }
   return state
 }
