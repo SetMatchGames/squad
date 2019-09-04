@@ -13,9 +13,9 @@ function App(props) {
   return (
     <div>
       <h1>Roshambo-Web</h1>
-      <OpponentSelector />
       <FormatSelector formats={props.squad.formats} />
       <Components components={props.squad.components}/>
+      <OpponentSelector />
       <P2pGameBoard playSession={props.playSession} components={props.squad.components}/>
     </div>
   );

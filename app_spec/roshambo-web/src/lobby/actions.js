@@ -7,11 +7,7 @@ export const LOBBY_FAILURE = "LOBBY_FAILURE"
 export const JOIN_LOBBY = "JOIN_LOBBY"
 export const LOBBY_HEARTBEAT = "LOBBY_HEARTBEAT"
 
-export const FOUND_OPPONENT = "FOUND_OPPONENT"
-export const OPPONENTS_FAILURE = "OPPONENTS_FAILURE"
 export const SELECT_OPPONENT = "SELECT_OPPONENT"
-export const OPPONENT_CONFIRMED = "OPPONENT_CONFIRMED"
-export const OPPONENT_SELECT_FAILURE = "OPPONENT_SELECT_FAILURE"
 
 export function actionPublisher(pubsub) {
   return (topic, action) => {
@@ -34,10 +30,10 @@ export function subscriptionDispatcher(
   }
 }
 
-export function connectToLobby(name, game) {
+export function connectToLobby(name, game, format) {
   return (dispatch) => {
     const node = newIPFSNode(`ipfs/${name}`)
-    const lobbyTopic = makeLobbyTopic('roshambo')
+    const lobbyTopic = makeLobbyTopic('roshambo', format)
     node.on('error', console.error)
     node.once('ready', () => node.id((err, info) => {
       if (err) { throw err }
@@ -99,10 +95,3 @@ export function selectOpponent(opponent) {
   return {type: SELECT_OPPONENT, opponent}
 }
 
-export function foundGameOpponent(opponent) {
-  return {type: FOUND_OPPONENT, opponent}
-}
-
-export function gameOpponentsFailure(error) {
-  return {type: OPPONENTS_FAILURE, error}
-}

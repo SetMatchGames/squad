@@ -12,33 +12,41 @@ import { startGame } from '../actions'
 import store from '../../store'
 
 function mapState(state) {
+  const format = state.squad.components ?
+        state.squad.components.format.definition.Format.name :
+        null
   return {
     opponents: state.lobby.opponents,
     opponentSelections: state.lobby.opponentSelections,
     player: state.lobby.player,
     node: state.lobby.node,
-    activeGames: state.game.activeGames
+    activeGames: state.game.activeGames,
+    format
   }
 }
 
-function handleInputPlayerName() {
-  const displayName = document.getElementById("display-name-input").value
-  // TODO refactor display name out of connecting to lobby
-  store.dispatch(connectToLobby(displayName, "roshambo"))
+function handleInputPlayerName(game, format) {
+  return () => {
+    const displayName = document.getElementById("display-name-input").value
+    // TODO refactor display name out of connecting to lobby
+    store.dispatch(connectToLobby(displayName, game, format))
+  }
 }
 
 function OpponentSelector(props) {
   if (props.player.name === undefined) {
+    const game = "roshambo"
+    const format = props.format
     return (
       <div>
-        <label>
+        <h3>
           To get started, submit a display name:
-          <input id="display-name-input" type="text" />
-        </label>
+        </h3>
+        <input id="display-name-input" type="text" />
         <input
           type="submit"
           value="Join lobby"
-          onClick={handleInputPlayerName}
+          onClick={handleInputPlayerName(game, format)}
         />
       </div>
     )
@@ -57,10 +65,12 @@ function OpponentSelector(props) {
     pubAction(topic, selectOpponent(opponent))
     // If I selected an opponent that selected me, start a game against them
     if (!props.opponentSelections[selectedIndex]) {
+      console.log("no opponent selection for", selectedIndex)
       return
     }
     if (props.player.info.id === props.opponentSelections[selectedIndex].from) {
-      store.dispatch(startGame(opponent, props.node.pubsub))
+      console.log("starting game", opponent, props.node.pubsub)
+      store.dispatch(startGame(opponent, props.node.pubsub, props.format))
     }
   }
 
