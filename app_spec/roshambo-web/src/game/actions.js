@@ -7,8 +7,8 @@ export const START_GAME_AGAINST = "START_GAME_AGAINST"
 export const GAME_STARTED = "GAME_STARTED"
 export const PLAY_MOVE = "PLAY_MOVE"
 
-export function playMove(move) {
-  return { type: PLAY_MOVE, move }
+export function playMove(gameTopic, move) {
+  return { type: PLAY_MOVE, gameTopic, move }
 }
 
 function startGameAgainst(opponent) {

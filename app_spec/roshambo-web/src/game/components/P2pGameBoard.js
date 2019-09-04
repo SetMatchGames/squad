@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 import { actionPublisher } from '../../lobby/actions'
 import { joinGame, playMove } from '../actions'
 import { activeGameTopic } from '../utils'
+import findWinner from '../findWinner'
 import store from '../../store'
 
 function mapState(state) {
@@ -29,8 +30,65 @@ function alreadyJoined(props) {
   return false
 }
 
+function IMoved(props) {
+  const gameTopic = activeGameTopic(props.activeGames, props.player.info.id)
+  return !!props.startedGames[gameTopic].moves[props.player.info.id]
+}
+
+function theyMoved(props) {
+  const gameTopic = activeGameTopic(props.activeGames, props.player.info.id)
+  const them = props.lobby.opponentSelections[props.player.info.id].from
+  return !!props.startedGames[gameTopic].moves[them]
+}
+
 function P2pGameBoard (props) {
-  // Game is started when I am in an active game
+  console.log("rengering game board", props)
+  if (!inActiveGame(props)) {
+    return <h3>Game not yet joined</h3>
+  }
+
+  if (inActiveGame(props) && !alreadyJoined(props)) {
+    store.dispatch(joinGame(
+      props.activeGames,
+      props.player.info.id,
+      props.lobby.node.pubsub
+    ))
+    return <h3>Joining game</h3>
+  }
+
+  let iDidMove = false
+  let theyDidMove = false
+  try {
+    iDidMove = IMoved(props)
+    theyDidMove = theyMoved(props)
+  } catch (_) {}
+
+  if(iDidMove && theyDidMove) {
+    const opponent = props.lobby.opponentSelections[props.player.info.id]
+    const gameTopic = activeGameTopic(props.activeGames, props.player.info.id)
+    const theirMove = props.startedGames[gameTopic].moves[opponent.from]
+    const myMove = props.startedGames[gameTopic].moves[props.player.info.id]
+    const winner = findWinner(opponent.name, theirMove, "You", myMove)
+    return (
+      <div>
+        <h3>You played {myMove.name}</h3>
+        <h3>{opponent.name} played {theirMove.name}</h3>
+        <h1>{winner} WIN(S)! BwaBwaBwaaaaaa</h1>
+      </div>
+    )
+  }
+
+  if(iDidMove) {
+    const gameTopic = activeGameTopic(props.activeGames, props.player.info.id)
+    const myMove = props.startedGames[gameTopic][props.player.info.id]
+    return (
+      <div>
+        <h3>You chose {myMove}</h3>
+        <h3>Waiting for them to choose</h3>
+      </div>
+    )
+  }
+
   function handleMove() {
     console.log("handling move")
     let index = document.getElementById("move-index")
@@ -42,15 +100,7 @@ function P2pGameBoard (props) {
     const component = props.components.list[index].definition.Component
     const gameTopic = activeGameTopic(props.activeGames, props.player.info.id)
     const pubAction = actionPublisher(props.lobby.node.pubsub)
-    pubAction(gameTopic, playMove(component))
-  }
-
-  if (inActiveGame(props) && !alreadyJoined(props)) {
-    store.dispatch(joinGame(
-      props.activeGames,
-      props.player.info.id,
-      props.lobby.node.pubsub
-    ))
+    pubAction(gameTopic, playMove(gameTopic, component))
   }
 
   if(inActiveGame(props)) {
@@ -66,11 +116,17 @@ function P2pGameBoard (props) {
             )
           })}
         </select>
-        <input type="submit" value="Submit move" onClick={handleMove()} />
+        <input type="submit" value="Submit move" onClick={handleMove} />
       </div>
     )
   }
-  return <h3>Game not yet joined</h3>
+  return (
+    <div>
+      <h3>Something went terribly wrong.</h3>
+      <h3>Please donate to 0x76bc4C780Dd85558Bc4B24a4f262f4eB0bE78ca7</h3>
+      <h3>As a token of appreciation dispite the failed effort.</h3>
+    </div>
+  )
 }
 
 export default connect(mapState)(P2pGameBoard)
