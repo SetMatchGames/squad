@@ -42,7 +42,6 @@ function theyMoved(props) {
 }
 
 function P2pGameBoard (props) {
-  console.log("rengering game board", props)
   if (!inActiveGame(props)) {
     return <h3>Game not yet joined</h3>
   }
@@ -68,12 +67,12 @@ function P2pGameBoard (props) {
     const gameTopic = activeGameTopic(props.activeGames, props.player.info.id)
     const theirMove = props.startedGames[gameTopic].moves[opponent.from]
     const myMove = props.startedGames[gameTopic].moves[props.player.info.id]
-    const winner = findWinner(opponent.name, theirMove, "You", myMove)
+    const winner = findWinner(`${opponent.name} WINS!`, theirMove, "You WIN!", myMove)
     return (
       <div>
         <h3>You played {myMove.name}</h3>
         <h3>{opponent.name} played {theirMove.name}</h3>
-        <h1>{winner} WIN(S)! BwaBwaBwaaaaaa</h1>
+        <h1>{winner} BwaBwaBwaaaaaa</h1>
       </div>
     )
   }
@@ -106,7 +105,7 @@ function P2pGameBoard (props) {
   if(inActiveGame(props)) {
     return (
       <div>
-        <label> choose move: </label>
+        <h3> choose move: </h3>
         <select id="move-index">
           {props.components.list.map((component, n) => {
             return (

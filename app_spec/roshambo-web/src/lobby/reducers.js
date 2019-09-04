@@ -2,24 +2,10 @@ import { combineReducers } from 'redux'
 
 import {
   LOBBY_HEARTBEAT,
-  OPPONENTS_FAILURE,
-  OPPONENT_CONFIRMED,
-  OPPONENT_SELECT_FAILURE,
   SELECT_OPPONENT,
   SET_PLAYER,
   JOIN_LOBBY
 } from './actions'
-
-function opponentStatus(state = {}, action) {
-  if ([
-    OPPONENTS_FAILURE,
-    OPPONENT_CONFIRMED,
-    OPPONENT_SELECT_FAILURE,
-  ].includes(action.type)) {
-    return { ...action }
-  }
-  return state
-}
 
 function opponentSelections(state = {}, action) {
   if (action.type === SELECT_OPPONENT) {
@@ -40,6 +26,7 @@ function opponents(state = {}, action) {
   return state
 }
 
+
 function player(state = {}, action) {
   if (action.type === SET_PLAYER) {
     return Object.assign({}, action)
@@ -56,7 +43,7 @@ function node(state = null, action) {
 
 export const lobby = combineReducers({
   player,
-  opponentStatus,
+//  opponentStatus,
   opponents,
   opponentSelections,
   node
