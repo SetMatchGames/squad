@@ -5,6 +5,7 @@
 
 import { metastore } from "squad-sdk"
 import store from "../store"
+import IPFS from 'ipfs'
 
 export const CREATE_DEFINITION = "CREATE_DEFINITION"
 export const CREATE_DEFINITION_SUCCESS = "CREATE_DEFINITION_SUCCESS"
@@ -14,12 +15,57 @@ export const RECEIVE_CATALOG = "RECEIVE_CATALOG"
 export const CATALOG_FAILURE = "CATALOG_FAILURE"
 export const SWITCH_DEFINITION_FORM = "SWITCH_DEFINITION_FORM"
 
+const TOPIC = "squad.games/metastore/topic"
+
+const node = new IPFS({
+  repo: `squad.games/ipfsRepo/${Math.random()}`,
+  EXPERIMENTAL: {
+    pubsub: true
+  },
+  config: {
+    Addresses: {
+      Swarm: [
+        '/dns4/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-websocket-star'
+      ]
+    }
+  }
+})
+
+export function shareDefinitions() {
+  // when someone sends deffinions, submit them
+  setTimeout(
+    () => {
+      node.pubsub.subscribe(TOPIC, (message) => {
+        const data = JSON.parse(message.data.toString())
+        console.log("submitting each of", data)
+        data.forEach((def) => {
+          store.dispatch(submitDefinition(def))
+        })
+      })
+    },
+    4000
+  )
+
+  // periodically send all the definitions you have
+  setInterval(
+    () => {
+      ["Format", "Game", "Component"].forEach(type => {
+        metastore.getAllDefinitionsOfType(type).then(defs => {
+          console.log("publishing", defs)
+          node.pubsub.publish(TOPIC, Buffer.from(JSON.stringify(defs), 'utf-8'))
+        })
+      })
+    },
+    10000
+  )
+}
+
 export function submitDefinition(definition) {
   return (dispatch) => {
     dispatch(createDefinition(definition))
     metastore.createDefinition(definition).then(
       (address) => {
-        if (checkForDuplicate(address, definition)) { 
+        if (checkForDuplicate(address, definition)) {
           dispatch(createDefinitionFailure(definition, "Duplicate definition"))
         } else {
           dispatch(createDefinitionSuccess(address, definition))
@@ -34,9 +80,9 @@ export function createDefinition(definition) {
   let definitionType = Object.keys(definition)[0]
   let catalogName = `${definitionType} Catalog`
   return {
-    type: CREATE_DEFINITION, 
+    type: CREATE_DEFINITION,
     definition,
-    name: catalogName, 
+    name: catalogName,
     definitionType
   }
 }
@@ -45,10 +91,10 @@ export function createDefinitionSuccess(address, definition) {
   let definitionType = Object.keys(definition)[0]
   let catalogName = `${definitionType} Catalog`
   return {
-    type: CREATE_DEFINITION_SUCCESS, 
+    type: CREATE_DEFINITION_SUCCESS,
     definition,
-    key: address, 
-    name: catalogName, 
+    key: address,
+    name: catalogName,
     definitionType
   }
 }
@@ -57,10 +103,10 @@ export function createDefinitionFailure(definition, error) {
   let definitionType = Object.keys(definition)[0]
   let catalogName = `${definitionType} Catalog`
   return {
-    type: CREATE_DEFINITION_FAILURE, 
+    type: CREATE_DEFINITION_FAILURE,
     error,
-    definition, 
-    name: catalogName, 
+    definition,
+    name: catalogName,
     definitionType
   }
 }
