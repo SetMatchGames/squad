@@ -31,15 +31,22 @@ const node = new IPFS({
   }
 })
 
+const submitted = {}
+
 export function shareDefinitions() {
   // when someone sends deffinions, submit them
+  console.log("sharing definitions")
   setTimeout(
     () => {
       node.pubsub.subscribe(TOPIC, (message) => {
         const data = JSON.parse(message.data.toString())
-        console.log("submitting each of", data)
         data.forEach((def) => {
-          store.dispatch(submitDefinition(def))
+          let key = JSON.stringify(def)
+          if (!submitted[key]) {
+            console.log("submitting", def)
+            store.dispatch(submitDefinition(def))
+            submitted[key] = true
+          }
         })
       })
     },
