@@ -2,7 +2,7 @@ const { spawn } = require('child_process')
 const fs = require('fs')
 const process = require('process')
 const path = require('path')
-// const curationMarket = require('../../curation/api')
+const curationMarket = require('./curation-api')
 const metastore = require('./metastore-api')
 
 const runners = {
@@ -62,9 +62,21 @@ async function runGame(definition) {
   return runner(JSON.parse(definition.Game.data))
 }
 
+// Combined metastore and curationMarket functions
+
+// handle submitting a definition and creating a new bond at the same time
+async function newDefinitionWithBond(definition, addressOfCurve, initialBuyNumber, opts) {
+  console.log("new def args", definition, addressOfCurve, initialBuyNumber, opts)
+  const bondId = await metastore.createDefinition(definition)
+  await curationMarket.newBond(addressOfCurve, bondId, initialBuyNumber, opts)
+  console.log("new bond created with definition!")
+  return [await curationMarket.getSupply(bondId), bondId]
+}
+
 module.exports = {
   runGame,
   registerRunner,
-  metastore
-//  curationMarket // methods: makeDefaults(account), makeBond(factory, defaults, bondABI)
+  metastore,
+  curationMarket,
+  newDefinitionWithBond
 }
