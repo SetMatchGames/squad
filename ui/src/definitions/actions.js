@@ -3,9 +3,13 @@
  * There are catalogs for each of the definition types (Game, Format, Component)
  */
 
-import { metastore } from "squad-sdk"
+import { newDefinitionWithBond, metastore } from "squad-sdk"
 import store from "../store"
-import IPFS from 'ipfs'
+import IPFS from "ipfs"
+
+import * as dotenv from "dotenv"
+dotenv.config()
+console.log("curve", process.env.SIMPLE_CURVE_ADDR)
 
 export const CREATE_DEFINITION = "CREATE_DEFINITION"
 export const CREATE_DEFINITION_SUCCESS = "CREATE_DEFINITION_SUCCESS"
@@ -35,7 +39,7 @@ const submitted = {}
 
 export function shareDefinitions() {
   // when someone sends deffinions, submit them
-  console.log("sharing definitions")
+  // console.log("sharing definitions")
   setTimeout(
     () => {
       node.pubsub.subscribe(TOPIC, (message) => {
@@ -43,7 +47,7 @@ export function shareDefinitions() {
         data.forEach((def) => {
           let key = JSON.stringify(def)
           if (!submitted[key]) {
-            console.log("submitting", def)
+            // console.log("submitting", def)
             store.dispatch(submitDefinition(def))
             submitted[key] = true
           }
@@ -58,7 +62,7 @@ export function shareDefinitions() {
     () => {
       ["Format", "Game", "Component"].forEach(type => {
         metastore.getAllDefinitionsOfType(type).then(defs => {
-          console.log("publishing", defs)
+          // console.log("publishing", defs)
           node.pubsub.publish(TOPIC, Buffer.from(JSON.stringify(defs), 'utf-8'))
         })
       })
@@ -70,7 +74,7 @@ export function shareDefinitions() {
 export function submitDefinition(definition) {
   return (dispatch) => {
     dispatch(createDefinition(definition))
-    metastore.createDefinition(definition).then(
+    newDefinitionWithBond(definition, '0x8B33b44c0F30ea308821860a2C4a3da85Bf1f3E9', 0, {}).then(
       (address) => {
         if (checkForDuplicate(address, definition)) {
           dispatch(createDefinitionFailure(definition, "Duplicate definition"))
