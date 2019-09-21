@@ -58,9 +58,11 @@ async function init(defaults) {
     process.env.AUTOBOND_ADDR,
     defaults
   )
+  console.log("autobond", process.env.AUTOBOND_ADDR)
+  console.log("init finished", web3)
 }
 
-async function newBond(addressOfCurve, bondId, initialBuyNumber, opts) {
+async function newBond(addressOfCurve = process.env.SIMPLE_CURVE_ADDR, bondId, initialBuyNumber, opts = {}) {
   await init()
   let bondSha = web3.utils.sha3(bondId)
   let o = Object.assign({}, options, opts)

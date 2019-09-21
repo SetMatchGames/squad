@@ -8,8 +8,7 @@ develop:
 	cd curation && npm run deploy-dev
 	cd curation && echo '\nDEVELOPMENT=true' >> .env && \
 	cp .env ../sdk/js/curation-api/.env && \
-	cp .env ../sdk/js/tests/.env && \
-	cat .env >> ../ui/.env
+	cp .env ../sdk/js/tests/.env
 	# Packaging holochain DNA...
 	cd metastore && hc package
 	# Starting holochain test conductor...
