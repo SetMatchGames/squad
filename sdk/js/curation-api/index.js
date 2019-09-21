@@ -35,7 +35,7 @@ async function init(defaults) {
   console.log("running init...")
 
   // Development env (non-browser)
-  if (process.env.DEVELOPMENT === 'true') {
+  if ('true' === 'true') {
     // add ganache web3
     const provider = new Web3.providers.WebsocketProvider('ws://127.0.0.1:8545')
     web3 = new Web3(provider)
@@ -55,10 +55,9 @@ async function init(defaults) {
   options = defaults
   autoBond = await new web3.eth.Contract(
     AutoBond.abi,
-    process.env.AUTOBOND_ADDR,
+    '0x8854986fa43cFfcA5b6e5F0b3ef3db9F91B32E2F',
     defaults
   )
-  console.log("autobond", process.env.AUTOBOND_ADDR)
   console.log("init finished", web3)
 }
 
@@ -66,11 +65,15 @@ async function newBond(addressOfCurve = process.env.SIMPLE_CURVE_ADDR, bondId, i
   await init()
   let bondSha = web3.utils.sha3(bondId)
   let o = Object.assign({}, options, opts)
-  return await autoBond.methods.newBond(
-    addressOfCurve,
-    bondSha,
-    initialBuyNumber,
-  ).send(o)
+  let curve = await autoBond.methods.bonds(bondSha).call({}).curve
+  if (curve === '0x0000000000000000000000000000000000000000') {
+    return await autoBond.methods.newBond(
+      addressOfCurve,
+      bondSha,
+      initialBuyNumber,
+    ).send(o)
+  }
+  throw "Bond already exists."
 }
 
 async function getSupply(bondId) {
@@ -79,12 +82,12 @@ async function getSupply(bondId) {
   return await autoBond.methods.getSupply(bondSha).call({})
 }
 
-async function getBalance(bondId, address) {
+async function getBalance(bondId, holderAddress) {
   await init()
   let bondSha = web3.utils.sha3(bondId)
   return await autoBond.methods.getBalance(
     bondSha,
-    address,
+    holderAddress,
   ).call({})
 }
 
