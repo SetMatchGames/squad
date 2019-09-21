@@ -3,7 +3,7 @@
  * There are catalogs for each of the definition types (Game, Format, Component)
  */
 
-import { curationMarket, metastore } from "squad-sdk"
+import { curationMarket, newDefinitionWithBond, metastore } from "squad-sdk"
 import store from "../store"
 import IPFS from "ipfs"
 
@@ -70,20 +70,8 @@ export function shareDefinitions() {
 export function submitDefinition(definition) {
   return (dispatch) => {
     dispatch(createDefinition(definition))
-    metastore.createDefinition(definition).then(
-      (address) => {
-        if (checkForDuplicate(address, definition)) {
-          dispatch(createDefinitionFailure(definition, "Duplicate definition"))
-        } else {
-          console.log("address", address)
-          curationMarket.newBond('0x2e8ece3B190e5C85B095585B0e1C1AD300367de3', address, 0).then(
-            (newBond) => {
-              dispatch(createDefinitionSuccess(address, newBond))
-            },
-            (error) => dispatch(createDefinitionFailure(definition, error))
-          )
-        }
-      },
+    newDefinitionWithBond(definition).then(
+      (address) => dispatch(createDefinitionSuccess(definition, address)),
       (error) => dispatch(createDefinitionFailure(definition, error))
     )
   }
@@ -100,7 +88,7 @@ export function createDefinition(definition) {
   }
 }
 
-export function createDefinitionSuccess(address, definition) {
+export function createDefinitionSuccess(definition, address) {
   let definitionType = Object.keys(definition)[0]
   let catalogName = `${definitionType} Catalog`
   return {
@@ -201,12 +189,4 @@ async function catalogWithKeys(definitionType, name) {
     return entry
   })
   return withKeys
-}
-
-function checkForDuplicate(address, definition) {
-  let name = Object.keys(definition)[0]
-  let keys = store.getState().catalogs[`${name} Catalog-${name}`].definitions.map(d => {
-    return d.key
-  })
-  return keys.includes(address)
 }
