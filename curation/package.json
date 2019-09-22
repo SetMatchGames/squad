@@ -7,6 +7,7 @@
     "test": "test"
   },
   "dependencies": {
+    "dotenv": "^8.1.0",
     "fs": "0.0.1-security",
     "ganache-cli": "^6.5.0",
     "openzeppelin-solidity": "^2.3.0",
@@ -17,7 +18,7 @@
     "test": "mocha",
     "_deploy": "./node_modules/.bin/truffle migrate --network",
     "deploy-local": "npm run _deploy local",
-    "deploy-dev": "npm run _deploy development"
+    "deploy-dev": "NETWORK=development npm run _deploy development"
   },
   "author": "",
   "license": "ISC"
