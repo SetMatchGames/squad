@@ -4,6 +4,7 @@ const process = require('process')
 const path = require('path')
 const curationMarket = require('./curation-api')
 const metastore = require('./metastore-api')
+const config = require('./curation-config.json')
 
 const runners = {
   "web-game-v0": async (gameData) => {
@@ -67,14 +68,12 @@ async function runGame(definition) {
 // handle submitting a definition and creating a new bond at the same time
 async function newDefinitionWithBond(
   definition, 
-  addressOfCurve = '0x5142096f20916308fDF1540b16407680b7582f38', 
+  addressOfCurve = config.contracts.simpleLinearCurve, 
   initialBuyUnits = 0, 
   opts = {}
 ) {
-  console.log("new def args", definition, addressOfCurve, initialBuyUnits, opts)
   const bondId = await metastore.createDefinition(definition)
-  console.log("bond", await curationMarket.newBond(addressOfCurve, bondId, initialBuyUnits, opts))
-  console.log("new bond created with definition!")
+  await curationMarket.newBond(addressOfCurve, bondId, initialBuyUnits, opts)
   return bondId
 }
 

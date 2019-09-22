@@ -1,6 +1,8 @@
-require("dotenv").config()
 const Web3 = require("web3")
 const AutoBond = require("../../../curation/build/contracts/AutoBond.json")
+const config = require("../curation-config.json")
+const contractAddresses = config.contracts
+const network = config.network
 
 async function addWeb3() {
     // Modern dapp browsers...
@@ -35,7 +37,7 @@ async function init(defaults) {
   console.log("running init...")
 
   // Development env (non-browser)
-  if ('true' === 'true') {
+  if (network === 'development') {
     // add ganache web3
     const provider = new Web3.providers.WebsocketProvider('ws://127.0.0.1:8545')
     web3 = new Web3(provider)
@@ -55,17 +57,17 @@ async function init(defaults) {
   options = defaults
   autoBond = await new web3.eth.Contract(
     AutoBond.abi,
-    '0x8854986fa43cFfcA5b6e5F0b3ef3db9F91B32E2F',
+    contractAddresses.autoBond,
     defaults
   )
   console.log("init finished", web3)
 }
 
-async function newBond(addressOfCurve = process.env.SIMPLE_CURVE_ADDR, bondId, initialBuyNumber, opts = {}) {
+async function newBond(addressOfCurve = contractAddresses.simpleLinearCurve, bondId, initialBuyNumber, opts = {}) {
   await init()
   let bondSha = web3.utils.sha3(bondId)
   let o = Object.assign({}, options, opts)
-  let curve = await autoBond.methods.bonds(bondSha).call({}).curve
+  let curve = await autoBond.methods.getCurve(bondSha).call({})
   if (curve === '0x0000000000000000000000000000000000000000') {
     return await autoBond.methods.newBond(
       addressOfCurve,
