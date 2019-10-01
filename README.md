@@ -1,6 +1,6 @@
 # Squad
 
-Prototype Set Match Games platform on Holochain
+Prototype Set Match Games platform on Holochain & Ethereum.
 
 As Set Match Games is to Valve, Squad is to Steam.
 
