@@ -1,12 +1,23 @@
 # Squad
 
-Prototype Set Match Games platform on Holochain & Ethereum.
+Squad is an open source video game store for community-designed games. Focuses include community contribution, curation markets, and decentralization.
 
-As Set Match Games is to Valve, Squad is to Steam.
+Squad is made up of two products:
+ - the **Squad store**, a game store and launcher
+ - the **Squad SDK**, an SDK for allowing community submitted defintions (metadata for games and game-related elements), generating and purchasing tokens associated with those definitions, and curating those definitions by their market activity (curation markets). Used in the Squad platform and available for game makers who want to incorporate these features.
 
-Squad is the platform where game players and creators submit their contributions and browse contributions that have been submitted. All the things that Steam does internally (game vetting, game curating) will be done publicly.
+## Architecture
+Squad is in the prototype / proof-of-concept stage. The current architecture uses:
+ - Holochain to validate and store metadata
+ - Ethereum to generate tokens via [curved bonds](https://medium.com/@simondlr/tokens-2-0-curved-token-bonding-in-curation-markets-1764a2e0bee5)
+ - IPFS as a peer-to-peer networking shim
+ 
+TBD
 
-# Setting up a development environment
+## Contribution Guide
+TBD
+
+## Setting up a development environment
 
 1. Install nix shell: `curl https://nixos.org/nix/install | sh`
 
@@ -20,7 +31,7 @@ Squad is the platform where game players and creators submit their contributions
 
 5. In a command line in a new tab, start the nix shell (step 3) and then start the React app with `make react`. (I believe using the `--pure` tag for the nix-shell will _not_ work here because react-scripts needs your local environment variables, such as default browser.)
 
-# To test the roshambo-web game
+## Testing the roshambo-web game
 
 1. Set up the development environment with both `make develop` and `make react` running (see above).
 
