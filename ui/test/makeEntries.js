@@ -1,4 +1,4 @@
-const { metastore } = require('squad-sdk')
+const { metastore, newDefinitionWithBond } = require('squad-sdk')
 
 const roshambo = {
   Game: {
@@ -61,13 +61,13 @@ metastore.on('open', async () => {
 
     // metastore tests
   
-    const a = await metastore.createDefinition(roshambo)
+    const a = await newDefinitionWithBond(roshambo)
     console.log("roshambo address:", a)
   
     const r = await metastore.getDefinition(a)
     console.log("roshambo retrieved:", r)
 
-    await metastore.createDefinition(roshamboWebTest)
+    await newDefinitionWithBond(roshamboWebTest)
   
     setTimeout(async () => {
       const g = await metastore.getDefinitionsFromCatalog("Game", "Game Catalog")
@@ -77,7 +77,8 @@ metastore.on('open', async () => {
   
     const componentAdds = await Promise.all(
       components.map(async c => {
-        return metastore.createDefinition(c)
+        // return metastore.createDefinition(c)
+        return newDefinitionWithBond(c)
       })
     )
     console.log("component addresses:", componentAdds)
@@ -102,10 +103,10 @@ metastore.on('open', async () => {
       }
     }
   
-    const f = await metastore.createDefinition(standard)
+    const f = await newDefinitionWithBond(standard)
     console.log("format address:", f)
 
-    const o = await metastore.createDefinition(rockless)
+    const o = await newDefinitionWithBond(rockless)
     console.log("rockless format address:", o)
   
     const z = await metastore.getDefinition(f)

@@ -8,7 +8,11 @@ import { Provider } from 'react-redux'
 import store from './store'
 
 import { connectToSquad } from './squad/actions'
-import { fetchCatalog, switchDefinitionForm } from './definitions/actions'
+import {
+  fetchCatalog,
+  switchDefinitionForm,
+  shareDefinitions,
+} from './definitions/actions'
 
 ReactDOM.render(
   <Provider store={store}>
@@ -21,9 +25,10 @@ store.dispatch(connectToSquad(
   'ws://localhost:8888', // TODO make this configurable
   (connection, dispatch) => {
     dispatch(fetchCatalog("Game", "Game Catalog"))
-    dispatch(fetchCatalog("Format", "Format Catalog"))
     dispatch(fetchCatalog("Component", "Component Catalog"))
-    dispatch(switchDefinitionForm("Game"))
+    dispatch(fetchCatalog("Format", "Format Catalog"))
+    dispatch(switchDefinitionForm("Game", "Game Catalog"))
+    shareDefinitions()
   },
   (error, dispatch) => {
     console.warn(error)

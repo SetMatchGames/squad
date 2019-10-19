@@ -18,10 +18,8 @@ function on(message, f) {
 }
 
 async function call(zome, method, inputs) {
-  console.log("squad.call", zome, method, inputs)
 
   const instanceInfo = await squad.connection.call('info/instances', {})
-  console.log('instanceInfo', instanceInfo)
 
   const params = {
     "instance_id": instanceInfo[0].id,
@@ -29,9 +27,7 @@ async function call(zome, method, inputs) {
     "function": method,
     "args": inputs
   }
-  console.log("calling", params)
   const result = JSON.parse(await squad.connection.call('call', params))
-  console.log("RESULT", result)
 
   if (result.Ok === undefined) {
     throw result

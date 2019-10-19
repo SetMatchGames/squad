@@ -18,6 +18,7 @@ import {
   moveRecieved,
   revealWinner
 } from '../actions'
+
 import { gameStarted, gameFinished } from '../../squad/actions'
 
 function mapState(state) {
@@ -43,16 +44,8 @@ const handlePlayer2Registered = (_) => {
 }
 
 function GameBoard(props) {
-  // action functions that need props
-  const handleMove1Received = (_) => {
-    handleMove(1)
-  }
 
-  const handleMove2Received = (_) => {
-    handleMove(2)
-  }
-
-  function handleMove(n /* 1 or 2 */) { 
+  function handleMove(n /* 1 or 2 */) {
     return (n) => {
       let index = document.getElementById(`move-index`).value
       let component = props.components.list[index].definition.Component
@@ -66,7 +59,7 @@ function GameBoard(props) {
   }
 
   const handleRevealWinner = (move2) => {
-    let { 
+    let {
       player1,
       move1,
       player2
@@ -83,7 +76,7 @@ function GameBoard(props) {
       </div>
     )
   }
-  
+
   // conditional renders
   switch(props.playSession.status) {
     case REQUEST_PLAYER_ONE:
@@ -95,7 +88,7 @@ function GameBoard(props) {
           <input type="submit" value="Register player" onClick={handlePlayer1Registered}/>
         </div>
       )
-      
+
     case REQUEST_PLAYER_TWO:
       return (
         <div>

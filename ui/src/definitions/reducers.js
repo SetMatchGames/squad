@@ -4,7 +4,7 @@ import {
   REQUEST_CATALOG,
   RECEIVE_CATALOG,
   CATALOG_FAILURE,
-  SWITCH_DEFINITION_FORM,
+  SWITCH_DEFINITION_FORM
 } from './actions'
 
 import { catalogKey } from './utils'
@@ -65,7 +65,7 @@ function catalog(state = newCatalog(), action) {
     break
 
   case CREATE_DEFINITION_FAILURE:
-    console.log("Definition creation failed:", action.error)
+    console.log("Definition creation failed:", action.error, action.definition)
     newState = Object.assign(
       {},
       state,
@@ -80,16 +80,20 @@ function catalog(state = newCatalog(), action) {
 }
 
 export function catalogs(state = {}, action) {
-  const key = catalogKey(action.name, action.definitionType)
-  switch(action.type) {
-  case REQUEST_CATALOG:
+  let key = "Last Action"
+  const catActions = [
+    CREATE_DEFINITION_SUCCESS,
+    CREATE_DEFINITION_FAILURE,
+    REQUEST_CATALOG,
+    RECEIVE_CATALOG,
+    CATALOG_FAILURE,
+    SWITCH_DEFINITION_FORM
+  ]
+  if (catActions.includes(action.type)) {
+    key = catalogKey(action.name, action.definitionType)
     // initialize a new definition catalog if one isn't there
     state[key] = state[key] ? state[key] : newCatalog()
-    break
-  default:
-    break
   }
-  // reduce the requested catalog
   state[key] = Object.assign(
     {},
     catalog(state[key], action)
