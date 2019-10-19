@@ -1,5 +1,7 @@
 curation/build
 
+squad-config.json
+
 *.env
 ./dist/
 ./metastore/dist/
