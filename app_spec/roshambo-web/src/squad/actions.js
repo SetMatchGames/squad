@@ -16,7 +16,8 @@ export function connectToSquad(
   return (dispatch) => {
     let squadUri = ""
     try {
-      squadUri = getUrlParams(["squadUri"])["squadUri"]
+      const locationUrl = new URL(window.location.href)
+      squadUri =  locationUrl.searchParams.get("squadUri")
     } catch(error) {
       dispatch(connectFail(error))
       return

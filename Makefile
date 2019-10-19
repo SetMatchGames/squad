@@ -11,6 +11,7 @@ develop:
 	# Packaging holochain DNA...
 	cd metastore && hc package
 	# Starting holochain test conductor...
+	echo '{"sdkUrl": "ws://localhost:8888"}' > sdk/js/squad-config.json
 	-cd metastore && hc run --logging
 
 .PHONY: react

@@ -4,12 +4,15 @@ const process = require('process')
 const path = require('path')
 const curationMarket = require('./curation-api')
 const metastore = require('./metastore-api')
-const config = require('./curation-config.json')
+const curationConfig = require('./curation-config.json')
+const squadConfig = require('./squad-config.json')
 
 const runners = {
   "web-game-v0": async (gameData) => {
-    let tab = window.open(gameData["url"])
-    tab.focus
+    const gameUrl = new URL(gameData["url"])
+    gameUrl.searchParams.set("squadUri", squadConfig.sdkUrl)
+    let tab = window.open(gameUrl)
+    tab.focus()
   }
 }
 
@@ -18,7 +21,6 @@ function registerRunner(type_, runner) {
 }
 
 async function runGame(definition) {
-  // TODO handle the case that a REST holochain uri is passed in
   console.log("squad.runGame", definition)
   const runner = runners[definition.Game.type_]
   return runner(JSON.parse(definition.Game.data))
@@ -29,7 +31,7 @@ async function runGame(definition) {
 // handle submitting a definition and creating a new bond at the same time
 async function newDefinitionWithBond(
   definition,
-  addressOfCurve = config.contracts.simpleLinearCurve,
+  addressOfCurve = curationConfig.contracts.simpleLinearCurve,
   initialBuyUnits = 0,
   opts = {}
 ) {
