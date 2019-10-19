@@ -1,7 +1,8 @@
 curation/build
 
 *.env
-dist/
+./dist/
+./metastore/dist/
 node_modules/
 target/
 
