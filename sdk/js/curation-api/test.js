@@ -1,4 +1,3 @@
-require("dotenv").config()
 const curation = require("./index")
 
 function assert(statement, error) {

@@ -11,7 +11,7 @@ develop:
 	# Packaging holochain DNA...
 	cd metastore && hc package
 	# Starting holochain test conductor...
-	-cd metastore && hc run --logging &> holochain.log
+	-cd metastore && hc run --logging
 
 .PHONY: react
 react:
