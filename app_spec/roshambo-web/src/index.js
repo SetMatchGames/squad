@@ -10,7 +10,6 @@ import store from './store'
 import {
   connectToSquad,
   getFormatList,
-  getGameOpponents,
 } from './squad/actions'
 
 ReactDOM.render(
@@ -29,8 +28,6 @@ store.dispatch(connectToSquad(
   },
   console.log // messageCallback
 ))
-
-store.dispatch(getGameOpponents('roshambo'))
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.

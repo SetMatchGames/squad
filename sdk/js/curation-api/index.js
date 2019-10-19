@@ -1,7 +1,8 @@
-require("dotenv").config()
 const Web3 = require("web3")
 const AutoBond = require("../../../curation/build/contracts/AutoBond.json")
-const SimpleLinearCurve = require("../../../curation/build/contracts/SimpleLinearCurve.json")
+const config = require("../curation-config.json")
+const contractAddresses = config.contracts
+const network = config.network
 
 async function addWeb3() {
     // Modern dapp browsers...
@@ -33,9 +34,10 @@ let options
 
 async function init(defaults) {
   if (web3 !== undefined) { return }
+  console.log("running init...")
 
   // Development env (non-browser)
-  if (process.env.DEVELOPMENT === 'true') {
+  if (network === 'development') {
     // add ganache web3
     const provider = new Web3.providers.WebsocketProvider('ws://127.0.0.1:8545')
     web3 = new Web3(provider)
@@ -49,75 +51,83 @@ async function init(defaults) {
   if (defaults === undefined) {
     defaults = {
       from: accounts[0],
-      gasPrice: '1000000'
+      gas: 900000
     }
   }
   options = defaults
-  console.log("init", options)
-  console.log("the address is", AutoBond.address)
   autoBond = await new web3.eth.Contract(
     AutoBond.abi,
-    process.env.AUTOBOND_ADDR,
+    contractAddresses.autoBond,
     defaults
   )
+  console.log("init finished", web3)
 }
 
-async function newBond(addressOfCurve, bondId, initialBuyNumber) {
+async function newBond(addressOfCurve = contractAddresses.simpleLinearCurve, bondId, initialBuyNumber, opts = {}) {
   await init()
-  return await autoBond.methods.newBond(
-    addressOfCurve,
-    web3.utils.fromAscii(bondId),
-    initialBuyNumber,
-  ).send({})
+  let bondSha = web3.utils.sha3(bondId)
+  let o = Object.assign({}, options, opts)
+  let curve = await autoBond.methods.getCurve(bondSha).call({})
+  if (curve === '0x0000000000000000000000000000000000000000') {
+    return await autoBond.methods.newBond(
+      addressOfCurve,
+      bondSha,
+      initialBuyNumber,
+    ).send(o)
+  }
+  throw "Bond already exists."
 }
 
 async function getSupply(bondId) {
   await init()
-  return await autoBond.methods.getSupply(
-    web3.utils.fromAscii(bondId)
-  ).call({})
+  let bondSha = web3.utils.sha3(bondId)
+  return await autoBond.methods.getSupply(bondSha).call({})
 }
 
-async function getBalance(bondId, address) {
+async function getBalance(bondId, holderAddress) {
   await init()
+  let bondSha = web3.utils.sha3(bondId)
   return await autoBond.methods.getBalance(
-    web3.utils.fromAscii(bondId),
-    address,
-  )
+    bondSha,
+    holderAddress,
+  ).call({})
 }
 
 async function buy(units, bondId, opts) {
   await init()
-  let o = Object.assign(options, opts)
-  console.log("opts", opts, options)
-  console.log("options", o)
+  let bondSha = web3.utils.sha3(bondId)
+  let o = Object.assign({}, options, opts)
   return await autoBond.methods.buy(
     units,
-    web3.utils.fromAscii(bondId),
+    bondSha,
   ).send(o)
 }
 
-async function sell(units, bondId) {
+async function sell(units, bondId, opts) {
   await init()
+  let bondSha = web3.utils.sha3(bondId)
+  let o = Object.assign({}, options, opts)
   return await autoBond.methods.sell(
     units,
-    web3.utils.fromAscii(bondId),
-  ).send({})
+    bondSha,
+  ).send(o)
 }
 
 async function getBuyPrice(units, bondId) {
   await init()
+  let bondSha = web3.utils.sha3(bondId)
   return await autoBond.methods.getBuyPrice(
     units,
-    web3.utils.fromAscii(bondId),
+    bondSha,
   ).call({})
 }
 
 async function getSellPrice(units, bondId) {
   await init()
+  let bondSha = web3.utils.sha3(bondId)
   return await autoBond.methods.getSellPrice(
     units,
-    web3.utils.fromAscii(bondId),
+    bondSha,
   ).call({})
 }
 

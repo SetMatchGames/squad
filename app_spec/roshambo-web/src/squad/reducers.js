@@ -60,9 +60,9 @@ function components(state = null, action) {
 }
 
 export const squad = combineReducers({
-    uri, 
-    // on, 
-    status, 
-    formats, 
-    components
+  uri,
+  status,
+  formats,
+  components
 })
+
