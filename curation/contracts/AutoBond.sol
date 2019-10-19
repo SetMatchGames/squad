@@ -43,7 +43,6 @@ contract AutoBond {
     require(curve != address(0), "Must specify a curve address");
     require(bonds[bondId].curve == address(0), "Bond id exists");
     Bond memory bond = Bond({ curve: curve, supply: 0 });
-    // bond.curve = curve;
     bonds[bondId] = bond;
     if (units > 0) {
       _buy(units, bondId, msg.sender, msg.value);

@@ -2,26 +2,23 @@ const fs = require("fs")
 const AutoBond = artifacts.require("AutoBond")
 const SimpleLinearCurve = artifacts.require("SimpleLinearCurve")
 
+let curationConfig = { contracts: {} }
+
 module.exports = function(deployer) {
   deployer.deploy(AutoBond).then(c => {
-    // write AutoBond address to .env file
-    fs.writeFileSync(
-      '.env',
-      `AUTOBOND_ADDR=${c.address}`,
-      (err) => {
-        if (err) throw err
-        console.log('AutoBond address saved to .env')
-      }
-    )
+    // write address to config file
+    addToConfig("autoBond", c.address)
+    fs.writeFileSync("curation-config.json", JSON.stringify(curationConfig))
   })
   deployer.deploy(SimpleLinearCurve).then(c => {
-    fs.appendFileSync(
-      '.env',
-      `\nSIMPLE_CURVE_ADDR=${c.address}`,
-      (err) => {
-        if (err) throw err
-        console.log('AutoBond address saved to .env')
-      }
-    )
+    // write address to config file
+    addToConfig("simpleLinearCurve", c.address)
+    fs.writeFileSync("curation-config.json", JSON.stringify(curationConfig))
   })
 };
+
+function addToConfig(name, address) {
+  const network = process.env.NETWORK
+  curationConfig["network"] = network
+  curationConfig.contracts[name] = address
+}

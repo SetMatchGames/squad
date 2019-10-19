@@ -25,7 +25,7 @@ const handleCreateDefinition = (_) => {
 
 const handleSwitchDefinitionForm = (_) => {
   const type = document.getElementById(`definition-type`).value
-  store.dispatch(switchDefinitionForm(type))
+  store.dispatch(switchDefinitionForm(type, `${type} Catalog`))
 }
 
 function FormField(props) {
@@ -71,6 +71,7 @@ function DefinitionFields(props) {
 function DefinitionForm(props) {
   return (
     <div>
+      <h2>Submit new definition</h2>
       <label>Definition type:</label><br/>
       <select id="definition-type" onChange={handleSwitchDefinitionForm}>
         <option value="Game">Game</option>

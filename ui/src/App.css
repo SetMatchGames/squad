@@ -20,16 +20,21 @@
 }
 
 .App-body {
-    width: 62vw;
-    margin-left: auto;
-    margin-right: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 62vw;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.Definition {
+  width: 62vw;
+  border-bottom: 1px solid grey;
+  margin-bottom: 2vw;
+  word-wrap: break-word;
+}
+
+.Launch-button {
+  margin: 1vw 0vw 1vw 0vw;
 }
