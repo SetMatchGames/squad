@@ -5,9 +5,8 @@ develop:
 	# Starting ganache...
 	-curation/node_modules/.bin/ganache-cli -b 1 &> ganache.log &
 	# Deploying contracts...
-	cd curation && \
-	npm run deploy-dev && \
-	cp curation-config.json ../sdk/js/curation-config.json
+	cd curation && npm run deploy-dev
+	#cp curation-config.json ../sdk/js/curation-config.json
 	# Packaging holochain DNA...
 	cd metastore && hc package
 	# Starting holochain test conductor...
@@ -22,3 +21,11 @@ react:
 	# cd ui/test && node makeEntries
 	# Starting react app
 	cd ui && npm run start
+
+.PHONY: test
+test:
+	cd sdk/js && npm run test
+	cd metastore && hc test
+	cd ui && CI=true npm run test
+	cd curation && npm run test
+
