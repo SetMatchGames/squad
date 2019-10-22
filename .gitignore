@@ -1,6 +1,7 @@
 curation/build
 
 squad-config.json
+lerna-debug.log
 
 *.env
 ./dist/
