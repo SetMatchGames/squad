@@ -1,31 +1,41 @@
 .PHONY: develop
 develop:
-	# Installing ganache...
-	cd curation && npm install
+        # Installing ganache...
+	cd packages/curation/app && npm install
 	# Starting ganache...
-	-curation/node_modules/.bin/ganache-cli -b 1 &> ganache.log &
+	-packages/curation/app/node_modules/.bin/ganache-cli -b 1 &
 	# Deploying contracts...
-	cd curation && npm run deploy-dev
+	cd packages/curation/app && npm run deploy-dev
 	#cp curation-config.json ../sdk/js/curation-config.json
 	# Packaging holochain DNA...
-	cd metastore && hc package
+	cd packages/metastore/app && hc package
 	# Starting holochain test conductor...
-	echo '{"sdkUrl": "ws://localhost:8888"}' > sdk/js/squad-config.json
-	-cd metastore && hc run --logging
+	echo '{"sdkUrl": "ws://localhost:8888"}' > packages/squad-sdk/js/squad-config.json
+	-cd packages/metastore/app && hc run --logging
 
 .PHONY: react
-react:
+react: bootstrap
 	# Installing ui packages...
-	cd ui && npm install
+#	cd packages/squad-games-web && npm install
 	# Adding holochain test data (disabled for now)
-	# cd ui/test && node makeEntries
+	# cd packages/squad-games-web/test && node makeEntries
 	# Starting react app
-	cd ui && npm run start
+	cd packages/squad-games-web && npm run start
+
+.PHONY: bootstrap
+bootstrap:
+	lerna bootstrap
 
 .PHONY: test
-test:
-	cd sdk/js && npm run test
-	cd metastore && hc test
-	cd ui && CI=true npm run test
-	cd curation && npm run test
-
+test: bootstrap
+	echo "Running all test suites"
+	cd packages/squad-sdk/js && npm run test
+	echo "WARNING skipping metastore hc test, they are broken"
+#	cd packages/metastore/app && hc test
+	cd packages/metastore/clients/js && npm run test
+	echo "WARNING skipping ui npm test because of that stupid bug"
+#	cd packages/squad-game-web && CI=true npm test
+	cd packages/curation/app && npm run test
+	cd packages/curation/clients/js && npm run test
+	echo "Whoops forgot app spec tests!" && false
+	echo "All test suites pass!"

@@ -1,0 +1,17 @@
+{
+  "name": "@squad/curation",
+  "version": "0.0.0",
+  "description": "Squad Games JavaScript Curation Market client",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "web3": "^1.2.1"
+  },
+  "devDependencies": {
+    "jest": "^24.9.0"
+  }
+}

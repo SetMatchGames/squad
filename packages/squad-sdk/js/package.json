@@ -1,0 +1,20 @@
+{
+  "name": "@squad/sdk",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@squad/curation": "^0.0.0",
+    "@squad/metastore": "^0.0.0",
+    "rpc-websockets": "^4.4.0",
+    "web3": "^1.2.1"
+  },
+  "devDependencies": {
+    "jest": "^24.9.0"
+  }
+}

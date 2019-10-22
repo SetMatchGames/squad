@@ -1,0 +1,27 @@
+{
+  "name": "curation",
+  "version": "1.0.0",
+  "description": "",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "dotenv": "^8.1.0",
+    "fs": "0.0.1-security",
+    "ganache-cli": "^6.5.0",
+    "openzeppelin-solidity": "^2.3.0",
+    "rpc-websockets": "^4.6.1",
+    "truffle": "^5.0.29",
+    "web3": "^1.2.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "truffle test",
+    "_deploy": "./node_modules/.bin/truffle migrate --network",
+    "deploy-local": "npm run _deploy local",
+    "deploy-dev": "NETWORK=development npm run _deploy development"
+  },
+  "author": "",
+  "license": "ISC"
+}
