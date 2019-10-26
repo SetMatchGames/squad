@@ -1,0 +1,30 @@
+version: "3"
+services:
+
+  ganache:
+    image: "trufflesuite/ganache-cli:latest"
+    command: -b 1
+    ports:
+      - "8545:8545"
+
+#  metastore:
+#    image: holochain/holochain-rust
+#    command: hc package && hc run --logging
+#    volumes:
+#      - "./packages/metastore/app:/holochain"
+
+  squad-games:
+    build: .
+    command: lerna bootstrap && npm run start
+    ports:
+      - "3000:3000"
+    volumes:
+      - "./packages/squad-games-web:/app"
+
+  app-spec:
+    build: .
+    command: npm run start
+    ports:
+      - "3001:3001"
+    volumes:
+      - "./packages/app-spec-web:/app"
