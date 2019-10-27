@@ -3,8 +3,8 @@
 
 ### Important links
 -documentation tbd-
- - [Submit bugs and suggestions](https://www.github.com/setmatchgames/squad/issues) (github issues)
- - [Community discussion](https://discord.gg/AKnbAe9) (discord)
+ - [Submit bugs and suggestions](https://www.github.com/setmatchgames/squad/issues) (Github issues)
+ - [Community discussion](https://discord.gg/AKnbAe9) (Discord)
 
 ### Table of Contents
  - [Introduction](#Introduction)
@@ -19,7 +19,7 @@
 ## Introduction
 Before contributing, you should be familiar with [Squad](https://github.com/SetMatchGames/squad) and its architecture (needs link) and have a clear idea of what you're trying to achieve.
 
-If you're not sure what type of contribution to make, you can look through unaddressed github issues or join our [discord](https://discord.gg/AKnbAe9) and ask for ideas. We'll be happy to give you something to do!
+If you're not sure what type of contribution to make, you can look through unaddressed github issues or join our [Discord](https://discord.gg/AKnbAe9) and ask for ideas. We'll be happy to give you something to do!
 
 ## Bugs and Suggestions
 If you've found a bug, please go to Squad's github issues, check if the bug has already been submitted, and if it hasn't, submit a new issue. Tag your issue with "bug" and use existing bug-tagged issues as examples for how to format your submission.
@@ -60,7 +60,7 @@ If you'd like to request a new feature or a change, follow the same protocol usi
 -thank you!-
 
 ## Contact us
-The best way to get in touch with people working on Squad directly is through our [discord](https://discord.gg/AKnbAe9). The core contributors to Squad as of October, 2019, are:
- - Jesse B. Miller ("BayesianAgent | Jesse#2255" on discord)
- - Ezra Weller ("Ezra Weller#4662" on discord)
+The best way to get in touch with people working on Squad directly is through our [Discord](https://discord.gg/AKnbAe9). The core contributors to Squad as of October, 2019, are:
+ - Jesse B. Miller ("BayesianAgent | Jesse#2255" on Discord)
+ - Ezra Weller ("Ezra Weller#4662" on Discord)
 
