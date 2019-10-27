@@ -28,3 +28,5 @@ Squad is an open source project that welcomes contributions from anyone, as long
 The best way to get in touch with people working on Squad directly is through our [Discord](https://discord.gg/AKnbAe9). The core contributors to Squad as of October, 2019, are:
  - Jesse B. Miller ("BayesianAgent | Jesse#2255" on Discord)
  - Ezra Weller ("Ezra Weller#4662" on Discord)
+ 
+ We also stream development at [twitch.tv/setmatchgames](https://www.twitch.tv/setmatchgames)! Streams generally happen every Saturday from 11:30 AM - 2:30 PM EST.
