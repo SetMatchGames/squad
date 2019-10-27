@@ -1,5 +1,12 @@
 # Squad
 
+### Table of Contents
+ - [Introduction](#Introduction)
+ - [Architecture](#Architecture)
+ - [Contribution Guide](#Contribution-Guide
+ - [Contact us](#Contact-us)
+ 
+## Introduction
 Squad is an open source video game store for community-designed games. Focuses include community contribution, curation markets, and decentralization.
 
 Squad is made up of two products:
@@ -15,22 +22,9 @@ Squad is in the prototype / proof-of-concept stage. The current architecture use
 TBD
 
 ## Contribution Guide
-TBD
+Squad is an open source project that welcomes contributions from anyone, as long as they follow our [contribution guide](CONTRIBUTING.md).
 
-# Local Development Environment
-
-## Requirements
-
-1. Make
-1. Docker
-
-## make develop
-
-`make develop` starts a full local development environment with all services running, all applications launched, and test suites being watched:
-
-* Metastore
-  * 3 nodes
-* Curation Market
-  * Ganache local test net
-* Squad Games
-* App Spec Web Game
+## Contact us
+The best way to get in touch with people working on Squad directly is through our [discord](https://discord.gg/AKnbAe9). The core contributors to Squad as of October, 2019, are:
+ - Jesse B. Miller ("BayesianAgent | Jesse#2255" on discord)
+ - Ezra Weller ("Ezra Weller#4662" on discord)
