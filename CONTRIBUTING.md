@@ -2,44 +2,44 @@
 -welcome-
 
 **Important links**
+
 -documentation tbd-
  - Report bugs as [github issues](https://www.github.com/setmatchgames/squad/issues)
  - Discuss Squad and ask questions on the [Squad discord](https://discord.gg/AKnbAe9)
 
 **Table of Contents**
--tbd-
- - [Introduction](#An-introduction-to-contributing-to-Squad)
- - [Bugs and suggestions](#Reporting-bugs-and-suggesting-features)
- - [Dev Environment Setup](#Setting-up-a-dev-environment)
- - [Submitting changes](#Submitting-your-changes)
-   * [Writing code](#Writing-code-for-Squad)
-   * [Testing](#Testing-your-code)
-   * [Submitting code](#Creating-a-pull-request)
+ - [Introduction](#Introduction)
+ - [Bugs and Suggestions](#Bugs-and-Suggestions)
+ - [Dev Environment Setup](#Dev-Environment-Setup)
+ - [Submitting Changes](#Submitting-Changes)
+   * [Code Guidelines](#Code-Guidelines)
+   * [Testing](#Testing)
+   * [Pull Requests](#Pull-Requests)
  - [Contact us](#Contact-us)
 
-## An introduction to contributing to Squad
+## Introduction
 Before contributing, you should be familiar with [Squad](https://github.com/SetMatchGames/squad) and its architecture (needs link) and have a clear idea of what you're trying to achieve.
 
 If you're not sure what type of contribution to make, you can look through unaddressed github issues or join our [discord](https://discord.gg/AKnbAe9) and ask for ideas. We'll be happy to give you something to do!
 
-## Reporting bugs and suggesting features
+## Bugs and Suggestions
 If you've found a bug, please go to Squad's github issues, check if the bug has already been submitted, and if it hasn't, submit a new issue. Tag your issue with "bug" and use existing bug-tagged issues as examples for how to format your submission.
 
 If you'd like to request a new feature or a change, follow the same protocol using the "suggestion" tag instead of "bug."
 
-## Setting up a dev evironment
+## Dev Environment Setup
 -tbd-
 
-## Submitting your changes
-### Writing code for Squad
+## Submitting Changes
+### Code Guidelines
 -general guidelines-
 -linting rules-
 
-### Testing your code
+### Testing
 -unit tests-
 -integration tests-
 
-### Creating a pull request
+### Pull Requests
 -PR formating-
 -automatic testing-
 -thank you!-
