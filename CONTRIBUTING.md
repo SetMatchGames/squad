@@ -17,7 +17,7 @@
  - [Contact us](#Contact-us)
 
 ## Introduction
-Before contributing, you should be familiar with [Squad](https://github.com/SetMatchGames/squad) and its architecture (needs link) and have a clear idea of what you're trying to achieve.
+Before contributing, you should be familiar with [Squad](README.md) and its architecture (needs link) and have a clear idea of what you're trying to achieve.
 
 If you're not sure what type of contribution to make, you can look through unaddressed github issues or join our [Discord](https://discord.gg/AKnbAe9) and ask for ideas. We'll be happy to give you something to do!
 
