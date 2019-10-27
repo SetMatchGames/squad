@@ -1,7 +1,7 @@
 # Contributing to Squad
 Squad is an open source project that welcomes all contributions following this guide. If you're reading this, thanks! We appreciate your interest in the project and encourage you to try making a contribution and joining the community.
 
-### Important links
+### Important Links
 -documentation tbd-
  - [Submit bugs and suggestions](https://www.github.com/setmatchgames/squad/issues) (Github issues)
  - [Community discussion](https://discord.gg/AKnbAe9) (Discord)
