@@ -1,5 +1,5 @@
 # Contributing to Squad
--welcome-
+Squad is an open source project that welcomes all contributions following this guide. If you're reading this, thanks! We appreciate your interest in the project and encourage you to try making a contribution and to join the community.
 
 ### Important links
 -documentation tbd-
@@ -57,7 +57,7 @@ If you'd like to request a new feature or a change, follow the same protocol usi
 
 -automatic testing-
 
--thank you!-
+Thank you for making a contribution to Squad!
 
 ## Contact us
 The best way to get in touch with people working on Squad directly is through our [Discord](https://discord.gg/AKnbAe9). The core contributors to Squad as of October, 2019, are:
