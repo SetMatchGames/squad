@@ -21,6 +21,9 @@ services:
       - "3000:3000"
     volumes:
       - "./packages/squad-games-web:/app/packages/squad-games-web"
+      - "./packages/curation-market/clients/js:/app/packages/curation-market/clients/js"
+      - "./packages/metastore/clients/js:/app/packages/metastore/clients/js"
+      - "./packages/squad-sdk/js:/app/packages/squad-sdk/js"
 
   app-spec:
     build: .
@@ -30,3 +33,6 @@ services:
       - "3001:3000"
     volumes:
       - "./packages/app-spec-web:/app/packages/app-spec-web"
+      - "./packages/curation-market/clients/js:/app/packages/curation-market/clients/js"
+      - "./packages/metastore/clients/js:/app/packages/metastore/clients/js"
+      - "./packages/squad-sdk/js:/app/packages/squad-sdk/js"

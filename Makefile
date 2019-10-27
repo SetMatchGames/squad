@@ -1,10 +1,11 @@
 .PHONY: develop
-develop: build/bootstrap
-	docker-compose up > build/docker-compose.log &
+develop: build/bootstrap build/compose-build-squad-games build/compose-build-app-spec
 	cd packages/curation-market/app/ && \
 		./wait-for-ganache.sh localhost:8545 \
 		npm run watch-contracts > ../../../build/truffle.log &
-	tail -f build/docker-compose.log build/truffle.log
+#	TODO: work out how to best get the output that is relevant
+#             not just mashing together all the output
+	docker-compose up
 
        # Installing ganache...
 #	cd packages/curation/app && npm install
@@ -26,13 +27,20 @@ react: build/bootstrap
 #	# Starting react app
 	cd packages/squad-games-web && npm run start
 
+build/compose-build-squad-games: Dockerfile packages/squad-games-web/*
+	docker-compose build squad-games
+	touch build/compose-build-squad-games
+
+build/compose-build-app-spec: Dockerfile packages/app-spec-web/*
+	docker-compose build app-spec
+	touch build/compose-build-app-spec
 
 build/bootstrap: build/. packages/curation-market/clients/js/contracts packages/curation-market/clients/js/curation-config.json
 	lerna bootstrap
 	touch build/bootstrap
 
 packages/curation-market/clients/js/contracts: packages/curation-market/app/build/contracts
-	cp -r packages/curation-market/app/build packages/curation-market/clients/js/contracts
+	cp -r packages/curation-market/app/build/contracts packages/curation-market/clients/js/contracts
 
 packages/curation-market/app/build/contracts: packages/curation-market/app/contracts/*
 	cd packages/curation-market/app && truffle compile

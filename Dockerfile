@@ -7,12 +7,11 @@ RUN apk add --no-cache git python build-base
 
 RUN npm install -g lerna
 
-COPY packages/metastore/clients/js packages/metastore/clients/js
-COPY packages/curation-market/clients/js packages/curation-market/clients/js
-COPY packages/squad-sdk/js packages/squad-sdk/js
 COPY lerna.json lerna.json
 COPY package.json package.json
-RUN lerna bootstrap
+
+# This is a dev environment container.
+# All packages are mounted in
 
 ENV BROWSER none
 ENV REACT_EDITOR none

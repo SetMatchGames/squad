@@ -1,6 +1,6 @@
 const Web3 = require("web3")
-const AutoBond = require("contracts/AutoBond.json")
-const config = require("curation-config.json")
+const AutoBond = require("./contracts/AutoBond.json")
+const config = require("./curation-config.json")
 const contractAddresses = config.contracts
 const network = config.network
 
