@@ -25,6 +25,6 @@ TBD
 Squad is an open source project that welcomes contributions from anyone, as long as they follow our [contribution guide](CONTRIBUTING.md).
 
 ## Contact us
-The best way to get in touch with people working on Squad directly is through our [discord](https://discord.gg/AKnbAe9). The core contributors to Squad as of October, 2019, are:
- - Jesse B. Miller ("BayesianAgent | Jesse#2255" on discord)
- - Ezra Weller ("Ezra Weller#4662" on discord)
+The best way to get in touch with people working on Squad directly is through our [Discord](https://discord.gg/AKnbAe9). The core contributors to Squad as of October, 2019, are:
+ - Jesse B. Miller ("BayesianAgent | Jesse#2255" on Discord)
+ - Ezra Weller ("Ezra Weller#4662" on Discord)
