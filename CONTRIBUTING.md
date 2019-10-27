@@ -1,12 +1,12 @@
 # Contributing to Squad
 -welcome-
 
-#### Important links
+### Important links
 -documentation tbd-
  - Report bugs and make suggestions as [github issues](https://www.github.com/setmatchgames/squad/issues)
  - Discuss Squad and ask questions on the [Squad discord](https://discord.gg/AKnbAe9)
 
-#### Table of Contents
+### Table of Contents
  - [Introduction](#Introduction)
  - [Bugs and Suggestions](#Bugs-and-Suggestions)
  - [Dev Environment Setup](#Dev-Environment-Setup)
