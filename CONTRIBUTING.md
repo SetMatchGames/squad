@@ -3,8 +3,8 @@
 
 ### Important links
 -documentation tbd-
- - Report bugs and make suggestions as [github issues](https://www.github.com/setmatchgames/squad/issues)
- - Discuss Squad and ask questions on the [Squad discord](https://discord.gg/AKnbAe9)
+ - [Submit bugs and suggestions](https://www.github.com/setmatchgames/squad/issues)
+ - [Community discussion](https://discord.gg/AKnbAe9)
 
 ### Table of Contents
  - [Introduction](#Introduction)
