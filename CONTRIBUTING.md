@@ -27,7 +27,19 @@ If you've found a bug, please go to Squad's github issues, check if the bug has 
 If you'd like to request a new feature or a change, follow the same protocol using the "suggestion" tag instead of "bug."
 
 ## Dev Environment Setup
--tbd-
+### Requirements
+1. Make
+1. Docker
+
+### `make develop`
+`make develop` starts a full local development environment with all services running, all applications launched, and test suites being watched:
+
+- Metastore
+  * 3 nodes
+- Curation Market
+  * Ganache local test net
+- Squad Games
+- App Spec Web Game
 
 ## Submitting Changes
 ### Code Guidelines
