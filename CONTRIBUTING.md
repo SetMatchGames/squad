@@ -32,15 +32,19 @@ If you'd like to request a new feature or a change, follow the same protocol usi
 ## Submitting Changes
 ### Code Guidelines
 -general guidelines-
+
 -linting rules-
 
 ### Testing
 -unit tests-
+
 -integration tests-
 
 ### Pull Requests
 -PR formating-
+
 -automatic testing-
+
 -thank you!-
 
 ## Contact us
