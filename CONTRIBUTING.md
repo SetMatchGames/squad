@@ -44,6 +44,14 @@ If you'd like to request a new feature or a change, follow the same protocol usi
 ## Submitting Changes
 ### Code Guidelines
 -general guidelines-
+ - Squad Games Web (React: JS)
+ - SDK (JS)
+   * Curation Market
+     - Client (JS)
+     - App (Ethereum: Solidity)
+   * Metastore
+     - Client (JS)
+     - App (Holochain: Rust)
 
 -linting rules-
 
