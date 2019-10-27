@@ -4,6 +4,7 @@
  - [Introduction](#Introduction)
  - [Architecture](#Architecture)
  - [Contribution Guide](#Contribution-Guide)
+ - [Local Demo](#Local-Demo)
  - [Contact us](#Contact-us)
  
 ## Introduction
@@ -29,6 +30,9 @@ Squad is in the prototype / proof-of-concept stage. The current architecture use
 
 ## Contribution Guide
 Squad is an open source project that welcomes contributions from anyone, as long as they follow our [contribution guide](CONTRIBUTING.md).
+
+## Local Demo
+(explain how to do a local demo)
 
 ## Contact us
 The best way to get in touch with people working on Squad directly is through our [Discord](https://discord.gg/AKnbAe9). The core contributors to Squad as of October, 2019, are:
