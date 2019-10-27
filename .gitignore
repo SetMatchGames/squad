@@ -21,6 +21,7 @@ holochain.log
 *secret*
 squad_components.json
 
+packages/curation-market/clients/js/contracts
 
 // made by netwrking shim
 packages/squad-games-web/squad.games

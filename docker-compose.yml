@@ -15,16 +15,18 @@ services:
 
   squad-games:
     build: .
-    command: lerna bootstrap && npm run start
+    command: npm run start
+    working_dir: /app/packages/squad-games-web
     ports:
       - "3000:3000"
     volumes:
-      - "./packages/squad-games-web:/app"
+      - "./packages/squad-games-web:/app/packages/squad-games-web"
 
   app-spec:
     build: .
     command: npm run start
+    working_dir: /app/packages/app-spec-web
     ports:
-      - "3001:3001"
+      - "3001:3000"
     volumes:
-      - "./packages/app-spec-web:/app"
+      - "./packages/app-spec-web:/app/packages/app-spec-web"

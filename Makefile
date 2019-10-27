@@ -3,7 +3,7 @@ develop: build/bootstrap
 	docker-compose up > build/docker-compose.log &
 	cd packages/curation-market/app/ && \
 		./wait-for-ganache.sh localhost:8545 \
-		npm run watch-contracts > build/truffle.log &
+		npm run watch-contracts > ../../../build/truffle.log &
 	tail -f build/docker-compose.log build/truffle.log
 
        # Installing ganache...
@@ -27,11 +27,20 @@ react: build/bootstrap
 	cd packages/squad-games-web && npm run start
 
 
-build/bootstrap: build/.
+build/bootstrap: build/. packages/curation-market/clients/js/contracts packages/curation-market/clients/js/curation-config.json
 	lerna bootstrap
 	touch build/bootstrap
 
-build:
+packages/curation-market/clients/js/contracts: packages/curation-market/app/build/contracts
+	cp -r packages/curation-market/app/build packages/curation-market/clients/js/contracts
+
+packages/curation-market/app/build/contracts: packages/curation-market/app/contracts/*
+	cd packages/curation-market/app && truffle compile
+
+packages/curation-market/clients/js/curation-config.json: packages/curation-market/app/curation-config.json
+	cp packages/curation-market/app/curation-config.json packages/curation-market/clients/js/curation-config.json
+
+build/.:
 	mkdir build
 
 .PHONY: test
@@ -54,4 +63,6 @@ test: build/bootstrap
 clean:
 	docker-compose down
 	rm -rf build
+	rm -rf packages/curation-market/clients/js/contracts
+	rm -rf packages/curation-market/app/build
 	lerna clean
