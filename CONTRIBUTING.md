@@ -49,11 +49,15 @@ If you'd like to request a new feature or a change, follow the same protocol usi
    * Curation Market
      - Client (JS)
      - App (Ethereum: Solidity)
+       * Protocol for upgrading smart contracts
    * Metastore
      - Client (JS)
      - App (Holochain: Rust)
+       * Protocol for upgrading holochain apps
 
 -linting rules-
+
+JS - ESlint, probably
 
 ### Testing
 -unit tests-
