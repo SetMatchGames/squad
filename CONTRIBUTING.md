@@ -67,9 +67,13 @@ Rust - Clippy? Maybe not necessary because of Rust's built in linting
 -integration tests-
 
 ### Pull Requests
+-Branching-
+
 -PR formating-
 
--automatic testing-
+-Automatic testing-
+
+Travis CI probably?
 
 Thank you for making a contribution to Squad!
 
