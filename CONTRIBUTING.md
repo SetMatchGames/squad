@@ -58,7 +58,9 @@ If you'd like to request a new feature or a change, follow the same protocol usi
 -linting rules-
 
 JS/React - StandardJS?
+
 Solidity - Solhint?
+
 Rust - Clippy? Maybe not necessary because of Rust's built in linting
 
 ### Testing
