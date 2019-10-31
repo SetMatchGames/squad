@@ -32,7 +32,7 @@ TODO: Talk about Lerna/monorepo/package structure here if that gets stabilized
 Squad is an open source project that welcomes contributions from anyone, as long as they follow our [contribution guide](CONTRIBUTING.md).
 
 ## Local Demo
-(explain how to do a local demo)
+See the [app-spec](/packages/app-spec-web) to try out all the software in this repo.
 
 ## Contact us
 The best way to get in touch with people working on Squad directly is through our [Discord](https://discord.gg/AKnbAe9). The core contributors to Squad as of October, 2019, are:
