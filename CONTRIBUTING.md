@@ -1,11 +1,6 @@
 # Contributing to Squad
 Squad is an open source project that welcomes all contributions following this guide. If you're reading this, thanks! We appreciate your interest in the project and encourage you to try making a contribution and joining the community.
 
-### Important Links
--documentation tbd-
- - [Submit bugs and suggestions](https://www.github.com/setmatchgames/squad/issues) (Github issues)
- - [Community discussion](https://discord.gg/AKnbAe9) (Discord)
-
 ### Table of Contents
  - [Introduction](#Introduction)
  - [Bugs and Suggestions](#Bugs-and-Suggestions)
@@ -22,7 +17,7 @@ Before contributing, you should be familiar with [Squad](README.md) and its arch
 If you're not sure what type of contribution to make, you can look through unaddressed github issues or join our [Discord](https://discord.gg/AKnbAe9) and ask for ideas. We'll be happy to give you something to do!
 
 ## Bugs and Suggestions
-If you've found a bug, please go to Squad's github issues, check if the bug has already been submitted, and if it hasn't, submit a new issue. Tag your issue with "bug" and use existing bug-tagged issues as examples for how to format your submission.
+If you've found a bug, please go to Squad's [github issues](https://www.github.com/setmatchgames/squad/issues), check if the bug has already been submitted, and if it hasn't, submit a new issue. Tag your issue with "bug" and use existing bug-tagged issues as examples for how to format your submission.
 
 If you'd like to request a new feature or a change, follow the same protocol using the "suggestion" tag instead of "bug."
 
