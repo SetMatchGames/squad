@@ -40,6 +40,8 @@ If you'd like to request a new feature or a change, follow the same protocol usi
 ### Code Guidelines
 Squad uses a number of languages and frameworks. Our approaches to each are still forming, but we'll update them here as they stabilize:
 
+TODO
+
 **React/Redux**
 
 **Non-React Javascript** 
@@ -49,6 +51,7 @@ Squad uses a number of languages and frameworks. Our approaches to each are stil
 **Rust** 
 
 ### Linting
+TODO
 
 Javascript & React: StandardJS
 
