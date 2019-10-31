@@ -38,30 +38,26 @@ If you'd like to request a new feature or a change, follow the same protocol usi
 
 ## Submitting Changes
 ### Code Guidelines
--general guidelines-
- - Squad Games Web (React: JS)
- - SDK (JS)
-   * Curation Market
-     - Client (JS)
-     - App (Ethereum: Solidity)
-       * Protocol for upgrading smart contracts
-   * Metastore
-     - Client (JS)
-     - App (Holochain: Rust)
-       * Protocol for upgrading holochain apps
+Squad uses a number of languages and frameworks. Our approaches to each are still forming, but we'll update them here as they stabilize:
 
--linting rules-
+**React/Redux**
 
-JS/React - StandardJS?
+**Non-React Javascript** 
 
-Solidity - Solhint?
+**Solidity** 
 
-Rust - Clippy? Maybe not necessary because of Rust's built in linting
+**Rust** 
+
+### Linting
+
+Javascript & React: StandardJS
+
+Solidity: Solhint
+
+Rust: Clippy? Maybe not necessary because of Rust's built in linting
 
 ### Testing
--unit tests-
-
--integration tests-
+TODO
 
 ### Pull Requests
 Squad uses a [develop --> master](https://nvie.com/posts/a-successful-git-branching-model/#the-main-branches) git branch structure. Your contribution should start with a fork of the `develop` branch and end with a pull request to merge your fork back into the `develop` branch.  
