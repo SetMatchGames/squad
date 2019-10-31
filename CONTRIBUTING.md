@@ -69,7 +69,7 @@ Rust - Clippy? Maybe not necessary because of Rust's built in linting
 -integration tests-
 
 ### Pull Requests
--Branching-
+Squad uses a [develop --> master](https://nvie.com/posts/a-successful-git-branching-model/#the-main-branches) git branch structure. Your contribution should start with a fork of the `develop` branch and end with a pull request to merge your fork back into the `develop` branch in this repo.  
 
 -PR formating-
 
