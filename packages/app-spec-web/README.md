@@ -1,5 +1,7 @@
 This app-spec is an example game built using the Squad-SDK.
 
+To try it out, follow the instructions to [set up a dev environment for Squad](/CONTRIBUTING.md#Dev-Environment-Setup)
+
 ---
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
