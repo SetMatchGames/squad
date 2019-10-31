@@ -10,7 +10,7 @@
 ## Introduction
 Squad is an open source project consisting of  
 1. a video game store for community-designed games and 
-1. a software development kit that helps game developers make games that support community-based design. 
+1. a software development kit that helps game developers support community-based design. 
 
 The project's focuses include community contribution, curation markets, and decentralization.
 
@@ -26,7 +26,7 @@ Squad is in the prototype / proof-of-concept stage. The current architecture use
  - Ethereum to generate tokens via [curved bonds](https://medium.com/@simondlr/tokens-2-0-curved-token-bonding-in-curation-markets-1764a2e0bee5)
  - IPFS as a peer-to-peer networking shim
  
-(TODO: Talk about Lerna/monorepo/package structure here if that gets stabilized)
+TODO: Talk about Lerna/monorepo/package structure here if that gets stabilized
 
 ## Contribution Guide
 Squad is an open source project that welcomes contributions from anyone, as long as they follow our [contribution guide](CONTRIBUTING.md).
