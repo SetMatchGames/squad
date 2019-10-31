@@ -69,14 +69,14 @@ Rust - Clippy? Maybe not necessary because of Rust's built in linting
 -integration tests-
 
 ### Pull Requests
-**Squad uses a [develop --> master](https://nvie.com/posts/a-successful-git-branching-model/#the-main-branches) git branch structure.** Your contribution should start with a fork of the `develop` branch and end with a pull request to merge your fork back into the `develop` branch in this repo.  
+Squad uses a [develop --> master](https://nvie.com/posts/a-successful-git-branching-model/#the-main-branches) git branch structure. Your contribution should start with a fork of the `develop` branch and end with a pull request to merge your fork back into the `develop` branch in this repo.  
 
-**Please give your pull request a clear title.** If the request is a response to an issue, put `Issue [NUMBER]` in the title. In the description, briefly explain:
+Please give your pull request a clear title. If the request is a response to an issue, put `Issue [NUMBER]` in the title. In the description, briefly explain:
  1. What changes are included
  2. How these change are a valuable contribution to Squad
  3. Why you've implemented them the way you have
 
-Before submitting your pull request, please **make sure the automatic tests pass** or give a good reason why you are submitting with failing tests (NOT IMPLEMENTED). We make an effort to respond to all pull requests, and if your request is not merged, we'll be sure to give you feedback about why.
+Before submitting your pull request, please make sure the automatic tests pass or give a good reason why you are submitting with failing tests (NOT IMPLEMENTED). We make an effort to respond to all pull requests, and if your request is not merged, we'll be sure to give you feedback about why.
 
 That's it. Thank you for contributing to Squad!
 
