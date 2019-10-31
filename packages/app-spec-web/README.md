@@ -1,6 +1,6 @@
 This app-spec is an example game built using the Squad-SDK.
 
-To try it out, follow the instructions to [set up a dev environment for Squad](/CONTRIBUTING.md#Dev-Environment-Setup)
+To try it out, follow the instructions to [set up a dev environment for Squad](/CONTRIBUTING.md#Dev-Environment-Setup).
 
 ---
 
