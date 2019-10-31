@@ -1,4 +1,8 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Squad Games (Web) is the web version of the Squad game store and game discovery tool. It depends on the Squad-SDK.
+
+---
+
+Default README from [Create React App](https://github.com/facebook/create-react-app):
 
 ## Available Scripts
 
