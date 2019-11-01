@@ -18,7 +18,7 @@ The project's focuses include community contribution, curation markets, and dece
 WIP
 
 Squad is made up of two products:
- - **Squad**, a game store and launcher
+ - **Squad Games**, a game store and launcher
  - the **Squad SDK**, an SDK for allowing community submitted defintions (metadata for games and game-related elements), generating and purchasing tokens associated with those definitions, and curating those definitions by their market activity (curation markets). Used in the Squad platform and available for game makers who want to incorporate these features.
 
 Squad is in the prototype / proof-of-concept stage. The current architecture uses:
