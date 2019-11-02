@@ -4,7 +4,7 @@ Squad is an open source project consisting of
 1. a video game store for community-designed games and 
 1. a software development kit that helps game developers support community-based design. 
 
-The project's focuses include community contribution, curation markets, and decentralization.
+The Squad-SDK is a software development kit that supports community-designed video games. Building with the Squad-SDK will let you build a game that allows community created and curated components, formats, and other elements inside your game. With the SDK, a game's community can 1) submit game elements, 2) buy them, 3), curate them (via curation markets), and 4) license and profit off their contributions.
 
 ### Table of Contents
  - [Architecture](#Architecture)
