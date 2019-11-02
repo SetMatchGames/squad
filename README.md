@@ -21,9 +21,6 @@ Explain each of the main folders in the repo
 ## Contribution Guide
 Squad is an open source project that welcomes contributions from anyone, as long as they follow our [contribution guide](CONTRIBUTING.md).
 
-## Local Demo
-See the [app-spec](/packages/app-spec-web) to try out all the software in this repo.
-
 ## Contact us
 The best way to get in touch with people working on Squad directly is through our [Discord](https://discord.gg/AKnbAe9). The core contributors to Squad as of October, 2019, are:
  - Jesse B. Miller ("BayesianAgent | Jesse#2255" on Discord)
