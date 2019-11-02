@@ -22,6 +22,8 @@ If you've found a bug, please go to Squad's [github issues](https://www.github.c
 If you'd like to request a new feature or a change, follow the same protocol using the "suggestion" tag instead of "bug."
 
 ## Dev Environment Setup
+WIP
+
 ### Requirements
 1. Make
 1. Docker
