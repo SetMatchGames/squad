@@ -7,11 +7,11 @@ services:
     ports:
       - "8545:8545"
 
-#  metastore:
-#    image: holochain/holochain-rust
-#    command: hc package && hc run --logging
-#    volumes:
-#      - "./packages/metastore/app:/holochain"
+  metastore:
+    build: packages/metastore/app
+    command: hc run --logging
+    ports:
+      - "8888:8888"
 
   squad-games:
     build: .
