@@ -7,14 +7,17 @@ Squad is an open source project consisting of
 The Squad-SDK is a software development kit that supports community-designed video games. Building with the Squad-SDK will let you build a game that allows community created and curated components, formats, and other elements inside your game. With the SDK, a game's community can 1) submit game elements, 2) buy them, 3), curate them (via curation markets), and 4) license and profit off their contributions.
 
 ### Table of Contents
- - [Architecture](#Architecture)
+ - [In this repo](#In-this-repo)
  - [Contribution Guide](#Contribution-Guide)
- - [Local Demo](#Local-Demo)
  - [Contact us](#Contact-us)
 
-## What's in this repo
-WIP
-Explain each of the main folders in the repo
+## In this repo
+Inside the `packages` folder of this repo, you'll find:
+ - [**app-spec-web**](/packages/app-spec-web): an example game that supports community design, built using the Squad SDK. 
+ - [**curation-market**](/packages/curation-market): an autonomous market maker for tokens connected with games and game elements, built on Ethereum. This is how users will buy/sell games and game pieces.
+ - [**metastore**](/packages/metastore): Decentralized storage for metadata representing games and game pieces, built mostly using Holochain. This metadata links users to actual game data.
+ - [**squad-games-web**](/packages/squad-games-web): Web implementation of a game store and discovery engine for games that use the Squad-SDK.
+ - [**squad-sdk**](/packages/squad-sdk): Software development kit for enabling community-design features in video games.
 
 ## Contribution Guide
 Squad is an open source project that welcomes contributions from anyone, as long as they follow our [contribution guide](CONTRIBUTING.md).
