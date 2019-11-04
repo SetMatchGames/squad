@@ -33,12 +33,12 @@ clean:
 	rm -rf build
 	rm -rf packages/curation-market/clients/js/contracts
 	rm -rf packages/curation-market/app/build
-	docker stop devnet
+	-docker stop devnet
 	lerna clean
 
 
 $(js-client-contracts): build/curation-market
-	cp -r $(curation-market-contracts) $(js-client-contracts)
+	cp -r $(curation-market-contracts) $(curation-market-js)
 
 
 $(curation-market-js)/curation-config.json: build/curation-market
@@ -51,7 +51,7 @@ build/curation-market: build/devnet
 
 
 build/devnet: build/.
-	-docker run --rm --name devnet -p 8545:8545 trufflesuite/ganache-cli -b 1
+	-docker run -d --rm --name devnet -p 8545:8545 trufflesuite/ganache-cli -b 1
 	touch build/devnet
 
 
