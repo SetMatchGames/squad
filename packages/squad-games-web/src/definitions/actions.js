@@ -5,7 +5,6 @@
 
 import { curationMarket, newDefinitionWithBond, metastore } from "@squad/sdk"
 import store from "../store"
-import IPFS from "ipfs"
 
 export const CREATE_DEFINITION = "CREATE_DEFINITION"
 export const CREATE_DEFINITION_SUCCESS = "CREATE_DEFINITION_SUCCESS"
@@ -15,55 +14,14 @@ export const RECEIVE_CATALOG = "RECEIVE_CATALOG"
 export const CATALOG_FAILURE = "CATALOG_FAILURE"
 export const SWITCH_DEFINITION_FORM = "SWITCH_DEFINITION_FORM"
 
-const TOPIC = "squad.games/metastore/topic"
-
-const node = new IPFS({
-  repo: `squad.games/ipfsRepo/${Math.random()}`,
-  EXPERIMENTAL: {
-    pubsub: true
-  },
-  config: {
-    Addresses: {
-      Swarm: [
-        '/dns4/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-websocket-star'
-      ]
-    }
-  }
-})
-
-const submitted = {}
+const node = metastore.networking.createNode('squad.games')
 
 export function shareDefinitions() {
-  // when someone sends deffinions, submit them
-  // console.log("sharing definitions")
-  setTimeout(
-    () => {
-      node.pubsub.subscribe(TOPIC, (message) => {
-        const data = JSON.parse(message.data.toString())
-        data.forEach((def) => {
-          let key = JSON.stringify(def)
-          if (!submitted[key]) {
-            // console.log("submitting", def)
-            store.dispatch(submitDefinition(def))
-            submitted[key] = true
-          }
-        })
-      })
-    },
-    4000
-  )
-
-  // periodically send all the definitions you have
-  setInterval(
-    () => {
-      ["Format", "Game", "Component"].forEach(type => {
-        metastore.getAllDefinitionsOfType(type).then(defs => {
-          // console.log("publishing", defs)
-          node.pubsub.publish(TOPIC, Buffer.from(JSON.stringify(defs), 'utf-8'))
-        })
-      })
-    },
-    10000
+  metastore.networking.shareDefinitions(
+    node,
+    "squad.games/metastore/topic", 
+    ["Format", "Game", "Component"],
+    submitDefinition
   )
 }
 

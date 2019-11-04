@@ -1,5 +1,6 @@
-To run test out this prototype, you'll need to link the sdk into this directory:
-`$ ln -s ../../../sdk ./app_spec/roshambo-web/src/sdk`
+This app-spec is an example game built using the Squad-SDK.
+
+To try it out, follow the instructions to [set up a dev environment for Squad](/CONTRIBUTING.md#Dev-Environment-Setup).
 
 ---
 
