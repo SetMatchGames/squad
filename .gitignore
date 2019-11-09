@@ -1,4 +1,3 @@
-squad-config.json
 lerna-debug.log
 
 *.env
@@ -22,7 +21,9 @@ holochain.log
 squad_components.json
 
 packages/curation-market/clients/js/contracts
+packages/curation-market/clients/js/curation-config.json
 
 // made by netwrking shim
 packages/squad-games-web/squad.game
 packages/squad-sdk/js/squad.game
+

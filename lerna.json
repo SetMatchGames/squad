@@ -1,6 +1,7 @@
 {
   "packages": [
     "packages/*/clients/js/",
+    "packages/*/app",
     "packages/*/js/",
     "packages/*"
   ],

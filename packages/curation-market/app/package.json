@@ -1,5 +1,5 @@
 {
-  "name": "curation",
+  "name": "@squad/curation-market",
   "version": "1.0.0",
   "description": "",
   "main": "truffle-config.js",
@@ -12,13 +12,14 @@
     "ganache-cli": "^6.5.0",
     "openzeppelin-solidity": "^2.3.0",
     "rpc-websockets": "^4.6.1",
+    "truffle": "^5.0.43",
     "web3": "^1.2.1"
   },
   "devDependencies": {
     "watch": "^1.0.2"
   },
   "scripts": {
-    "watch-contracts": "watch 'truffle migrate --reset --network development' contracts",
+    "watch-contracts": "watch 'npx truffle migrate --reset --network development' contracts",
     "test": "truffle test",
     "_deploy": "truffle migrate --network",
     "deploy-local": "npm run _deploy local",
