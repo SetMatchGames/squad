@@ -18,7 +18,6 @@
 * browse formats and components by market information
 * buy/sell formats and components
 
-
 ## What genra of game might we make?
 * CCG/TCG/Deckbuilder
   * https://boardgame.io/
@@ -39,7 +38,11 @@
 * Platformer
 * Platform fighter
 * Bullet hell
+* Something like Diplomacy
+* Something like Worms
+* Our card game fighting game?!?
 
 ## Meets all requirements cleanly
 * 4x
-* Tower defense (seems good)
+* Tower defense
+* Something like Worms
