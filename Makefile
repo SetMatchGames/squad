@@ -28,13 +28,41 @@ metastore: build/bootstrap
 	$(metastore-shell) 'hc package && hc run --logging'
 
 
+.PHONY test:
+test: test-curation-market test-squad-games-web test-app-spec-web
+#test: test-metastore
+
+
 .PHONY: clean
 clean:
 	rm -rf build
 	rm -rf packages/curation-market/clients/js/contracts
 	rm -rf packages/curation-market/app/build
 	-docker stop devnet
+	-docker rm devnet
 	lerna clean
+
+
+.PHONY: test-metastore
+test-metastore:
+	cd $(metastore-js) && npm run test
+	$(metastore-shell) hc test
+
+
+.PHONY: test-squad-games-web
+test-squad-games:
+	cd $(squad-games-web) && npm run test
+
+
+.PHONY: test-app-spec-web
+test-app-spec-web:
+	cd $(app-spec-web) && npm run test
+
+
+.PHONY: test-curation
+test-curation-market: build/curation-market $(curation-market-js)/curation-config.json
+	cd $(curation-market-js) && npm run test
+	cd $(curation-market) && npm run test
 
 
 $(js-client-contracts): build/curation-market
