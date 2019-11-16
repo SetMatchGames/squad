@@ -65,7 +65,7 @@ test-app-spec-web:
 	cd $(app-spec-web) && npm run test
 
 
-.PHONY: test-curation
+.PHONY: test-curation-market
 test-curation-market: build/curation-market $(curation-market-js)/curation-config.json
 	cd $(curation-market-js) && npm run test
 	cd $(curation-market) && npm run test
