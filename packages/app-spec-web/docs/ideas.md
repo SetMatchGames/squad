@@ -49,3 +49,6 @@
 * Auto battler
 * Chess
 * Wormslike
+
+## Actually let's do
+* Automatic chess
