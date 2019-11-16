@@ -46,4 +46,6 @@
 ## Meets all requirements cleanly
 * 4x
 * Tower defense
+* Auto battler
+* Chess
 * Something like Worms
