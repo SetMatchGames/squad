@@ -9,6 +9,7 @@
 * Multiplayer Orthogame
 * Web game
 * Simple
+* Videogame native
 
 ## Game features
 * connect and play a format with another player
@@ -17,7 +18,6 @@
 * submit formats and components
 * browse formats and components by market information
 * buy/sell formats and components
-
 
 ## What genra of game might we make?
 * CCG/TCG/Deckbuilder
@@ -39,7 +39,16 @@
 * Platformer
 * Platform fighter
 * Bullet hell
+* Something like Diplomacy
+* Something like Worms
+* Our card game fighting game?!?
 
 ## Meets all requirements cleanly
-* 4x
-* Tower defense (seems good)
+* Tower defense
+* Auto defense
+* Auto battler
+* Chess
+* Wormslike
+
+## Actually let's do
+* Automatic chess
