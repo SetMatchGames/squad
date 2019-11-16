@@ -45,6 +45,7 @@
 
 ## Meets all requirements cleanly
 * Tower defense
+* Auto defense
 * Auto battler
 * Chess
 * Wormslike
