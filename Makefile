@@ -8,6 +8,9 @@ sdk-js = packages/squad-sdk/js
 js-client-contracts = packages/curation-market/clients/js/contracts
 curation-market-contracts = packages/curation-market/app/build/contracts
 
+# TODO update ./holonix to https://holochain.love
+metastore-shell = cd $(metastore) && nix-shell ./holonix --pure --command
+
 
 .PHONY: squad-games-web
 squad-games-web: build/bootstrap $(curation-market-js)/curation-config.json
@@ -21,8 +24,6 @@ app-spec-web: $(js-client-contracts)
 	cd $(app-spec-web) && npm run start
 
 
-# TODO update ./holonix to https://holochain.love
-metastore-shell = cd $(metastore) && nix-shell ./holonix --pure --command
 .PHONY: metastore
 metastore: build/bootstrap
 	$(metastore-shell) 'hc package && hc run --logging'
@@ -59,7 +60,7 @@ test-app-spec-web:
 	cd $(app-spec-web) && npm run test
 
 
-.PHONY: test-curation
+.PHONY: test-curation-market
 test-curation-market: build/curation-market $(curation-market-js)/curation-config.json
 	cd $(curation-market-js) && npm run test
 	cd $(curation-market) && npm run test
@@ -73,7 +74,7 @@ $(curation-market-js)/curation-config.json: build/curation-market
 	cp $(curation-market)/curation-config.json $(curation-market-js)/curation-config.json
 
 
-build/curation-market: build/devnet
+build/curation-market: build/devnet build/bootstrap
 	cd $(curation-market) && npm run deploy-dev
 	touch build/curation-market
 
