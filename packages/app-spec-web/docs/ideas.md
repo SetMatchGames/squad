@@ -9,6 +9,7 @@
 * Multiplayer Orthogame
 * Web game
 * Simple
+* Videogame native
 
 ## Game features
 * connect and play a format with another player
