@@ -32,6 +32,8 @@ let accounts
 let autoBond
 let options
 
+// TODO race condition bug when init is called concurrently for the first time
+// consider requiring an explicit call to init by client code
 async function init(defaults) {
   if (web3 !== undefined) { return }
   console.log("running init...")
@@ -60,7 +62,14 @@ async function init(defaults) {
     contractAddresses.autoBond,
     defaults
   )
-  console.log("init finished", web3)
+  console.log("init finished")
+}
+
+class BondAlreadyExists extends Error {
+  constructor(message) {
+    super(message)
+    this.name = "BondAlreadyExists"
+  }
 }
 
 async function newBond(addressOfCurve = contractAddresses.simpleLinearCurve, bondId, initialBuyNumber, opts = {}) {
@@ -75,7 +84,7 @@ async function newBond(addressOfCurve = contractAddresses.simpleLinearCurve, bon
       initialBuyNumber,
     ).send(o)
   }
-  throw "Bond already exists."
+  throw new BondAlreadyExists(`Bond ${bondId} already exists.`)
 }
 
 async function getSupply(bondId) {
@@ -140,7 +149,8 @@ module.exports = {
   getBuyPrice,
   getSellPrice,
   buy,
-  sell
+  sell,
+  BondAlreadyExists
 }
 
 

@@ -67,9 +67,23 @@ const extraComponents = [
   }
 ]
 
-test("Tests run", () => {
-  console.warn("Skipping Metastore Tests until they are rewritten in jest")
-  expect(true).toBe(true)
+metastore.webSocketConnection('ws://localhost:8888')
+
+test("Submit and retrieve definition", () => {
+  metastore.on('open', async () => {
+    const a = await metastore.createDefinition(roshambo)
+    const r = await metastore.getDefinition(a)
+    await expect(r).toStrictEqual(roshambo)
+    metastore.close()
+  })
+})
+
+test("Get game catalog", () => {
+  metastore.on('open', async () => {
+    const g = await metastore.getDefinitionsFromCatalog("Game", "Game Catalog")
+    await expect(g[0]).toStrictEqual("roshambo")
+    metastore.close()
+  })
 })
 
 /*

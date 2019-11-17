@@ -12,6 +12,7 @@
     "redux-thunk": "^2.3.0"
   },
   "scripts": {
+    "load_dev_defs": "node load_dev_defs.js",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",

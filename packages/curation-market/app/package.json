@@ -12,7 +12,7 @@
     "ganache-cli": "^6.5.0",
     "openzeppelin-solidity": "^2.3.0",
     "rpc-websockets": "^4.6.1",
-    "truffle": "^5.0.43",
+    "truffle": "^5.1.0",
     "web3": "^1.2.1"
   },
   "devDependencies": {
@@ -20,8 +20,8 @@
   },
   "scripts": {
     "watch-contracts": "watch 'npx truffle migrate --reset --network development' contracts",
-    "test": "truffle test",
-    "_deploy": "truffle migrate --network",
+    "test": "npx truffle test",
+    "_deploy": "npx truffle migrate --network",
     "deploy-local": "npm run _deploy local",
     "deploy-dev": "NETWORK=development npm run _deploy development"
   },

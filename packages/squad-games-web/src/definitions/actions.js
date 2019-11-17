@@ -14,12 +14,12 @@ export const RECEIVE_CATALOG = "RECEIVE_CATALOG"
 export const CATALOG_FAILURE = "CATALOG_FAILURE"
 export const SWITCH_DEFINITION_FORM = "SWITCH_DEFINITION_FORM"
 
-const node = metastore.networking.createNode('squad.games')
 
 export function shareDefinitions() {
+  const node = metastore.networking.createNode('squad.games')
   metastore.networking.shareDefinitions(
     node,
-    "squad.games/metastore/topic", 
+    "squad.games/metastore/topic",
     ["Format", "Game", "Component"],
     submitDefinition
   )

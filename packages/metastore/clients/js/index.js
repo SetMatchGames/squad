@@ -120,7 +120,7 @@ function shareDefinitions(node, TOPIC, typeArray, shareFunction) {
   setInterval(
     () => {
       typeArray.forEach(type => {
-        metastore.getAllDefinitionsOfType(type).then(defs => {
+        getAllDefinitionsOfType(type).then(defs => {
           // console.log("publishing", defs)
           node.pubsub.publish(TOPIC, Buffer.from(JSON.stringify(defs), 'utf-8'))
         })
