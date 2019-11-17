@@ -62,13 +62,13 @@ test-squad-games-web:
 
 .PHONY: test-app-spec-web
 test-app-spec-web:
-	cd $(app-spec-web) && CI=true npm run test
+	cd $(app-spec-web) && npm run test
 
 
-.PHONY: test-curation-market
+.PHONY: test-curation
 test-curation-market: build/curation-market $(curation-market-js)/curation-config.json
-	cd $(curation-market) && npm run test
 	cd $(curation-market-js) && npm run test
+	cd $(curation-market) && npm run test
 
 
 $(js-client-contracts): build/curation-market
