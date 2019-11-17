@@ -22,6 +22,7 @@ squad-games-web: $(js-client-contracts)
 .PHONY: app-spec-web
 app-spec-web: build/bootstrap $(curation-market-js)/curation-config.json
 app-spec-web: $(js-client-contracts)
+	cd $(app-spec-web) && npm run load_dev_defs
 	cd $(app-spec-web) && npm run start
 
 
@@ -62,13 +63,13 @@ test-squad-games-web:
 
 .PHONY: test-app-spec-web
 test-app-spec-web:
-	cd $(app-spec-web) && npm run test
+	cd $(app-spec-web) && CI=true npm run test
 
 
 .PHONY: test-curation-market
 test-curation-market: build/curation-market $(curation-market-js)/curation-config.json
-	cd $(curation-market-js) && npm run test
 	cd $(curation-market) && npm run test
+	cd $(curation-market-js) && npm run test
 
 
 $(js-client-contracts): build/curation-market
