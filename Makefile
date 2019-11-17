@@ -76,8 +76,11 @@ $(js-client-contracts): build/curation-market
 	cp -r $(curation-market-contracts) $(curation-market-js)
 
 
-$(curation-market-js)/curation-config.json: build/curation-market
+$(curation-market-js)/curation-config.json: $(curation-market)/curation-config.json
 	cp $(curation-market)/curation-config.json $(curation-market-js)/curation-config.json
+
+
+$(curation-market)/curation-config.json: build/curation-market
 
 
 build/curation-market: build/devnet build/bootstrap
