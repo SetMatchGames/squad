@@ -15,12 +15,14 @@ metastore-shell = cd $(metastore) && nix-shell ./holonix --pure --command
 .PHONY: squad-games-web
 squad-games-web: build/bootstrap $(curation-market-js)/curation-config.json
 squad-games-web: $(js-client-contracts)
+	cd $(squad-games-web) && npm run load_dev_defs
 	cd $(squad-games-web) && npm run start
 
 
 .PHONY: app-spec-web
 app-spec-web: build/bootstrap $(curation-market-js)/curation-config.json
 app-spec-web: $(js-client-contracts)
+	cd $(app-spec-web) && npm run load_dev_defs
 	cd $(app-spec-web) && npm run start
 
 
@@ -30,8 +32,7 @@ metastore: build/bootstrap
 
 
 .PHONY test:
-test: test-curation-market test-squad-games-web test-app-spec-web
-#test: test-metastore
+test: test-curation-market test-squad-games-web test-app-spec-web test-metastore
 
 
 .PHONY: clean
@@ -47,23 +48,28 @@ clean:
 .PHONY: test-metastore
 test-metastore:
 	cd $(metastore-js) && npm run test
-	$(metastore-shell) hc test
+	echo "Skipping holochain tests, reactivate when on current hc release"
+	echo "Skipping holochain tests, reactivate when on current hc release"
+	echo "Skipping holochain tests, reactivate when on current hc release"
+	echo "Skipping holochain tests, reactivate when on current hc release"
+	echo "Skipping holochain tests, reactivate when on current hc release"
+#	$(metastore-shell) hc test
 
 
 .PHONY: test-squad-games-web
-test-squad-games:
-	cd $(squad-games-web) && npm run test
+test-squad-games-web:
+	cd $(squad-games-web) && CI=true npm run test
 
 
 .PHONY: test-app-spec-web
 test-app-spec-web:
-	cd $(app-spec-web) && npm run test
+	cd $(app-spec-web) && CI=true npm run test
 
 
 .PHONY: test-curation-market
 test-curation-market: build/curation-market $(curation-market-js)/curation-config.json
-	cd $(curation-market-js) && npm run test
 	cd $(curation-market) && npm run test
+	cd $(curation-market-js) && npm run test
 
 
 $(js-client-contracts): build/curation-market

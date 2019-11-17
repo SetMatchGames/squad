@@ -32,6 +32,8 @@ let accounts
 let autoBond
 let options
 
+// TODO race condition bug when init is called concurrently for the first time
+// consider requiring an explicit call to init by client code
 async function init(defaults) {
   if (web3 !== undefined) { return }
   console.log("running init...")
@@ -60,7 +62,7 @@ async function init(defaults) {
     contractAddresses.autoBond,
     defaults
   )
-  console.log("init finished", web3)
+  console.log("init finished")
 }
 
 async function newBond(addressOfCurve = contractAddresses.simpleLinearCurve, bondId, initialBuyNumber, opts = {}) {

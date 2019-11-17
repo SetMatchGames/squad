@@ -38,7 +38,6 @@ contract("AutoBond", ([alice, bob, ...accounts]) => {
 
     // Alice can create bond A
     await autoBond.newBond(curve.address, bondAId, 0, {from: alice})
-
     // supply of A should be 0
     assert.equal((await autoBond.bonds(bondAId)).supply, 0)
     assert.equal(await autoBond.getSupply(bondAId), 0)

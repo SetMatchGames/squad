@@ -12,7 +12,7 @@
     "ganache-cli": "^6.5.0",
     "openzeppelin-solidity": "^2.3.0",
     "rpc-websockets": "^4.6.1",
-    "truffle": "^5.0.43",
+    "truffle": "^5.1.0",
     "web3": "^1.2.1"
   },
   "devDependencies": {

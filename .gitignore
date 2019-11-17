@@ -24,6 +24,6 @@ packages/curation-market/clients/js/contracts
 packages/curation-market/clients/js/curation-config.json
 
 // made by netwrking shim
-packages/squad-games-web/squad.game
-packages/squad-sdk/js/squad.game
+packages/squad-games-web/squad.games
+packages/squad-sdk/js/squad.games
 
