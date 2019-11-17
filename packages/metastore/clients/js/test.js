@@ -67,6 +67,9 @@ const extraComponents = [
   }
 ]
 
+// TODO: these tests shouldn't be testing the zome functions, only that the right inputs are going into them
+  // This way, we will not need to run or mock a conductor in order to run these tests
+
 metastore.webSocketConnection('ws://localhost:8888')
 
 test("Submit and retrieve definition", () => {
