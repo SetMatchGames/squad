@@ -15,14 +15,13 @@ metastore-shell = cd $(metastore) && nix-shell ./holonix --pure --command
 .PHONY: squad-games-web
 squad-games-web: build/bootstrap $(curation-market-js)/curation-config.json
 squad-games-web: $(js-client-contracts)
-#	cd $(squad-games-web) && npm run load_dev_defs
+	cd $(squad-games-web) && npm run load_dev_defs
 	cd $(squad-games-web) && npm run start
 
 
 .PHONY: app-spec-web
 app-spec-web: build/bootstrap $(curation-market-js)/curation-config.json
 app-spec-web: $(js-client-contracts)
-#	cd $(app-spec-web) && npm run load_dev_defs
 	cd $(app-spec-web) && npm run start
 
 
@@ -76,11 +75,8 @@ $(js-client-contracts): build/curation-market
 	cp -r $(curation-market-contracts) $(curation-market-js)
 
 
-$(curation-market-js)/curation-config.json: $(curation-market)/curation-config.json
+$(curation-market-js)/curation-config.json: build/curation-market
 	cp $(curation-market)/curation-config.json $(curation-market-js)/curation-config.json
-
-
-$(curation-market)/curation-config.json: build/curation-market
 
 
 build/curation-market: build/devnet build/bootstrap
