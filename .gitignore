@@ -27,3 +27,5 @@ packages/curation-market/clients/js/curation-config.json
 packages/squad-games-web/squad.games
 packages/squad-sdk/js/squad.games
 
+// made during migration 
+packages/curation-market/app/curation-config.json
