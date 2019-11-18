@@ -3,11 +3,20 @@
 This is a scratch space to work out the design considerations
 of Automatic Chess as an App Spec Game
 
-# Expandability
+# Expandability and the AI
 
 The biggest question in my mind is how expandability will work.
 What will the data format of the components be and what
 immutable rules will the game engine have?
+
+How will the AI know what to do with the expansions?
+
+## Hooks option
+
+The AI loop will have a number of lifecycle hooks and will
+ask each peice what to do about it.
+
+TODO examples
 
 ## Moves function plus metadata option
 
