@@ -84,7 +84,7 @@ test("Submit and retrieve definition", () => {
 test("Get game catalog", () => {
   metastore.on('open', async () => {
     const g = await metastore.getDefinitionsFromCatalog("Game", "Game Catalog")
-    await expect(g[0]).toStrictEqual("roshambo")
+    await expect(g[0]).toStrictEqual(roshambo)
     metastore.close()
   })
 })

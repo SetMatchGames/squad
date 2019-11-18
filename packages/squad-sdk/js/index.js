@@ -35,6 +35,7 @@ async function newDefinitionWithBond(
   opts = {}
 ) {
   const bondId = await metastore.createDefinition(definition)
+  console.log('metastore worked', bondId)
   await curation.newBond(addressOfCurve, bondId, initialBuyUnits, opts)
   return bondId
 }
