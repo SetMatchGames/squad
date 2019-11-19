@@ -14,7 +14,7 @@ How will the AI know what to do with the expansions?
 ## Hooks option
 
 The AI loop will have a number of lifecycle hooks and will
-ask each peice what to do about it.
+ask each piece what to do about it.
 
 TODO examples
 
@@ -22,8 +22,8 @@ TODO examples
 
 The moves method option would be to have the component specify
 `moves(space, context) -> [<legal move>...]`. The game would
-instantiate pices for each moves method and call the moves
-function to discover where the pice is allowed to in a given
+instantiate pieces for each moves method and call the moves
+function to discover where the piece is allowed to in a given
 context.
 
 ```
