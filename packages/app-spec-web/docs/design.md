@@ -78,5 +78,7 @@ context.
 ```
 ## Code to steal
 https://github.com/oakmac/chessboardjs/
+
 https://github.com/jhlywa/chess.js
+
 https://github.com/nmrugg/stockfish.js/
