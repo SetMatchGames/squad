@@ -1,5 +1,5 @@
 import React from 'react';
-import Chess from 'chess.js';
+import Chess from './libraries/chess.js';
 import Chessboard from './libraries/chessboard.js';
 
 class Board extends React.Component {
