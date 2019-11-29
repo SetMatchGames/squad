@@ -55,53 +55,107 @@ var Chess = function(fen) {
 
   var POSSIBLE_RESULTS = ['1-0', '0-1', '1/2-1/2', '*'];
 
-  
-  /*
+  // Draft of what components might look like
 
   var COMPONENTS = {
     PIECES: {
       p: {
-        offsets: [16],
-        mechanics: {
-          extraFirstMove: [32],
+        moves: {
+          emptyOffsets: [16],
           captureOffsets: [17, 15],
-          differentBlackOffsets: [-16],
-          differentBlackFirstMove: [-32],
-          differeentBlackCaptureOffsets: [-17, -15],
-          enPassant: True,
-          promotable: True
+          emptyFirstOffsets: [32],
+          enPassant: [17, 15],
+          blackAsymmetric: {
+            emptyOffsets: [-16],
+            captureOffsets: [-17, -15],
+            emptyFirstOffsets: [-32],
+            enPassant: [-17, -15],
+          }
+        },
+        moveResults: {
+          promotable: true
         }
       },
       n: {
-        offsets: [-18, -33, -31, -14, 18, 33, 31,  14],
-        mechanics: {}
+        moves: {
+          captureOffsets: [-18, -33, -31, -14, 18, 33, 31, 14]
+        }
       },
       b: {
-        offsets: [-17, -15, 17, 15],
-        mechanics: {
-          extendable: True
+        moves: {
+          extendableCaptures: [-17, -15, 17, 15]
         }
       },
       r: {
-        offsets: [-16, 1, 16, -1],
-        mechanics: {
-          extendable: True
+        moves: {
+          extendableCaptures: [-16, 1, 16, -1],
+        },
+        attributes: {
+          castleTarget: true
         }
       },
       q: {
-        offsets: [-17, -16, -15, 1, 17, 16, 15, -1],
-        mechanics: {
-          extendable: True
+        moves: {
+          extendableCaptures: [-17, -16, -15, 1, 17, 16, 15, -1]
         }
       },
       k: {
-        offsets: [-17, -16, -15, 1, 17, 16, 15, -1],
-        mechanics: {}
+        moves: {
+          captureOffsets: [-17, -16, -15, 1, 17, 16, 15, -1],
+          castle: [ true ]
+        }
       }
     }
   }
 
-  */
+  // Mechanic functions
+
+  var MECHANICS = {
+    blackAsymmetric: "A supermechanic -- if a piece is black and has this mechanic, it uses \
+                      its 'blackAsymmetric' version of tagged mechanics",
+                      
+    // MOVE mechanics
+      // moves that can only be made to an empty square
+    emptyOffsets: function (board, startPosition, offset, us) {
+      var square = startPosition + offset
+      if (square & 0x88)          { return false }
+      if (board[square] !== null) { return false }
+      return { square, BITS: BITS.NORMAL }
+    },
+      // moves that can be made to an empty square or an enemy square
+    captureOffsets: function(board, startPosition, offset, us) {
+      var square = startPosition + offset 
+      if (square & 0x88) { return false }
+      if (board[square] == null)     { 
+        console.log('Found empty move for a captureOffset:')
+        return { square, BITS: BITS.NORMAL }
+      }
+      if (board[square].color == us) { return false }
+      console.log('Found CAPTURE move!')
+      return { square, BITS: BITS.CAPTURE }
+    },
+      // moves that can only be made to an empty square on a piece's first move
+    emptyFirstOffsets: function(board, startPosition, offset, us) {
+      return 1
+    },
+      // screw this
+    enPassant: function(board, startPosition, offset, us) {
+      return 1
+    },
+      // moves that can extend across any number of square following the same offset pattern 
+      // as long as they are not blocked, empty or enemy squares
+    extendableCaptures: function(board, startPosition, offset, us) {
+      return 1
+    },
+      // A special move
+    castle: function(board, startPosition, offset, us) {
+      return 1
+    },
+    // MOVE RESULT mechanics: mechanics that occur as a result of moves
+    promotable: function(board, startPosition, offset, us) {
+      return 1
+    },
+  }
 
   // TODO Here are the movement rules for the components
 
@@ -294,7 +348,6 @@ var Chess = function(fen) {
    * we're at it
    */
   function validate_fen(fen) {
-    console.log("validate fen");
     var errors = {
        0: 'No errors.',
        1: 'FEN string must contain six space-delimited fields.',
@@ -577,6 +630,35 @@ var Chess = function(fen) {
       if (piece == null || piece.color !== us) {
         continue;
       }
+
+      // New component interpretation goes here
+      // move mechanics
+      var mechanics = COMPONENTS.PIECES[piece.type]
+      for (var m = 0; m < Object.keys(mechanics.moves).length; m++) {
+
+        var mechanicName = Object.keys(mechanics.moves)[m]
+        if (typeof mechanics.moves[mechanicName] !== 'object') { continue }
+        
+        var mechanic = mechanics.moves[mechanicName]
+
+        if (us === BLACK && mechanics.moves.blackAsymmetric !== undefined) {
+          if (mechanics.moves.blackAsymmetric[mechanicName] !== undefined) {
+            mechanic = mechanics.moves.blackAsymmetric[mechanicName]
+          }
+        }
+
+        for (var o = 0; o < mechanic.length; o++) {
+          var offset = mechanic[o]
+          console.log('Checking', us, piece.type, mechanicName, i, offset)
+          var result = MECHANICS[mechanicName](board, i, offset, us)
+          if (result) {
+            console.log('Found move for', mechanicName, ',', piece.type, ':', result)
+            // add_move(board, moves, i, result.square, result.BITS)
+          }
+        }
+      }
+
+      // move results (just promotions right now)
 
       if (piece.type === PAWN) {
         /* single square, non-capturing */
