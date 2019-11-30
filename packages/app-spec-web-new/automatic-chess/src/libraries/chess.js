@@ -61,15 +61,15 @@ var Chess = function(fen) {
     PIECES: {
       p: {
         moves: {
-          emptyOffsets: [16],
-          captureOffsets: [17, 15],
-          emptyFirstOffsets: [32],
-          enPassant: [17, 15],
+          emptyOffsets: [-16],
+          captureOffsets: [-17, -15],
+          emptyFirstOffsets: [-32],
+          enPassant: [-17, -15],
           blackAsymmetric: {
-            emptyOffsets: [-16],
-            captureOffsets: [-17, -15],
-            emptyFirstOffsets: [-32],
-            enPassant: [-17, -15],
+            emptyOffsets: [16],
+            captureOffsets: [17, 15],
+            emptyFirstOffsets: [32],
+            enPassant: [17, 15],
           }
         },
         moveResults: {
@@ -88,7 +88,7 @@ var Chess = function(fen) {
       },
       r: {
         moves: {
-          extendableCaptures: [-16, 1, 16, -1],
+          extendableCaptures: [-16, 1, 16, -1]
         },
         attributes: {
           castleTarget: true
@@ -110,50 +110,74 @@ var Chess = function(fen) {
 
   // Mechanic functions
 
+    // Submechanics: building blocks for mechanics
+  function emptyMove(square) {
+    if (square & 0x88)          { return }
+    if (board[square] !== null) { return }
+    return { square, BITS: BITS.NORMAL }
+  }
+
+  function captureMove(square, us) {
+    if (square & 0x88)             { return }
+    if (board[square] == null)     { return { square, BITS: BITS.NORMAL } }
+    if (board[square].color == us) { return }
+    return { square, BITS: BITS.CAPTURE }
+  }
+
   var MECHANICS = {
-    blackAsymmetric: "A supermechanic -- if a piece is black and has this mechanic, it uses \
-                      its 'blackAsymmetric' version of tagged mechanics",
-                      
+    // Supermechanics: hold other mechanics inside them
+    blackAsymmetric: "If a piece is black and has this mechanic, it uses \
+                      its 'blackAsymmetric' version of tagged mechanics",             
     // MOVE mechanics
       // moves that can only be made to an empty square
-    emptyOffsets: function (board, startPosition, offset, us) {
-      var square = startPosition + offset
-      if (square & 0x88)          { return false }
-      if (board[square] !== null) { return false }
-      return { square, BITS: BITS.NORMAL }
+    emptyOffsets: function (startSquare, offset, us, piece) {
+      var square = startSquare + offset
+      return [ emptyMove(square) ]
     },
       // moves that can be made to an empty square or an enemy square
-    captureOffsets: function(board, startPosition, offset, us) {
-      var square = startPosition + offset 
-      if (square & 0x88) { return false }
-      if (board[square] == null)     { 
-        console.log('Found empty move for a captureOffset:')
-        return { square, BITS: BITS.NORMAL }
-      }
-      if (board[square].color == us) { return false }
-      console.log('Found CAPTURE move!')
-      return { square, BITS: BITS.CAPTURE }
+    captureOffsets: function(startSquare, offset, us, piece) {
+      var square = startSquare + offset
+      return [ captureMove(square, us) ]
     },
       // moves that can only be made to an empty square on a piece's first move
-    emptyFirstOffsets: function(board, startPosition, offset, us) {
-      return 1
+    emptyFirstOffsets: function(startSquare, offset, us, piece) {
+      if (!initial_board[startSquare]) { return [] }
+      if (
+        initial_board[startSquare].type !== piece.type ||
+        initial_board[startSquare].color !== us
+      ) { return [] }
+      var square = startSquare + offset
+      return [ emptyMove(square) ]
     },
       // screw this
-    enPassant: function(board, startPosition, offset, us) {
-      return 1
+    enPassant: function(startSquare, offset, us, piece) {
+      return []
     },
-      // moves that can extend across any number of square following the same offset pattern 
+      // moves that can extend across any number of squares following the same offset pattern 
       // as long as they are not blocked, empty or enemy squares
-    extendableCaptures: function(board, startPosition, offset, us) {
-      return 1
+    extendableCaptures: function(startSquare, offset, us, piece) {
+      var results = []
+      var square = startSquare
+      while (true) {
+        square += offset
+        if (square & 0x88) break
+        if (board[square] == null) {
+          results.push({ square, BITS: BITS.NORMAL })
+        } else {
+          if (board[square].color == us) break
+          results.push({ square, BITS: BITS.CAPTURE })
+          break
+        }
+      }
+      return results
     },
-      // A special move
-    castle: function(board, startPosition, offset, us) {
-      return 1
+      // A special move (screw this for now as well)
+    castle: function(startSquare, offset, us, piece) {
+      return []
     },
     // MOVE RESULT mechanics: mechanics that occur as a result of moves
-    promotable: function(board, startPosition, offset, us) {
-      return 1
+    promotable: function(startSquare, offset, us, piece) {
+      return []
     },
   }
 
@@ -258,6 +282,7 @@ var Chess = function(fen) {
   };
 
   var board = new Array(128);
+  var initial_board = new Array(128);
   var kings = {w: EMPTY, b: EMPTY};
   var turn = WHITE;
   var castling = {w: 0, b: 0};
@@ -314,6 +339,7 @@ var Chess = function(fen) {
       } else {
         var color = (piece < 'a') ? WHITE : BLACK;
         put({type: piece.toLowerCase(), color: color}, algebraic(square));
+        initial_board[square] = {type: piece.toLowerCase(), color: color}
         square++;
       }
     }
@@ -599,6 +625,7 @@ var Chess = function(fen) {
     }
 
     var moves = [];
+    var test_moves = [];
     var us = turn;
     var them = swap_color(us);
     var second_rank = {b: RANK_7, w: RANK_2};
@@ -649,31 +676,33 @@ var Chess = function(fen) {
 
         for (var o = 0; o < mechanic.length; o++) {
           var offset = mechanic[o]
-          console.log('Checking', us, piece.type, mechanicName, i, offset)
-          var result = MECHANICS[mechanicName](board, i, offset, us)
-          if (result) {
-            console.log('Found move for', mechanicName, ',', piece.type, ':', result)
-            // add_move(board, moves, i, result.square, result.BITS)
+          var results = MECHANICS[mechanicName](i, offset, us, piece)
+          if (results[0]) {
+            test_moves = test_moves.concat(results)
+            for (var n = 0; n < results.length; n++) {
+              add_move(board, moves, i, results[n].square, results[n].BITS)
+            }
           }
         }
       }
 
       // move results (just promotions right now)
 
+      /*
       if (piece.type === PAWN) {
-        /* single square, non-capturing */
+        // single square, non-capturing 
         var square = i + PAWN_OFFSETS[us][0];
         if (board[square] == null) {
             add_move(board, moves, i, square, BITS.NORMAL);
 
-          /* double square */
+          // double square 
           var square = i + PAWN_OFFSETS[us][1];
           if (second_rank[us] === rank(i) && board[square] == null) {
             add_move(board, moves, i, square, BITS.BIG_PAWN);
           }
         }
 
-        /* pawn captures */
+        // pawn captures 
         for (j = 2; j < 4; j++) {
           var square = i + PAWN_OFFSETS[us][j];
           if (square & 0x88) continue;
@@ -702,11 +731,14 @@ var Chess = function(fen) {
               break;
             }
 
-            /* break, if knight or king */
+            // break, if knight or king 
             if (piece.type === 'n' || piece.type === 'k') break;
           }
         }
       }
+      */
+      console.log(moves)
+      console.log(test_moves)
     }
 
     /* check for castling if: a) we're generating all moves, or b) we're doing
