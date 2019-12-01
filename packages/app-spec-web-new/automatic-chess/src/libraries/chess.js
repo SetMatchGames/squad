@@ -78,6 +78,7 @@ var Chess = function(fen) {
       },
       n: {
         moves: {
+          emptyOffsets: [-18, -33, -31, -14, 18, 33, 31, 14],
           captureOffsets: [-18, -33, -31, -14, 18, 33, 31, 14]
         }
       },
@@ -101,6 +102,7 @@ var Chess = function(fen) {
       },
       k: {
         moves: {
+          emptyOffsets: [-17, -16, -15, 1, 17, 16, 15, -1],
           captureOffsets: [-17, -16, -15, 1, 17, 16, 15, -1],
           castle: [ true ]
         }
@@ -113,21 +115,24 @@ var Chess = function(fen) {
     // Submechanics: building blocks for mechanics
   function emptyMove(square) {
     if (square & 0x88)          { return }
-    if (board[square] !== null) { return }
+    if (!!board[square])        { return }
     return { square, BITS: BITS.NORMAL }
   }
 
   function captureMove(square, us) {
     if (square & 0x88)             { return }
-    if (board[square] == null)     { return { square, BITS: BITS.NORMAL } }
+    if (!board[square])            { return }
     if (board[square].color == us) { return }
     return { square, BITS: BITS.CAPTURE }
   }
 
-  var MECHANICS = {
-    // Supermechanics: hold other mechanics inside them
+  var SUPERMECHANICS = {
+    // TODO redo this as an "only move forward" regular mechanic
     blackAsymmetric: "If a piece is black and has this mechanic, it uses \
-                      its 'blackAsymmetric' version of tagged mechanics",             
+                      its 'blackAsymmetric' version of tagged mechanics"
+  }
+
+  var MECHANICS = {           
     // MOVE mechanics
       // moves that can only be made to an empty square
     emptyOffsets: function (startSquare, offset, us, piece) {
@@ -143,7 +148,7 @@ var Chess = function(fen) {
     emptyFirstOffsets: function(startSquare, offset, us, piece) {
       if (!initial_board[startSquare]) { return [] }
       if (
-        initial_board[startSquare].type !== piece.type ||
+        initial_board[startSquare].type  !== piece.type ||
         initial_board[startSquare].color !== us
       ) { return [] }
       var square = startSquare + offset
@@ -161,7 +166,7 @@ var Chess = function(fen) {
       while (true) {
         square += offset
         if (square & 0x88) break
-        if (board[square] == null) {
+        if (!board[square]) {
           results.push({ square, BITS: BITS.NORMAL })
         } else {
           if (board[square].color == us) break
@@ -176,8 +181,22 @@ var Chess = function(fen) {
       return []
     },
     // MOVE RESULT mechanics: mechanics that occur as a result of moves
-    promotable: function(startSquare, offset, us, piece) {
-      return []
+      // If a piece reaches the other end of the board, replace it with a queen
+    promotable: function(move, us) {
+      if ((us == WHITE && rank(move.to) === RANK_8) || 
+      (us == BLACK && rank(move.to) === RANK_1)) {
+        var new_moves = []
+        var pieces = Object.keys(COMPONENTS.PIECES)//.pop(KING)
+        for (var i = 0, len = pieces.length; i < len; i++) {
+          var new_move = Object.assign({}, move, {
+            flags: BITS.PROMOTION,
+            promotion: pieces[i]
+          })
+          new_moves.push(new_move)
+        }
+        return new_moves
+      }
+      return [ move ]
     },
   }
 
@@ -608,24 +627,40 @@ var Chess = function(fen) {
     return move;
   }
 
-  // TODO this has the rest of the move rules (some will need to change for compontification)
-
   function generate_moves(options) {
     function add_move(board, moves, from, to, flags) {
-      /* if pawn promotion */
-      if (board[from].type === PAWN &&
-         (rank(to) === RANK_8 || rank(to) === RANK_1)) {
-          var pieces = [QUEEN, ROOK, BISHOP, KNIGHT];
-          for (var i = 0, len = pieces.length; i < len; i++) {
-            moves.push(build_move(board, from, to, flags, pieces[i]));
-          }
+      
+      // move result mechanics
+      var move = build_move(board, from, to, flags)
+      var promotion_moves = []
+      var mechanics = COMPONENTS.PIECES[board[from].type]
+      if (mechanics.moveResults) {
+        for (var m = 0; m < Object.keys(mechanics.moveResults).length; m++) {
+          var mechanicName = Object.keys(mechanics.moveResults)[m]
+          promotion_moves = promotion_moves.concat(MECHANICS[mechanicName](move, us, piece))
+        }
+        for (m = 0; m < promotion_moves.length; m++) {
+          moves.push(promotion_moves[m])
+        }
       } else {
-       moves.push(build_move(board, from, to, flags));
+        moves.push(move)
       }
+
+      /* if pawn promotion */
+      /*
+      if (board[from].type === PAWN &&
+      (rank(to) === RANK_8 || rank(to) === RANK_1)) {
+        var pieces = Object.keys(COMPONENTS.PIECES)
+        for (var i = 0, len = pieces.length; i < len; i++) {
+          moves.push(build_move(board, from, to, flags, pieces[i]));
+        }
+      } else {
+        moves.push(build_move(board, from, to, flags));
+      }
+      */
     }
 
     var moves = [];
-    var test_moves = [];
     var us = turn;
     var them = swap_color(us);
     var second_rank = {b: RANK_7, w: RANK_2};
@@ -658,14 +693,10 @@ var Chess = function(fen) {
         continue;
       }
 
-      // New component interpretation goes here
       // move mechanics
       var mechanics = COMPONENTS.PIECES[piece.type]
       for (var m = 0; m < Object.keys(mechanics.moves).length; m++) {
-
         var mechanicName = Object.keys(mechanics.moves)[m]
-        if (typeof mechanics.moves[mechanicName] !== 'object') { continue }
-        
         var mechanic = mechanics.moves[mechanicName]
 
         if (us === BLACK && mechanics.moves.blackAsymmetric !== undefined) {
@@ -678,15 +709,12 @@ var Chess = function(fen) {
           var offset = mechanic[o]
           var results = MECHANICS[mechanicName](i, offset, us, piece)
           if (results[0]) {
-            test_moves = test_moves.concat(results)
             for (var n = 0; n < results.length; n++) {
               add_move(board, moves, i, results[n].square, results[n].BITS)
             }
           }
         }
       }
-
-      // move results (just promotions right now)
 
       /*
       if (piece.type === PAWN) {
@@ -737,8 +765,6 @@ var Chess = function(fen) {
         }
       }
       */
-      console.log(moves)
-      console.log(test_moves)
     }
 
     /* check for castling if: a) we're generating all moves, or b) we're doing
@@ -837,6 +863,7 @@ var Chess = function(fen) {
     }
 
     make_move(move);
+    console.log('MAKING MOVE', move)
     if (in_check()) {
       if (in_checkmate()) {
         output += '#';
