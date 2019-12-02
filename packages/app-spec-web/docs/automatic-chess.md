@@ -40,6 +40,7 @@ Possible draft mechanics:
 Players always each get exactly one King (or a piece that plays that role).
 #### Stage 2: Piece placement
 Players get matched up with an opponent within the game. Each player places their pieces on the board.
+
 Possible piece placement mechanics:
  - Players place their pieces one at a time, so they can respond to each other's choices.
  - Players can place pieces up to some total score. Each piece counts a certain amount towards that score, 
@@ -47,6 +48,7 @@ Possible piece placement mechanics:
  to level up, plus auto-leveling each round.
 #### Stage 3: Playing
 The two boards play eachother with the traditional chess rules (to check mate), with an identical engine piloting both sides.
+
 Possible play result mechanics:
  - Simple best of X matches (or best record in a round robin), with players getting to re-place pieces before each match.
  - Autobattler mechanics: winners get +1 gold, losers lose "life" equal to the number of pieces the opponent had when 
