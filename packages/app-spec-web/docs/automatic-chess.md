@@ -42,7 +42,7 @@ Players always each get exactly one King (or a piece that plays that role).
 Players get matched up with an opponent within the game. Each player places their pieces on the board.
 
 Possible piece placement mechanics:
- - Players place their pieces one at a time, so they can respond to each other's choices.
+ - Players take turns placing their pieces one at a time, so they can respond to each other's choices.
  - Players can place pieces up to some total score. Each piece counts a certain amount towards that score, 
  with more powerful pieces having higher scores. If multiple rounds, players can raise this score by paying 
  to level up, plus auto-leveling each round.
