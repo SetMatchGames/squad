@@ -65,6 +65,13 @@ async function init(defaults) {
   console.log("init finished")
 }
 
+class BondAlreadyExists extends Error {
+  constructor(message) {
+    super(message)
+    this.name = "BondAlreadyExists"
+  }
+}
+
 async function newBond(addressOfCurve = contractAddresses.simpleLinearCurve, bondId, initialBuyNumber, opts = {}) {
   await init()
   let bondSha = web3.utils.sha3(bondId)
@@ -77,7 +84,7 @@ async function newBond(addressOfCurve = contractAddresses.simpleLinearCurve, bon
       initialBuyNumber,
     ).send(o)
   }
-  throw "Bond already exists."
+  throw new BondAlreadyExists(`Bond ${bondId} already exists.`)
 }
 
 async function getSupply(bondId) {
@@ -142,7 +149,8 @@ module.exports = {
   getBuyPrice,
   getSellPrice,
   buy,
-  sell
+  sell,
+  BondAlreadyExists
 }
 
 

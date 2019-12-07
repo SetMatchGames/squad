@@ -40,10 +40,39 @@ async function newDefinitionWithBond(
   return bondId
 }
 
+// definition is an "idenpotentish" way to call newDefinitionWithBond
+// it will check to see if the definition exists before creating it
+async function definition(
+  definition,
+  addressOfCurve = curation.config.contracts.simpleLinearCurve,
+  initialBuyUnits = 0,
+  opts = {}
+) {
+  try {
+    return await newDefinitionWithBond(
+      definition,
+      addressOfCurve,
+      initialBuyUnits,
+      opts
+    )
+  } catch (e) {
+    if (e instanceof curation.BondAlreadyExists) {
+      return await metastore.createDefinition(definition)
+    } else {
+      throw e
+    }
+  }
+
+  const bondId = await metastore.createDefinition(definition)
+  await curation.newBond(addressOfCurve, bondId, initialBuyUnits, opts)
+  return bondId
+}
+
 module.exports = {
   runGame,
   registerRunner,
   metastore,
   curation,
+  definition,
   newDefinitionWithBond
 }

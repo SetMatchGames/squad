@@ -8,14 +8,14 @@ sdk-js = packages/squad-sdk/js
 js-client-contracts = packages/curation-market/clients/js/contracts
 curation-market-contracts = packages/curation-market/app/build/contracts
 
-# TODO update ./holonix to https://holochain.love
+
 metastore-shell = cd $(metastore) && nix-shell https://holochain.love --pure --command
 
 
 .PHONY: squad-games-web
 squad-games-web: build/bootstrap $(curation-market-js)/curation-config.json
 squad-games-web: $(js-client-contracts)
-#	cd $(squad-games-web) && npm run load_dev_defs
+	cd $(squad-games-web) && npm run load_dev_defs
 	cd $(squad-games-web) && npm run start
 
 

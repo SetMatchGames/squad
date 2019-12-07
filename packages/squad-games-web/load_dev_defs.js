@@ -1,6 +1,6 @@
-const { curation, metastore, newDefinitionWithBond } = require('@squad/sdk')
+const { curation, metastore, definition } = require('@squad/sdk')
 
-const defs = [{
+const games = [{
   Game: {
     name: "App Spec",
     type_: "web-game-v0",
@@ -8,7 +8,9 @@ const defs = [{
       url: "http://localhost:3001"
     })
   }
-}, {
+}]
+
+const components = [{
   Component: {
     name: "Rock",
     type_: "Roshambo",
@@ -39,38 +41,53 @@ const defs = [{
 
 metastore.webSocketConnection('ws://localhost:8888')
 
-
+let started = false
 let done = false
-let waitTimes = 3
 metastore.on('open', async () => {
   await curation.init()
+  started = true
   console.log("Connected to metastore")
-  const addrs = await Promise.all(defs.map(async d => {
-    return newDefinitionWithBond(d)
+  const gameAddrs = await Promise.all(games.map(async d => {
+    return definition(d)
   }))
-  console.log("created defs", addrs)
-
-  const components = await metastore.getAllDefinitionsOfType("Component")
-  console.log("got components", addrs)
+  console.log("created games", gameAddrs)
+  const componentAddrs = await Promise.all(components.map(async d => {
+    return definition(d)
+  }))
+  console.log("created components", componentAddrs)
 
   const standard = {
     Format: {
       name: "Standard",
-      components: compnents
+      components: componentAddrs
     }
   }
-  await newDefinitionWithBond(standard)
+  await definition(standard)
   console.log("created standard format")
   done = true
 })
 
+let waitedForMetastore = false
+let waitedForDefs = false
 function waitUntilDone() {
-  if (!done && waitTimes >= 0) {
-    console.log(`Waiting for dev defs ${waitTimes} more times`)
-    setTimeout(waitUntilDone, 5000)
-    waitTimes -= 1
-  } else if (!done) {
-    throw new Error("ERR Timeout. Is the metastore running? (make metastore)")
+  console.log(`waited: meta ${waitedForMetastore}, defs ${waitedForDefs}`)
+  console.log(`started: ${started}, done ${done}`)
+  if (done) {
+    console.log("Done waiting for dev defs")
+    process.exit(0) // I guess... probably not worth figuring out why its needed
+    return
+  } else if (!done && !started && !waitedForMetastore) {
+    console.log(`Waiting a sec for metastore to come up`)
+    handle = setTimeout(waitUntilDone, 5000)
+    waitedForMetastore = true
+    return
+  } else if (!done && started && !waitedForDefs) {
+    console.log("Started: waiting for dev definitions")
+    handle = setTimeout(waitUntilDone, 5000)
+    waitedForDefs = true
+    return
+  } else {
+    throw new Error("waited too long for metastore/defs")
   }
 }
 
