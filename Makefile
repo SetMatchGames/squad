@@ -22,7 +22,6 @@ squad-games-web: $(js-client-contracts)
 .PHONY: app-spec-web
 app-spec-web: build/bootstrap $(curation-market-js)/curation-config.json
 app-spec-web: $(js-client-contracts)
-#	cd $(app-spec-web) && npm run load_dev_defs
 	cd $(app-spec-web) && npm run start
 
 

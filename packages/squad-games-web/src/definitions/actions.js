@@ -140,7 +140,6 @@ async function withFormatComponentNames(formatArray) {
 async function catalogWithKeys(definitionType, name) {
   let definitions = await metastore.getDefinitionsFromCatalog(definitionType, name)
   let addresses = await metastore.getCatalogAddresses(definitionType, name)
-  console.log(definitions)
   let withKeys = addresses.map(address => {
     let entry = {}
     entry["definition"] = definitions[addresses.indexOf(address)]
