@@ -8,8 +8,8 @@ sdk-js = packages/squad-sdk/js
 js-client-contracts = packages/curation-market/clients/js/contracts
 curation-market-contracts = packages/curation-market/app/build/contracts
 
-# TODO update ./holonix to https://holochain.love
-metastore-shell = cd $(metastore) && nix-shell ./holonix --pure --command
+
+metastore-shell = cd $(metastore) && nix-shell https://holochain.love --pure --command
 
 
 .PHONY: squad-games-web
