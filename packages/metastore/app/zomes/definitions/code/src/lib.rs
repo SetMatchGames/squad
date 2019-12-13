@@ -1,4 +1,3 @@
-#![feature(try_from)]
 extern crate serde;
 extern crate serde_json;
 #[macro_use]
@@ -190,7 +189,11 @@ define_zome! {
         catalog_entry()
     ]
 
-    genesis: || { Ok(()) }
+    init: || { Ok(()) }
+
+    validate_agent: |validation_data : EntryValidationData::<AgentId>| {
+        Ok(())
+    }
 
     functions: [
         create_definition: {
