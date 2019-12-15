@@ -926,7 +926,8 @@ var Chess = function(fen) {
 
       // check all of the moves for the other color and see if any of them target our king
         // maximum call stack exceeded!!!
-
+      
+      // New plan: no checks! no checkmate! game ends when someone captures the king!!
 
       if (ATTACKS[index] & (1 << SHIFTS[piece.type])) {
         if (piece.type === PAWN) {
