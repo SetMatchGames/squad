@@ -12,9 +12,10 @@ class Board extends React.Component {
       if (game.game_over()) return false
 
       // only pick up pieces for White
-      if (piece.search(/^b/) !== -1) return false
+      // if (piece.search(/^b/) !== -1) return false
     }
 
+    /*
     function makeRandomMove () {
       var possibleMoves = game.moves()
 
@@ -25,6 +26,7 @@ class Board extends React.Component {
       game.move(possibleMoves[randomIdx])
       board.position(game.fen())
     }
+    */
 
     function onDrop (source, target) {
       // see if the move is legal
@@ -38,7 +40,7 @@ class Board extends React.Component {
       if (move === null) return 'snapback'
 
       // make random legal move for black
-      window.setTimeout(makeRandomMove, 250)
+      // window.setTimeout(makeRandomMove, 250)
     }
 
     // update the board position after the piece snap
