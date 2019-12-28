@@ -8,19 +8,19 @@
  */
 
 // Create piece abbreviations
-let pieces = []
+let pieces = {}
 const pieceCodenames = {}
 const codenamePieces = {}
 
 const makeCodenames = (pieceList) => {
   pieces = pieceList
   let codeDec = 1
-  for (let i = 0; i < pieces.length; i++) {
+  for (name in pieces) {
     let codeHex = codeDec.toString(16)
     if (codeHex.length < 2) { codeHex = '0' + codeHex }
     else if (codeHex.length > 2) { throw 'Exceeded max unique pieces' }
-    codenamePieces[codeHex] = pieces[i].name
-    pieceCodenames[pieces[i].name] = codeHex
+    codenamePieces[codeHex] = name
+    pieceCodenames[name] = codeHex
     codeDec += 1
   }
 }
@@ -31,7 +31,7 @@ let boardTemplate = []
 const board = {}
 
 const makeEmptyBoard = (size) => {
-  let square = 0
+  let square = 1
   boardSize = size
   const rowLengths = Array(boardSize).fill(boardSize)
   const rows = rowLengths.map((n) => {
@@ -72,16 +72,52 @@ const generateState = () => {
   return boardState
 }
 
-// update board from state
+// Update board from state
 
 // Mechanics functions
 
 const MECHANICS = {
   'move': ([rise, run, direction, maxSteps], from) => {
+    // return to & any flags (remove piece)
+    let offset = rise * boardSize + run * direction
+    let steps = 0
+    let outputs = []
+    let to = from
+    while (steps < maxSteps) {
+      steps += 1
+      to += offset
+      if (to > boardSize * boardSize - 1) { break } // this needs to check if we went off the side of the board!!
+      // squares on the left edge can't be approached by moving right
+      // right edge can't be approached by moving left
+      // etc.
+      // how to check if a square is an edge square and which edge?
+        // 
+      // how to check if a move includes a cardinal direction?
+        // rise, run, direction
+        // (from % boardSize - to % boardSize) > 0 ? left : right (if 0, neither)
+        // parseInt(from/boardSize) - parseInt(to/boardSize) > 0 ? down : up (if 0, neither)
 
+      let square = board[to]
+      if (square !== null) { break }
+      outputs.push({to})
+    }
+    return outputs
   },
   'capture': ([rise, run, direction, maxSteps], from) => {
-
+    let offset = rise * boardSize + run * direction
+    let steps = 0
+    let outputs = []
+    let to = from
+    while (steps < maxSteps) {
+      steps += 1
+      to += offset
+      if (to > boardSize * boardSize - 1) { break }
+      let square = board[to]
+      if (square === null) { break }
+      if (pieces[codenamePieces[square]].color === color) { break }
+      outputs.push({to})
+    }
+    return outputs
   }
 }
 
@@ -115,7 +151,15 @@ const generateMoves = () => {
 
   for (square in board) {
     if (board[square] === null ) { continue }
-
+    let codename = board[square]
+    let piece = pieces[codenamePieces[codename]]
+    for (name in piece.mechanics) {
+      let mechanic = MECHANICS[name]
+      for(let i = 0; i < piece.mechanics[name].length; i++) {
+        let params = piece.mechanics[name][i]
+        console.log(codenamePieces[codename], name, params, mechanic(params, parseInt(square)))
+      }
+    }
   }
 }
 
@@ -123,13 +167,13 @@ const generateMoves = () => {
 
 // testing
 
-const testBoardSize = 4
+const testBoardSize = 8
 makeEmptyBoard(testBoardSize)
 console.log('empty board', board, boardTemplate)
 
-const testPieces = [
-  {
-    'name': 'pawn',
+const testPieces = {
+  'pawn': {
+    'color': 'w',
     'mechanics': {
       'move': [
         [1, 0, 1, 1],
@@ -140,8 +184,8 @@ const testPieces = [
       ]
     }
   },
-  {
-    'name': 'queen',
+  'queen': {
+    'color': 'w',
     'mechanics': {
       'move': [
         [1, 0, 1, 100], //8
@@ -165,8 +209,8 @@ const testPieces = [
       ]
     }
   },
-  {
-    'name': 'king',
+  'king': {
+    'color': 'w',
     'mechanics': {
       'move': [
         [1, 0, 1, 1],
@@ -189,12 +233,32 @@ const testPieces = [
         [1, 1, -1, 1]
       ]
     }
+  },
+  'knight': {
+    'color': 'w',
+    'mechanics': {
+      'move': [
+        [1, 2, 1, 1],
+        [-1, 2, 1, 1],
+        [1, 2, -1, 1],
+        [-1, 2, -1, 1]
+      ],
+      'capture': [
+        [1, 2, 1, 1],
+        [-1, 2, 1, 1],
+        [1, 2, -1, 1],
+        [-1, 2, -1, 1]
+      ]
+    }
   }
-]
+}
 makeCodenames(testPieces)
 console.log('piece codenames', pieceCodenames)
 
 board[2] = pieceCodenames['pawn']
 board[12] = pieceCodenames['queen']
+console.log('board', board)
 
 console.log('board state:', generateState())
+
+generateMoves()
