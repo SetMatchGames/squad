@@ -1,264 +1,204 @@
 /*
- * SQUAD CHESS
+ * SQUAD CHESS RULES ENGINE
  * 
- * This library should be able to take in a list of custom pieces (fitting a standard data format) 
- * and a board state that includes those pieces, the turn number, and player whose turn it is,
- * then return all the legal moves.
+ * This library takes in a game state (board position, turn number, and legal moves) and an action (a move), 
+ * then returns a new state and set of legal moves.
  * 
  */
 
-// Create piece abbreviations
-let pieces = {}
-const pieceCodenames = {}
-const codenamePieces = {}
+// General architecture: 
+  // now: take in a board state and an action (move), return a new state and a list of legal moves
 
-const makeCodenames = (pieceList) => {
-  pieces = pieceList
-  let codeDec = 1
-  for (name in pieces) {
-    let codeHex = codeDec.toString(16)
-    if (codeHex.length < 2) { codeHex = '0' + codeHex }
-    else if (codeHex.length > 2) { throw 'Exceeded max unique pieces' }
-    codenamePieces[codeHex] = name
-    pieceCodenames[name] = codeHex
-    codeDec += 1
-  }
-}
-
-// Create an empty board
-let boardSize = 0
-let boardTemplate = []
-const board = {}
-
-const makeEmptyBoard = (size) => {
-  let square = 1
-  boardSize = size
-  const rowLengths = Array(boardSize).fill(boardSize)
-  const rows = rowLengths.map((n) => {
-    return Array(parseInt(n)).fill(1).map((x,y) => x + y)
-  })
-  boardTemplate = rows
-  for (let i = 0; i < rows.length; i++) {
-    for (let j = 0; j < rows[i].length; j++) {
-      board[square] = null
-      square += 1
-    }
-  }
-}
-
-// Generate a board state string
-// These strings are what is passed back and forth between the ui, this library, the chess ai, etc.
-let color = 'w'
-let turns = 0
-
-const generateState = () => {
-  let boardState = ''
-  let rowIndex = 0
-  let rowLength = 0
-  for (square in board) {
-    rowLength += 1
-    if (board[square] === null) {
-      boardState += '00'
-    } else {
-      boardState += board[square]
-    }
-    if (rowLength === boardTemplate[rowIndex].length) {
-      rowLength = 0
-      rowIndex += 1
-      if (rowIndex + 1 <= boardTemplate.length) { boardState += '/' }
-    }
-  }
-  boardState += ` ${color} ${turns}`
-  return boardState
-}
-
-// Update board from state
-
-// Mechanics functions
+// move = { from: [0,1], to: [4,6] }
+// state = { position: {'0,1': {pieceId, player: 0||1}... }, turn: 14 }
+// PIECES = { pieceId: { name: 'rook', mechanics: { 'move': [moveInputs] } }} (owned by 'component' definitions)
+// MECHANICS = { 'move': function (takes moveInputs, returns [move])} (owned by 'game' definition)
 
 const MECHANICS = {
-  'move': ([rise, run, direction, maxSteps], from) => {
-    // return to & any flags (remove piece)
-    let offset = rise * boardSize + run * direction
-    let steps = 0
-    let outputs = []
+  'move': (inputs, from, position, turn) => {
+    // inputs = { offset, steps } // this might eventually support moves based on arbitrary formula
+      // offset = [x, y]
+    let moves = []
     let to = from
-    while (steps < maxSteps) {
-      steps += 1
-      to += offset
-      if (to > boardSize * boardSize - 1) { break } // this needs to check if we went off the side of the board!!
-      // squares on the left edge can't be approached by moving right
-      // right edge can't be approached by moving left
-      // etc.
-      // how to check if a square is an edge square and which edge?
-        // 
-      // how to check if a move includes a cardinal direction?
-        // rise, run, direction
-        // (from % boardSize - to % boardSize) > 0 ? left : right (if 0, neither)
-        // parseInt(from/boardSize) - parseInt(to/boardSize) > 0 ? down : up (if 0, neither)
-
-      let square = board[to]
-      if (square !== null) { break }
-      outputs.push({to})
+    // for each step
+    for(let i = 0; i < inputs.steps; i++) {
+      to = [to[0]+inputs.offset[0], to[1]+inputs.offset[1]]
+      if (!(to in position)) { break } // if off board
+      if (position[to] !== null) { break } // if not empty
+      moves.push({
+        'from': from,
+        'to': to
+      })
     }
-    return outputs
+    return moves
   },
-  'capture': ([rise, run, direction, maxSteps], from) => {
-    let offset = rise * boardSize + run * direction
-    let steps = 0
-    let outputs = []
+  'capture': (inputs, from, position, turn) => {
+    let moves = []
     let to = from
-    while (steps < maxSteps) {
-      steps += 1
-      to += offset
-      if (to > boardSize * boardSize - 1) { break }
-      let square = board[to]
-      if (square === null) { break }
-      if (pieces[codenamePieces[square]].color === color) { break }
-      outputs.push({to})
+    for(let i = 0; i < inputs.steps; i++) {
+      to = [to[0]+inputs.offset[0], to[1]+inputs.offset[1]]
+      if (!(to in position)) { break } // if off board
+      if (position[to] === null) { continue } // if empty
+      moves.push({
+        'from': from,
+        'to': to
+      })
+      break
     }
-    return outputs
+    return moves
   }
 }
 
-// Generate possible moves
-  // cycle through all squares
-    // if there is no piece or piece of the wrong color, next
-    // if there is a piece of the right color, 
-    // use its mechanics to generate all the possible moves it can make
-    // and add them to the list
+let PIECES = {}
 
-    // problem: if the board varies in size, 1-dimensional offsets/slopes 
-    // don't work as easily. How can we convert a slope to an offset on any 
-    // size and shape of board?
-/*
-    slope = [1,2]
-    direction = 1 | -1
-    from = 4
-    to = 13
+const makePosition = (position, move) => {
+  let newPosition = Object.assign(position)
+  newPosition[move.to] = position[move.from]
+  newPosition[move.from] = null
+  return newPosition
+}
 
-    8 9 10 11  12  13 [14] 15
-    0 1  2  3  [4] 5  6    7 
-
-    step = slope[0] * boardSize + slope[1] * direction
-
-    substep = slope * boardSize (y axis) + 1 (x axis)
-    # of substeps in step = smallest whole number divisible by slope / slope
-    */
-  
-const generateMoves = () => {
-  const moves = []
-
-  for (square in board) {
-    if (board[square] === null ) { continue }
-    let codename = board[square]
-    let piece = pieces[codenamePieces[codename]]
-    for (name in piece.mechanics) {
+const generateMoves = (position, turn) => {
+  let moves = []
+  for (square in position) {
+    // check that there is a valid piece
+    if (position[square] === null) { continue }
+    if (position[square].player !== turn % 2) { continue }
+    // if a piece, look the piece up by its Id
+    let pieceId = position[square].pieceId
+    // for each of the piece's mechanics
+    for (name in PIECES[pieceId].mechanics) {
       let mechanic = MECHANICS[name]
-      for(let i = 0; i < piece.mechanics[name].length; i++) {
-        let params = piece.mechanics[name][i]
-        console.log(codenamePieces[codename], name, params, mechanic(params, parseInt(square)))
-      }
+      // gather moves for each input for that mechanic
+      PIECES[pieceId].mechanics[name].forEach(input => {
+        // add any valid moves to the list
+        moves = moves.concat(mechanic(input, stringToSquare(square), position, turn))
+      })
     }
   }
+  return moves
 }
 
-// Move
+const takeTurn = ({ position, turn, legalMoves }, move) => {
+  if (!move in legalMoves) { throw 'Submitted an illegal move!' }
+  const newPosition = makePosition(position, move)
+  const newState = {
+    'position': newPosition,
+    'turn': turn+1,
+    'legalMoves': generateMoves(newPosition)
+  }
+  return newState
+}
 
-// testing
+// Helpers
 
-const testBoardSize = 8
-makeEmptyBoard(testBoardSize)
-console.log('empty board', board, boardTemplate)
+function stringToSquare(string) {
+  return string.split(',').map(x => parseInt(x))
+}
 
-const testPieces = {
+const mockPieceList = {
   'pawn': {
-    'color': 'w',
-    'mechanics': {
+    mechanics: {
       'move': [
-        [1, 0, 1, 1],
+        { offset: [0,1], steps: 1 }
       ],
       'capture': [
-        [1, 1, 1, 1],
-        [1, 1, -1, 1]
-      ]
-    }
-  },
-  'queen': {
-    'color': 'w',
-    'mechanics': {
-      'move': [
-        [1, 0, 1, 100], //8
-        [1, 1, 1, 100], //9
-        [0, 1, 1, 100], //1
-        [-1, 1, 1, 100], //-7
-        [-1, 0, 1, 100], //-8
-        [-1, 1, -1, 100], //-9
-        [0, 1, -1, 100], //-1
-        [1, 1, -1, 100] // 7
-      ],
-      'capture': [
-        [1, 0, 1, 100],
-        [1, 1, 1, 100],
-        [0, 1, 1, 100], 
-        [-1, 1, 1, 100], 
-        [-1, 0, 1, 100],
-        [-1, 1, -1, 100],
-        [0, 1, -1, 100],
-        [1, 1, -1, 100]
-      ]
-    }
-  },
-  'king': {
-    'color': 'w',
-    'mechanics': {
-      'move': [
-        [1, 0, 1, 1],
-        [1, 1, 1, 1], 
-        [0, 1, 1, 1], 
-        [-1, 1, 1, 1], 
-        [-1, 0, 1, 1], 
-        [-1, 1, -1, 1], 
-        [0, 1, -1, 1],
-        [1, 1, -1, 1]
-      ],
-      'capture': [
-        [1, 0, 1, 1],
-        [1, 1, 1, 1],
-        [0, 1, 1, 1], 
-        [-1, 1, 1, 1], 
-        [-1, 0, 1, 1],
-        [-1, 1, -1, 1],
-        [0, 1, -1, 1],
-        [1, 1, -1, 1]
+        { offset: [1,1], steps: 1 },
+        { offset: [-1,1], steps: 1 }
       ]
     }
   },
   'knight': {
-    'color': 'w',
-    'mechanics': {
+    mechanics: {
       'move': [
-        [1, 2, 1, 1],
-        [-1, 2, 1, 1],
-        [1, 2, -1, 1],
-        [-1, 2, -1, 1]
+        { offset: [2,1], steps: 1 },
+        { offset: [1,2], steps: 1 },
+        { offset: [-2,1], steps: 1 },
+        { offset: [-1,2], steps: 1 },
+        { offset: [1,-2], steps: 1 },
+        { offset: [2,-1], steps: 1 },
+        { offset: [-2,-1], steps: 1 },
+        { offset: [-1,-2], steps: 1 }
       ],
       'capture': [
-        [1, 2, 1, 1],
-        [-1, 2, 1, 1],
-        [1, 2, -1, 1],
-        [-1, 2, -1, 1]
+        { offset: [2,1], steps: 1 },
+        { offset: [1,2], steps: 1 },
+        { offset: [-2,1], steps: 1 },
+        { offset: [-1,2], steps: 1 },
+        { offset: [1,-2], steps: 1 },
+        { offset: [2,-1], steps: 1 },
+        { offset: [-2,-1], steps: 1 },
+        { offset: [-1,-2], steps: 1 }
+      ]
+    }
+  },
+  'rook': {
+    mechanics: {
+      'move': [
+        { offset: [0,1], steps: 100 },
+        { offset: [0,-1], steps: 100 },
+        { offset: [1,0], steps: 100 },
+        { offset: [-1,0], steps: 100 }
+      ],
+      'capture': [
+        { offset: [0,1], steps: 100 },
+        { offset: [0,-1], steps: 100 },
+        { offset: [1,0], steps: 100 },
+        { offset: [-1,0], steps: 100 }
       ]
     }
   }
 }
-makeCodenames(testPieces)
-console.log('piece codenames', pieceCodenames)
 
-board[2] = pieceCodenames['pawn']
-board[12] = pieceCodenames['queen']
-console.log('board', board)
+let mockStartingPosition = {
+  '0,0': {
+    pieceId: 'pawn',
+    player: 0
+  },
+  '0,1': null,
+  '0,2': null,
+  '0,3': {
+    pieceId: 'knight',
+    player: 0
+  },
+  '1,0': {
+    pieceId: 'rook',
+    player: 0
+  },
+  '1,1': null,
+  '1,2': null,
+  '1,3': null,
+  '2,0': null,
+  '2,1': {
+    pieceId: 'pawn',
+    player: 1
+  },
+  '2,2': {
+    pieceId: 'pawn',
+    player: 1
+  },
+  '2,3': null,
+  '3,0': null,
+  '3,1': {
+    pieceId: 'knight',
+    player: 1
+  },
+  '3,2': {
+    pieceId: 'rook',
+    player: 1
+  },
+  '3,3': null
+}
 
-console.log('board state:', generateState())
+// testing
 
-generateMoves()
+PIECES = mockPieceList
+let moves = generateMoves(mockStartingPosition, 0)
+let state = {
+  position: mockStartingPosition,
+  turn: 0,
+  legalMoves: moves
+}
+console.log(state)
+let newState = takeTurn(state, moves[0])
+console.log(newState)
