@@ -39,6 +39,7 @@ const MECHANICS = {
       to = [to[0]+inputs.offset[0], to[1]+inputs.offset[1]]
       if (!(to in position)) { break } // if off board
       if (position[to] === null) { continue } // if empty
+      if (position[from].player === position[to].player) { break } // if same color piece
       moves.push({
         'from': from,
         'to': to
@@ -63,6 +64,7 @@ const generateMoves = (position, turn) => {
   for (square in position) {
     // check that there is a valid piece
     if (position[square] === null) { continue }
+    console.log(position[square].player, turn, turn % 2)
     if (position[square].player !== turn % 2) { continue }
     // if a piece, look the piece up by its Id
     let pieceId = position[square].pieceId
@@ -85,7 +87,7 @@ const takeTurn = ({ position, turn, legalMoves }, move) => {
   const newState = {
     'position': newPosition,
     'turn': turn+1,
-    'legalMoves': generateMoves(newPosition)
+    'legalMoves': generateMoves(newPosition, turn+1)
   }
   return newState
 }
@@ -95,6 +97,8 @@ const takeTurn = ({ position, turn, legalMoves }, move) => {
 function stringToSquare(string) {
   return string.split(',').map(x => parseInt(x))
 }
+
+// testing
 
 const mockPieceList = {
   'pawn': {
@@ -190,8 +194,6 @@ let mockStartingPosition = {
   '3,3': null
 }
 
-// testing
-
 PIECES = mockPieceList
 let moves = generateMoves(mockStartingPosition, 0)
 let state = {
@@ -199,6 +201,6 @@ let state = {
   turn: 0,
   legalMoves: moves
 }
-console.log(state)
+console.log(state, state.legalMoves)
 let newState = takeTurn(state, moves[0])
-console.log(newState)
+console.log(newState, newState.legalMoves)
