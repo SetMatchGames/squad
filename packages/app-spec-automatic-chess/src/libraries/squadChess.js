@@ -4,15 +4,16 @@
  * This library takes in a game state (board position, turn number, and legal moves) and an action (a move), 
  * then returns a new state and set of legal moves.
  * 
+ * General architecture: Take in a board state and an action (move), 
+ * return a new state and a list of legal moves.
+ * 
+ * DATA TYPES
+ * move = { from: [0,1], to: [4,6] }
+ * state = { position: {'0,1': {pieceId, player: 0||1}... }, turn: 14 }
+ * PIECES = { pieceId: { name: 'rook', mechanics: { 'move': [moveInputs] }}} (come from 'component' definitions)
+ * MECHANICS = { 'mechanic name': function that takes move inputs, returns moves } (come from 'game' definition)
+ * 
  */
-
-// General architecture: 
-  // now: take in a board state and an action (move), return a new state and a list of legal moves
-
-// move = { from: [0,1], to: [4,6] }
-// state = { position: {'0,1': {pieceId, player: 0||1}... }, turn: 14 }
-// PIECES = { pieceId: { name: 'rook', mechanics: { 'move': [moveInputs] } }} (owned by 'component' definitions)
-// MECHANICS = { 'move': function (takes moveInputs, returns [move])} (owned by 'game' definition)
 
 const MECHANICS = {
   'move': (inputs, from, position, turn) => {
@@ -52,6 +53,10 @@ const MECHANICS = {
 
 let PIECES = {}
 
+const registerPieces = (pieces) => {
+  PIECES = pieces
+}
+
 const makePosition = (position, move) => {
   let newPosition = Object.assign(position)
   newPosition[move.to] = position[move.from]
@@ -61,27 +66,33 @@ const makePosition = (position, move) => {
 
 const generateMoves = (position, turn) => {
   let moves = []
+  let king = false
   for (square in position) {
-    // check that there is a valid piece
+    // check that there is a piece
     if (position[square] === null) { continue }
-    console.log(position[square].player, turn, turn % 2)
+    // check that the piece is the correct color
     if (position[square].player !== turn % 2) { continue }
-    // if a piece, look the piece up by its Id
-    let pieceId = position[square].pieceId
+    // get the piece
+    let piece = PIECES[position[square].pieceId]
+    // if the piece has the 'king' property, mark king as true
+    if (piece.king) { king = true }
     // for each of the piece's mechanics
-    for (name in PIECES[pieceId].mechanics) {
+    for (name in piece.mechanics) {
       let mechanic = MECHANICS[name]
       // gather moves for each input for that mechanic
-      PIECES[pieceId].mechanics[name].forEach(input => {
+      piece.mechanics[name].forEach(input => {
         // add any valid moves to the list
         moves = moves.concat(mechanic(input, stringToSquare(square), position, turn))
       })
     }
   }
+  // if there was no king, return 0 valid moves
+  if (king === false) { moves = [] }
   return moves
 }
 
 const takeTurn = ({ position, turn, legalMoves }, move) => {
+  if (!move) { throw 'No move submitted!' }
   if (!move in legalMoves) { throw 'Submitted an illegal move!' }
   const newPosition = makePosition(position, move)
   const newState = {
@@ -93,114 +104,9 @@ const takeTurn = ({ position, turn, legalMoves }, move) => {
 }
 
 // Helpers
-
 function stringToSquare(string) {
   return string.split(',').map(x => parseInt(x))
 }
 
-// testing
-
-const mockPieceList = {
-  'pawn': {
-    mechanics: {
-      'move': [
-        { offset: [0,1], steps: 1 }
-      ],
-      'capture': [
-        { offset: [1,1], steps: 1 },
-        { offset: [-1,1], steps: 1 }
-      ]
-    }
-  },
-  'knight': {
-    mechanics: {
-      'move': [
-        { offset: [2,1], steps: 1 },
-        { offset: [1,2], steps: 1 },
-        { offset: [-2,1], steps: 1 },
-        { offset: [-1,2], steps: 1 },
-        { offset: [1,-2], steps: 1 },
-        { offset: [2,-1], steps: 1 },
-        { offset: [-2,-1], steps: 1 },
-        { offset: [-1,-2], steps: 1 }
-      ],
-      'capture': [
-        { offset: [2,1], steps: 1 },
-        { offset: [1,2], steps: 1 },
-        { offset: [-2,1], steps: 1 },
-        { offset: [-1,2], steps: 1 },
-        { offset: [1,-2], steps: 1 },
-        { offset: [2,-1], steps: 1 },
-        { offset: [-2,-1], steps: 1 },
-        { offset: [-1,-2], steps: 1 }
-      ]
-    }
-  },
-  'rook': {
-    mechanics: {
-      'move': [
-        { offset: [0,1], steps: 100 },
-        { offset: [0,-1], steps: 100 },
-        { offset: [1,0], steps: 100 },
-        { offset: [-1,0], steps: 100 }
-      ],
-      'capture': [
-        { offset: [0,1], steps: 100 },
-        { offset: [0,-1], steps: 100 },
-        { offset: [1,0], steps: 100 },
-        { offset: [-1,0], steps: 100 }
-      ]
-    }
-  }
-}
-
-let mockStartingPosition = {
-  '0,0': {
-    pieceId: 'pawn',
-    player: 0
-  },
-  '0,1': null,
-  '0,2': null,
-  '0,3': {
-    pieceId: 'knight',
-    player: 0
-  },
-  '1,0': {
-    pieceId: 'rook',
-    player: 0
-  },
-  '1,1': null,
-  '1,2': null,
-  '1,3': null,
-  '2,0': null,
-  '2,1': {
-    pieceId: 'pawn',
-    player: 1
-  },
-  '2,2': {
-    pieceId: 'pawn',
-    player: 1
-  },
-  '2,3': null,
-  '3,0': null,
-  '3,1': {
-    pieceId: 'knight',
-    player: 1
-  },
-  '3,2': {
-    pieceId: 'rook',
-    player: 1
-  },
-  '3,3': null
-}
-
-PIECES = mockPieceList
-let moves = generateMoves(mockStartingPosition, 0)
-let state = {
-  position: mockStartingPosition,
-  turn: 0,
-  legalMoves: moves
-}
-console.log(state, state.legalMoves)
-let newState = takeTurn(state, moves[0])
-console.log(newState, newState.legalMoves)
+// Exports
+module.exports = { registerPieces, generateMoves, takeTurn }
