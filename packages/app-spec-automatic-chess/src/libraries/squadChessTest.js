@@ -1,4 +1,4 @@
-const chess = require('./squadChess.js')
+const chess = require('./squadChessRules.js')
 
 const mockPieceList = {
   pawn: {
@@ -123,12 +123,12 @@ let mockStartingPosition = {
 }
 
 chess.registerPieces(mockPieceList)
-let moves = chess.generateMoves(mockStartingPosition, 0)
+let turns = chess.generateTurns(mockStartingPosition, 0)
 let state = {
   position: mockStartingPosition,
-  turn: 0,
-  legalMoves: moves
+  turnNumber: 0,
+  legalTurns: turns
 }
-console.log(state, state.legalMoves)
-let newState = chess.takeTurn(state, moves[0])
-console.log(newState, newState.legalMoves)
+console.log(state, state.legalTurns)
+let newState = chess.takeTurn(state, turns[0])
+console.log(newState, newState.legalTurns)
