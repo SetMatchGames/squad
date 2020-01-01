@@ -62,7 +62,7 @@ const BoardSquare = {
       // prioritize local images
       if (vnode.attrs.graphics.local) {
         console.log(vnode.attrs.graphics.local[pieceColor])
-        imgLink = `./public/img/${vnode.attrs.graphics.local[pieceColor]}`
+        imgLink = `./img/${vnode.attrs.graphics.local[pieceColor]}`
       } // else if (vnode.graphics.remote)...
       return m(
         `.square#${vnode.attrs.key}`,
