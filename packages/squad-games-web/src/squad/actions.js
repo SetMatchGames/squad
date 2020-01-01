@@ -13,7 +13,6 @@ export function connectToSquad(
   return dispatch => {
     dispatch(connecting())
     const connection = metastore.webSocketConnection(uri)
-    console.log(connection)
     connection.on("open", () => {
       dispatch(connectSuccess(connection.on))
       successCallback(connection, dispatch)

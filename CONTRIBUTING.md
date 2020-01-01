@@ -42,6 +42,9 @@ protocol using the "suggestion" tag instead of "bug."
 
 WIP
 
+Note: If you want to use a mock metastore, and not run all the holochain
+stuff, set the environment variable `MOCK_METASTORE=true`
+
 ### Requirements
 
 1. Make
