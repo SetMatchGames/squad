@@ -13,11 +13,6 @@ function webSocketConnection(uri) {
   return squad.connection
 }
 
-function mockConnection() {
-  squad.connection = mockMetastore()
-  return squad.connection
-}
-
 function on(message, f) {
   squad.connection.on(message, f)
 }
@@ -136,7 +131,6 @@ function shareDefinitions(node, TOPIC, typeArray, shareFunction) {
 
 module.exports = {
   webSocketConnection,
-  mockConnection,
   on,
   call,
   createDefinition,

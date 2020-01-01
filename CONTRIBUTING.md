@@ -42,13 +42,10 @@ protocol using the "suggestion" tag instead of "bug."
 
 WIP
 
-Note: If you want to use a mock metastore, and not run all the holochain
-stuff, set the environment variable `MOCK_METASTORE=true`
-
 ### Requirements
 
 1. Make
-1. nix-shell
+1. nix-shell (unless using the mock metastore)
 1. npm
 1. lerna
 1. c++ buildtools (gcc-c++ in rpm based systems)
@@ -60,8 +57,12 @@ terminals
 `make squad-games-web`
 `make app-spec-web`
 
-TODO: seed the dev metastore with enough deffinitions to run the app
-spec
+To stand up a full dev environment with the mock metastore set the
+`MOCK_METASTORE` environment variable to `true` and skip making the
+metastore
+
+`MOCK_METASTORE=true make squad-games-web`
+`MOCK_METASTORE=true make app-spec-web`
 
 TODO: `make app-spec-web` should not open a browser automatically,
 you'll have to close that tab yourself for now.
