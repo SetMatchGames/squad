@@ -12,6 +12,12 @@ const mockPieceList = {
         { offset: [1,1], steps: 1 },
         { offset: [-1,1], steps: 1 }
       ]
+    },
+    graphics: {
+      local: {
+        white: 'chesspieces/wikipedia/wP.png',
+        black: 'chesspieces/wikipedia/bP.png'
+      }
     }
   },
   knight: {
@@ -36,6 +42,12 @@ const mockPieceList = {
         { offset: [-2,-1], steps: 1 },
         { offset: [-1,-2], steps: 1 }
       ]
+    },
+    graphics: {
+      local: {
+        white: 'chesspieces/wikipedia/wN.png',
+        black: 'chesspieces/wikipedia/bN.png'
+      }
     }
   },
   rook: {
@@ -52,9 +64,16 @@ const mockPieceList = {
         { offset: [1,0], steps: 100 },
         { offset: [-1,0], steps: 100 }
       ]
+    },
+    graphics: {
+      local: {
+        white: 'chesspieces/wikipedia/wR.png',
+        black: 'chesspieces/wikipedia/bR.png'
+      }
     }
   },
   king: {
+    king: true,
     mechanics: {
       move: [
         { offset: [0,1], steps: 1 },
@@ -77,7 +96,12 @@ const mockPieceList = {
         { offset: [-1,1], steps: 1 }
       ]
     },
-    king: true
+    graphics: {
+      local: {
+        white: 'chesspieces/wikipedia/wK.png',
+        black: 'chesspieces/wikipedia/bK.png'
+      }
+    }
   }
 }
 
@@ -135,7 +159,7 @@ let gameState = {
 
 const App = {
   view: () => {
-    return m(Board, { position: gameState.position })
+    return m(Board, { position: gameState.position, pieces: mockPieceList })
   }
 }
 
