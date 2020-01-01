@@ -45,8 +45,10 @@ WIP
 ### Requirements
 
 1. Make
-1. nix-shell
+1. nix-shell (unless using the mock metastore)
 1. npm
+1. lerna
+1. c++ buildtools (gcc-c++ in rpm based systems)
 
 To stand up a full dev environment, run the followin in separate
 terminals
@@ -55,8 +57,14 @@ terminals
 `make squad-games-web`
 `make app-spec-web`
 
-TODO: seed the dev metastore with enough deffinitions to run the app
-spec
+If you are not doing development work on the metastore, you may
+want to use the mock metastore. In order to do so, set the
+`MOCK_METASTORE` environment variable to `true` and skip making the
+metastore. This makes the build process much quicker and does not
+depend on nix-shell.
+
+`MOCK_METASTORE=true make squad-games-web`
+`MOCK_METASTORE=true make app-spec-web`
 
 TODO: `make app-spec-web` should not open a browser automatically,
 you'll have to close that tab yourself for now.

@@ -1,33 +1,32 @@
 const WebSocket = require('rpc-websockets').Client
 const IPFS = require('ipfs')
+const mockMetastore = require('./mock').mockConnection
 
 const squad = {}
 
 function webSocketConnection(uri) {
-  squad.connection = new WebSocket(uri)
-  return squad.connection
-}
-
-function mockConnection(mock) {
-  squad.connection = mock
+  if (uri === 'mock'){
+    squad.connection = mockMetastore()
+  } else {
+    squad.connection = new WebSocket(uri)
+  }
   return squad.connection
 }
 
 function on(message, f) {
-  console.warn("let's depreciate the on function")
   squad.connection.on(message, f)
 }
 
 async function call(zome, method, inputs) {
-
+  // TODO: Can we cache this?
   const instanceInfo = await squad.connection.call('info/instances', {})
-
   const params = {
     "instance_id": instanceInfo[0].id,
     "zome": zome,
     "function": method,
     "args": inputs
   }
+
   const result = JSON.parse(await squad.connection.call('call', params))
 
   if (result.Ok === undefined) {
@@ -132,7 +131,6 @@ function shareDefinitions(node, TOPIC, typeArray, shareFunction) {
 
 module.exports = {
   webSocketConnection,
-  mockConnection,
   on,
   call,
   createDefinition,
