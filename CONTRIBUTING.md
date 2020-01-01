@@ -57,9 +57,11 @@ terminals
 `make squad-games-web`
 `make app-spec-web`
 
-To stand up a full dev environment with the mock metastore set the
+If you are not doing development work on the metastore, you may
+want to use the mock metastore. In order to do so, set the
 `MOCK_METASTORE` environment variable to `true` and skip making the
-metastore
+metastore. This makes the build process much quicker and does not
+depend on nix-shell.
 
 `MOCK_METASTORE=true make squad-games-web`
 `MOCK_METASTORE=true make app-spec-web`
