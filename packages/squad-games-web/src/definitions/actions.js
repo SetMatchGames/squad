@@ -85,7 +85,7 @@ export function fetchCatalog(definitionType, name) {
         dispatch(receiveCatalog(definitionType, name, withKeys))
       }
     })
-    .catch(error => {
+     .catch(error => {
       dispatch(catalogFailure(definitionType, name, error))
     })
   }

@@ -49,11 +49,11 @@ metastore.on('open', async () => {
   console.log("Connected to metastore")
   const gameAddrs = await Promise.all(games.map(async d => {
     return definition(d)
-  }))
+  })).catch(console.error)
   console.log("created games", gameAddrs)
   const componentAddrs = await Promise.all(components.map(async d => {
     return definition(d)
-  }))
+  })).catch(console.error)
   console.log("created components", componentAddrs)
 
   const standard = {
@@ -62,8 +62,8 @@ metastore.on('open', async () => {
       components: componentAddrs
     }
   }
-  await definition(standard)
-  console.log("created standard format")
+  const standardAddr = await definition(standard).catch(console.error)
+  console.log("created standard format", standardAddr)
   done = true
 })
 
