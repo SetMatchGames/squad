@@ -1,6 +1,4 @@
-import m from "mithril"
-import chess from "./squadChessRules"
-import Board from './Board.js'
+const chess = require('./squadChessRules.js')
 
 const mockPieceList = {
   pawn: {
@@ -126,17 +124,11 @@ let mockStartingPosition = {
 
 chess.registerPieces(mockPieceList)
 let turns = chess.generateTurns(mockStartingPosition, 0)
-
-let gameState = {
+let state = {
   position: mockStartingPosition,
   turnNumber: 0,
   legalTurns: turns
 }
-
-const App = {
-  view: () => {
-    return m(Board, { position: gameState.position })
-  }
-}
-
-m.mount(document.body, App)
+console.log(state, state.legalTurns)
+let newState = chess.takeTurn(state, turns[0])
+console.log(newState, newState.legalTurns)
