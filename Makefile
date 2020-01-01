@@ -14,7 +14,7 @@ metastore-shell = cd $(metastore) && nix-shell https://holochain.love --pure --c
 
 .PHONY: squad-games-web
 squad-games-web: build/bootstrap $(curation-market-js)/curation-config.json
-squad-games-web: $(js-client-contracts)
+squad-games-web: $(js-client-contracts) build/devnet metastore
 	cd $(squad-games-web) && npm run load_dev_defs
 	cd $(squad-games-web) && npm run start
 
@@ -39,8 +39,9 @@ clean:
 	rm -rf build
 	rm -rf packages/curation-market/clients/js/contracts
 	rm -rf packages/curation-market/app/build
-	-docker stop devnet
-	-docker rm devnet
+	if [ -a buil/devnet ]; then kill $(shell cat build/devnet); fi
+#	-docker stop devnet
+#	-docker rm devnet
 	lerna clean
 
 
@@ -85,8 +86,9 @@ build/curation-market: build/devnet build/bootstrap
 
 
 build/devnet: build/.
-	-docker run -d --rm --name devnet -p 8545:8545 trufflesuite/ganache-cli -b 1
-	touch build/devnet
+#	-docker run -d --rm --name devnet -p 8545:8545 trufflesuite/ganache-cli -b 1
+	cd $(curation-market) && npx ganache-cli -b 1 &
+	echo "$!" > build/devnet
 
 
 build/bootstrap: build/.
@@ -96,3 +98,4 @@ build/bootstrap: build/.
 
 build/.:
 	mkdir build
+

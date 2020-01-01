@@ -47,6 +47,8 @@ WIP
 1. Make
 1. nix-shell
 1. npm
+1. lerna
+1. c++ buildtools (gcc-c++ in rpm based systems)
 
 To stand up a full dev environment, run the followin in separate
 terminals
