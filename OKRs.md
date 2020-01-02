@@ -31,3 +31,5 @@ Build a small, devoted community
 Explore funding options
 - Describe 3 realistic funding methods
 - 10 inquiries towards those funding methods
+
+Publish a whitepaper
