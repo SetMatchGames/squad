@@ -1,6 +1,7 @@
 import m from "mithril"
 import chess from "./squadChessRules"
 import Board from './Board.js'
+import state from './state.js'
 
 const mockPieceList = {
   pawn: {
@@ -151,15 +152,19 @@ let mockStartingPosition = {
 chess.registerPieces(mockPieceList)
 let turns = chess.generateTurns(mockStartingPosition, 0)
 
-let gameState = {
+console.log(state)
+
+state['game'] = {
   position: mockStartingPosition,
   turnNumber: 0,
   legalTurns: turns
 }
 
+state['pieces'] = mockPieceList
+
 const App = {
   view: () => {
-    return m(Board, { position: gameState.position, pieces: mockPieceList })
+    return m(Board)
   }
 }
 

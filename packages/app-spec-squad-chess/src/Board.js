@@ -1,4 +1,6 @@
 import m from "mithril"
+import chess from "./squadChessRules"
+import state from "./state.js"
 
 const BOARD_CONFIG = {
   squares: {
@@ -10,17 +12,30 @@ const BOARD_CONFIG = {
 
 const squareSize = BOARD_CONFIG.squares.size
 
-function squareToCircle(key) {
-  console.log(key)
+/* I don't totally understand what this general dragover listener is doing:
+ * When I add similar 'ondragover' listeners on each component,
+ * we generate a constant stream of events, which is bad. Maybe those events are coming
+ * from the main document itself? So for now:
+ */
+document.addEventListener("dragover", (e) => {
+  e.preventDefault();
+}, false);
+
+let from
+
+function recordFrom() {
+  return (e) => {
+    from = e.target.id
+  }
 }
 
 const BoardPiece = {
   view: (vnode) => {
     return m(
-      'img', 
+      'img#'+vnode.key, 
       { 
         src: vnode.attrs.imgLink,
-        onclick: () => squareToCircle(vnode.attrs.key),
+        onmousedown: recordFrom(),
         style: {
           width: squareSize+'vw',
           height: squareSize+'vw'
@@ -30,7 +45,7 @@ const BoardPiece = {
   }
 }
 
-function squareStyle(coordinates, squareColor, pieceColor) {
+function squareStyle(coordinates, squareColor) {
   return {
     position: 'absolute',
     right: (40+squareSize*coordinates[0])+'vw',
@@ -41,55 +56,66 @@ function squareStyle(coordinates, squareColor, pieceColor) {
     'justify-content': 'center',
     width: squareSize+'vw',
     height: squareSize+'vw',
-    background: squareColor,
-    color: pieceColor
+    background: squareColor
   } 
+}
+
+function handleTurn(gameState) {
+  return (e) => {
+    e.preventDefault()
+    const turn = { 
+      from: chess.stringToSquare(from), 
+      to: chess.stringToSquare(e.target.id)
+    }
+    const newState = chess.takeTurn(gameState, turn)
+    state.game = newState
+  }
 }
 
 const BoardSquare = {
   view: (vnode) => {
     // convert the string coordinates back to an array
-    let coordinates = vnode.attrs.key.split(',').map(x => parseInt(x))
+    let coordinates = chess.stringToSquare(vnode.key)
     // create the checkerboard color pattern
     let squareColor = BOARD_CONFIG.squares.lightColor
     if ((coordinates[0] + coordinates[1]) % 2 == 1) { squareColor = BOARD_CONFIG.squares.darkColor }
-    // if the square holds a piece, return the piece as well
+    let boardPiece
+    // if the square holds a piece, set the properties
     if (vnode.attrs.value) {
       // get the link to the piece graphic
+      let imgLink
       let pieceColor = 'white'
       if (vnode.attrs.value.player === 1) { pieceColor = 'black' }
-      let imgLink = ''
       // prioritize local images
       if (vnode.attrs.graphics.local) {
-        console.log(vnode.attrs.graphics.local[pieceColor])
         imgLink = `./img/${vnode.attrs.graphics.local[pieceColor]}`
       } // else if (vnode.graphics.remote)...
-      return m(
-        `.square#${vnode.attrs.key}`,
-        { style: squareStyle(coordinates, squareColor, pieceColor) },
-        m(BoardPiece, { imgLink })
-      )
+      boardPiece = m(BoardPiece, { imgLink, key: vnode.key })
     }
-    // if not, just return the square
+    // if not, just return an empty square
     return m(
-      `.square#${vnode.attrs.key}`, 
-      { style: squareStyle(coordinates, squareColor) }
+      `.square#${vnode.key}`,
+      { 
+        style: squareStyle(coordinates, squareColor), 
+        ondrop: handleTurn(state.game)
+      },
+      boardPiece
     )
   }
 }
 
 const Board = {
-  view: (vnode) => {
+  view: () => {
     return m(
       "#board",
       // For each square in the position
-      Object.keys(vnode.attrs.position).map(squareId => {
+      Object.keys(state.game.position).map(squareId => {
         // grab what's in the square
-        const value = vnode.attrs.position[squareId]
-        let graphics = {}
+        const value = state.game.position[squareId]
         // if there is a piece, grab links to piece images 
+        let graphics
         if (value) {
-          graphics = vnode.attrs.pieces[value.pieceId].graphics
+          graphics = state.pieces[value.pieceId].graphics
         }
         // add the square to the board
         return m(

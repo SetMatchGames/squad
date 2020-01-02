@@ -93,7 +93,7 @@ const generateTurns = (position, turnNumber) => {
 
 const takeTurn = ({ position, turnNumber, legalTurns }, turn) => {
   if (!turn) { throw 'No turn submitted!' }
-  if (!legalTurns.includes(turn)) { throw 'Submitted an illegal turn!' }
+  if (!turnLegality(turn, legalTurns)) { throw 'Submitted an illegal turn!' }
   const newPosition = updatePosition(position, turn)
   const newState = {
     'position': newPosition,
@@ -104,9 +104,22 @@ const takeTurn = ({ position, turnNumber, legalTurns }, turn) => {
 }
 
 // Helpers
-function stringToSquare(string) {
+const stringToSquare = (string) => {
   return string.split(',').map(x => parseInt(x))
 }
 
+function turnLegality(turn, legalTurns) {
+  let legality = false
+  legalTurns.forEach(legalTurn => {
+    if (legalTurn.from[0] === turn.from[0] && 
+      legalTurn.from[1] === turn.from[1] &&
+      legalTurn.to[0] === turn.to[0] &&
+      legalTurn.to[1] === turn.to[1]) {
+      legality = true
+    }
+  })
+  return legality
+}
+
 // Exports
-module.exports = { registerPieces, generateTurns, takeTurn }
+module.exports = { registerPieces, generateTurns, takeTurn, stringToSquare }
