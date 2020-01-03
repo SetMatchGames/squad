@@ -88,13 +88,14 @@ const BoardPiece = {
 
 function squareStyle(coordinates, squareColor, highlighted) {
   const result = {
+    // TODO move the static CSS elsewhere
     position: 'absolute',
-    right: (40+squareSize*coordinates[0])+'vw',
-    top: (10+squareSize*coordinates[1])+'vw',
     display: 'flex',
     'flex-direction': 'column',
     'align-items': 'center',
     'justify-content': 'center',
+    right: (40+squareSize*coordinates[0])+'vw',
+    top: (10+squareSize*coordinates[1])+'vw',
     width: squareSize+'vw',
     height: squareSize+'vw',
     background: squareColor

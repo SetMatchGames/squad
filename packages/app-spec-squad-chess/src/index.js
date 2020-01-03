@@ -3,7 +3,8 @@ import chess from "./rules.js"
 import Board from './Board.js'
 import state from './state.js'
 
-// TODO intial state should be created differently
+// TODO how will the app arrive at the initial game state?
+// TODO should we just manage state with redux?
 
 const mockPieceList = {
   pawn: {
@@ -161,10 +162,6 @@ state['game'] = {
 }
 
 state['pieces'] = mockPieceList
-
-state['board'] = {
-  highlightedSquares: []
-}
 
 // end initial state
 
