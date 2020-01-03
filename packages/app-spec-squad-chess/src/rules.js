@@ -80,7 +80,12 @@ const generateTurns = (position, turnNumber) => {
     for (name in piece.mechanics) {
       const mechanic = MECHANICS[name]
       // gather turns for each set of params for that mechanic
-      piece.mechanics[name].forEach(params => {
+      piece.mechanics[name].forEach(p => {
+        // mirror the params by default for each color
+        let params = Object.assign({}, p)
+        if (turnNumber % 2 === 1) { 
+          params.offset = params.offset.map(p => p*-1)
+        }
         // add any valid turns to the list
         turns = turns.concat(mechanic(params, stringToSquare(square), position, turnNumber))
       })
@@ -93,7 +98,9 @@ const generateTurns = (position, turnNumber) => {
 
 const takeTurn = ({ position, turnNumber, legalTurns }, turn) => {
   if (!turn) { throw 'No turn submitted!' }
-  if (!turnLegality(turn, legalTurns)) { throw 'Submitted an illegal turn!' }
+  if (!turnLegality(turn, legalTurns)) { 
+    throw 'Submitted an illegal turn!' 
+  }
   const newPosition = updatePosition(position, turn)
   const newState = {
     'position': newPosition,

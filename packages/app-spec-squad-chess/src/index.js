@@ -1,7 +1,9 @@
 import m from "mithril"
-import chess from "./squadChessRules"
+import chess from "./rules.js"
 import Board from './Board.js'
 import state from './state.js'
+
+// TODO intial state should be created differently
 
 const mockPieceList = {
   pawn: {
@@ -152,8 +154,6 @@ let mockStartingPosition = {
 chess.registerPieces(mockPieceList)
 let turns = chess.generateTurns(mockStartingPosition, 0)
 
-console.log(state)
-
 state['game'] = {
   position: mockStartingPosition,
   turnNumber: 0,
@@ -161,6 +161,12 @@ state['game'] = {
 }
 
 state['pieces'] = mockPieceList
+
+state['board'] = {
+  highlightedSquares: []
+}
+
+// end initial state
 
 const App = {
   view: () => {
