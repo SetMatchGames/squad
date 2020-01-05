@@ -1,5 +1,6 @@
 # Objectives and Key Results
 _Objectives: Qualitative, inspiring statement
+
 _Key Results: 3-5 quantifiable, measurable results for an objective._
 
 ## Quarterly
