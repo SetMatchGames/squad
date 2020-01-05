@@ -1,7 +1,7 @@
 # Objectives and Key Results
 _Objectives: Qualitative, inspiring statement_
 
-_Key Results: 3-5 quantifiable, measurable results for an objective._
+_Key Results: 3-5 quantifiable, measurable results for an objective_
 
 ## Quarterly
 ### Q1 2020
