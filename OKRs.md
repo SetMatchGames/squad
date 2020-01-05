@@ -1,5 +1,5 @@
 # Objectives and Key Results
-_Objectives: Qualitative, inspiring statement
+_Objectives: Qualitative, inspiring statement_
 
 _Key Results: 3-5 quantifiable, measurable results for an objective._
 
