@@ -71,14 +71,14 @@ const BoardPiece = {
     let highlighted = squareInArray(coordinates, state.board.highlightedSquares)
     // if highlighted, click to attempt turn
     if (highlighted) {
-      attrs['onclick'] = handleClickTurn(highlighted)
+      attrs['onclick'] = handleTurn()
     // if deselect is queued, handle it
     } else if (squareInArray(coordinates, [state.board.deselectable])) {
       attrs['onmouseup'] = handleDeselectPiece()
     // if the selected piece, let another mousedown queue deselect
     } else if (squareInArray(coordinates, [state.board.from])) {
       attrs['onmousedown'] = queueDeselect()
-    // if deselectable, let a mouse up deselect
+    // if not highlighted or selected, select the piece
     } else {
       attrs['onmousedown'] = handleSelectPiece()
     }
@@ -89,11 +89,6 @@ const BoardPiece = {
 function squareStyle(coordinates, squareColor, highlighted) {
   const result = {
     // TODO move the static CSS elsewhere
-    position: 'absolute',
-    display: 'flex',
-    'flex-direction': 'column',
-    'align-items': 'center',
-    'justify-content': 'center',
     right: (40+squareSize*coordinates[0])+'vw',
     top: (10+squareSize*coordinates[1])+'vw',
     width: squareSize+'vw',
@@ -107,32 +102,24 @@ function squareStyle(coordinates, squareColor, highlighted) {
   return result
 }
 
-function handleTurn(e) {
-  e.preventDefault()
-  const turn = { 
-    from: state.board.from, 
-    to: chess.stringToSquare(e.target.id)
-  }
-  // attempt to take the turn
-  const newState = chess.takeTurn(state.game, turn)
-  // update the state if takeTurn doesn't throw
-  state.game = newState
-  state.board.highlightedSquares = []
-  // if no legal turns, the game is over
-  if (newState.legalTurns.length === 0) {
-    let winner = 'White'
-    if (newState.turnNumber % 2 === 0) { winner = 'Black'}
-    console.log(`${winner} wins!`)
-  }
-}
-
-function handleDropTurn() {
-  return (e) => handleTurn(e)
-}
-
-function handleClickTurn(highlighted) {
-  if (highlighted === true) {
-    return (e) => handleTurn(e)
+function handleTurn() {
+  return (e) => {
+    e.preventDefault()
+    const turn = { 
+      from: state.board.from, 
+      to: chess.stringToSquare(e.target.id)
+    }
+    // attempt to take the turn
+    const newState = chess.takeTurn(state.game, turn)
+    // update the state if takeTurn doesn't throw
+    state.game = newState
+    state.board.highlightedSquares = []
+    // if no legal turns, the game is over
+    if (newState.legalTurns.length === 0) {
+      let winner = 'White'
+      if (newState.turnNumber % 2 === 0) { winner = 'Black'}
+      console.log(`${winner} wins!`)
+    }
   }
 }
 
@@ -156,8 +143,8 @@ const BoardSquare = {
     if ((coordinates[0] + coordinates[1]) % 2 == 1) { squareColor = BOARD_CONFIG.squares.darkColor }
     // highlight square
     let highlighted = squareInArray(coordinates, state.board.highlightedSquares)
-    let highlightOnClick = false
     let squareContent
+    let onclick
     // if the square holds a piece, set the properties
     if (vnode.attrs.content) {
       // get the link to the piece graphic
@@ -171,15 +158,15 @@ const BoardSquare = {
       squareContent = m(BoardPiece, { imgLink, key: vnode.key })
     } else {
       // if the square is empty and highlighted, add an onclick for handling a turn
-      if (highlighted) { highlightOnClick = true }
+      if (highlighted) { onclick = handleTurn() }
     }
     // if not, just return an empty square
     return m(
       `.square#${vnode.key}`,
       { 
         style: squareStyle(coordinates, squareColor, highlighted), 
-        ondrop: handleDropTurn(),
-        onclick: handleClickTurn(highlightOnClick)
+        ondrop: handleTurn(),
+        onclick
       },
       squareContent
     )

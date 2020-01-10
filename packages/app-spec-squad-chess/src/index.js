@@ -4,7 +4,6 @@ import Board from './Board.js'
 import state from './state.js'
 
 // TODO how will the app arrive at the initial game state?
-// TODO should we just manage state with redux?
 
 const mockPieceList = {
   pawn: {
