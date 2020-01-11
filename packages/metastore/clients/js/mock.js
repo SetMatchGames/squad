@@ -1,6 +1,8 @@
-const WebSocketServer = require('rpc-websockets').Server
+const WebSocketServer = require('rpc-websockets')
 const WebSocket = require('rpc-websockets').Client
 const crypto = require('crypto')
+
+console.log(WebSocketServer)
 
 const mockMetastore = {}
 

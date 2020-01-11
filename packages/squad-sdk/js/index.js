@@ -1,7 +1,10 @@
-const { spawn } = require('child_process')
-const fs = require('fs')
-const process = require('process')
-const path = require('path')
+/* 
+* unneeded libraries?
+* const { spawn } = require('child_process')
+* const fs = require('fs')
+* const process = require('process')
+* const path = require('path')
+*/
 const curation = require('@squad/curation')
 const metastore = require('@squad/metastore')
 const squadConfig = require('./squad-config.json')
