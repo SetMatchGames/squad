@@ -1,4 +1,5 @@
 import m from "mithril"
+import { metastore } from '@squad/sdk'
 import chess from "./rules.js"
 import Board from './Board.js'
 import state from './state.js'
@@ -162,7 +163,9 @@ state['game'] = {
 
 state['pieces'] = mockPieceList
 
-// end initial state
+// end brute force initial state
+
+console.log(metastore.webSocketConnection('mock'))
 
 const App = {
   view: () => {
