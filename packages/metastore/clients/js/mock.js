@@ -1,8 +1,4 @@
-const WebSocketServer = require('rpc-websockets')
-const WebSocket = require('rpc-websockets').Client
 const crypto = require('crypto')
-
-console.log(WebSocketServer)
 
 const mockMetastore = {}
 
@@ -30,7 +26,7 @@ function entryAddress(entry) {
   return crypto.createHash('sha256').update(JSON.stringify(entry)).digest('hex')
 }
 
-const createDefinition = ({definition}) => {
+const createDefinition = ({definition, games = []}) => {
   const defString = JSON.stringify(definition)
   const address = entryAddress(definition)
   DEFINITIONS[address] = definition
@@ -40,7 +36,22 @@ const createDefinition = ({definition}) => {
     // add it to that catalog if the definition is of that type
     // if there is no catalog, it's an invalid type
     if (type_ in definition) {
-      // deffinitions use their rust type as the top level key
+      // Adding definition to the proper game catalogs
+      if (type_ !== 'Game') {
+        if (games.length === 0) { throw new Error(
+          `Invalid game addresses for ${type_}: ${games}`
+        )}
+        games.forEach(address => {
+          const catalogName = `${address} ${type_} Catalog`
+          let catalog = CATALOGS[type_][catalogName]
+          if (catalog) {
+            catalog.push(address)
+          } else {
+            catalog = [address]
+          }
+        })
+      }
+      // definitions use their rust type as the top level key
       // like {Game: {...}} or {Format: {...}}
       if (!CATALOGS[type_][`${type_} Catalog`].includes(address)) {
         CATALOGS[type_][`${type_} Catalog`].push(address)
@@ -105,40 +116,78 @@ const MOCK_ZOMES = {
 
 const MOCK_INSTANCE_ID = conf("MOCK_INSTANCE_ID", "mock_instance_id")
 
-function mockConnection() {
-  const port = conf("METASTORE_PORT", 8888)
-  const host = conf("METASTORE_HOST", "localhost")
-  const server = new WebSocketServer({port, host})
-  mockMetastore.server = server
-
-  server.register('info/instances', async function (params) {
-    return [{id: MOCK_INSTANCE_ID}]
-  })
-
-  server.register('call', async function (
-    {instance_id, zome, function: method, args} ) {
-    /*
-     * Mock implimentations of zome functions are registered in the
-     * MOCK_ZOMES object above.
-     * This function looks up the zome and function and calls it.
-     **/
-    if (instance_id !== MOCK_INSTANCE_ID) {
-      throw new Error(
-        `Expected instance_id to be ${MOCK_INSTANCE_ID}, but got ${instance_id}`
-      )
-    }
-    const mock_zome = MOCK_ZOMES[zome]
-    if (!mock_zome) { throw new Error(`Unknown zome ${zome}`) }
-    const zome_function = mock_zome[method]
-    if (!zome_function) { throw new Error(`Unknown function ${zome}/${method}`) }
-    const result = {Ok: zome_function(args)}
-    return JSON.stringify(result)
-  })
-
-  mockMetastore.client = new WebSocket(`ws://${host}:${port}`)
-  return mockMetastore.client
+function wsCall(method, params) {
+  switch (method) {
+    case 'info/instances': 
+      return [{id: MOCK_INSTANCE_ID}]
+      break;
+    case  'call': 
+      let {instance_id, zome, function: method, args} = params
+      if (instance_id !== MOCK_INSTANCE_ID) {
+        throw new Error(
+          `Expected instance_id to be ${MOCK_INSTANCE_ID}, but got ${instance_id}`
+        )
+      }
+      const mock_zome = MOCK_ZOMES[zome]
+      if (!mock_zome) { throw new Error(`Unknown zome ${zome}`) }
+      const zome_function = mock_zome[method]
+      if (!zome_function) { throw new Error(`Unknown function ${zome}/${method}`) }
+      const result = {Ok: zome_function(args)}
+      return JSON.stringify(result)
+      break;
+  }
 }
 
+const gameAddress = createDefinition({ definition: {
+  Game: {
+    name: "App Spec",
+    type_: "web-game-v0",
+    data: JSON.stringify({
+      url: "http://localhost:3001"
+    })
+  }
+}})
+
+const components = [{ 
+  Component: {
+    name: "Rock",
+    data: JSON.stringify({
+      winsAgainst: ["Scissors"],
+      losesAgainst: ["Paper"]
+    })
+  }
+}, { 
+  Component: {
+    name: "Paper",
+    data: JSON.stringify({
+      winsAgainst: ["Rock"],
+      losesAgainst: ["Scissors"]
+    })
+  }
+}, { 
+  Component: {
+    name: "Scissors",
+    data: JSON.stringify({
+      winsAgainst: ["Paper"],
+      losesAgainst: ["Rock"]
+    })
+  }
+}]
+
+components.forEach(definition => {
+  createDefinition({ definition, games: [gameAddress] })
+})
+
+createDefinition({
+  definition: { 
+    Format: {
+      name: 'Standard',
+      components: [ ...CATALOGS.Component['Component Catalog'] ]
+    }
+  },
+  games: [gameAddress]
+})
+
 module.exports = {
-  mockConnection
+  mockConnection: () => { return { call: wsCall } }
 }

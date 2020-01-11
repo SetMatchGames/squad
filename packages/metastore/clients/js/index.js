@@ -71,6 +71,18 @@ async function getDefinitionsFromCatalog(catalog_type, catalog_name) {
   )
 }
 
+async function getGameDefinitions(game_address, def_type) {
+  return await getDefinitionsFromCatalog(def_type, `${game_address} ${def_type} Catalog`)
+}
+
+async function getGameFormats(game_address) {
+  return await getGameDefinitions(game_address, 'Format')
+}
+
+async function getGameComponents(game_address) {
+  return await getGameDefinitions(game_address, 'Component')
+}
+
 function close() {
   squad.connection.close()
 }
@@ -139,6 +151,9 @@ module.exports = {
   getCatalogAddresses,
   getAllDefinitionsOfType,
   getDefinitionsFromCatalog,
+  getGameDefinitions,
+  getGameComponents,
+  getGameFormats,
   close,
   networking: {
     createNode,

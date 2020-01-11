@@ -165,7 +165,14 @@ state['pieces'] = mockPieceList
 
 // end brute force initial state
 
-console.log(metastore.webSocketConnection('mock'))
+metastore.webSocketConnection('mock')
+metastore.getDefinitionsFromCatalog(
+  'Game', 'Game Catalog'
+).then()
+metastore.getDefinitionsFromCatalog(
+  'Format', 'Format Catalog'
+).then()
+metastore.getGameFormats("bb46875009b53a74cdade17baebc0e0400767330f10dd797a4cc0840d52bd60e").then(console.log)
 
 const App = {
   view: () => {
