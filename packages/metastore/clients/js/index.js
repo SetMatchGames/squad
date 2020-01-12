@@ -109,7 +109,6 @@ const submitted = {}
 
 function shareDefinitions(node, TOPIC, typeArray, shareFunction) {
   // when someone sends deffinions, submit them
-  // console.log("sharing definitions")
   setTimeout(
     () => {
       node.pubsub.subscribe(TOPIC, (message) => {
@@ -117,7 +116,6 @@ function shareDefinitions(node, TOPIC, typeArray, shareFunction) {
         data.forEach((def) => {
           let key = JSON.stringify(def)
           if (!submitted[key]) {
-            // console.log("submitting", def)
             shareFunction(def)
             submitted[key] = true
           }
@@ -132,7 +130,6 @@ function shareDefinitions(node, TOPIC, typeArray, shareFunction) {
     () => {
       typeArray.forEach(type => {
         getAllDefinitionsOfType(type).then(defs => {
-          // console.log("publishing", defs)
           node.pubsub.publish(TOPIC, Buffer.from(JSON.stringify(defs), 'utf-8'))
         })
       })

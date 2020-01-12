@@ -1,18 +1,18 @@
 /*
  * SQUAD CHESS RULES
- * 
- * This library takes in a game state (board position, turn number, and legal turns) and an action (a turn), 
+ *
+ * This library takes in a game state (board position, turn number, and legal turns) and an action (a turn),
  * then returns a new state and set of legal turns.
- * 
- * General architecture: Take in a board state and an action (turn), 
+ *
+ * General architecture: Take in a board state and an action (turn),
  * return a new state and a list of legal turns.
- * 
+ *
  * DATA TYPES
  * turn = { from: [0,1], to: [4,6] }
  * state = { position: {'0,1': {pieceId, player: 0||1}... }, turnNumber: 14 }
  * PIECES = { pieceId: { name: 'rook', mechanics: { 'move': [moveInputs] }}} (come from 'component' definitions)
  * MECHANICS = { 'mechanic name': function that takes params, returns turns } (come from 'game' definition)
- * 
+ *
  */
 
 const MECHANICS = {
@@ -105,6 +105,7 @@ const generateTurns = (position, turnNumber) => {
       piece.mechanics[name].forEach(p => {
         // orientation
         let params = Object.assign({}, p)
+<<<<<<< HEAD
         let orientation = 0
         if (turnNumber % 2 === 0) {
           // if it exists, multiply by the white orientation
@@ -116,6 +117,10 @@ const generateTurns = (position, turnNumber) => {
         }
         for (let i = 0; i < orientation; i++) {
           params.offset = [ params.offset[1] * -1, params.offset[0] ]
+=======
+        if (turnNumber % 2 === 1) {
+          params.offset = params.offset.map(p => p*-1)
+>>>>>>> develop
         }
         // add any valid turns to the list
         turns = turns.concat(
@@ -131,8 +136,8 @@ const generateTurns = (position, turnNumber) => {
 
 const takeTurn = ({ position, turnNumber, legalTurns }, turn) => {
   if (!turn) { throw 'No turn submitted!' }
-  if (!turnLegality(turn, legalTurns)) { 
-    throw 'Submitted an illegal turn!' 
+  if (!turnLegality(turn, legalTurns)) {
+    throw 'Submitted an illegal turn!'
   }
   const newPosition = updatePosition(position, turn)
   const newState = {
@@ -151,7 +156,7 @@ const stringToSquare = (string) => {
 function turnLegality(turn, legalTurns) {
   let legality = false
   legalTurns.forEach(legalTurn => {
-    if (legalTurn.from[0] === turn.from[0] && 
+    if (legalTurn.from[0] === turn.from[0] &&
       legalTurn.from[1] === turn.from[1] &&
       legalTurn.to[0] === turn.to[0] &&
       legalTurn.to[1] === turn.to[1]) {

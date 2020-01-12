@@ -41,6 +41,7 @@ const createDefinition = ({definition, games = []}) => {
         if (games.length === 0) { throw new Error(
           `Invalid game addresses for ${type_}: ${games}`
         )}
+<<<<<<< HEAD
         games.forEach(address => {
           const catalogName = `${address} ${type_} Catalog`
           let catalog = CATALOGS[type_][catalogName]
@@ -48,6 +49,14 @@ const createDefinition = ({definition, games = []}) => {
             catalog.push(address)
           } else {
             catalog = [address]
+=======
+        games.forEach(gameAddress => {
+          const catalogName = `${gameAddress} ${type_} Catalog`
+          if (CATALOGS[type_][catalogName]) {
+            CATALOGS[type_][catalogName].push(address)
+          } else {
+            CATALOGS[type_][catalogName] = [address]
+>>>>>>> develop
           }
         })
       }
@@ -80,9 +89,9 @@ const getCatalogLinks = ({catalog_type, catalog_name}) => {
   if (!(catalog_type in CATALOGS)) {
     throw new Error(`Invalid type ${catalog_type}`)
   }
-  const catalog = CATALOGS[catalog_type][`${catalog_type} Catalog`]
+  const catalog = CATALOGS[catalog_type][catalog_name]
   if (!catalog) {
-    throw new Error(`${catalog_type} Catalog not found`)
+    throw new Error(`${catalog_type}/${catalog_name} not found`)
   }
   return catalog
 }
@@ -118,10 +127,17 @@ const MOCK_INSTANCE_ID = conf("MOCK_INSTANCE_ID", "mock_instance_id")
 
 function wsCall(method, params) {
   switch (method) {
+<<<<<<< HEAD
     case 'info/instances': 
       return [{id: MOCK_INSTANCE_ID}]
       break;
     case  'call': 
+=======
+    case 'info/instances':
+      return [{id: MOCK_INSTANCE_ID}]
+      break;
+    case  'call':
+>>>>>>> develop
       let {instance_id, zome, function: method, args} = params
       if (instance_id !== MOCK_INSTANCE_ID) {
         throw new Error(
@@ -134,11 +150,19 @@ function wsCall(method, params) {
       if (!zome_function) { throw new Error(`Unknown function ${zome}/${method}`) }
       const result = {Ok: zome_function(args)}
       return JSON.stringify(result)
+<<<<<<< HEAD
       break;
   }
 }
 
 const gameAddress = createDefinition({ definition: {
+=======
+      break
+  }
+}
+
+const rpsAddress = createDefinition({ definition: {
+>>>>>>> develop
   Game: {
     name: "App Spec",
     type_: "web-game-v0",
@@ -147,6 +171,7 @@ const gameAddress = createDefinition({ definition: {
     })
   }
 }})
+<<<<<<< HEAD
 
 const components = [{ 
   Component: {
@@ -186,6 +211,246 @@ createDefinition({
     }
   },
   games: [gameAddress]
+=======
+
+const rpsComponents = [{
+  Component: {
+    name: "Rock",
+    data: JSON.stringify({
+      winsAgainst: ["Scissors"],
+      losesAgainst: ["Paper"]
+    })
+  }
+}, {
+  Component: {
+    name: "Paper",
+    data: JSON.stringify({
+      winsAgainst: ["Rock"],
+      losesAgainst: ["Scissors"]
+    })
+  }
+}, {
+  Component: {
+    name: "Scissors",
+    data: JSON.stringify({
+      winsAgainst: ["Paper"],
+      losesAgainst: ["Rock"]
+    })
+  }
+}]
+
+rpsComponents.forEach(definition => {
+  createDefinition({ definition, games: [rpsAddress] })
+})
+
+createDefinition({
+  definition: {
+    Format: {
+      name: 'Standard',
+      components: [ ...CATALOGS.Component[`${rpsAddress} Component Catalog`] ]
+    }
+  },
+  games: [rpsAddress]
+})
+
+const squadChessAddress = createDefinition({ definition: {
+  Game: {
+    name: "Squad Chess",
+    type_: "web-game-v0",
+    data: JSON.stringify({
+      url: "http://localhost:3001"
+    })
+  }
+}})
+
+console.log(
+  "Squad Chess Address, update settings if this changes",
+  squadChessAddress
+)
+
+const squadChessComponents = [{
+  Component: {
+    name: "Rook",
+    data: JSON.stringify({
+      rook: {
+        mechanics: {
+          move: [
+            { offset: [0,1], steps: 100 },
+            { offset: [0,-1], steps: 100 },
+            { offset: [1,0], steps: 100 },
+            { offset: [-1,0], steps: 100 }
+          ],
+          capture: [
+            { offset: [0,1], steps: 100 },
+            { offset: [0,-1], steps: 100 },
+            { offset: [1,0], steps: 100 },
+            { offset: [-1,0], steps: 100 }
+          ]
+        },
+        graphics: {
+          local: {
+            white: 'chesspieces/wikipedia/wR.png',
+            black: 'chesspieces/wikipedia/bR.png'
+          }
+        }
+      }
+    })
+  }
+}, {
+  Component: {
+    name: "King",
+    data: JSON.stringify({
+      king: {
+        king: true,
+        mechanics: {
+          move: [
+            { offset: [0,1], steps: 1 },
+            { offset: [0,-1], steps: 1 },
+            { offset: [1,0], steps: 1 },
+            { offset: [-1,0], steps: 1 },
+            { offset: [1,1], steps: 1 },
+            { offset: [-1,-1], steps: 1 },
+            { offset: [1,-1], steps: 1 },
+            { offset: [-1,1], steps: 1 }
+          ],
+          capture: [
+            { offset: [0,1], steps: 1 },
+            { offset: [0,-1], steps: 1 },
+            { offset: [1,0], steps: 1 },
+            { offset: [-1,0], steps: 1 },
+            { offset: [1,1], steps: 1 },
+            { offset: [-1,-1], steps: 1 },
+            { offset: [1,-1], steps: 1 },
+            { offset: [-1,1], steps: 1 }
+          ]
+        },
+        graphics: {
+          local: {
+            white: 'chesspieces/wikipedia/wK.png',
+            black: 'chesspieces/wikipedia/bK.png'
+          }
+        }
+      }
+    })
+  }
+}, {
+  Component: {
+    name: "Pawn",
+    data: JSON.stringify({
+      pawn: {
+        mechanics: {
+          move: [
+            { offset: [0,1], steps: 1 }
+          ],
+          capture: [
+            { offset: [1,1], steps: 1 },
+            { offset: [-1,1], steps: 1 }
+          ]
+        },
+        graphics: {
+          local: {
+            white: 'chesspieces/wikipedia/wP.png',
+            black: 'chesspieces/wikipedia/bP.png'
+          }
+        }
+      }
+    })
+  }
+}, {
+  Component: {
+    name: "Knight",
+    data: JSON.stringify({
+      knight: {
+        mechanics: {
+          move: [
+            { offset: [2,1], steps: 1 },
+            { offset: [1,2], steps: 1 },
+            { offset: [-2,1], steps: 1 },
+            { offset: [-1,2], steps: 1 },
+            { offset: [1,-2], steps: 1 },
+            { offset: [2,-1], steps: 1 },
+            { offset: [-2,-1], steps: 1 },
+            { offset: [-1,-2], steps: 1 }
+          ],
+          capture: [
+            { offset: [2,1], steps: 1 },
+            { offset: [1,2], steps: 1 },
+            { offset: [-2,1], steps: 1 },
+            { offset: [-1,2], steps: 1 },
+            { offset: [1,-2], steps: 1 },
+            { offset: [2,-1], steps: 1 },
+            { offset: [-2,-1], steps: 1 },
+            { offset: [-1,-2], steps: 1 }
+          ]
+        },
+        graphics: {
+          local: {
+            white: 'chesspieces/wikipedia/wN.png',
+            black: 'chesspieces/wikipedia/bN.png'
+          }
+         }
+      }
+    })
+  }
+}]
+
+squadChessComponents.forEach(definition => {
+  createDefinition({ definition, games: [squadChessAddress] })
+})
+
+createDefinition({
+  definition: {
+    Format: {
+      name: 'PNRK',
+      components: [ ...CATALOGS.Component[`${squadChessAddress} Component Catalog`] ],
+      data: JSON.stringify({ // TODO implement this in the metastore Format type
+        startingPosition: {
+          '0,0': {
+            pieceId: 'pawn',
+            player: 0
+          },
+          '0,1': null,
+          '0,2': null,
+          '0,3': {
+            pieceId: 'knight',
+            player: 0
+          },
+          '1,0': {
+            pieceId: 'rook',
+            player: 0
+          },
+          '1,1': {
+            pieceId: 'king',
+            player: 0
+          },
+          '1,2': null,
+          '1,3': {
+            pieceId: 'king',
+            player: 1
+          },
+          '2,0': null,
+          '2,1': {
+            pieceId: 'pawn',
+            player: 1
+          },
+          '2,2': null,
+          '2,3': null,
+          '3,0': null,
+          '3,1': {
+            pieceId: 'knight',
+            player: 1
+          },
+          '3,2': {
+            pieceId: 'rook',
+            player: 1
+          },
+          '3,3': null
+        }
+      })
+    }
+  },
+  games: [squadChessAddress]
+>>>>>>> develop
 })
 
 module.exports = {

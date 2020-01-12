@@ -1,9 +1,17 @@
+<<<<<<< HEAD
 import m from "mithril"
 import { metastore } from '@squad/sdk'
 import chess from "./rules.js"
+=======
+import m from 'mithril'
+import { metastore } from '@squad/sdk'
+import chess from './rules.js'
+>>>>>>> develop
 import Board from './Board.js'
 import state from './state.js'
+import settings from './settings.json'
 
+<<<<<<< HEAD
 // TODO how will the app arrive at the initial game state?
 
 const mockPieceList = {
@@ -106,63 +114,39 @@ const mockPieceList = {
         black: 'chesspieces/wikipedia/bK.png'
       }
     }
+=======
+const App = {
+  view: () => {
+    return m(Board)
+>>>>>>> develop
   }
 }
 
-let mockStartingPosition = {
-  '0,0': {
-    pieceId: 'pawn',
-    player: 0
-  },
-  '0,1': null,
-  '0,2': null,
-  '0,3': {
-    pieceId: 'knight',
-    player: 0
-  },
-  '1,0': {
-    pieceId: 'rook',
-    player: 0
-  },
-  '1,1': {
-    pieceId: 'king',
-    player: 0
-  },
-  '1,2': null,
-  '1,3': null,
-  '2,0': null,
-  '2,1': {
-    pieceId: 'pawn',
-    player: 1
-  },
-  '2,2': {
-    pieceId: 'king',
-    player: 1
-  },
-  '2,3': null,
-  '3,0': null,
-  '3,1': {
-    pieceId: 'knight',
-    player: 1
-  },
-  '3,2': {
-    pieceId: 'rook',
-    player: 1
-  },
-  '3,3': null
-}
+async function init() {
+  metastore.webSocketConnection(settings.metastoreWs)
+  const formatDefs = await metastore.getGameFormats(settings.gameAddress)
+  state.formats = formatDefs.map(def => def.Format)
+  const format = state.formats[0] // TODO build in a format selection interface
+  console.log(format)
+  const components = await Promise.all(
+    format.components.map(metastore.getDefinition)
+  )
+  const pieces = components.map(
+    c => JSON.parse(c.Component.data)
+  ).reduce((ps, p) => {
+    return Object.assign(ps, p)
+  })
+  chess.registerPieces(pieces)
+  const startingPosition = JSON.parse(format.data).startingPosition
+  let turns = chess.generateTurns(startingPosition, 0)
 
-chess.registerPieces(mockPieceList)
-let turns = chess.generateTurns(mockStartingPosition, 0)
+  state['game'] = {
+    position: startingPosition,
+    turnNumber: 0,
+    legalTurns: turns
+  }
 
-state['game'] = {
-  position: mockStartingPosition,
-  turnNumber: 0,
-  legalTurns: turns
-}
-
-state['pieces'] = mockPieceList
-
+<<<<<<< HEAD
 // end brute force initial state
 
 metastore.webSocketConnection('mock')
@@ -173,11 +157,14 @@ metastore.getDefinitionsFromCatalog(
   'Format', 'Format Catalog'
 ).then()
 metastore.getGameFormats("bb46875009b53a74cdade17baebc0e0400767330f10dd797a4cc0840d52bd60e").then(console.log)
+=======
+  state['pieces'] = pieces
+>>>>>>> develop
 
-const App = {
-  view: () => {
-    return m(Board)
-  }
+  return "Squad Chess Initialized"
 }
 
-m.mount(document.body, App)
+init().then((message) => {
+  console.log(message, state)
+  m.mount(document.body, App)
+})
