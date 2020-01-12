@@ -9,9 +9,10 @@
  *
  * DATA TYPES
  * turn = { from: [0,1], to: [4,6] }
- * state = { position: {'0,1': {pieceId, player: 0||1}... }, turnNumber: 14 }
+ * state = { position: {'0,1': { content: {pieceId, player: 0||1}, admechanics }... }, turnNumber: 14, [legal turns] }
  * PIECES = { pieceId: { name: 'rook', mechanics: { 'move': [moveInputs] }}} (come from 'component' definitions)
- * MECHANICS = { 'mechanic name': function that takes params, returns turns } (come from 'game' definition)
+ * MECHANICS = { 'mechanic name': function that takes params, returns turns }
+ * ADMECHANICS = { 'admechanic name': function that takes legal turns, returns modified turns }
  *
  */
 
@@ -25,7 +26,7 @@ const MECHANICS = {
     for(let i = 0; i < params.steps; i++) {
       to = [to[0]+params.offset[0], to[1]+params.offset[1]]
       if (!(to in position)) { break } // if off board
-      if (position[to] !== null) { break } // if not empty
+      if (position[to].content !== null) { break } // if not empty
       turns.push({
         'from': from,
         'to': to
@@ -39,8 +40,8 @@ const MECHANICS = {
     for(let i = 0; i < params.steps; i++) {
       to = [to[0]+params.offset[0], to[1]+params.offset[1]]
       if (!(to in position)) { break } // if off board
-      if (position[to] === null) { continue } // if empty
-      if (position[from].player === position[to].player) { break } // if same color piece
+      if (position[to].content === null) { continue } // if empty
+      if (position[from].content.player === position[to].content.player) { break } // if same color piece
       turns.push({
         'from': from,
         'to': to
@@ -48,6 +49,26 @@ const MECHANICS = {
       break
     }
     return turns
+  }
+}
+
+/* Admechanics : Mechanics as Adverbs : Verbs
+ * Mechanics generate offsets (a piece moving from one square to another)
+ * Admechanics *modify* offsets
+ */
+const ADMECHANICS = {
+  'promotion': (params, turns, position, turnNumber) => {
+    return turns.map(turn => {
+      // if the 'to' square is promotoble for the right color
+      if (position[turn.to].promotion === turnNumber % 2) {
+        // allow promotion to any non-king piece used in the game by either player
+        const promotionPieces = Object.keys(PIECES).filter(id => {
+          return !PIECES[id].king
+        })
+        turn['promotion'] = promotionPieces
+      }
+      return turn
+    })
   }
 }
 
@@ -76,13 +97,15 @@ const registerPieces = (pieces) => {
   // format of the position changes: empty squares are no longer null, but their 'piece' field is null
 
 const registerFormat = (format) => {
-  FORMAT = format
+  FORMAT = Object.assign(format, { data: JSON.parse(format.data) })
 }
 
 const updatePosition = (position, turn) => {
+  console.log('updating with', turn)
+  if (turn.promotion) { console.log('Promotion!') }
   let newPosition = Object.assign({}, position)
-  newPosition[turn.to] = position[turn.from]
-  newPosition[turn.from] = null
+  newPosition[turn.to].content = position[turn.from].content
+  newPosition[turn.from].content = null
   return newPosition
 }
 
@@ -91,11 +114,11 @@ const generateTurns = (position, turnNumber) => {
   let king = false
   for (square in position) {
     // check that there is a piece
-    if (position[square] === null) { continue }
+    if (position[square].content === null) { continue }
     // check that the piece is the correct color
-    if (position[square].player !== turnNumber % 2) { continue }
+    if (position[square].content.player !== turnNumber % 2) { continue }
     // get the piece
-    let piece = PIECES[position[square].pieceId]
+    let piece = PIECES[position[square].content.pieceId]
     // if the piece has the 'king' property, mark king as true
     if (piece.king) { king = true }
     // for each of the piece's mechanics
@@ -105,27 +128,34 @@ const generateTurns = (position, turnNumber) => {
       piece.mechanics[name].forEach(p => {
         // orientation
         let params = Object.assign({}, p)
-<<<<<<< HEAD
         let orientation = 0
         if (turnNumber % 2 === 0) {
           // if it exists, multiply by the white orientation
-          if (FORMAT.orientation.white) { orientation = FORMAT.orientation.white }
+          if (FORMAT.data.orientation) { orientation = FORMAT.data.orientation.white }
         } else {
           // if it exists, multiple by the black orientation
           orientation = 2 // default to a 180d
-          if (FORMAT.orientation.black) { orientation = FORMAT.orientation.black }
+          if (FORMAT.data.orientation) { orientation = FORMAT.data.orientation.black }
         }
+        // do the rotations
+        console.log('before', orientation, params, FORMAT)
         for (let i = 0; i < orientation; i++) {
           params.offset = [ params.offset[1] * -1, params.offset[0] ]
-=======
-        if (turnNumber % 2 === 1) {
-          params.offset = params.offset.map(p => p*-1)
->>>>>>> develop
         }
-        // add any valid turns to the list
-        turns = turns.concat(
-          mechanic(params, stringToSquare(square), position, turnNumber)
-        )
+        console.log('after', params)
+        // generate turns with mechanic
+        let newTurns = mechanic(params, stringToSquare(square), position, turnNumber)
+        // modify turns with admechanics
+        if (piece.admechanics) {
+          for (name in piece.admechanics) {
+            const admechanic = ADMECHANICS[name]
+            piece.admechanics[name].forEach(params => {
+              newTurns = admechanic(params, newTurns, position, turnNumber)
+            })
+          }
+        }
+        // add final turns to legal turns list
+        turns = turns.concat(newTurns)
       })
     }
   }
@@ -136,10 +166,11 @@ const generateTurns = (position, turnNumber) => {
 
 const takeTurn = ({ position, turnNumber, legalTurns }, turn) => {
   if (!turn) { throw 'No turn submitted!' }
-  if (!turnLegality(turn, legalTurns)) {
+  const legalTurn = turnLegality(turn, legalTurns)
+  if (!legalTurn) {
     throw 'Submitted an illegal turn!'
   }
-  const newPosition = updatePosition(position, turn)
+  const newPosition = updatePosition(position, legalTurn)
   const newState = {
     'position': newPosition,
     'turnNumber': turnNumber+1,
@@ -154,17 +185,17 @@ const stringToSquare = (string) => {
 }
 
 function turnLegality(turn, legalTurns) {
-  let legality = false
+  let legal = false
   legalTurns.forEach(legalTurn => {
     if (legalTurn.from[0] === turn.from[0] &&
       legalTurn.from[1] === turn.from[1] &&
       legalTurn.to[0] === turn.to[0] &&
       legalTurn.to[1] === turn.to[1]) {
-      legality = true
+      legal = legalTurn
     }
   })
-  return legality
+  return legal
 }
 
 // Exports
-module.exports = { registerPieces, generateTurns, takeTurn, stringToSquare }
+module.exports = { registerPieces, registerFormat, generateTurns, takeTurn, stringToSquare }

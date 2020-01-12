@@ -1,5 +1,5 @@
 import m from "mithril"
-import chess from "./rules"
+import chess from "./rules.js"
 import state from "./state.js"
 
 const BOARD_CONFIG = {
@@ -105,13 +105,8 @@ function squareStyle(coordinates, squareColor, highlighted) {
 function handleTurn() {
   return (e) => {
     e.preventDefault()
-<<<<<<< HEAD
-    const turn = { 
-      from: state.board.from, 
-=======
     const turn = {
       from: state.board.from,
->>>>>>> develop
       to: chess.stringToSquare(e.target.id)
     }
     // attempt to take the turn
@@ -168,13 +163,8 @@ const BoardSquare = {
     // if not, just return an empty square
     return m(
       `.square#${vnode.key}`,
-<<<<<<< HEAD
-      { 
-        style: squareStyle(coordinates, squareColor, highlighted), 
-=======
       {
         style: squareStyle(coordinates, squareColor, highlighted),
->>>>>>> develop
         ondrop: handleTurn(),
         onclick
       },
@@ -191,7 +181,7 @@ const Board = {
       // For each square in the position
       Object.keys(state.game.position).map(squareId => {
         // grab what's in the square
-        const content = state.game.position[squareId]
+        const content = state.game.position[squareId].content
         // if there is a piece, grab links to piece images
         let graphics
         if (content) {

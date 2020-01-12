@@ -41,22 +41,12 @@ const createDefinition = ({definition, games = []}) => {
         if (games.length === 0) { throw new Error(
           `Invalid game addresses for ${type_}: ${games}`
         )}
-<<<<<<< HEAD
-        games.forEach(address => {
-          const catalogName = `${address} ${type_} Catalog`
-          let catalog = CATALOGS[type_][catalogName]
-          if (catalog) {
-            catalog.push(address)
-          } else {
-            catalog = [address]
-=======
         games.forEach(gameAddress => {
           const catalogName = `${gameAddress} ${type_} Catalog`
           if (CATALOGS[type_][catalogName]) {
             CATALOGS[type_][catalogName].push(address)
           } else {
             CATALOGS[type_][catalogName] = [address]
->>>>>>> develop
           }
         })
       }
@@ -127,17 +117,10 @@ const MOCK_INSTANCE_ID = conf("MOCK_INSTANCE_ID", "mock_instance_id")
 
 function wsCall(method, params) {
   switch (method) {
-<<<<<<< HEAD
-    case 'info/instances': 
-      return [{id: MOCK_INSTANCE_ID}]
-      break;
-    case  'call': 
-=======
     case 'info/instances':
       return [{id: MOCK_INSTANCE_ID}]
       break;
     case  'call':
->>>>>>> develop
       let {instance_id, zome, function: method, args} = params
       if (instance_id !== MOCK_INSTANCE_ID) {
         throw new Error(
@@ -150,19 +133,11 @@ function wsCall(method, params) {
       if (!zome_function) { throw new Error(`Unknown function ${zome}/${method}`) }
       const result = {Ok: zome_function(args)}
       return JSON.stringify(result)
-<<<<<<< HEAD
-      break;
-  }
-}
-
-const gameAddress = createDefinition({ definition: {
-=======
       break
   }
 }
 
 const rpsAddress = createDefinition({ definition: {
->>>>>>> develop
   Game: {
     name: "App Spec",
     type_: "web-game-v0",
@@ -171,47 +146,6 @@ const rpsAddress = createDefinition({ definition: {
     })
   }
 }})
-<<<<<<< HEAD
-
-const components = [{ 
-  Component: {
-    name: "Rock",
-    data: JSON.stringify({
-      winsAgainst: ["Scissors"],
-      losesAgainst: ["Paper"]
-    })
-  }
-}, { 
-  Component: {
-    name: "Paper",
-    data: JSON.stringify({
-      winsAgainst: ["Rock"],
-      losesAgainst: ["Scissors"]
-    })
-  }
-}, { 
-  Component: {
-    name: "Scissors",
-    data: JSON.stringify({
-      winsAgainst: ["Paper"],
-      losesAgainst: ["Rock"]
-    })
-  }
-}]
-
-components.forEach(definition => {
-  createDefinition({ definition, games: [gameAddress] })
-})
-
-createDefinition({
-  definition: { 
-    Format: {
-      name: 'Standard',
-      components: [ ...CATALOGS.Component['Component Catalog'] ]
-    }
-  },
-  games: [gameAddress]
-=======
 
 const rpsComponents = [{
   Component: {
@@ -347,6 +281,9 @@ const squadChessComponents = [{
             { offset: [-1,1], steps: 1 }
           ]
         },
+        admechanics: {
+          promotion: [ 'any' ]
+        },
         graphics: {
           local: {
             white: 'chesspieces/wikipedia/wP.png',
@@ -406,51 +343,94 @@ createDefinition({
       data: JSON.stringify({ // TODO implement this in the metastore Format type
         startingPosition: {
           '0,0': {
-            pieceId: 'pawn',
-            player: 0
+            content: {
+              pieceId: 'pawn',
+              player: 0
+            },
+            promotion: 1
           },
-          '0,1': null,
-          '0,2': null,
+          '0,1': {
+            content: null
+          },
+          '0,2': {
+            content: null
+          },
           '0,3': {
-            pieceId: 'knight',
-            player: 0
+            content: {
+              pieceId: 'knight',
+              player: 0
+            },
+            promotion: 0
           },
           '1,0': {
-            pieceId: 'rook',
-            player: 0
+            content: {
+              pieceId: 'rook',
+              player: 0
+            },
+            promotion: 1
           },
           '1,1': {
-            pieceId: 'king',
-            player: 0
+            content: {
+              pieceId: 'king',
+              player: 0
+            }
           },
-          '1,2': null,
+          '1,2': {
+            content: null
+          },
           '1,3': {
-            pieceId: 'king',
-            player: 1
+            content: {
+              pieceId: 'king',
+              player: 1
+            },
+            promotion: 0
           },
-          '2,0': null,
+          '2,0': {
+            content: null,
+            promotion: 1
+          },
           '2,1': {
-            pieceId: 'pawn',
-            player: 1
+            content: {
+              pieceId: 'pawn',
+              player: 1
+            }
           },
-          '2,2': null,
-          '2,3': null,
-          '3,0': null,
+          '2,2': {
+            content: null
+          },
+          '2,3': {
+            content: null,
+            promotion: 0
+          },
+          '3,0': {
+            content: null,
+            promotion: 1
+          },
           '3,1': {
-            pieceId: 'knight',
-            player: 1
+            content: {
+              pieceId: 'knight',
+              player: 1
+            }
           },
           '3,2': {
-            pieceId: 'rook',
-            player: 1
+            content: {
+              pieceId: 'rook',
+              player: 1
+            }
           },
-          '3,3': null
+          '3,3': {
+            content: null,
+            promotion: 0
+          }
+        },
+        orientation: {
+          white: 3,
+          black: 1
         }
       })
     }
   },
   games: [squadChessAddress]
->>>>>>> develop
 })
 
 module.exports = {
