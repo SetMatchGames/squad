@@ -71,6 +71,18 @@ async function getDefinitionsFromCatalog(catalog_type, catalog_name) {
   )
 }
 
+async function getGameDefinitions(game_address, def_type) {
+  return await getDefinitionsFromCatalog(def_type, `${game_address} ${def_type} Catalog`)
+}
+
+async function getGameFormats(game_address) {
+  return await getGameDefinitions(game_address, 'Format')
+}
+
+async function getGameComponents(game_address) {
+  return await getGameDefinitions(game_address, 'Component')
+}
+
 function close() {
   squad.connection.close()
 }
@@ -97,7 +109,6 @@ const submitted = {}
 
 function shareDefinitions(node, TOPIC, typeArray, shareFunction) {
   // when someone sends deffinions, submit them
-  // console.log("sharing definitions")
   setTimeout(
     () => {
       node.pubsub.subscribe(TOPIC, (message) => {
@@ -105,7 +116,6 @@ function shareDefinitions(node, TOPIC, typeArray, shareFunction) {
         data.forEach((def) => {
           let key = JSON.stringify(def)
           if (!submitted[key]) {
-            // console.log("submitting", def)
             shareFunction(def)
             submitted[key] = true
           }
@@ -120,7 +130,6 @@ function shareDefinitions(node, TOPIC, typeArray, shareFunction) {
     () => {
       typeArray.forEach(type => {
         getAllDefinitionsOfType(type).then(defs => {
-          // console.log("publishing", defs)
           node.pubsub.publish(TOPIC, Buffer.from(JSON.stringify(defs), 'utf-8'))
         })
       })
@@ -139,6 +148,9 @@ module.exports = {
   getCatalogAddresses,
   getAllDefinitionsOfType,
   getDefinitionsFromCatalog,
+  getGameDefinitions,
+  getGameComponents,
+  getGameFormats,
   close,
   networking: {
     createNode,

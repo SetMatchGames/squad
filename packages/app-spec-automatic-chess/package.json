@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@squad/sdk": "^1.0.0",
     "chess.js": "^0.10.2",
     "jquery": "^3.4.1",
     "react": "^16.12.0",

@@ -28,7 +28,7 @@ app-spec-web: $(js-client-contracts)
 .PHONY: metastore
 metastore: build/bootstrap
 ifeq ($(MOCK_METASTORE), true)
-	cd $(metastore-js) && node start_mock_metastore.js &
+	echo Using mock metastore
 else
 	$(metastore-shell) 'hc package && hc run --logging'
 endif
