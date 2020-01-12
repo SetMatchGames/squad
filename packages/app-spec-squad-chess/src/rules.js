@@ -51,10 +51,32 @@ const MECHANICS = {
   }
 }
 
-let PIECES = {}
+let FORMAT
+let PIECES
 
 const registerPieces = (pieces) => {
   PIECES = pieces
+}
+
+// Notes for orientation (should now be done)
+  // in the format metadata, optionally give an "orientation" for each color
+  // orientation has 4 possible values--0, 1, 2, 3--corresponding to cardinal directions
+  // white defaults to 0 and black to 2 if no orientations are given
+  // orientation causes rotation of offsets when generating moves: 0: 0d, 1: 90d, 2: 180d, 3: 270d
+  // this lets us make formats where white moves up and black moves left, for example.
+  // this could also be done per piece, but then it seems redundant with the offsets themselves
+  // Note: this doesn't seem like the most useful mechanic, except for Vitalik's stupid diagonal chess variant XD
+
+// Notes for promotion
+  // promotion should be a mechanic on pieces AND something marked in the format
+  // in the format's starting position (board), 'promotion squares' are labeled 
+  // separately for white and black
+  // when generating moves, the promotion mechanic checks if a piece is on a 
+  // promotion square of the proper color, and if it is, offers the player a promotion
+  // format of the position changes: empty squares are no longer null, but their 'piece' field is null
+
+const registerFormat = (format) => {
+  FORMAT = format
 }
 
 const updatePosition = (position, turn) => {
@@ -81,13 +103,24 @@ const generateTurns = (position, turnNumber) => {
       const mechanic = MECHANICS[name]
       // gather turns for each set of params for that mechanic
       piece.mechanics[name].forEach(p => {
-        // mirror the params by default for each color
+        // orientation
         let params = Object.assign({}, p)
-        if (turnNumber % 2 === 1) { 
-          params.offset = params.offset.map(p => p*-1)
+        let orientation = 0
+        if (turnNumber % 2 === 0) {
+          // if it exists, multiply by the white orientation
+          if (FORMAT.orientation.white) { orientation = FORMAT.orientation.white }
+        } else {
+          // if it exists, multiple by the black orientation
+          orientation = 2 // default to a 180d
+          if (FORMAT.orientation.black) { orientation = FORMAT.orientation.black }
+        }
+        for (let i = 0; i < orientation; i++) {
+          params.offset = [ params.offset[1] * -1, params.offset[0] ]
         }
         // add any valid turns to the list
-        turns = turns.concat(mechanic(params, stringToSquare(square), position, turnNumber))
+        turns = turns.concat(
+          mechanic(params, stringToSquare(square), position, turnNumber)
+        )
       })
     }
   }
