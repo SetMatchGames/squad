@@ -14,7 +14,7 @@ const squareSize = BOARD_CONFIG.squares.size
 
 /* I don't totally understand what this general dragover listener is doing:
  * When I add similar 'ondragover' listeners on each component,
- * we generate a huge, constant stream of events, which is bad. 
+ * we generate a huge, constant stream of events, which is bad.
  * Maybe those events are coming from the main document itself? So for now:
  */
 document.addEventListener("dragover", (e) => {
@@ -60,7 +60,7 @@ function handleSelectPiece() {
 
 const BoardPiece = {
   view: (vnode) => {
-    let attrs = { 
+    let attrs = {
       src: vnode.attrs.imgLink,
       style: {
         width: squareSize+'vw',
@@ -94,7 +94,7 @@ function squareStyle(coordinates, squareColor, highlighted) {
     width: squareSize+'vw',
     height: squareSize+'vw',
     background: squareColor
-  } 
+  }
   if (highlighted === true) {
     // highlighted square styling
     result['box-shadow'] = 'inset 0px 0px 0px 3px yellow'
@@ -105,8 +105,8 @@ function squareStyle(coordinates, squareColor, highlighted) {
 function handleTurn() {
   return (e) => {
     e.preventDefault()
-    const turn = { 
-      from: state.board.from, 
+    const turn = {
+      from: state.board.from,
       to: chess.stringToSquare(e.target.id)
     }
     // attempt to take the turn
@@ -163,8 +163,8 @@ const BoardSquare = {
     // if not, just return an empty square
     return m(
       `.square#${vnode.key}`,
-      { 
-        style: squareStyle(coordinates, squareColor, highlighted), 
+      {
+        style: squareStyle(coordinates, squareColor, highlighted),
         ondrop: handleTurn(),
         onclick
       },
@@ -182,14 +182,14 @@ const Board = {
       Object.keys(state.game.position).map(squareId => {
         // grab what's in the square
         const content = state.game.position[squareId]
-        // if there is a piece, grab links to piece images 
+        // if there is a piece, grab links to piece images
         let graphics
         if (content) {
           graphics = state.pieces[content.pieceId].graphics
         }
         // add the square to the board
         return m(
-          BoardSquare, 
+          BoardSquare,
           { key: squareId, content, graphics }
         )
       })
