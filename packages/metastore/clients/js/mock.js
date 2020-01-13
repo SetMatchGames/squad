@@ -325,7 +325,7 @@ const squadChessComponents = [{
             white: 'chesspieces/wikipedia/wN.png',
             black: 'chesspieces/wikipedia/bN.png'
           }
-         }
+        }
       }
     })
   }
@@ -425,7 +425,7 @@ createDefinition({
         },
         orientation: {
           white: 3,
-          black: 1
+          black: 2
         }
       })
     }

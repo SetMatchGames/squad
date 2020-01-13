@@ -11,6 +11,7 @@
  * turn = { from: [0,1], to: [4,6] }
  * state = { position: {'0,1': { content: {pieceId, player: 0||1}, admechanics }... }, turnNumber: 14, [legal turns] }
  * PIECES = { pieceId: { name: 'rook', mechanics: { 'move': [moveInputs] }}} (come from 'component' definitions)
+ * FORMAT = {  }
  * MECHANICS = { 'mechanic name': function that takes params, returns turns }
  * ADMECHANICS = { 'admechanic name': function that takes legal turns, returns modified turns }
  *
@@ -28,8 +29,9 @@ const MECHANICS = {
       if (!(to in position)) { break } // if off board
       if (position[to].content !== null) { break } // if not empty
       turns.push({
-        'from': from,
-        'to': to
+        from,
+        to,
+        pieceId: position[from].content.pieceId
       })
     }
     return turns
@@ -43,8 +45,9 @@ const MECHANICS = {
       if (position[to].content === null) { continue } // if empty
       if (position[from].content.player === position[to].content.player) { break } // if same color piece
       turns.push({
-        'from': from,
-        'to': to
+        from,
+        to,
+        pieceId: position[from].content.pieceId
       })
       break
     }
@@ -63,9 +66,14 @@ const ADMECHANICS = {
       if (position[turn.to].promotion === turnNumber % 2) {
         // allow promotion to any non-king piece used in the game by either player
         const promotionPieces = Object.keys(PIECES).filter(id => {
-          return !PIECES[id].king
+          return !PIECES[id].king && id !== turn.pieceId
         })
-        turn['promotion'] = promotionPieces
+        // TODO let the player choose what to promote to
+        // turn['promotion'] = promotionPieces
+        // TODO for now, implement a random promotion
+          // add a piece id to turns?
+        const promotionPieceId = promotionPieces[Math.round(Math.random()*(promotionPieces.length-1),1)]
+        turn.pieceId = promotionPieceId
       }
       return turn
     })
@@ -79,32 +87,16 @@ const registerPieces = (pieces) => {
   PIECES = pieces
 }
 
-// Notes for orientation (should now be done)
-  // in the format metadata, optionally give an "orientation" for each color
-  // orientation has 4 possible values--0, 1, 2, 3--corresponding to cardinal directions
-  // white defaults to 0 and black to 2 if no orientations are given
-  // orientation causes rotation of offsets when generating moves: 0: 0d, 1: 90d, 2: 180d, 3: 270d
-  // this lets us make formats where white moves up and black moves left, for example.
-  // this could also be done per piece, but then it seems redundant with the offsets themselves
-  // Note: this doesn't seem like the most useful mechanic, except for Vitalik's stupid diagonal chess variant XD
-
-// Notes for promotion
-  // promotion should be a mechanic on pieces AND something marked in the format
-  // in the format's starting position (board), 'promotion squares' are labeled 
-  // separately for white and black
-  // when generating moves, the promotion mechanic checks if a piece is on a 
-  // promotion square of the proper color, and if it is, offers the player a promotion
-  // format of the position changes: empty squares are no longer null, but their 'piece' field is null
-
 const registerFormat = (format) => {
-  FORMAT = Object.assign(format, { data: JSON.parse(format.data) })
+  FORMAT = JSON.parse(format.data)
 }
 
 const updatePosition = (position, turn) => {
-  console.log('updating with', turn)
-  if (turn.promotion) { console.log('Promotion!') }
   let newPosition = Object.assign({}, position)
-  newPosition[turn.to].content = position[turn.from].content
+  newPosition[turn.to].content = Object.assign(
+    position[turn.from].content,
+    { pieceId: turn.pieceId }
+  )
   newPosition[turn.from].content = null
   return newPosition
 }
@@ -131,18 +123,16 @@ const generateTurns = (position, turnNumber) => {
         let orientation = 0
         if (turnNumber % 2 === 0) {
           // if it exists, multiply by the white orientation
-          if (FORMAT.data.orientation) { orientation = FORMAT.data.orientation.white }
+          if (FORMAT.orientation) { orientation = FORMAT.orientation.white }
         } else {
           // if it exists, multiple by the black orientation
           orientation = 2 // default to a 180d
-          if (FORMAT.data.orientation) { orientation = FORMAT.data.orientation.black }
+          if (FORMAT.orientation) { orientation = FORMAT.orientation.black }
         }
         // do the rotations
-        console.log('before', orientation, params, FORMAT)
         for (let i = 0; i < orientation; i++) {
           params.offset = [ params.offset[1] * -1, params.offset[0] ]
         }
-        console.log('after', params)
         // generate turns with mechanic
         let newTurns = mechanic(params, stringToSquare(square), position, turnNumber)
         // modify turns with admechanics

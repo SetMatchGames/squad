@@ -16,7 +16,8 @@ async function init() {
   const formatDefs = await metastore.getGameFormats(settings.gameAddress)
   state.formats = formatDefs.map(def => def.Format)
   const format = state.formats[0] // TODO build in a format selection interface
-  console.log(format)
+  chess.registerFormat(format)
+
   const components = await Promise.all(
     format.components.map(metastore.getDefinition)
   )
@@ -26,17 +27,14 @@ async function init() {
     return Object.assign(ps, p)
   })
   chess.registerPieces(pieces)
-  chess.registerFormat(format)
-  console.log(format)
-  const position = format.data.startingPosition
-  let legalTurns = chess.generateTurns(position, 0)
 
+  const position = JSON.parse(format.data).startingPosition
+  let legalTurns = chess.generateTurns(position, 0)
   state['game'] = {
     position,
     turnNumber: 0,
     legalTurns
   }
-
   state['pieces'] = pieces
 
   return "Squad Chess Initialized"
