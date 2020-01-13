@@ -175,16 +175,17 @@ const stringToSquare = (string) => {
 }
 
 function turnLegality(turn, legalTurns) {
-  let legal = false
+  let foundTurn = false
   legalTurns.forEach(legalTurn => {
     if (legalTurn.from[0] === turn.from[0] &&
       legalTurn.from[1] === turn.from[1] &&
       legalTurn.to[0] === turn.to[0] &&
       legalTurn.to[1] === turn.to[1]) {
-      legal = legalTurn
+      // return the legalTurns version of the turn to preserve pieceId data
+      foundTurn = legalTurn
     }
   })
-  return legal
+  return foundTurn
 }
 
 // Exports
