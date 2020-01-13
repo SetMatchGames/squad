@@ -11,7 +11,7 @@
  * turn = { from: [0,1], to: [4,6] }
  * state = { position: {'0,1': { content: {pieceId, player: 0||1}, admechanics }... }, turnNumber: 14, [legal turns] }
  * PIECES = { pieceId: { name: 'rook', mechanics: { 'move': [moveInputs] }}} (come from 'component' definitions)
- * FORMAT = {  }
+ * FORMAT = { startingPosition: { position data }, OPTIONAL orientation: { white: 0, black: 2 } }
  * MECHANICS = { 'mechanic name': function that takes params, returns turns }
  * ADMECHANICS = { 'admechanic name': function that takes legal turns, returns modified turns }
  *
@@ -88,7 +88,7 @@ const registerPieces = (pieces) => {
 }
 
 const registerFormat = (format) => {
-  FORMAT = JSON.parse(format.data)
+  FORMAT = format
 }
 
 const updatePosition = (position, turn) => {
