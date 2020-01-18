@@ -11,6 +11,7 @@ Alpha release of Squad Chess
 - Curation of components and formats
 
 Make the stream good!
+- Good setup
 - 12 streams
 - 2 streams with guests
 - 3 interactions w/ new viewers (lol)
