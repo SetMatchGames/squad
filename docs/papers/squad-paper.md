@@ -131,7 +131,12 @@ A legally binding agreement between participants
 * Ethereum Automatic Bonds
 * DAOStack? Moloch? Homegrown?
 
-## Beyond video games
+## Future work and beyond video games
+
+Platform extension to add licencing agreements for each
+contribution. Contributors can set terms of service, or retail,
+tournament, streaming, etc. licences. Licences could be sold under
+Harberger taxation.
 
 * This idea should work for any software, not just games.
 * What about this system is "just for games" and would need to be changed or
