@@ -8,8 +8,7 @@
  * return a new state and a list of legal turns.
  *
  * DATA TYPES
- * turn = { from: [0,1], to: [4,6] }
- * state = { position: {'0,1': { content: {pieceId, player: 0||1}, square data }... }, turnNumber: 14, legalTurns: [] }
+ * state = { position: {'0,1': { content: {pieceId, player: 0||1}, square data }... }, turnNumber: 14, legalTurns: { turnId, turn... } }
  * turn = { '0,1': { content: { pieceId, player } }... }
  * FORMAT.pieces = { pieceId: { name: 'rook', mechanics: { 'move': [moveInputs] }}} (come from 'component' definitions)
  * FORMAT = { pieces, startingPosition: { position data }, OPTIONAL orientation: { white: 0, black: 2 } }
