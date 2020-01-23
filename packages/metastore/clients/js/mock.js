@@ -27,7 +27,6 @@ function entryAddress(entry) {
 }
 
 const createDefinition = ({definition, games = []}) => {
-  const defString = JSON.stringify(definition)
   const address = entryAddress(definition)
   DEFINITIONS[address] = definition
   var typeIdentified = false
@@ -198,7 +197,7 @@ const squadChessAddress = createDefinition({ definition: {
 }})
 
 console.log(
-  "Squad Chess Address, update settings if this changes",
+  "Squad Chess address (update settings if this changes):",
   squadChessAddress
 )
 
@@ -282,7 +281,7 @@ const squadChessComponents = [{
           ]
         },
         admechanics: {
-          promotion: [ 'any' ]
+          randomPromotion: ['default']
         },
         graphics: {
           local: {
