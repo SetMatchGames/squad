@@ -31,7 +31,7 @@ players is going to outmatch you" - Dan Felder
     * Large game companies employ entire teams to balance their games and still often receive harsh criticism on balance
 
 ## Cryptoeconomic System
-First, we should define cryptoeconomic. By "cryptoeconomic system," we mean an economic system that can be formally described in code; that is, the system is agnostic to everything not specified in the code. Such systems are often feature cryptographic techniques, hence the term "cryptoeconomic."
+By "cryptoeconomic system," we mean an economic system that can be formally described in code; that is, the system is agnostic to everything not specified in the code. Such systems often feature cryptographic techniques, hence the term "cryptoeconomic."
 
 With Squad, we aim to design an efficient cryptoeconomic system that 
 1. rewards individuals for making intelligent investments and contributions to the design and development of games, and
