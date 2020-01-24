@@ -30,20 +30,21 @@ players is going to outmatch you" - Dan Felder
   * And in practice:
     * Large game companies employ entire teams to balance their games and still often receive harsh criticism on balance
 
-## Cryptoeconomic Mechanism
-A decentralized system for contribution and curation must incentivize those two things.
+## Cryptoeconomic System
+First, we should define cryptoeconomic. By "cryptoeconomic system," we mean an economic system that can be formally described in code; that is, the system is agnostic to everything not specified in the code. Such systems are often feature cryptographic techniques, hence the term "cryptoeconomic."
 
-We propose to incentivize contribution through licenising and revenue shares
-and to make curation an incendental effect of market activity.
+With Squad, we aim to design an efficient cryptoeconomic system that 
+1. rewards individuals for making intelligent investments and contributions to the design and development of games, and
+1. curates great gameplay using markets.
 
-The basic economic loop:
+The basic economic loop to be defined in code:
 * People submit contributions (games, parts of games, parts of parts of games, and so on).
 * Games can choose to require payments from players. 
-* Games that use contributions from the community may be obligated by licenses to share their revenue with contribution authors.
-* All contributions are curated by their market activity.
+* Games that use contributions from the community can share revenue with the contribution authors (they may be obligated by licenses to do this).
+* Contributions are curated by their market activity.
 (Note also that some contributions can have elements of curation, i.e. formats)
 
-Payments and data (actually metadata, as we will see) can be processed and stored without a central mediator using other  crypteconomic systems (blockchains, etc.).
+Payments and data (actually metadata, as we will see) can be processed and stored without a central mediator using decentralized, cryptographic systems (blockchains, etc.).
 
 ## System Architecture
 
