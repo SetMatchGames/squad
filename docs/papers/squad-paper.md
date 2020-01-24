@@ -30,30 +30,6 @@ players is going to outmatch you" - Dan Felder
   * And in practice:
     * Large game companies employ entire teams to balance their games and still often receive harsh criticism on balance
 
-### Decentralized game design is viable in the near future
-
-Even though today's decentralized systems are limited, 
-we believe a successful system for decentralized game design is possible in the near future,
-because it depends on simple principles: 
-1. Game design is relatively simple and harmless.
-1. Contribution and curation are sufficient for progress.
-
-#### Game design is relatively simple and harmless
-This is *not* intended to belittle the difficulty of good game design (see above). 
-We mean that relative to, for example, designing and building a smart energy grid, 
-designing a game is simpler, and that the consequences of the energy grid failing
-are much larger than a game design failing.
-
-#### Contribution and curation are sufficient for progress
-This principle says that a system that supports these two, relatively simple features has no theoretical achievement limit.
-
-*Contribution* means things can be added to the system.
-*Curation* means contributions can be grouped arbitrarily.
-
-Programs can be thought of as systems that use only these two properties, and so can games.
-
-We believe Squad only needs to do these two things well to succeed at decentralized game design and balance. 
-
 ## Cryptoeconomic Mechanism
 A decentralized system for contribution and curation must incentivize those two things.
 
