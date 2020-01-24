@@ -169,21 +169,18 @@ Params:
 * Contributor Reputation award distribution equation
   * Probably logarithmic based on tokens sold
 * Gov DAO investor reputation equation and percentage
-  * Probably simple token weight
-  (it can't be worse than what you'd get from buying a ton of your own contribution, or else investors might do that,
-  which is bad for the curation markets)
-  (quadratic might be fine here, as well: yes, you can pseudo-sybil attack, but it's still more expensive because of the gas costs)
+  * Probably simple token weight * percentage
 * Funding reciept price
 * Gov DAO Funding Discount Curve
 
-Requirements:
-* 
 
 ## Our implimentation (Carry out the plan) (Physical model)
 
 * Holochain: distributed metadata storage (metastore)
-* Ethereum Automatic Bonds: curved bonds
+* Ethereum Automatic Bonds: curved bonds (curation markets)
+  * How curation data stuck in Ethereum will make it to the end user looking for a good game
 * DAOstack? Moloch? Homegrown?: gov DAO
+  * What features do we need to build this DAO?
 
 ## Future work and beyond video games
 
