@@ -1,56 +1,81 @@
 # Squad Paper
 
 A cryptoeconomic mechanism for the decentralized development of video
-games (software?)
+games (software?), following the principle that
+*contribution and curation are sufficient for progress*.
 
-Contribution and curation are sufficient for progress.
-
-In this paper we outline the opportunity we see in video game
-development, propose a cryptoeconomic mechanism to capture that
-opportunity, and consider broader applications of the system.
+In this paper, we 
+1. outline the opportunity we see in game design and balance, 
+1. propose a cryptoeconomic mechanism to capture that opportunity, 
+1. describe a general architecture for such a system, and 
+1. consider broader applications of the system.
 
 ## The Opportunity
 
-* Games are hard to design and develop. They require lots of
-  playtesting, the more people the better
-* The most popular games at the time of this writing are based on community
-  designed and developed mods
-  * MOBAs
-  * battle royales
-  * Hero shooters
+### Decentralized game design has the potential to 10x outperform centralized game design.
+* Games are hard to design. 
+  * In theory:
+    * The design space is too large to be well-explored in a centralized way
+  * And in practice:
+    * The most popular games at the time of this writing are based on community
+  designed and developed mods:
+      * MOBAs
+      * battle royales
+      * Hero shooters
 
-[Balancing games is super hard](https://www.gamasutra.com/blogs/DanFelder/20151012/251443/Design_101_Balancing_Games.php)
-"No matter how good you are at balancing, the collective intelligence of your
+* [Balancing games is super hard.](https://www.gamasutra.com/blogs/DanFelder/20151012/251443/Design_101_Balancing_Games.php)
+  * In theory:
+    * "No matter how good you are at balancing, the collective intelligence of your
 players is going to outmatch you" - Dan Felder
+  * And in practice:
+    * Large game companies employ entire teams to balance their games and still often receive harsh criticism on balance
 
-## Cryptoeconomic Mechanism
+## Cryptoeconomic System
+By "cryptoeconomic system," we mean an economic system that can be formally described in code; that is, the system is agnostic to everything not specified in the code. Such systems often feature cryptographic techniques, hence the term "cryptoeconomic."
 
-Design an efficient mechanism that rewards the collective intelligence
-fairly for their investment in and contributions to the design and
-development of video games.
+With Squad, we aim to design an efficient cryptoeconomic system that 
+1. rewards individuals for making intelligent investments and contributions to the design and development of games, and
+1. curates great gameplay using markets.
 
-Squad consists of three parts; distributed metadata storage, a
-curation market, and a governance DAO.
+The basic economic loop to be defined in code:
+* People submit contributions (games, parts of games, parts of parts of games, and so on).
+* Games can choose to require payments from players. 
+* Games that use contributions from the community can share revenue with the contribution authors (they may be obligated by licenses to do this).
+* Contributions are curated by their market activity.
+(Note also that some contributions can have elements of curation, i.e. formats)
 
-### Squad data model and Metastore
+Payments and data (actually metadata, as we will see) can be processed and stored without a central mediator using decentralized, cryptographic systems (blockchains, etc.).
 
-Squad breaks games down into 3 parts. A base game, game components,
-and formats
+## System Architecture
+
+Squad consists of three parts, all decentralized:
+1. metadata storage,
+2. curation markets, and 
+3. a governance DAO.
+
+### Squad data model and metastore
+
+Squad breaks games down into three parts: a base game, game components,
+and formats.
 
 Each of these three parts may be defined with a bit of metadata and
 contributed by anyone. The metastore is where all these definitions
 are stored. It holds every definition contributed to the system.
 
-* A Game definition is a specification for how to launch the game
+* A *Game* definition is a specification for how to launch the game
 
-* A Component definition is a specification of some game component to
+* A *Component* definition is a specification of some game component to
   be intrepreted by the game once launched
 
-* A Format definition is a specification of a set of legal components
+* A *Format* definition is a specification of a set of legal components
   and possibly some setup parameters to be intrepreted by the game
   once launched
 
-### Curation Market
+### Curation Markets
+
+(This is a new fangled term, but it's really just Hayek/Adam Smith/economics: 
+prices/popularity provide an incredibly rich signal of what people value. Not perfect, but 
+hard to argue anything else is better at scale.)
 
 #### Contributions get a curved bond
 
@@ -60,14 +85,24 @@ adopter, and more (detailed below). Each contribution is associated
 with a bonding curve whose token can be given value by the software
 developers (detailed below).
 
+The key point here is that **the original authors & early adopters get rewarded
+if the contribution becomes popular, creating a strong incentive to create and 
+discover potentially popular contributions.**
+
+Curved bonds also allow speculation, which has some positives and negatives,
+but probably overall positives (provide liquidity, better signalling on average).
+
 #### Right of first purchase
 
 When a contribution is made, the contributor may purchase as many of
-the definition tokens as they wish. Sinse this will always be the
+the definition tokens as they wish. Since this will always be the
 first purchase of that bond, it cannot fall in value but can increase
-in value. <<<<<Consider the option that contributors always get the first
+in value. 
+<<<<<Consider the option that contributors always get the first
 N tokens of their contributions (for free, or some fixed small fee on
-top of the ETH fee?, is spam even a problem?) and that funding the Gov
+top of the ETH fee?, is spam even a problem? 
+Ez: I don't think spam is a problem here: pump and dump / frontrunning are more likely, I think.
+) and that funding the Gov
 DAO grants them a larger N>>>>>
 
 * Models for games to give value to relevant definition tokens
@@ -97,7 +132,7 @@ Contributors may purchase a permenant discount on initial purchases of
 their future contributions by funding the Governance DAO. The more a
 given address funds the Gov DAO the more of a discount that address
 gets when contributing new definitions. This discount increases
-quadratically. The first level of discount costs 1, the second level
+quadratically: the first level of discount costs 1, the second level
 of discount costs 2 etc. This has the effect of shifting the price
 curve for that definition to the right. Contributors who believe in
 their future success in the platform are incentivised to fund the Gov
@@ -110,26 +145,42 @@ costly.
 Funding reciepts can only be transfered to addresses without any
 existing funding reciepts, and cannot be split sold or refunded.
 
+Let's consider framing this section in terms of these principles of DAO design:
+1. How and why would one become a voter?
+* Incedentally, as a result of people using (buying tokens from) your contributions
+2. How and why would one vote?
+* To fix some problem with the terms of service, which keeps the economic system you depend on safe
+* To censor some problematic content, for the same reason
+3. How and why would one fund the DAO?
+* In order to make more money off your game design contributions
+4. How and why would one get paid by the DAO?
+* Generally: for contributing to the public goods of the Squad ecosystem
+* Examples: lawyer editing the ToS or enforcing licenses, moderators identifying content that goes against ToS
+
 #### Terms of service
 
 A legally binding agreement between participants
 
-#### System Parameters
+#### System Parameters & Requirements
 
+Params:
 * Definition bond price curves
-* Reputation award amount and frequency
-* Reputation award distribution equation
+* Contributor Reputation award amount and frequency
+* Contributor Reputation award distribution equation
   * Probably logarithmic based on tokens sold
 * Gov DAO investor reputation equation and percentage
-  * Probably simple token weight
+  * Probably simple token weight * percentage
 * Funding reciept price
 * Gov DAO Funding Discount Curve
 
+
 ## Our implimentation (Carry out the plan) (Physical model)
 
-* Holochain
-* Ethereum Automatic Bonds
-* DAOStack? Moloch? Homegrown?
+* Holochain: distributed metadata storage (metastore)
+* Ethereum Automatic Bonds: curved bonds (curation markets)
+  * How curation data stuck in Ethereum will make it to the end user looking for a good game
+* DAOstack? Moloch? Homegrown?: gov DAO
+  * What features do we need to build this DAO?
 
 ## Future work and beyond video games
 
