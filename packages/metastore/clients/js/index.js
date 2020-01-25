@@ -1,15 +1,10 @@
 const WebSocket = require('rpc-websockets').Client
 const IPFS = require('ipfs')
-const mockMetastore = require('./mock').mockConnection
 
 const squad = {}
 
 function webSocketConnection(uri) {
-  if (uri === 'mock'){
-    squad.connection = mockMetastore()
-  } else {
-    squad.connection = new WebSocket(uri)
-  }
+  squad.connection = new WebSocket(uri)
   return squad.connection
 }
 

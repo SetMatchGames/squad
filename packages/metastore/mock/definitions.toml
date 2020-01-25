@@ -1,0 +1,55 @@
+[bb46875009b53a74cdade17baebc0e0400767330f10dd797a4cc0840d52bd60e.Game]
+name = "App Spec"
+type_ = "web-game-v0"
+data = '{"url":"http://localhost:3001"}'
+
+[184483e4915656a1f53692d2eaba842c2d60dfc68aba8b9c232dea63095fa475.Component]
+name = "Rock"
+data = '{"winsAgainst":["Scissors"],"losesAgainst":["Paper"]}'
+
+[594931f6da981208ecaec5c7c9e63fa06e02c373df913cf72890cac8c9f8899b.Component]
+name = "Paper"
+data = '{"winsAgainst":["Rock"],"losesAgainst":["Scissors"]}'
+
+[3ce359ee89dc429185252b87fad112a1edb80bd7ee38ef0baf582823c7dfed28.Component]
+name = "Scissors"
+data = '{"winsAgainst":["Paper"],"losesAgainst":["Rock"]}'
+
+[22d0a03e786ffc462aea68b8d93e9f3dc95e708c9e9c1181a48d074834d5df9e.Format]
+name = "Standard"
+components = [
+  "184483e4915656a1f53692d2eaba842c2d60dfc68aba8b9c232dea63095fa475",
+  "594931f6da981208ecaec5c7c9e63fa06e02c373df913cf72890cac8c9f8899b",
+  "3ce359ee89dc429185252b87fad112a1edb80bd7ee38ef0baf582823c7dfed28"
+]
+
+[8c875b7990077c166479df9ee2aafff7cc7bf82c54741ff47d169a56f18fe5d5.Game]
+name = "Squad Chess"
+type_ = "web-game-v0"
+data = '{"url":"http://localhost:3001"}'
+
+[643c65cd6f0e9d3fc0d6b8ede9e4f54197720192930e330dfb41ad14dc8079c5.Component]
+name = "Rook"
+data = '{"rook":{"mechanics":{"move":[{"offset":[0,1],"steps":100},{"offset":[0,-1],"steps":100},{"offset":[1,0],"steps":100},{"offset":[-1,0],"steps":100}],"capture":[{"offset":[0,1],"steps":100},{"offset":[0,-1],"steps":100},{"offset":[1,0],"steps":100},{"offset":[-1,0],"steps":100}]},"graphics":{"local":{"white":"chesspieces/wikipedia/wR.png","black":"chesspieces/wikipedia/bR.png"}}}}'
+
+[44f237953a5ef1e111e3d2257695c50974287383da61221696cb12aff46a0df7.Component]
+name = "King"
+data = '{"king":{"king":true,"mechanics":{"move":[{"offset":[0,1],"steps":1},{"offset":[0,-1],"steps":1},{"offset":[1,0],"steps":1},{"offset":[-1,0],"steps":1},{"offset":[1,1],"steps":1},{"offset":[-1,-1],"steps":1},{"offset":[1,-1],"steps":1},{"offset":[-1,1],"steps":1}],"capture":[{"offset":[0,1],"steps":1},{"offset":[0,-1],"steps":1},{"offset":[1,0],"steps":1},{"offset":[-1,0],"steps":1},{"offset":[1,1],"steps":1},{"offset":[-1,-1],"steps":1},{"offset":[1,-1],"steps":1},{"offset":[-1,1],"steps":1}]},"graphics":{"local":{"white":"chesspieces/wikipedia/wK.png","black":"chesspieces/wikipedia/bK.png"}}}}'
+
+[dab3d90e98d998c6ed82b7b2bca3a9164c59b04e6634d207ab72bca29197e188.Component]
+name = "Pawn"
+data = '{"pawn":{"mechanics":{"move":[{"offset":[0,1],"steps":1}],"capture":[{"offset":[1,1],"steps":1},{"offset":[-1,1],"steps":1}]},"graphics":{"local":{"white":"chesspieces/wikipedia/wP.png","black":"chesspieces/wikipedia/bP.png"}}}}'
+
+[303b21801557fa21275ce316c24e7beae580a50c84ca36c1b2614b10b6d7e89d.Component]
+name = "Knight"
+data = '{"knight":{"mechanics":{"move":[{"offset":[2,1],"steps":1},{"offset":[1,2],"steps":1},{"offset":[-2,1],"steps":1},{"offset":[-1,2],"steps":1},{"offset":[1,-2],"steps":1},{"offset":[2,-1],"steps":1},{"offset":[-2,-1],"steps":1},{"offset":[-1,-2],"steps":1}],"capture":[{"offset":[2,1],"steps":1},{"offset":[1,2],"steps":1},{"offset":[-2,1],"steps":1},{"offset":[-1,2],"steps":1},{"offset":[1,-2],"steps":1},{"offset":[2,-1],"steps":1},{"offset":[-2,-1],"steps":1},{"offset":[-1,-2],"steps":1}]},"graphics":{"local":{"white":"chesspieces/wikipedia/wN.png","black":"chesspieces/wikipedia/bN.png"}}}}'
+
+[671ec7fbc4d9a4882e5f4f35c7493c8b7617bbce6c534558666bcfa4254ea9d2.Format]
+name = "PNRK"
+components = [
+  "643c65cd6f0e9d3fc0d6b8ede9e4f54197720192930e330dfb41ad14dc8079c5",
+  "44f237953a5ef1e111e3d2257695c50974287383da61221696cb12aff46a0df7",
+  "dab3d90e98d998c6ed82b7b2bca3a9164c59b04e6634d207ab72bca29197e188",
+  "303b21801557fa21275ce316c24e7beae580a50c84ca36c1b2614b10b6d7e89d"
+]
+data = '{"startingPosition":{"0,0":{"pieceId":"pawn","player":0},"0,1":null,"0,2":null,"0,3":{"pieceId":"knight","player":0},"1,0":{"pieceId":"rook","player":0},"1,1":{"pieceId":"king","player":0},"1,2":null,"1,3":{"pieceId":"king","player":1},"2,0":null,"2,1":{"pieceId":"pawn","player":1},"2,2":null,"2,3":null,"3,0":null,"3,1":{"pieceId":"knight","player":1},"3,2":{"pieceId":"rook","player":1},"3,3":null}}'

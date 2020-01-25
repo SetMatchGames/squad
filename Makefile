@@ -4,6 +4,7 @@ curation-market-js = packages/curation-market/clients/js
 curation-market = packages/curation-market/app
 metastore-js = packages/metastore/clients/js
 metastore = packages/metastore/app
+mock-metastore = packages/metastore/mock
 sdk-js = packages/squad-sdk/js
 js-client-contracts = packages/curation-market/clients/js/contracts
 curation-market-contracts = packages/curation-market/app/build/contracts
@@ -15,7 +16,7 @@ metastore-shell = cd $(metastore) && nix-shell https://holochain.love --pure --c
 .PHONY: squad-games-web
 squad-games-web: build/bootstrap $(curation-market-js)/curation-config.json
 squad-games-web: $(js-client-contracts) build/devnet metastore
-	cd $(squad-games-web) && npm run load_dev_defs
+#	cd $(squad-games-web) && npm run load_dev_defs
 	cd $(squad-games-web) && npm run start
 
 
@@ -28,7 +29,7 @@ app-spec-web: $(js-client-contracts)
 .PHONY: metastore
 metastore: build/bootstrap
 ifeq ($(MOCK_METASTORE), true)
-	echo Using mock metastore
+	cd $(mock-metastore) && npm run start
 else
 	$(metastore-shell) 'hc package && hc run --logging'
 endif
@@ -50,7 +51,7 @@ clean:
 
 
 .PHONY: test-metastore
-test-metastore:
+test-metastore: build/bootstrap
 	cd $(metastore-js) && npm run test
 	echo "Skipping holochain tests, reactivate when on current hc release"
 	echo "Skipping holochain tests, reactivate when on current hc release"

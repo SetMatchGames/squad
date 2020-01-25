@@ -1,4 +1,4 @@
-let metastore = require('./index')
+let metastore = require('./index.js')
 
 // connect squad Client
 //metastore.webSocketConnection('ws://localhost:8888')
