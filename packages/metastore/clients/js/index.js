@@ -1,5 +1,5 @@
 const WebSocket = require('rpc-websockets').Client
-const IPFS = require('ipfs')
+//const IPFS = require('ipfs')
 
 const squad = {}
 
@@ -21,7 +21,6 @@ async function call(zome, method, inputs) {
     "function": method,
     "args": inputs
   }
-
   const result = JSON.parse(await squad.connection.call('call', params))
 
   if (result.Ok === undefined) {
@@ -30,8 +29,8 @@ async function call(zome, method, inputs) {
   return result.Ok
 }
 
-async function createDefinition(definition) {
-  return await call("definitions", "create_definition", {definition})
+async function createDefinition(definition, games = []) {
+  return await call("definitions", "create_definition", {definition, games})
 }
 
 async function getDefinition(address) {
@@ -43,11 +42,12 @@ async function getAddress(entry) {
 }
 
 async function getCatalogAddresses(catalog_type, catalog_name) {
-  return await call(
+  const addresses = await call(
     "definitions",
     "get_catalog_links",
     {catalog_type, catalog_name}
   )
+  return addresses
 }
 
 async function getAllDefinitionsOfType(catalog_type) {
@@ -82,8 +82,10 @@ function close() {
   squad.connection.close()
 }
 
+/*
+
 // Networking functions
-  // Create a node before trying to share definitions
+// Create a node before trying to share definitions
 function createNode(url) {
   return new IPFS({
     repo: `${url}/ipfsRepo/${Math.random()}`,
@@ -133,6 +135,8 @@ function shareDefinitions(node, TOPIC, typeArray, shareFunction) {
   )
 }
 
+*/
+
 module.exports = {
   webSocketConnection,
   on,
@@ -146,9 +150,9 @@ module.exports = {
   getGameDefinitions,
   getGameComponents,
   getGameFormats,
-  close,
+  close/*,
   networking: {
     createNode,
     shareDefinitions
-  }
+  }*/
 }

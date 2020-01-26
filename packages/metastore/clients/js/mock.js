@@ -139,7 +139,7 @@ function wsCall(method, params) {
 
 const rpsAddress = createDefinition({ definition: {
   Game: {
-    name: "App Spec",
+    name: "Squad Chess",
     type_: "web-game-v0",
     data: JSON.stringify({
       url: "http://localhost:3001"

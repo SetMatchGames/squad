@@ -1,5 +1,5 @@
 squad-games-web = packages/squad-games-web
-app-spec-web = packages/app-spec-web
+app-spec-roshambo = packages/app-spec-roshambo
 curation-market-js = packages/curation-market/clients/js
 curation-market = packages/curation-market/app
 metastore-js = packages/metastore/clients/js
@@ -8,6 +8,7 @@ mock-metastore = packages/metastore/mock
 sdk-js = packages/squad-sdk/js
 js-client-contracts = packages/curation-market/clients/js/contracts
 curation-market-contracts = packages/curation-market/app/build/contracts
+squad-chess = packages/app-spec-squad-chess
 
 
 metastore-shell = cd $(metastore) && nix-shell https://holochain.love --pure --command
@@ -16,14 +17,21 @@ metastore-shell = cd $(metastore) && nix-shell https://holochain.love --pure --c
 .PHONY: squad-games-web
 squad-games-web: build/bootstrap $(curation-market-js)/curation-config.json
 squad-games-web: $(js-client-contracts) build/devnet metastore
-#	cd $(squad-games-web) && npm run load_dev_defs
 	cd $(squad-games-web) && npm run start
 
 
-.PHONY: app-spec-web
-app-spec-web: build/bootstrap $(curation-market-js)/curation-config.json
-app-spec-web: $(js-client-contracts)
-	cd $(app-spec-web) && npm run start
+.PHONY: app-spec-roshambo
+app-spec-roshambo: build/bootstrap $(curation-market-js)/curation-config.json
+app-spec-roshambo: $(js-client-contracts)
+	cd $(app-spec-roshambo) && npm run start
+
+
+.PHONY: squad-chess
+squad-chess: build/bootstrap
+# TODO make this depend on metastore like things depend on build/devnet
+	cd $(squad-chess) && node load_defs.js
+	cd $(squad-chess) && npm run start
+	echo "open `pwd`/index.html in your browser"
 
 
 .PHONY: metastore
@@ -36,7 +44,7 @@ endif
 
 
 .PHONY test:
-test: test-curation-market test-squad-games-web test-app-spec-web test-metastore
+test: test-curation-market test-squad-games-web test-app-spec-roshambo test-metastore
 
 
 .PHONY: clean
@@ -45,8 +53,6 @@ clean:
 	rm -rf packages/curation-market/clients/js/contracts
 	rm -rf packages/curation-market/app/build
 	if [ -a buil/devnet ]; then kill $(shell cat build/devnet); fi
-#	-docker stop devnet
-#	-docker rm devnet
 	lerna clean
 
 
@@ -66,9 +72,9 @@ test-squad-games-web:
 	cd $(squad-games-web) && CI=true npm run test
 
 
-.PHONY: test-app-spec-web
-test-app-spec-web:
-	cd $(app-spec-web) && CI=true npm run test
+.PHONY: test-app-spec-roshambo
+test-app-spec-roshambo:
+	cd $(app-spec-roshambo) && CI=true npm run test
 
 
 .PHONY: test-curation-market

@@ -5,6 +5,8 @@ const toml = require('@iarna/toml')
 
 const mockMetastore = {}
 
+const DEF_TYPES = ["Game", "Component", "Format"]
+
 function conf(name, default_value) {
   var value = process.env[name]
   if (value === undefined) {
@@ -16,25 +18,49 @@ function conf(name, default_value) {
   return value
 }
 
-let DEFINITIONS = {}
-
-const CATALOGS = {
-  // { CatalogType: {CatalogName: [address]}}
-  Game: {"Game Catalog": []},
-  Format: {"Format Catalog": []},
-  Component: {"Component Catalog": []}
-}
-
 function entryAddress(entry) {
   return crypto.createHash('sha256').update(JSON.stringify(entry)).digest('hex')
 }
 
-const createDefinition = ({definition, games = []}) => {
-  const defString = JSON.stringify(definition)
+const definitionsPath = conf("MOCK_DEFINITIONS_PATH", "./build/definitions")
+const catalogsPath = conf("MOCK_CATALOGS_PATH", "./build/catalogs")
+
+//create definitions and catalogs folders if they don't exist
+if (!fs.existsSync(catalogsPath)) {
+  fs.mkdirSync(catalogsPath, {recursive: true})
+}
+if (!fs.existsSync(definitionsPath)) {
+  fs.mkdirSync(definitionsPath, {recursive: true})
+}
+
+const readDefinition = (address) => {
+  const data = fs.readFileSync(`${definitionsPath}/${address}.toml`, 'utf8')
+  return toml.parse(data)
+}
+
+// Content addressed write
+const writeDefinition = (definition) => {
   const address = entryAddress(definition)
-  DEFINITIONS[address] = definition
+  const data = toml.stringify(definition)
+  const filename = `${definitionsPath}/${address}.toml`
+  fs.writeFileSync(filename, data, 'utf8')
+  return address
+}
+
+const addToCatalog = (catalogName, address) => {
+  const catalogPath = `${catalogsPath}/${catalogName}`
+  if (!fs.existsSync(catalogPath)) {
+    fs.mkdirSync(catalogPath)
+  }
+  // write an empty file
+  fs.closeSync(fs.openSync(`${catalogPath}/${address}`, 'w'));
+}
+
+const createDefinition = ({definition, games = []}) => {
+  const address = writeDefinition(definition)
   var typeIdentified = false
-  for (var type_ in CATALOGS) {
+  for (let i in DEF_TYPES) {
+    const type_ = DEF_TYPES[i]
     // for each type of definition we have catalogs for
     // add it to that catalog if the definition is of that type
     // if there is no catalog, it's an invalid type
@@ -46,18 +72,12 @@ const createDefinition = ({definition, games = []}) => {
         )}
         games.forEach(gameAddress => {
           const catalogName = `${gameAddress} ${type_} Catalog`
-          if (CATALOGS[type_][catalogName]) {
-            CATALOGS[type_][catalogName].push(address)
-          } else {
-            CATALOGS[type_][catalogName] = [address]
-          }
+          addToCatalog(catalogName, address)
         })
       }
       // definitions use their rust type as the top level key
       // like {Game: {...}} or {Format: {...}}
-      if (!CATALOGS[type_][`${type_} Catalog`].includes(address)) {
-        CATALOGS[type_][`${type_} Catalog`].push(address)
-      }
+      addToCatalog(`${type_} Catalog`, address)
       typeIdentified = true
       break
     }
@@ -69,7 +89,7 @@ const createDefinition = ({definition, games = []}) => {
 }
 
 const getDefinition = ({address}) => {
-  const definition = DEFINITIONS[address]
+  const definition = readDefinition(address)
   if (!definition) {
     throw new Error(`No definition found for address ${address}`)
   }
@@ -78,14 +98,22 @@ const getDefinition = ({address}) => {
 
 const getEntryAddress = ({entry}) => entryAddress(entry)
 
+const readCatalog = (name) => {
+  const catalogPath = `${catalogsPath}/${name}`
+  if (!fs.existsSync(catalogPath)) {
+    console.error(`ERR: Catalog "${name}" not found`)
+    throw new Error(`ERR: Catalog ${name} not found`)
+  }
+  const addresses = fs.readdirSync(catalogPath)
+  return addresses
+}
+
 const getCatalogLinks = ({catalog_type, catalog_name}) => {
-  if (!(catalog_type in CATALOGS)) {
+  if (!DEF_TYPES.includes(catalog_type)) {
     throw new Error(`Invalid type ${catalog_type}`)
   }
-  const catalog = CATALOGS[catalog_type][catalog_name]
-  if (!catalog) {
-    throw new Error(`${catalog_type}/${catalog_name} not found`)
-  }
+  const catalog = readCatalog(catalog_name)
+  console.log("Read Catalog", catalog_name, catalog)
   return catalog
 }
 
@@ -118,31 +146,30 @@ const MOCK_ZOMES = {
 
 const MOCK_INSTANCE_ID = conf("MOCK_INSTANCE_ID", "mock_instance_id")
 
-const host = conf("MOCK_METASTORE_PORT", "8888")
-const port = conf("MOCK_METASTORE_HOST", "localhost")
+const host = conf("MOCK_METASTORE_HOST", "localhost")
+const port = conf("MOCK_METASTORE_PORT", "8888")
 
-const server = new WSServer({
-  port: host,
-  host: port
-})
+const server = new WSServer({host, port})
 
 console.log(`Mock Metastore Listening on ws://${host}:${port}`)
 
 server.register('info/instances', () => {
+  console.log("info/instances")
   return [{id: MOCK_INSTANCE_ID}]
 })
 
-const readDefinitions = (path) => {
+const readToml = (path) => {
   const data = fs.readFileSync(path, 'utf8')
   return toml.parse(data)
 }
 
-const writeDefinitions = (path, defs) => {
+const writeToml = (path, defs) => {
   const data = toml.stringify(defs)
   fs.writeFileSync(path, data, 'utf8')
 }
 
 server.register('call', ({instance_id, zome, function: method, args}) => {
+  console.log("call", instance_id, zome, method, args)
   if (instance_id !== MOCK_INSTANCE_ID) {
     throw new Error(
       `Expected instance_id to be ${MOCK_INSTANCE_ID}, but got ${instance_id}`
@@ -155,13 +182,14 @@ server.register('call', ({instance_id, zome, function: method, args}) => {
     "MOCK_METASTORE_DEFINITIONS_PATH",
     "./definitions.toml"
   )
-  // TODO keep an eye out for problems caused by this being shared mutable state
-  DEFINITIONS = readDefinitions(definitionsPath)
+  const catalogsPath = conf(
+    "MOCK_METASTORE_CATALOGS_PATH",
+    "./catalogs.toml"
+  )
   const mock_zome = MOCK_ZOMES[zome]
   if (!mock_zome) { throw new Error(`Unknown zome ${zome}`) }
   const zome_function = mock_zome[method]
   if (!zome_function) { throw new Error(`Unknown function ${zome}/${method}`) }
   const result = {Ok: zome_function(args)}
-  writeDefinitions(definitionsPath, DEFINITIONS)
   return JSON.stringify(result)
 })

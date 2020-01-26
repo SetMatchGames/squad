@@ -7,6 +7,6 @@ ws.on('open', () => {
     instance_id: 'mock_instance_id',
     zome: 'definitions',
     function: 'fake',
-    args: {},
+    args: {}
   }).then(console.log).catch(console.error)
 })

@@ -12,7 +12,7 @@ const App = {
 }
 
 async function init() {
-  metastore.webSocketConnection(settings.metastoreWs)
+  console.log("init squad chess", settings)
   const formatDefs = await metastore.getGameFormats(settings.gameAddress)
   state.formats = formatDefs.map(def => def.Format)
   const format = state.formats[0] // TODO build in a format selection interface
@@ -40,7 +40,11 @@ async function init() {
   return "Squad Chess Initialized"
 }
 
-init().then((message) => {
-  console.log(message, state)
+
+metastore.webSocketConnection(settings.metastoreWs)
+
+metastore.on("open", async () => {
+  await init()
+  console.log("initialized")
   m.mount(document.body, App)
 })
