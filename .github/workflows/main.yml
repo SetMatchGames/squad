@@ -15,4 +15,4 @@ jobs:
     - run: npm i -g lerna
       name: install lerna
     - run: make ci
-      name: test everything
+      name: run QA suite
