@@ -13,31 +13,23 @@ const App = {
 
 async function init() {
   metastore.webSocketConnection(settings.metastoreWs)
+
   const formatDefs = await metastore.getGameFormats(settings.gameAddress)
-  state.formats = formatDefs.map(def => def.Format)
-  const format = state.formats[0] // TODO build in a format selection interface
-  console.log(format)
+  state.rawFormats = formatDefs.map(def => def.Format)
+  const formatToLoad = state.rawFormats[0] // TODO build in a format selection interface
+
   const components = await Promise.all(
-    format.components.map(metastore.getDefinition)
+    formatToLoad.components.map(metastore.getDefinition)
   )
   const pieces = components.map(
     c => JSON.parse(c.Component.data)
   ).reduce((ps, p) => {
     return Object.assign(ps, p)
   })
-  chess.registerPieces(pieces)
-  const startingPosition = JSON.parse(format.data).startingPosition
-  let turns = chess.generateTurns(startingPosition, 0)
 
-  state['game'] = {
-    position: startingPosition,
-    turnNumber: 0,
-    legalTurns: turns
-  }
-
-  state['pieces'] = pieces
-
-  return "Squad Chess Initialized"
+  state['loadedFormat'] = Object.assign(JSON.parse(formatToLoad.data), { pieces })
+  state['game'] = chess.createGame(state.loadedFormat)
+  return "Squad Chess initialized"
 }
 
 init().then((message) => {
