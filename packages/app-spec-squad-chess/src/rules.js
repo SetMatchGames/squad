@@ -14,7 +14,7 @@
  *   }, 
  *   turnNumber: 14, 
  *   legalTurns: { 
- *     from: { to: turn..., to:...}, from... 
+ *     from: { to: turn, to:...}, from... 
  *   } 
  * }
  * turn = { '0,1': { content: { pieceId, player } }... }
