@@ -47,23 +47,8 @@ function handleSelectPiece() {
     // select the piece and highlight possible turns
     let from = chess.stringToSquare(e.target.id)
     let tos = []
-    Object.keys(state.game.legalTurns).forEach(turnId => {
-      const turn = state.game.legalTurns[turnId]
-      let match = false
-      // see if the turn involves the from square
-      Object.keys(turn).forEach(s => {
-        const square = chess.stringToSquare(s)
-        if (from[0] === square[0] &&
-          from[1] === square[1]) { match = true }
-      })
-      // if it does, highlight all the other squares from that turn
-      if (match === true) {
-        Object.keys(turn).forEach(s => {
-          const square = chess.stringToSquare(s)
-          if (from[0] !== square[0] ||
-            from[1] !== square[1]) { tos.push(square) }
-        })
-      }
+    Object.keys(state.game.legalTurns[from]).forEach(toSquare => {
+      tos.push(chess.stringToSquare(toSquare))
     })
     state.board = Object.assign({}, state.board, {
       from,
@@ -120,9 +105,10 @@ function squareStyle(coordinates, squareColor, highlighted) {
 function handleTurn() {
   return (e) => {
     e.preventDefault()
-    const turnId = chess.squareToString(state.board.from)+'->'+e.target.id
+    const from = state.board.from
+    const to = e.target.id
     // attempt to take the turn
-    const newState = chess.takeTurn(state.game, turnId)
+    const newState = chess.takeTurn(state.game, [from, to])
     // update the state if takeTurn doesn't throw
     state.game = newState
     state.board.highlightedSquares = []

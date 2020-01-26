@@ -8,7 +8,15 @@
  * return a new state and a list of legal turns.
  *
  * DATA TYPES
- * state = { position: {'0,1': { content: {pieceId, player: 0||1}, square data }... }, turnNumber: 14, legalTurns: { turnId, turn... } }
+ * state = { 
+ *   position: {
+ *     '0,1': { content: { pieceId, player: 0||1 }, square data }... 
+ *   }, 
+ *   turnNumber: 14, 
+ *   legalTurns: { 
+ *     from: { to: turn..., to:...}, from... 
+ *   } 
+ * }
  * turn = { '0,1': { content: { pieceId, player } }... }
  * FORMAT.pieces = { pieceId: { name: 'rook', mechanics: { 'move': [moveInputs] }}} (come from 'component' definitions)
  * FORMAT = { pieces, startingPosition: { position data }, OPTIONAL orientation: { white: 0, black: 2 } }
@@ -30,42 +38,38 @@ const MECHANIC_FNS = {
     // for each step
     for(let i = 0; i < params.steps; i++) {
       to = [to[0]+params.offset[0], to[1]+params.offset[1]]
-      toKey = squareToString(to)
       if (!(to in position)) { break } // if off board
       if (position[to].content !== null) { break } // if not empty
-      const turnId = from+'->'+toKey
-      let turn = {}
+      const turn = {}
       turn[from] = Object.assign({}, position[from], { content: null })
-      turn[toKey] = Object.assign(
-        {}, 
-        position[toKey], 
+      turn[to] = Object.assign(
+        {},
+        position[to], 
         { content: { pieceId, player: turnNumber % 2 } }
       )
-      turns[turnId] = turn
+      turns[to] = turn
     }
     return turns
   },
   'capture': (params, from, position, turnNumber) => {
     // params = { offset, steps } // this might eventually support turns based on arbitrary formula
       // offset = [x, y]
-    let turns = {}
+    const turns = {}
     let to = stringToSquare(from)
     const pieceId = position[from].content.pieceId
     for(let i = 0; i < params.steps; i++) {
       to = [to[0]+params.offset[0], to[1]+params.offset[1]]
-      toKey = squareToString(to)
       if (!(to in position)) { break } // if off board
       if (position[to].content === null) { continue } // if empty
       if (position[from].content.player === position[to].content.player) { break } // if same color piece
-      const turnId = from+'->'+toKey
-      let turn = {}
+      const turn = {}
       turn[from] = Object.assign({}, position[from], { content: null })
-      turn[toKey] = Object.assign(
-        {}, 
-        position[toKey], 
+      turn[to] = Object.assign(
+        {},
+        position[to], 
         { content: { pieceId, player: turnNumber % 2 } }
       )
-      turns[turnId] = turn
+      turns[to] = turn
       break
     }
     return turns
@@ -78,12 +82,12 @@ const MECHANIC_FNS = {
  * Use admechanics when you need a mechanic that modifies all of a piece's other mechanics.
  */ 
 const ADMECHANIC_FNS = {
-  'randomPromotion': (params, turns, position, turnNumber) => {
+  'randomPromotion': (params, from, position, turns, turnNumber) => {
     // params = ['default', 'self', 'king']
     const newTurns = Object.assign({}, turns)
     const player = turnNumber % 2
-    Object.keys(newTurns).forEach(turnId => {
-      const newTurn = newTurns[turnId]
+    Object.keys(newTurns).forEach(square => {
+      const newTurn = newTurns[square]
       // for each square in the turn
       Object.keys(newTurn).forEach(square => {
         // if there is a piece and its a promotion square of the right color
@@ -168,12 +172,12 @@ const generateTurns = (position, turnNumber) => {
           for (name in piece.admechanics) {
             const admechanic = ADMECHANIC_FNS[name]
             piece.admechanics[name].forEach(params => {
-              newTurns = admechanic(params, newTurns, position, turnNumber)
+              newTurns = admechanic(params, square, position, newTurns, turnNumber)
             })
           }
         }
         // add final turns to legal turns list
-        turns = Object.assign(turns, newTurns)
+        turns[square] = Object.assign({}, turns[square], newTurns)
       })
     }
   }
@@ -182,10 +186,12 @@ const generateTurns = (position, turnNumber) => {
   return turns
 }
 
-const takeTurn = ({ position, turnNumber, legalTurns }, turnId) => {
-  if (!turnId) { throw new Error('No turnId submitted!') }
-  const legalTurn = legalTurns[turnId]
-  if (!legalTurn) { throw new Error('Submitted an illegal turn!') }
+const takeTurn = ({ position, turnNumber, legalTurns }, [from, to]) => {
+  if (!from || !to) { throw new Error('No "from" or "to" submitted!') }
+  const legalTurnsFrom = legalTurns[from]
+  if (!legalTurnsFrom) { throw new Error('Invalid "from" square!') }
+  const legalTurn = legalTurnsFrom[to]
+  if (!legalTurn) { throw new Error('Invalid "to" square!') }
   const newPosition = updatePosition(position, legalTurn)
   const newState = {
     'position': newPosition,
@@ -200,9 +206,5 @@ const stringToSquare = (string) => {
   return string.split(',').map(x => parseInt(x))
 }
 
-const squareToString = (square) => {
-  return `${square[0]},${square[1]}`
-}
-
 // Exports
-module.exports = { createGame, takeTurn, stringToSquare, squareToString }
+module.exports = { createGame, takeTurn, stringToSquare }
