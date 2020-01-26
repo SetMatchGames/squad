@@ -27,7 +27,6 @@ function entryAddress(entry) {
 }
 
 const createDefinition = ({definition, games = []}) => {
-  const defString = JSON.stringify(definition)
   const address = entryAddress(definition)
   DEFINITIONS[address] = definition
   var typeIdentified = false
@@ -198,7 +197,7 @@ const squadChessAddress = createDefinition({ definition: {
 }})
 
 console.log(
-  "Squad Chess Address, update settings if this changes",
+  "Squad Chess address (update settings if this changes):",
   squadChessAddress
 )
 
@@ -281,6 +280,9 @@ const squadChessComponents = [{
             { offset: [-1,1], steps: 1 }
           ]
         },
+        admechanics: {
+          randomPromotion: ['default']
+        },
         graphics: {
           local: {
             white: 'chesspieces/wikipedia/wP.png',
@@ -322,7 +324,7 @@ const squadChessComponents = [{
             white: 'chesspieces/wikipedia/wN.png',
             black: 'chesspieces/wikipedia/bN.png'
           }
-         }
+        }
       }
     })
   }
@@ -340,45 +342,89 @@ createDefinition({
       data: JSON.stringify({ // TODO implement this in the metastore Format type
         startingPosition: {
           '0,0': {
-            pieceId: 'pawn',
-            player: 0
+            content: {
+              pieceId: 'pawn',
+              player: 0
+            },
+            promotion: 1
           },
-          '0,1': null,
-          '0,2': null,
+          '0,1': {
+            content: null
+          },
+          '0,2': {
+            content: null
+          },
           '0,3': {
-            pieceId: 'knight',
-            player: 0
+            content: {
+              pieceId: 'knight',
+              player: 0
+            },
+            promotion: 0
           },
           '1,0': {
-            pieceId: 'rook',
-            player: 0
+            content: {
+              pieceId: 'rook',
+              player: 0
+            },
+            promotion: 1
           },
           '1,1': {
-            pieceId: 'king',
-            player: 0
+            content: {
+              pieceId: 'king',
+              player: 0
+            }
           },
-          '1,2': null,
+          '1,2': {
+            content: null
+          },
           '1,3': {
-            pieceId: 'king',
-            player: 1
+            content: {
+              pieceId: 'king',
+              player: 1
+            },
+            promotion: 0
           },
-          '2,0': null,
+          '2,0': {
+            content: null,
+            promotion: 1
+          },
           '2,1': {
-            pieceId: 'pawn',
-            player: 1
+            content: {
+              pieceId: 'pawn',
+              player: 1
+            }
           },
-          '2,2': null,
-          '2,3': null,
-          '3,0': null,
+          '2,2': {
+            content: null
+          },
+          '2,3': {
+            content: null,
+            promotion: 0
+          },
+          '3,0': {
+            content: null,
+            promotion: 1
+          },
           '3,1': {
-            pieceId: 'knight',
-            player: 1
+            content: {
+              pieceId: 'knight',
+              player: 1
+            }
           },
           '3,2': {
-            pieceId: 'rook',
-            player: 1
+            content: {
+              pieceId: 'rook',
+              player: 1
+            }
           },
-          '3,3': null
+          '3,3': {
+            content: null,
+            promotion: 0
+          }
+        },
+        orientation: {
+          white: 3,
+          black: 2
         }
       })
     }
