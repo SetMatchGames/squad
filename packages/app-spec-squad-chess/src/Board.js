@@ -1,5 +1,5 @@
 import m from "mithril"
-import chess from "./rules"
+import chess from "./rules.js"
 import state from "./state.js"
 
 const BOARD_CONFIG = {
@@ -47,9 +47,8 @@ function handleSelectPiece() {
     // select the piece and highlight possible turns
     let from = chess.stringToSquare(e.target.id)
     let tos = []
-    state.game.legalTurns.forEach(t => {
-      if (from[0] === t.from[0] &&
-        from[1] === t.from[1]) { tos.push(t.to) }
+    Object.keys(state.game.legalTurns[from]).forEach(toSquare => {
+      tos.push(chess.stringToSquare(toSquare))
     })
     state.board = Object.assign({}, state.board, {
       from,
@@ -79,7 +78,8 @@ const BoardPiece = {
     } else if (squareInArray(coordinates, [state.board.from])) {
       attrs['onmousedown'] = queueDeselect()
     // if not highlighted or selected, select the piece
-    } else {
+    } else if (state.game.position[vnode.key].content.player 
+    === state.game.turnNumber % 2) {
       attrs['onmousedown'] = handleSelectPiece()
     }
     return m('img#'+vnode.key, attrs)
@@ -105,12 +105,10 @@ function squareStyle(coordinates, squareColor, highlighted) {
 function handleTurn() {
   return (e) => {
     e.preventDefault()
-    const turn = {
-      from: state.board.from,
-      to: chess.stringToSquare(e.target.id)
-    }
+    const from = state.board.from
+    const to = e.target.id
     // attempt to take the turn
-    const newState = chess.takeTurn(state.game, turn)
+    const newState = chess.takeTurn(state.game, [from, to])
     // update the state if takeTurn doesn't throw
     state.game = newState
     state.board.highlightedSquares = []
@@ -181,11 +179,11 @@ const Board = {
       // For each square in the position
       Object.keys(state.game.position).map(squareId => {
         // grab what's in the square
-        const content = state.game.position[squareId]
+        const content = state.game.position[squareId].content
         // if there is a piece, grab links to piece images
         let graphics
         if (content) {
-          graphics = state.pieces[content.pieceId].graphics
+          graphics = state.loadedFormat.pieces[content.pieceId].graphics
         }
         // add the square to the board
         return m(
