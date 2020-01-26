@@ -14,7 +14,5 @@ jobs:
         node-version: '12.x'
     - run: npm i -g lerna
       name: install lerna
-    - run: make test
+    - run: make ci
       name: test everything
-      env:
-        MOCK_METASTORE: true

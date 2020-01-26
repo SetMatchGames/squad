@@ -14,6 +14,10 @@ squad-chess = packages/app-spec-squad-chess
 metastore-shell = cd $(metastore) && nix-shell https://holochain.love --pure --command
 
 
+.PHONY: ci
+ci: build/bootstrap test-metastore
+
+
 .PHONY: squad-games-web
 squad-games-web: build/bootstrap $(curation-market-js)/curation-config.json
 squad-games-web: $(js-client-contracts) build/devnet metastore
