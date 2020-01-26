@@ -8,12 +8,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      env:
+        MOCK_METASTORE: true
     - uses: actions/checkout@v1
     - uses: actions/setup-node@v1
       with:
         node-version: '12.x'
-#    - run: sudo apt install -y  build-essential
-#      name: install c++ toolchain for node gyp and keccak
     - run: npm i -g lerna
       name: install lerna
     - run: make test
