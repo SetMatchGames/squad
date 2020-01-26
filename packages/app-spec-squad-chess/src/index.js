@@ -12,7 +12,7 @@ const App = {
 }
 
 async function init() {
-  metastore.webSocketConnection(settings.metastoreWs)
+  console.log("init squad chess", settings)
 
   const formatDefs = await metastore.getGameFormats(settings.gameAddress)
   state.rawFormats = formatDefs.map(def => def.Format)
@@ -32,7 +32,11 @@ async function init() {
   return "Squad Chess initialized"
 }
 
-init().then((message) => {
-  console.log(message, state)
+
+metastore.webSocketConnection(settings.metastoreWs)
+
+metastore.on("open", async () => {
+  await init()
+  console.log("initialized")
   m.mount(document.body, App)
 })
