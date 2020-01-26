@@ -9,5 +9,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
-    - name: all tests
-      run: make test
+    - uses: actions/setup-node@v1
+      with:
+        node-version: '12.x'
+    - run: npm i -g lerna
+      name: install lerna
+    - run: make test
+      name: test everything
