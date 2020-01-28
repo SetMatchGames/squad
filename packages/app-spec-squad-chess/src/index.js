@@ -11,8 +11,8 @@ const App = {
   }
 }
 
-async function init() {
-  console.log("init squad chess", settings)
+async function init () {
+  console.log('init squad chess', settings)
 
   const formatDefs = await metastore.getGameFormats(settings.gameAddress)
   state.rawFormats = formatDefs.map(def => def.Format)
@@ -27,16 +27,15 @@ async function init() {
     return Object.assign(ps, p)
   })
 
-  state['loadedFormat'] = Object.assign(JSON.parse(formatToLoad.data), { pieces })
-  state['game'] = chess.createGame(state.loadedFormat)
-  return "Squad Chess initialized"
+  state.loadedFormat = Object.assign(JSON.parse(formatToLoad.data), { pieces })
+  state.game = chess.createGame(state.loadedFormat)
+  return 'Squad Chess initialized'
 }
-
 
 metastore.webSocketConnection(settings.metastoreWs)
 
-metastore.on("open", async () => {
+metastore.on('open', async () => {
   await init()
-  console.log("initialized")
+  console.log('initialized')
   m.mount(document.body, App)
 })
