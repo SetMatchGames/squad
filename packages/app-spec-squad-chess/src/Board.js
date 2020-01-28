@@ -174,6 +174,7 @@ const BoardSquare = {
 const Board = {
   oninit: resetBoardState,
   view: () => {
+    if (!state.game) { return }
     return m(
       "#board",
       // For each square in the position
