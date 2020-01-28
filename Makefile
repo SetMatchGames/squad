@@ -58,6 +58,7 @@ clean:
 	rm -rf build
 	rm -rf packages/curation-market/clients/js/contracts
 	rm -rf packages/curation-market/app/build
+	rm $(curation-market-js)/curation-config.json
 	if [ -a build/devnet ]; then kill $(shell cat build/devnet); fi
 
 
@@ -78,6 +79,7 @@ test-mock-metastore: build/bootstrap
 
 .PHONY: test-sdk-js
 test-sdk-js: build/bootstrap $(js-client-contracts)
+test-sdk-js:$(curation-market-js)/curation-config.json
 	cd $(sdk-js) && npm run test
 
 
