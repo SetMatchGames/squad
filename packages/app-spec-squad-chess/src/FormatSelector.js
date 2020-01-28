@@ -7,11 +7,9 @@ const FormatSelector = {
       '#format-selector',
       m('h3', 'Available Formats'),
       state.rawFormats.map((rawFormat, index) => {
-        const url = String(window.location)
-        const sectionToCut = String(window.location.search)
-        const href = url.slice(0, url.length - sectionToCut.length) + `?format=${index}`
-        console.log(href)
-        return m(`a[href=${href}]`, rawFormat.name)
+        const url = new URL(window.location)
+        url.search = `?format=${index}`
+        return m(`a[href=${url}]`, rawFormat.name)
       })
     )
   }
