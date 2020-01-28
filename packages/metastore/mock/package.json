@@ -4,7 +4,7 @@
   "description": "Mock of the squad metastore for alpna release and testing",
   "main": "index.js",
   "scripts": {
-    "test": "npx standard",
+    "test": "standard",
     "start": "node index.js"
   },
   "dependencies": {
