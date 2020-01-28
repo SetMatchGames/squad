@@ -15,7 +15,7 @@ metastore-shell = cd $(metastore) && nix-shell https://holochain.love --pure --c
 
 
 .PHONY: ci
-ci: build/bootstrap test-metastore
+ci: build/bootstrap test-metastore test-mock-metastore
 
 
 .PHONY: squad-games-web
@@ -58,6 +58,11 @@ clean:
 	rm -rf packages/curation-market/app/build
 	if [ -a buil/devnet ]; then kill $(shell cat build/devnet); fi
 	lerna clean
+
+
+.PHONY: test-mock-metastore
+test-mock-metastore: build/bootstrap
+	cd $(mock-metastore) && npm run test
 
 
 .PHONY: test-metastore

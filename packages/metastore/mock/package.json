@@ -4,12 +4,13 @@
   "description": "Mock of the squad metastore for alpna release and testing",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "standard",
     "start": "node index.js"
   },
   "dependencies": {
     "@iarna/toml": "^2.2.3",
-    "rpc-websockets": "^4.6.1"
+    "rpc-websockets": "^4.6.1",
+    "standard": "^14.3.1"
   },
   "author": "SetMatchGames",
   "license": "Apache-2.0"
