@@ -1,25 +1,25 @@
 const WebSocket = require('rpc-websockets').Client
-//const IPFS = require('ipfs')
+// const IPFS = require('ipfs')
 
 const squad = {}
 
-function webSocketConnection(uri) {
+function webSocketConnection (uri) {
   squad.connection = new WebSocket(uri)
   return squad.connection
 }
 
-function on(message, f) {
+function on (message, f) {
   squad.connection.on(message, f)
 }
 
-async function call(zome, method, inputs) {
+async function call (zome, method, inputs) {
   // TODO: Can we cache this?
   const instanceInfo = await squad.connection.call('info/instances', {})
   const params = {
-    "instance_id": instanceInfo[0].id,
-    "zome": zome,
-    "function": method,
-    "args": inputs
+    instance_id: instanceInfo[0].id,
+    zome: zome,
+    function: method,
+    args: inputs
   }
   const result = JSON.parse(await squad.connection.call('call', params))
 
@@ -29,56 +29,56 @@ async function call(zome, method, inputs) {
   return result.Ok
 }
 
-async function createDefinition(definition, games = []) {
-  return await call("definitions", "create_definition", {definition, games})
+async function createDefinition (definition, games = []) {
+  return call('definitions', 'create_definition', { definition, games })
 }
 
-async function getDefinition(address) {
-  return await call("definitions", "get_definition", {address})
+async function getDefinition (address) {
+  return call('definitions', 'get_definition', { address })
 }
 
-async function getAddress(entry) {
-  return await call("definitions", "get_entry_address", {entry})
+async function getAddress (entry) {
+  return call('definitions', 'get_entry_address', { entry })
 }
 
-async function getCatalogAddresses(catalog_type, catalog_name) {
-  const addresses = await call(
-    "definitions",
-    "get_catalog_links",
-    {catalog_type, catalog_name}
+async function getCatalogAddresses (catalogType, catalogName) {
+  const addresses = call(
+    'definitions',
+    'get_catalog_links',
+    { catalog_type: catalogType, catalog_name: catalogName }
   )
   return addresses
 }
 
-async function getAllDefinitionsOfType(catalog_type) {
-  return await call(
-    "definitions",
-    "get_all_definitions_of_type",
-    {catalog_type}
+async function getAllDefinitionsOfType (catalogType) {
+  return call(
+    'definitions',
+    'get_all_definitions_of_type',
+    { catalog_type: catalogType }
   )
 }
 
-async function getDefinitionsFromCatalog(catalog_type, catalog_name) {
-  return await call(
-    "definitions",
-    "get_definitions_from_catalog",
-    {catalog_type, catalog_name}
+async function getDefinitionsFromCatalog (catalogType, catalogName) {
+  return call(
+    'definitions',
+    'get_definitions_from_catalog',
+    { catalog_type: catalogType, catalog_name: catalogName }
   )
 }
 
-async function getGameDefinitions(game_address, def_type) {
-  return await getDefinitionsFromCatalog(def_type, `${game_address} ${def_type} Catalog`)
+async function getGameDefinitions (gameAddress, defType) {
+  return getDefinitionsFromCatalog(defType, `${gameAddress} ${defType} Catalog`)
 }
 
-async function getGameFormats(game_address) {
-  return await getGameDefinitions(game_address, 'Format')
+async function getGameFormats (gameAddress) {
+  return getGameDefinitions(gameAddress, 'Format')
 }
 
-async function getGameComponents(game_address) {
-  return await getGameDefinitions(game_address, 'Component')
+async function getGameComponents (gameAddress) {
+  return getGameDefinitions(gameAddress, 'Component')
 }
 
-function close() {
+function close () {
   squad.connection.close()
 }
 
@@ -154,5 +154,5 @@ module.exports = {
   networking: {
     createNode,
     shareDefinitions
-  }*/
+  } */
 }

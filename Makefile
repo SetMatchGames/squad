@@ -77,7 +77,7 @@ test-mock-metastore: build/bootstrap
 
 
 .PHONY: test-sdk-js
-test-sdk-js: build/bootstrap
+test-sdk-js: build/bootstrap $(js-client-contracts)
 	cd $(sdk-js) && npm run test
 
 
