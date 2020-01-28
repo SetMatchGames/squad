@@ -1,3 +1,5 @@
+/* global test, expect jest */
+
 const squad = require('./index')
 
 // mock the curation market and metastore
@@ -6,33 +8,33 @@ const metastore = require('@squad/metastore')
 jest.mock('@squad/curation')
 jest.mock('@squad/metastore')
 
-metastore.createDefinition.mockReturnValue("mockBondId")
+metastore.createDefinition.mockReturnValue('mockBondId')
 
-test("Tests run", () => {
+test('Tests run', () => {
   expect(true).toBe(true)
 })
 
-test("newDefinitionWithBond", async () => {
+test('newDefinitionWithBond', async () => {
   const component = {
     Component: {
-      name: "Rock",
-      type_: "Roshambo",
+      name: 'Rock',
+      type_: 'Roshambo',
       data: JSON.stringify({
-        winsAgainst: ["Scissors"],
-        losesAgainst: ["Paper"]
+        winsAgainst: ['Scissors'],
+        losesAgainst: ['Paper']
       })
     }
   }
 
-  const curve_address = "0xmockcurveaddress"
-  const initial_buy_units = 10
+  const curveAddress = '0xmockcurveaddress'
+  const initialBuyUnits = 10
   const value = 55
 
-  const result = await squad.newDefinitionWithBond(
+  await squad.newDefinitionWithBond(
     component,
-    curve_address,
-    initial_buy_units,
-    {value}
+    curveAddress,
+    initialBuyUnits,
+    { value }
   )
 
   // should have created a metastore deffinition
@@ -40,10 +42,9 @@ test("newDefinitionWithBond", async () => {
 
   // should have used the returned bond id for a new curation market bond
   expect(curation.newBond).toBeCalledWith(
-    curve_address,
-    "mockBondId",
-    initial_buy_units,
-    {value}
+    curveAddress,
+    'mockBondId',
+    initialBuyUnits,
+    { value }
   )
-
 })
