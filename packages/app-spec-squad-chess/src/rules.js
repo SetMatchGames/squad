@@ -151,13 +151,13 @@ const generateTurns = (position, turnNumber) => {
       piece.mechanics[mechanicName].forEach(p => {
         // orientation
         const params = Object.assign({}, p)
-        let orientation = 0
+        let orientation = 2
         if (turnNumber % 2 === 0) {
           // if it exists, multiply by the white orientation
           if (FORMAT.orientation) { orientation = FORMAT.orientation.white }
         } else {
           // if it exists, multiple by the black orientation
-          orientation = 2 // default to a 180d
+          orientation = 0 // default to a 180d
           if (FORMAT.orientation) { orientation = FORMAT.orientation.black }
         }
         // do the rotations

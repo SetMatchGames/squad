@@ -1,34 +1,45 @@
 import m from 'mithril'
 import { metastore } from '@squad/sdk'
 import chess from './rules.js'
-import Board from './Board.js'
-import state from './state.js'
 import settings from './settings.json'
+
+import state from './state.js'
+import Board from './Board.js'
+import FormatSelector from './FormatSelector.js'
 
 const App = {
   view: () => {
-    return m(Board)
+    return m(
+      '#App',
+      m(Board),
+      m(FormatSelector)
+    )
   }
 }
 
 async function init () {
   console.log('init squad chess', settings)
 
-  const formatDefs = await metastore.getGameFormats(settings.gameAddress)
+  const formatDefs = await metastore.getGameFormats(settings.gameAddress) // metastore will load any new formats here
   state.rawFormats = formatDefs.map(def => def.Format)
-  const formatToLoad = state.rawFormats[0] // TODO build in a format selection interface
+  const urlParams = new URLSearchParams(window.location.search)
+  const formatToLoad = state.rawFormats[urlParams.get('format')]
 
-  const components = await Promise.all(
-    formatToLoad.components.map(metastore.getDefinition)
-  )
-  const pieces = components.map(
-    c => JSON.parse(c.Component.data)
-  ).reduce((ps, p) => {
-    return Object.assign(ps, p)
-  })
+  if (formatToLoad) {
+    const components = await Promise.all(
+      formatToLoad.components.map(metastore.getDefinition)
+    )
+    const pieces = components.map(
+      c => JSON.parse(c.Component.data)
+    ).reduce((ps, p) => {
+      return Object.assign(ps, p)
+    })
 
-  state.loadedFormat = Object.assign(JSON.parse(formatToLoad.data), { pieces })
-  state.game = chess.createGame(state.loadedFormat)
+    state.loadedFormat = Object.assign(JSON.parse(formatToLoad.data), { pieces })
+    console.log('loaded format', state.loadedFormat)
+    state.game = chess.createGame(state.loadedFormat)
+  }
+
   return 'Squad Chess initialized'
 }
 

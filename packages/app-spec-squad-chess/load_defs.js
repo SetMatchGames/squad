@@ -246,6 +246,327 @@ async function main () {
   }
 
   await createDefinition(pnrkFormat, [squadChessAddress])
+
+  const chessFormat = {
+    Format: {
+      name: 'Chess',
+      components: [...squadChessCatalog],
+      data: JSON.stringify({ // TODO implement this in the metastore Format type
+        startingPosition: {
+          '0,0': {
+            content: {
+              pieceId: 'rook',
+              player: 1
+            },
+            promotion: 0
+          },
+          '1,0': {
+            content: {
+              pieceId: 'rook',
+              player: 1
+            },
+            promotion: 0
+          },
+          '2,0': {
+            content: {
+              pieceId: 'knight',
+              player: 1
+            },
+            promotion: 0
+          },
+          '3,0': {
+            content: {
+              pieceId: 'king',
+              player: 1
+            },
+            promotion: 0
+          },
+          '4,0': {
+            content: {
+              pieceId: 'rook',
+              player: 1
+            },
+            promotion: 0
+          },
+          '5,0': {
+            content: {
+              pieceId: 'knight',
+              player: 1
+            },
+            promotion: 0
+          },
+          '6,0': {
+            content: {
+              pieceId: 'rook',
+              player: 1
+            },
+            promotion: 0
+          },
+          '7,0': {
+            content: {
+              pieceId: 'rook',
+              player: 1
+            },
+            promotion: 0
+          },
+          '0,1': {
+            content: {
+              pieceId: 'pawn',
+              player: 1
+            }
+          },
+          '1,1': {
+            content: {
+              pieceId: 'pawn',
+              player: 1
+            }
+          },
+          '2,1': {
+            content: {
+              pieceId: 'pawn',
+              player: 1
+            }
+          },
+          '3,1': {
+            content: {
+              pieceId: 'pawn',
+              player: 1
+            }
+          },
+          '4,1': {
+            content: {
+              pieceId: 'pawn',
+              player: 1
+            }
+          },
+          '5,1': {
+            content: {
+              pieceId: 'pawn',
+              player: 1
+            }
+          },
+          '6,1': {
+            content: {
+              pieceId: 'pawn',
+              player: 1
+            }
+          },
+          '7,1': {
+            content: {
+              pieceId: 'pawn',
+              player: 1
+            }
+          },
+          '0,2': {
+            content: null
+          },
+          '1,2': {
+            content: null
+          },
+          '2,2': {
+            content: null
+          },
+          '3,2': {
+            content: null
+          },
+          '4,2': {
+            content: null
+          },
+          '5,2': {
+            content: null
+          },
+          '6,2': {
+            content: null
+          },
+          '7,2': {
+            content: null
+          },
+          '0,3': {
+            content: null
+          },
+          '1,3': {
+            content: null
+          },
+          '2,3': {
+            content: null
+          },
+          '3,3': {
+            content: null
+          },
+          '4,3': {
+            content: null
+          },
+          '5,3': {
+            content: null
+          },
+          '6,3': {
+            content: null
+          },
+          '7,3': {
+            content: null
+          },
+          '0,4': {
+            content: null
+          },
+          '1,4': {
+            content: null
+          },
+          '2,4': {
+            content: null
+          },
+          '3,4': {
+            content: null
+          },
+          '4,4': {
+            content: null
+          },
+          '5,4': {
+            content: null
+          },
+          '6,4': {
+            content: null
+          },
+          '7,4': {
+            content: null
+          },
+          '0,5': {
+            content: null
+          },
+          '1,5': {
+            content: null
+          },
+          '2,5': {
+            content: null
+          },
+          '3,5': {
+            content: null
+          },
+          '4,5': {
+            content: null
+          },
+          '5,5': {
+            content: null
+          },
+          '6,5': {
+            content: null
+          },
+          '7,5': {
+            content: null
+          },
+          '0,6': {
+            content: {
+              pieceId: 'pawn',
+              player: 0
+            }
+          },
+          '1,6': {
+            content: {
+              pieceId: 'pawn',
+              player: 0
+            }
+          },
+          '2,6': {
+            content: {
+              pieceId: 'pawn',
+              player: 0
+            }
+          },
+          '3,6': {
+            content: {
+              pieceId: 'pawn',
+              player: 0
+            }
+          },
+          '4,6': {
+            content: {
+              pieceId: 'pawn',
+              player: 0
+            }
+          },
+          '5,6': {
+            content: {
+              pieceId: 'pawn',
+              player: 0
+            }
+          },
+          '6,6': {
+            content: {
+              pieceId: 'pawn',
+              player: 0
+            }
+          },
+          '7,6': {
+            content: {
+              pieceId: 'pawn',
+              player: 0
+            }
+          },
+          '0,7': {
+            content: {
+              pieceId: 'rook',
+              player: 0
+            },
+            promotion: 1
+          },
+          '1,7': {
+            content: {
+              pieceId: 'rook',
+              player: 0
+            },
+            promotion: 1
+          },
+          '2,7': {
+            content: {
+              pieceId: 'knight',
+              player: 0
+            },
+            promotion: 1
+          },
+          '3,7': {
+            content: {
+              pieceId: 'rook',
+              player: 0
+            },
+            promotion: 1
+          },
+          '4,7': {
+            content: {
+              pieceId: 'king',
+              player: 0
+            },
+            promotion: 1
+          },
+          '5,7': {
+            content: {
+              pieceId: 'knight',
+              player: 0
+            },
+            promotion: 1
+          },
+          '6,7': {
+            content: {
+              pieceId: 'rook',
+              player: 0
+            },
+            promotion: 1
+          },
+          '7,7': {
+            content: {
+              pieceId: 'rook',
+              player: 0
+            },
+            promotion: 1
+          }
+        },
+        orientation: {
+          white: 2,
+          black: 0
+        }
+      })
+    }
+  }
+
+  await createDefinition(chessFormat, [squadChessAddress])
 }
 
 on('open', () => {
