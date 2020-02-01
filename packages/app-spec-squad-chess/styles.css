@@ -1,7 +1,13 @@
+/* Board */
 .square {
   position: absolute;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+}
+/* Format Selector */
+#format-selector {
+  display: flex;
+  flex-direction: column;
 }

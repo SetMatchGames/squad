@@ -174,24 +174,28 @@ const BoardSquare = {
 const Board = {
   oninit: resetBoardState,
   view: () => {
-    return m(
-      "#board",
-      // For each square in the position
-      Object.keys(state.game.position).map(squareId => {
-        // grab what's in the square
-        const content = state.game.position[squareId].content
-        // if there is a piece, grab links to piece images
-        let graphics
-        if (content) {
-          graphics = state.loadedFormat.pieces[content.pieceId].graphics
-        }
-        // add the square to the board
-        return m(
-          BoardSquare,
-          { key: squareId, content, graphics }
-        )
-      })
-    )
+    if (!state.game) { 
+      return m("#board", 'Load a format!')
+    } else {
+      return m(
+        "#board",
+        // For each square in the position
+        Object.keys(state.game.position).map(squareId => {
+          // grab what's in the square
+          const content = state.game.position[squareId].content
+          // if there is a piece, grab links to piece images
+          let graphics
+          if (content) {
+            graphics = state.loadedFormat.pieces[content.pieceId].graphics
+          }
+          // add the square to the board
+          return m(
+            BoardSquare,
+            { key: squareId, content, graphics }
+          )
+        })
+      )
+    }
   }
 }
 
