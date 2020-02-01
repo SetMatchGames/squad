@@ -15,7 +15,8 @@ metastore-shell = cd $(metastore) && nix-shell https://holochain.love --pure --c
 
 
 .PHONY: ci
-ci: build/bootstrap test-metastore
+ci: build/bootstrap test-metastore test-mock-metastore test-squad-chess
+ci: test-sdk-js
 
 
 .PHONY: squad-games-web
@@ -48,7 +49,8 @@ endif
 
 
 .PHONY test:
-test: test-curation-market test-squad-games-web test-app-spec-roshambo test-metastore
+test: test-curation-market test-squad-games-web test-app-spec-roshambo
+test: test-metastore test-squad-chess
 
 
 .PHONY: clean
@@ -56,8 +58,29 @@ clean:
 	rm -rf build
 	rm -rf packages/curation-market/clients/js/contracts
 	rm -rf packages/curation-market/app/build
-	if [ -a buil/devnet ]; then kill $(shell cat build/devnet); fi
+	rm $(curation-market-js)/curation-config.json
+	if [ -a build/devnet ]; then kill $(shell cat build/devnet); fi
+
+
+.PHONY: very-clean
+very-clean: clean
 	lerna clean
+
+
+.PHONY: test-squad-chess
+test-squad-chess: build/bootstrap
+	cd $(squad-chess) && npm run test
+
+
+.PHONY: test-mock-metastore
+test-mock-metastore: build/bootstrap
+	cd $(mock-metastore) && npm run test
+
+
+.PHONY: test-sdk-js
+test-sdk-js: build/bootstrap $(js-client-contracts)
+test-sdk-js:$(curation-market-js)/curation-config.json
+	cd $(sdk-js) && npm run test
 
 
 .PHONY: test-metastore
@@ -101,7 +124,6 @@ build/curation-market: build/devnet build/bootstrap
 
 
 build/devnet: build/.
-#	-docker run -d --rm --name devnet -p 8545:8545 trufflesuite/ganache-cli -b 1
 	cd $(curation-market) && npx ganache-cli -b 1 &
 	echo "$!" > build/devnet
 

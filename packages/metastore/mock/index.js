@@ -3,14 +3,12 @@ const WSServer = require('rpc-websockets').Server
 const crypto = require('crypto')
 const toml = require('@iarna/toml')
 
-const mockMetastore = {}
+const DEF_TYPES = ['Game', 'Component', 'Format']
 
-const DEF_TYPES = ["Game", "Component", "Format"]
-
-function conf(name, default_value) {
+function conf (name, defaultValue) {
   var value = process.env[name]
   if (value === undefined) {
-    value = default_value
+    value = defaultValue
   }
   if (value === undefined) {
     throw new Error(`Required configuration "${name}" not found.`)
@@ -18,19 +16,19 @@ function conf(name, default_value) {
   return value
 }
 
-function entryAddress(entry) {
+function entryAddress (entry) {
   return crypto.createHash('sha256').update(JSON.stringify(entry)).digest('hex')
 }
 
-const definitionsPath = conf("MOCK_DEFINITIONS_PATH", "./build/definitions")
-const catalogsPath = conf("MOCK_CATALOGS_PATH", "./build/catalogs")
+const definitionsPath = conf('MOCK_DEFINITIONS_PATH', './build/definitions')
+const catalogsPath = conf('MOCK_CATALOGS_PATH', './build/catalogs')
 
-//create definitions and catalogs folders if they don't exist
+// create definitions and catalogs folders if they don't exist
 if (!fs.existsSync(catalogsPath)) {
-  fs.mkdirSync(catalogsPath, {recursive: true})
+  fs.mkdirSync(catalogsPath, { recursive: true })
 }
 if (!fs.existsSync(definitionsPath)) {
-  fs.mkdirSync(definitionsPath, {recursive: true})
+  fs.mkdirSync(definitionsPath, { recursive: true })
 }
 
 const readDefinition = (address) => {
@@ -53,13 +51,13 @@ const addToCatalog = (catalogName, address) => {
     fs.mkdirSync(catalogPath)
   }
   // write an empty file
-  fs.closeSync(fs.openSync(`${catalogPath}/${address}`, 'w'));
+  fs.closeSync(fs.openSync(`${catalogPath}/${address}`, 'w'))
 }
 
-const createDefinition = ({definition, games = []}) => {
+const createDefinition = ({ definition, games = [] }) => {
   const address = writeDefinition(definition)
   var typeIdentified = false
-  for (let i in DEF_TYPES) {
+  for (const i in DEF_TYPES) {
     const type_ = DEF_TYPES[i]
     // for each type of definition we have catalogs for
     // add it to that catalog if the definition is of that type
@@ -67,9 +65,11 @@ const createDefinition = ({definition, games = []}) => {
     if (type_ in definition) {
       // Adding definition to the proper game catalogs
       if (type_ !== 'Game') {
-        if (games.length === 0) { throw new Error(
+        if (games.length === 0) {
+          throw new Error(
           `Invalid game addresses for ${type_}: ${games}`
-        )}
+          )
+        }
         games.forEach(gameAddress => {
           const catalogName = `${gameAddress} ${type_} Catalog`
           addToCatalog(catalogName, address)
@@ -88,7 +88,7 @@ const createDefinition = ({definition, games = []}) => {
   return address
 }
 
-const getDefinition = ({address}) => {
+const getDefinition = ({ address }) => {
   const definition = readDefinition(address)
   if (!definition) {
     throw new Error(`No definition found for address ${address}`)
@@ -96,7 +96,7 @@ const getDefinition = ({address}) => {
   return definition
 }
 
-const getEntryAddress = ({entry}) => entryAddress(entry)
+const getEntryAddress = ({ entry }) => entryAddress(entry)
 
 const readCatalog = (name) => {
   const catalogPath = `${catalogsPath}/${name}`
@@ -108,33 +108,39 @@ const readCatalog = (name) => {
   return addresses
 }
 
-const getCatalogLinks = ({catalog_type, catalog_name}) => {
-  if (!DEF_TYPES.includes(catalog_type)) {
-    throw new Error(`Invalid type ${catalog_type}`)
+const getCatalogLinks = ({
+  catalog_type: catalogType,
+  catalog_name: catalogName
+}) => {
+  if (!DEF_TYPES.includes(catalogType)) {
+    throw new Error(`Invalid type ${catalogType}`)
   }
-  const catalog = readCatalog(catalog_name)
-  console.log("Read Catalog", catalog_name, catalog)
+  const catalog = readCatalog(catalogName)
+  console.log('Read Catalog', catalogName, catalog)
   return catalog
 }
 
-const getAllDefinitionsOfType =  ({catalog_type}) => {
+const getAllDefinitionsOfType = ({ catalog_type: catalogType }) => {
   return MOCK_ZOMES.definitions.get_definitions_from_catalog({
-    catalog_type: catalog_type,
-    catalog_name: `${catalog_type} Catalog`
+    catalog_type: catalogType,
+    catalog_name: `${catalogType} Catalog`
   })
 }
 
-const getDefinitionsFromCatalog = ({catalog_type, catalog_name}) => {
+const getDefinitionsFromCatalog = ({
+  catalog_type: catalogType,
+  catalog_name: catalogName
+}) => {
   const catalog = MOCK_ZOMES.definitions.get_catalog_links(
-    {catalog_type, catalog_name}
+    { catalogType, catalogName }
   )
   return catalog.map(address => {
-    return MOCK_ZOMES.definitions.get_definition({address})
+    return MOCK_ZOMES.definitions.get_definition({ address })
   })
 }
 
 const MOCK_ZOMES = {
-  "definitions": {
+  definitions: {
     create_definition: createDefinition,
     get_definition: getDefinition,
     get_entry_address: getEntryAddress,
@@ -144,52 +150,36 @@ const MOCK_ZOMES = {
   }
 }
 
-const MOCK_INSTANCE_ID = conf("MOCK_INSTANCE_ID", "mock_instance_id")
+const MOCK_INSTANCE_ID = conf('MOCK_INSTANCE_ID', 'mock_instance_id')
 
-const host = conf("MOCK_METASTORE_HOST", "localhost")
-const port = conf("MOCK_METASTORE_PORT", "8888")
+const host = conf('MOCK_METASTORE_HOST', 'localhost')
+const port = conf('MOCK_METASTORE_PORT', '8888')
 
-const server = new WSServer({host, port})
+const server = new WSServer({ host, port })
 
 console.log(`Mock Metastore Listening on ws://${host}:${port}`)
 
 server.register('info/instances', () => {
-  console.log("info/instances")
-  return [{id: MOCK_INSTANCE_ID}]
+  console.log('info/instances')
+  return [{ id: MOCK_INSTANCE_ID }]
 })
 
-const readToml = (path) => {
-  const data = fs.readFileSync(path, 'utf8')
-  return toml.parse(data)
-}
-
-const writeToml = (path, defs) => {
-  const data = toml.stringify(defs)
-  fs.writeFileSync(path, data, 'utf8')
-}
-
-server.register('call', ({instance_id, zome, function: method, args}) => {
-  console.log("call", instance_id, zome, method, args)
-  if (instance_id !== MOCK_INSTANCE_ID) {
+server.register('call', ({
+  instance_id: instanceId,
+  zome,
+  function: method,
+  args
+}) => {
+  console.log('call', instanceId, zome, method, args)
+  if (instanceId !== MOCK_INSTANCE_ID) {
     throw new Error(
-      `Expected instance_id to be ${MOCK_INSTANCE_ID}, but got ${instance_id}`
+      `Expected instance_id to be ${MOCK_INSTANCE_ID}, but got ${instanceId}`
     )
   }
-  // for the mock, and in order to enable manual editing of definitions
-  // we reload the definitions from the filesystem on every call, later
-  // we will write the file to the filesystem
-  const definitionsPath = conf(
-    "MOCK_METASTORE_DEFINITIONS_PATH",
-    "./definitions.toml"
-  )
-  const catalogsPath = conf(
-    "MOCK_METASTORE_CATALOGS_PATH",
-    "./catalogs.toml"
-  )
-  const mock_zome = MOCK_ZOMES[zome]
-  if (!mock_zome) { throw new Error(`Unknown zome ${zome}`) }
-  const zome_function = mock_zome[method]
-  if (!zome_function) { throw new Error(`Unknown function ${zome}/${method}`) }
-  const result = {Ok: zome_function(args)}
+  const mockZome = MOCK_ZOMES[zome]
+  if (!mockZome) { throw new Error(`Unknown zome ${zome}`) }
+  const zomeFunction = mockZome[method]
+  if (!zomeFunction) { throw new Error(`Unknown function ${zome}/${method}`) }
+  const result = { Ok: zomeFunction(args) }
   return JSON.stringify(result)
 })

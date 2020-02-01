@@ -10,15 +10,15 @@ import FormatSelector from './FormatSelector.js'
 const App = {
   view: () => {
     return m(
-      '#App', 
+      '#App',
       m(Board),
       m(FormatSelector)
     )
   }
 }
 
-async function init() {
-  console.log("init squad chess", settings)
+async function init () {
+  console.log('init squad chess', settings)
 
   const formatDefs = await metastore.getGameFormats(settings.gameAddress) // metastore will load any new formats here
   state.rawFormats = formatDefs.map(def => def.Format)
@@ -34,20 +34,19 @@ async function init() {
     ).reduce((ps, p) => {
       return Object.assign(ps, p)
     })
-  
-    state['loadedFormat'] = Object.assign(JSON.parse(formatToLoad.data), { pieces })
+
+    state.loadedFormat = Object.assign(JSON.parse(formatToLoad.data), { pieces })
     console.log('loaded format', state.loadedFormat)
-    state['game'] = chess.createGame(state.loadedFormat)
+    state.game = chess.createGame(state.loadedFormat)
   }
 
-  return "Squad Chess initialized"
+  return 'Squad Chess initialized'
 }
-
 
 metastore.webSocketConnection(settings.metastoreWs)
 
-metastore.on("open", async () => {
+metastore.on('open', async () => {
   await init()
-  console.log("initialized")
+  console.log('initialized')
   m.mount(document.body, App)
 })

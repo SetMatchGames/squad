@@ -1,6 +1,6 @@
-import m from "mithril"
-import chess from "./rules.js"
-import state from "./state.js"
+import m from 'mithril'
+import chess from './rules.js'
+import state from './state.js'
 
 const BOARD_CONFIG = {
   squares: {
@@ -17,20 +17,20 @@ const squareSize = BOARD_CONFIG.squares.size
  * we generate a huge, constant stream of events, which is bad.
  * Maybe those events are coming from the main document itself? So for now:
  */
-document.addEventListener("dragover", (e) => {
-  e.preventDefault();
-}, false);
+document.addEventListener('dragover', (e) => {
+  e.preventDefault()
+}, false)
 
 // initialize or reset the 'board' part of the state
-function resetBoardState() {
-  state['board'] = {
+function resetBoardState () {
+  state.board = {
     from: [],
     highlightedSquares: [],
     deselectable: []
   }
 }
 
-function queueDeselect() {
+function queueDeselect () {
   return (e) => {
     state.board = Object.assign({}, state.board, {
       deselectable: chess.stringToSquare(e.target.id)
@@ -38,15 +38,15 @@ function queueDeselect() {
   }
 }
 
-function handleDeselectPiece() {
+function handleDeselectPiece () {
   return resetBoardState
 }
 
-function handleSelectPiece() {
+function handleSelectPiece () {
   return (e) => {
     // select the piece and highlight possible turns
-    let from = chess.stringToSquare(e.target.id)
-    let tos = []
+    const from = chess.stringToSquare(e.target.id)
+    const tos = []
     Object.keys(state.game.legalTurns[from]).forEach(toSquare => {
       tos.push(chess.stringToSquare(toSquare))
     })
@@ -59,40 +59,40 @@ function handleSelectPiece() {
 
 const BoardPiece = {
   view: (vnode) => {
-    let attrs = {
+    const attrs = {
       src: vnode.attrs.imgLink,
       style: {
-        width: squareSize+'vw',
-        height: squareSize+'vw'
+        width: squareSize + 'vw',
+        height: squareSize + 'vw'
       }
     }
-    let coordinates = chess.stringToSquare(vnode.key)
-    let highlighted = squareInArray(coordinates, state.board.highlightedSquares)
+    const coordinates = chess.stringToSquare(vnode.key)
+    const highlighted = squareInArray(coordinates, state.board.highlightedSquares)
     // if highlighted, click to attempt turn
     if (highlighted) {
-      attrs['onclick'] = handleTurn()
+      attrs.onclick = handleTurn()
     // if deselect is queued, handle it
     } else if (squareInArray(coordinates, [state.board.deselectable])) {
-      attrs['onmouseup'] = handleDeselectPiece()
+      attrs.onmouseup = handleDeselectPiece()
     // if the selected piece, let another mousedown queue deselect
     } else if (squareInArray(coordinates, [state.board.from])) {
-      attrs['onmousedown'] = queueDeselect()
+      attrs.onmousedown = queueDeselect()
     // if not highlighted or selected, select the piece
-    } else if (state.game.position[vnode.key].content.player 
-    === state.game.turnNumber % 2) {
-      attrs['onmousedown'] = handleSelectPiece()
+    } else if (state.game.position[vnode.key].content.player ===
+    state.game.turnNumber % 2) {
+      attrs.onmousedown = handleSelectPiece()
     }
-    return m('img#'+vnode.key, attrs)
+    return m('img#' + vnode.key, attrs)
   }
 }
 
-function squareStyle(coordinates, squareColor, highlighted) {
+function squareStyle (coordinates, squareColor, highlighted) {
   const result = {
     // TODO move the static CSS elsewhere
-    right: (40+squareSize*coordinates[0])+'vw',
-    top: (10+squareSize*coordinates[1])+'vw',
-    width: squareSize+'vw',
-    height: squareSize+'vw',
+    right: (40 + squareSize * coordinates[0]) + 'vw',
+    top: (10 + squareSize * coordinates[1]) + 'vw',
+    width: squareSize + 'vw',
+    height: squareSize + 'vw',
     background: squareColor
   }
   if (highlighted === true) {
@@ -102,7 +102,7 @@ function squareStyle(coordinates, squareColor, highlighted) {
   return result
 }
 
-function handleTurn() {
+function handleTurn () {
   return (e) => {
     e.preventDefault()
     const from = state.board.from
@@ -115,13 +115,13 @@ function handleTurn() {
     // if no legal turns, the game is over
     if (newState.legalTurns.length === 0) {
       let winner = 'White'
-      if (newState.turnNumber % 2 === 0) { winner = 'Black'}
+      if (newState.turnNumber % 2 === 0) { winner = 'Black' }
       console.log(`${winner} wins!`)
     }
   }
 }
 
-function squareInArray(square, array) {
+function squareInArray (square, array) {
   let result = false
   if (array.length === 0) { return result }
   array.forEach(s => {
@@ -135,12 +135,12 @@ function squareInArray(square, array) {
 const BoardSquare = {
   view: (vnode) => {
     // convert the string coordinates back to an array
-    let coordinates = chess.stringToSquare(vnode.key)
+    const coordinates = chess.stringToSquare(vnode.key)
     // create the checkerboard color pattern
     let squareColor = BOARD_CONFIG.squares.lightColor
-    if ((coordinates[0] + coordinates[1]) % 2 == 1) { squareColor = BOARD_CONFIG.squares.darkColor }
+    if ((coordinates[0] + coordinates[1]) % 2 === 1) { squareColor = BOARD_CONFIG.squares.darkColor }
     // highlight square
-    let highlighted = squareInArray(coordinates, state.board.highlightedSquares)
+    const highlighted = squareInArray(coordinates, state.board.highlightedSquares)
     let squareContent
     let onclick
     // if the square holds a piece, set the properties
@@ -174,11 +174,11 @@ const BoardSquare = {
 const Board = {
   oninit: resetBoardState,
   view: () => {
-    if (!state.game) { 
-      return m("#board", 'Load a format!')
+    if (!state.game) {
+      return m('#board', 'Load a format!')
     } else {
       return m(
-        "#board",
+        '#board',
         // For each square in the position
         Object.keys(state.game.position).map(squareId => {
           // grab what's in the square

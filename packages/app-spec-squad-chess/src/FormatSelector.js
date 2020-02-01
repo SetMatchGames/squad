@@ -1,5 +1,5 @@
-import m from "mithril"
-import state from "./state.js"
+import m from 'mithril'
+import state from './state.js'
 
 const FormatSelector = {
   view: () => {

@@ -2,37 +2,36 @@ const { on, webSocketConnection, createDefinition, getCatalogAddresses } = requi
 
 webSocketConnection('ws://localhost:8888')
 
-process.on('unhandledRejection', r => console.log(r));
+process.on('unhandledRejection', r => console.log(r))
 
-async function main() {
-
+async function main () {
   const squadChessAddress = await createDefinition({
     Game: {
-      name: "Squad Chess",
-      type_: "web-game-v0",
+      name: 'Squad Chess',
+      type_: 'web-game-v0',
       data: JSON.stringify({
-        url: "http://localhost:3001"
+        url: 'http://localhost:3001'
       })
     }
   })
 
   const squadChessComponents = [{
     Component: {
-      name: "Rook",
+      name: 'Rook',
       data: JSON.stringify({
         rook: {
           mechanics: {
             move: [
-              { offset: [0,1], steps: 100 },
-              { offset: [0,-1], steps: 100 },
-              { offset: [1,0], steps: 100 },
-              { offset: [-1,0], steps: 100 }
+              { offset: [0, 1], steps: 100 },
+              { offset: [0, -1], steps: 100 },
+              { offset: [1, 0], steps: 100 },
+              { offset: [-1, 0], steps: 100 }
             ],
             capture: [
-              { offset: [0,1], steps: 100 },
-              { offset: [0,-1], steps: 100 },
-              { offset: [1,0], steps: 100 },
-              { offset: [-1,0], steps: 100 }
+              { offset: [0, 1], steps: 100 },
+              { offset: [0, -1], steps: 100 },
+              { offset: [1, 0], steps: 100 },
+              { offset: [-1, 0], steps: 100 }
             ]
           },
           graphics: {
@@ -46,30 +45,30 @@ async function main() {
     }
   }, {
     Component: {
-      name: "King",
+      name: 'King',
       data: JSON.stringify({
         king: {
           king: true,
           mechanics: {
             move: [
-              { offset: [0,1], steps: 1 },
-              { offset: [0,-1], steps: 1 },
-              { offset: [1,0], steps: 1 },
-              { offset: [-1,0], steps: 1 },
-              { offset: [1,1], steps: 1 },
-              { offset: [-1,-1], steps: 1 },
-              { offset: [1,-1], steps: 1 },
-              { offset: [-1,1], steps: 1 }
+              { offset: [0, 1], steps: 1 },
+              { offset: [0, -1], steps: 1 },
+              { offset: [1, 0], steps: 1 },
+              { offset: [-1, 0], steps: 1 },
+              { offset: [1, 1], steps: 1 },
+              { offset: [-1, -1], steps: 1 },
+              { offset: [1, -1], steps: 1 },
+              { offset: [-1, 1], steps: 1 }
             ],
             capture: [
-              { offset: [0,1], steps: 1 },
-              { offset: [0,-1], steps: 1 },
-              { offset: [1,0], steps: 1 },
-              { offset: [-1,0], steps: 1 },
-              { offset: [1,1], steps: 1 },
-              { offset: [-1,-1], steps: 1 },
-              { offset: [1,-1], steps: 1 },
-              { offset: [-1,1], steps: 1 }
+              { offset: [0, 1], steps: 1 },
+              { offset: [0, -1], steps: 1 },
+              { offset: [1, 0], steps: 1 },
+              { offset: [-1, 0], steps: 1 },
+              { offset: [1, 1], steps: 1 },
+              { offset: [-1, -1], steps: 1 },
+              { offset: [1, -1], steps: 1 },
+              { offset: [-1, 1], steps: 1 }
             ]
           },
           graphics: {
@@ -83,16 +82,16 @@ async function main() {
     }
   }, {
     Component: {
-      name: "Pawn",
+      name: 'Pawn',
       data: JSON.stringify({
         pawn: {
           mechanics: {
             move: [
-              { offset: [0,1], steps: 1 }
+              { offset: [0, 1], steps: 1 }
             ],
             capture: [
-              { offset: [1,1], steps: 1 },
-              { offset: [-1,1], steps: 1 }
+              { offset: [1, 1], steps: 1 },
+              { offset: [-1, 1], steps: 1 }
             ]
           },
           admechanics: {
@@ -109,29 +108,29 @@ async function main() {
     }
   }, {
     Component: {
-      name: "Knight",
+      name: 'Knight',
       data: JSON.stringify({
         knight: {
           mechanics: {
             move: [
-              { offset: [2,1], steps: 1 },
-              { offset: [1,2], steps: 1 },
-              { offset: [-2,1], steps: 1 },
-              { offset: [-1,2], steps: 1 },
-              { offset: [1,-2], steps: 1 },
-              { offset: [2,-1], steps: 1 },
-              { offset: [-2,-1], steps: 1 },
-              { offset: [-1,-2], steps: 1 }
+              { offset: [2, 1], steps: 1 },
+              { offset: [1, 2], steps: 1 },
+              { offset: [-2, 1], steps: 1 },
+              { offset: [-1, 2], steps: 1 },
+              { offset: [1, -2], steps: 1 },
+              { offset: [2, -1], steps: 1 },
+              { offset: [-2, -1], steps: 1 },
+              { offset: [-1, -2], steps: 1 }
             ],
             capture: [
-              { offset: [2,1], steps: 1 },
-              { offset: [1,2], steps: 1 },
-              { offset: [-2,1], steps: 1 },
-              { offset: [-1,2], steps: 1 },
-              { offset: [1,-2], steps: 1 },
-              { offset: [2,-1], steps: 1 },
-              { offset: [-2,-1], steps: 1 },
-              { offset: [-1,-2], steps: 1 }
+              { offset: [2, 1], steps: 1 },
+              { offset: [1, 2], steps: 1 },
+              { offset: [-2, 1], steps: 1 },
+              { offset: [-1, 2], steps: 1 },
+              { offset: [1, -2], steps: 1 },
+              { offset: [2, -1], steps: 1 },
+              { offset: [-2, -1], steps: 1 },
+              { offset: [-1, -2], steps: 1 }
             ]
           },
           graphics: {
@@ -149,12 +148,12 @@ async function main() {
     await createDefinition(definition, [squadChessAddress])
   })
 
-  const squadChessCatalog = await getCatalogAddresses("Component", `${squadChessAddress} Component Catalog`)
+  const squadChessCatalog = await getCatalogAddresses('Component', `${squadChessAddress} Component Catalog`)
 
   const pnrkFormat = {
     Format: {
       name: 'PNRK',
-      components: [ ...squadChessCatalog ],
+      components: [...squadChessCatalog],
       data: JSON.stringify({ // TODO implement this in the metastore Format type
         startingPosition: {
           '0,0': {
@@ -251,7 +250,7 @@ async function main() {
   const chessFormat = {
     Format: {
       name: 'Chess',
-      components: [ ...squadChessCatalog ],
+      components: [...squadChessCatalog],
       data: JSON.stringify({ // TODO implement this in the metastore Format type
         startingPosition: {
           '0,0': {
@@ -570,9 +569,9 @@ async function main() {
   await createDefinition(chessFormat, [squadChessAddress])
 }
 
-on("open", () => {
+on('open', () => {
   main().then(() => {
-    console.log("done")
+    console.log('done')
     process.exit(0)
   })
 })

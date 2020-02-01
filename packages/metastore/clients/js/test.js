@@ -1,45 +1,47 @@
-let metastore = require('./index.js')
+/* global test, expect */
+
+const metastore = require('./index.js')
 
 // connect squad Client
-//metastore.webSocketConnection('ws://localhost:8888')
+// metastore.webSocketConnection('ws://localhost:8888')
 
 const roshambo = {
   Game: {
-    name: "Roshambo",
-    type_: "linux-bash-game-v0",
+    name: 'Roshambo',
+    type_: 'linux-bash-game-v0',
     data: JSON.stringify({
-      cmd: `cat ../app_spec/install_and_run.sh | bash`,
+      cmd: 'cat ../app_spec/install_and_run.sh | bash',
       options: []
     })
   }
 }
 
-const components = [
+/* const components = [
   {
     Component: {
-      name: "Rock",
-      type_: "Roshambo",
+      name: 'Rock',
+      type_: 'Roshambo',
       data: JSON.stringify({
-        winsAgainst: ["Scissors"],
-        losesAgainst: ["Paper"]
+        winsAgainst: ['Scissors'],
+        losesAgainst: ['Paper']
       })
     }
   }, {
     Component: {
-      name: "Paper",
-      type_: "Roshambo",
+      name: 'Paper',
+      type_: 'Roshambo',
       data: JSON.stringify({
-        winsAgainst: ["Rock"],
-        losesAgainst: ["Scissors"]
+        winsAgainst: ['Rock'],
+        losesAgainst: ['Scissors']
       })
     }
   }, {
     Component: {
-      name: "Scissors",
-      type_: "Roshambo",
+      name: 'Scissors',
+      type_: 'Roshambo',
       data: JSON.stringify({
-        winsAgainst: ["Paper"],
-        losesAgainst: ["Rock"]
+        winsAgainst: ['Paper'],
+        losesAgainst: ['Rock']
       })
     }
   }
@@ -48,31 +50,31 @@ const components = [
 const extraComponents = [
   {
     Component: {
-      name: "Lizard",
-      type_: "Roshambo",
+      name: 'Lizard',
+      type_: 'Roshambo',
       data: JSON.stringify({
-        winsAgainst: ["Spock", "Paper"],
-        losesAgainst: ["Rock", "Scissors"]
+        winsAgainst: ['Spock', 'Paper'],
+        losesAgainst: ['Rock', 'Scissors']
       })
     }
   }, {
     Component: {
-      name: "Spock",
-      type_: "Roshambo",
+      name: 'Spock',
+      type_: 'Roshambo',
       data: JSON.stringify({
-        winsAgainst: ["Rock", "Scissors"],
-        losesAgainst: ["Paper", "Lizard"]
+        winsAgainst: ['Rock', 'Scissors'],
+        losesAgainst: ['Paper', 'Lizard']
       })
     }
   }
-]
+] */
 
 // TODO: these tests shouldn't be testing the zome functions, only that the right inputs are going into them
-  // This way, we will not need to run or mock a conductor in order to run these tests
+// This way, we will not need to run or mock a conductor in order to run these tests
 
 metastore.webSocketConnection('ws://localhost:8888')
 
-test("Submit and retrieve definition", () => {
+test('Submit and retrieve definition', () => {
   metastore.on('open', async () => {
     const a = await metastore.createDefinition(roshambo)
     const r = await metastore.getDefinition(a)
@@ -81,10 +83,10 @@ test("Submit and retrieve definition", () => {
   })
 })
 
-test("Get game catalog", () => {
+test('Get game catalog', () => {
   metastore.on('open', async () => {
-    const g = await metastore.getDefinitionsFromCatalog("Game", "Game Catalog")
-    await expect(g[0]).toStrictEqual("roshambo")
+    const g = await metastore.getDefinitionsFromCatalog('Game', 'Game Catalog')
+    await expect(g[0]).toStrictEqual('roshambo')
     metastore.close()
   })
 })
