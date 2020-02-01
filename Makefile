@@ -20,19 +20,17 @@ ci: test-sdk-js
 
 
 .PHONY: squad-games-web
-squad-games-web: build/bootstrap $(curation-market-js)/curation-config.json
-squad-games-web: $(js-client-contracts) build/devnet metastore
+squad-games-web: build/bootstrap squad-sdk-js build/devnet metastore
 	cd $(squad-games-web) && npm run start
 
 
 .PHONY: app-spec-roshambo
-app-spec-roshambo: build/bootstrap $(curation-market-js)/curation-config.json
-app-spec-roshambo: $(js-client-contracts)
+app-spec-roshambo: build/bootstrap squad-sdk-js
 	cd $(app-spec-roshambo) && npm run start
 
 
 .PHONY: squad-chess
-squad-chess: build/bootstrap
+squad-chess: build/bootstrap squad-sdk-js
 # TODO make this depend on metastore like things depend on build/devnet
 	cd $(squad-chess) && node load_defs.js
 	cd $(squad-chess) && npm run start
@@ -58,6 +56,8 @@ clean:
 	rm -rf build
 	rm -rf packages/curation-market/clients/js/contracts
 	rm -rf packages/curation-market/app/build
+	rm -rf packages/metastore/mock/build
+	rm -rf $(js-client-contracts)
 	rm $(curation-market-js)/curation-config.json
 	if [ -a build/devnet ]; then kill $(shell cat build/devnet); fi
 
@@ -78,8 +78,7 @@ test-mock-metastore: build/bootstrap
 
 
 .PHONY: test-sdk-js
-test-sdk-js: build/bootstrap $(js-client-contracts)
-test-sdk-js:$(curation-market-js)/curation-config.json
+test-sdk-js: build/bootstrap squad-sdk-js
 	cd $(sdk-js) && npm run test
 
 
@@ -109,6 +108,8 @@ test-curation-market: build/curation-market $(curation-market-js)/curation-confi
 	cd $(curation-market) && npm run test
 	cd $(curation-market-js) && npm run test
 
+.PHONY: squad-sdk-js
+squad-sdk-js: $(js-client-contracts) $(curation-market-js)/curation-config.json
 
 $(js-client-contracts): build/curation-market
 	cp -r $(curation-market-contracts) $(curation-market-js)
