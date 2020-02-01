@@ -4,7 +4,7 @@
   "description": "Squad Games JavaScript Metastore client",
   "main": "index.js",
   "scripts": {
-    "test": "jest --forceExit"
+    "test": "standard && jest --forceExit"
   },
   "author": "",
   "license": "Apache-2.0",
