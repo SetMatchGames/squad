@@ -34,7 +34,7 @@ app-spec-roshambo: $(js-client-contracts)
 .PHONY: squad-chess
 squad-chess: build/bootstrap
 # TODO make this depend on metastore like things depend on build/devnet
-	cd $(squad-chess) && node load_defs.js
+	cd $(squad-chess) && node scripts/load_defs.js
 	cd $(squad-chess) && npm run start
 	echo "open `pwd`/index.html in your browser"
 
