@@ -4,6 +4,8 @@
 This script is a hack job to make it easier to make test definitons
 This can be a model for a true chess def builder, but this ain't it
 
+Some editing required after generation, but this handles the heavy lifting
+
 Example empty board
 
 node make-chess-def.js empty-board 8 8  // standard chess board
@@ -48,13 +50,10 @@ const TYPES = {
     // this semicolon is needed!!! JS is kinda BS
     ;[...Array(parseInt(height)).keys()].forEach(h => {
       [...Array(parseInt(width)).keys()].forEach(w => {
-        board[`${h},${w}`] = {
-          content: null,
-          promotion: 1
-        }
+        board[`${h},${w}`] = { content: null }
       })
     })
-    console.log(JSON.stringify(board, null, 2))
+    return JSON.stringify(board, null, 2)
   },
   'move-capture': ([_, __, ___, rise, run, steps, ...rotations]) => {
     rise = parseInt(rise)
@@ -108,9 +107,7 @@ const TYPES = {
     const params = uniquePairs(offsets).map(
       pair => { return { offset: pair, steps } }
     )
-    console.log(
-      JSON.stringify({ move: params, capture: params }, null, 2)
-    )
+    return JSON.stringify({ move: params, capture: params }, null, 2)
   },
   undefined: () => {
     console.log(`
@@ -124,4 +121,12 @@ offset rise run steps rotation(0,1,2,3)...
   }
 }
 
-TYPES[process.argv[2]](process.argv)
+function main (args) {
+  return TYPES[args[2]](args)
+}
+
+if (require.main === module) {
+  console.log(main(process.argv))
+}
+
+module.exports = { main }
