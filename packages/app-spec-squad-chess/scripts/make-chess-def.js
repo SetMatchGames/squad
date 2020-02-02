@@ -42,9 +42,9 @@ function uniquePairs (pairs) {
 }
 
 const TYPES = {
-  "empty-board": ([_, __, ___, height, width]) => {
+  'empty-board': ([_, __, ___, height, width]) => {
     // print an empty board of the specified size
-    let board = {}
+    const board = {}
     // this semicolon is needed!!! JS is kinda BS
     ;[...Array(parseInt(height)).keys()].forEach(h => {
       [...Array(parseInt(width)).keys()].forEach(w => {
@@ -56,7 +56,7 @@ const TYPES = {
     })
     console.log(JSON.stringify(board, null, 2))
   },
-  "move-capture": ([_, __, ___, rise, run, steps, ...rotations]) => {
+  'move-capture': ([_, __, ___, rise, run, steps, ...rotations]) => {
     rise = parseInt(rise)
     run = parseInt(run)
     steps = parseInt(steps)
@@ -70,46 +70,46 @@ const TYPES = {
         '4', // reverse no negative
         '5', // reverse negative first
         '6', // reverse negative second
-        '7'  // reverse negative both
+        '7' // reverse negative both
       ]
     }
     var offsets = []
     rotations.forEach(rotation => {
       var [a, b] = [...[rise, run]]
       switch (rotation) {
-      case '0': // forward no negative
-        break
-      case '1': // forward negative first
-        a = -a
-        break
-      case '2': // forward negative second
-        b = -b
-        break
-      case '3': // forward negative both
-        [a, b] = [-a, -b]
-        break
-      case '4': // reverse no negative
-        [a, b] = [b, a]
-        break
-      case '5': // reverse negative first
-        [a, b] = [-b, a]
-        break
-      case '6': // reverse negative second
-        [a, b] = [b, -a]
-        break
-      case '7': // reverse negative both
-        [a, b] = [-b, -a]
-        break
-      default:
-        throw new Error(`invalid offset rotation ${rotation}`)
+        case '0': // forward no negative
+          break
+        case '1': // forward negative first
+          a = -a
+          break
+        case '2': // forward negative second
+          b = -b
+          break
+        case '3': // forward negative both
+          [a, b] = [-a, -b]
+          break
+        case '4': // reverse no negative
+          [a, b] = [b, a]
+          break
+        case '5': // reverse negative first
+          [a, b] = [-b, a]
+          break
+        case '6': // reverse negative second
+          [a, b] = [b, -a]
+          break
+        case '7': // reverse negative both
+          [a, b] = [-b, -a]
+          break
+        default:
+          throw new Error(`invalid offset rotation ${rotation}`)
       }
       offsets.push([...[a, b]])
     })
     const params = uniquePairs(offsets).map(
-      pair => { return {offset: pair, steps} }
+      pair => { return { offset: pair, steps } }
     )
     console.log(
-      JSON.stringify({move: params, capture: params}, null, 2)
+      JSON.stringify({ move: params, capture: params }, null, 2)
     )
   },
   undefined: () => {
@@ -125,4 +125,3 @@ offset rise run steps rotation(0,1,2,3)...
 }
 
 TYPES[process.argv[2]](process.argv)
-
