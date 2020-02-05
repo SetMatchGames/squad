@@ -59,7 +59,6 @@ async function getAllDefinitionsOfType (catalogType) {
 }
 
 async function getDefinitionsFromCatalog (catalogType, catalogName) {
-  console.log('getting defs from cat', catalogType, catalogName)
   return call(
     'definitions',
     'get_definitions_from_catalog',
