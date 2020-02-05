@@ -116,7 +116,6 @@ const getCatalogLinks = ({
     throw new Error(`Invalid type ${catalogType}`)
   }
   const catalog = readCatalog(catalogName)
-  console.log('Read Catalog', catalogName, catalog)
   return catalog
 }
 
@@ -132,7 +131,7 @@ const getDefinitionsFromCatalog = ({
   catalog_name: catalogName
 }) => {
   const catalog = MOCK_ZOMES.definitions.get_catalog_links(
-    { catalogType, catalogName }
+    { catalog_type: catalogType, catalog_name: catalogName }
   )
   return catalog.map(address => {
     return MOCK_ZOMES.definitions.get_definition({ address })
