@@ -144,7 +144,7 @@ const BoardSquare = {
     let squareContent
     let onclick
     // if the square holds a piece, set the properties
-    if (vnode.attrs.content) {
+    if (vnode.attrs.content && vnode.attrs.content.pieceId) {
       // get the link to the piece graphic
       let imgLink
       let pieceColor = 'white'
@@ -185,7 +185,7 @@ const Board = {
           const content = state.game.position[squareId].content
           // if there is a piece, grab links to piece images
           let graphics
-          if (content) {
+          if (content && content.pieceId) {
             graphics = state.loadedFormat.pieces[content.pieceId].graphics
           }
           // add the square to the board

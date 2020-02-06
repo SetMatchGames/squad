@@ -53,13 +53,13 @@ test: test-metastore test-squad-chess
 
 .PHONY: clean
 clean:
-	rm -rf build
-	rm -rf packages/curation-market/clients/js/contracts
-	rm -rf packages/curation-market/app/build
-	rm -rf packages/metastore/mock/build
-	rm -rf $(js-client-contracts)
-	rm $(curation-market-js)/curation-config.json
 	if [ -a build/devnet ]; then kill $(shell cat build/devnet); fi
+	-rm -rf build
+	-rm -rf packages/curation-market/clients/js/contracts
+	-rm -rf packages/curation-market/app/build
+	-rm -rf packages/metastore/mock/build
+	-rm -rf $(js-client-contracts)
+	-rm $(curation-market-js)/curation-config.json
 
 
 .PHONY: very-clean

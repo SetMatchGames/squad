@@ -31,6 +31,7 @@ const MECHANIC_FNS = {
   move: (params, from, position, turnNumber) => {
     // params = { offset, steps } // this might eventually support turns based on arbitrary formula
     // offset = [x, y]
+    console.log(`move(`, params, from, position, turnNumber)
     const turns = {}
     let to = stringToSquare(from)
     const pieceId = position[from].content.pieceId
@@ -38,15 +39,18 @@ const MECHANIC_FNS = {
     for (let i = 0; i < params.steps; i++) {
       to = [to[0] + params.offset[0], to[1] + params.offset[1]]
       if (!(to in position)) { break } // if off board
-      if (position[to].content !== null) { break } // if not empty
+      // TODO this was considering a promotable space "not empty" so you
+      //      couldn't move into it
+      if (position[to].content !== null && position[to].content.pieceId) { break } // if not empty
       const turn = {}
-      turn[from] = Object.assign({}, position[from], { content: null })
+      turn[from] = Object.assign({}, position[from], { content: null }) // TODO what if it was promotable?
       turn[to] = Object.assign(
         {},
         position[to],
         { content: { pieceId, player: turnNumber % 2 } }
       )
       turns[to] = turn
+      console.log('turns', turns)
     }
     return turns
   },

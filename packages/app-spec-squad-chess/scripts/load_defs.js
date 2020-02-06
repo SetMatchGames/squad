@@ -1,4 +1,9 @@
-const { on, webSocketConnection, createDefinition, getCatalogAddresses } = require('@squad/sdk').metastore
+const {
+  on,
+  webSocketConnection,
+  createDefinition,
+  getCatalogAddresses
+} = require('@squad/sdk').metastore
 
 webSocketConnection('ws://localhost:8888')
 
@@ -137,6 +142,70 @@ async function main () {
             local: {
               white: 'chesspieces/wikipedia/wN.png',
               black: 'chesspieces/wikipedia/bN.png'
+            }
+          }
+        }
+      })
+    }
+  }, {
+    Component: {
+      name: 'Bishop',
+      data: JSON.stringify({
+        bishop: {
+          mechanics: {
+            move: [
+              { offset: [1, 1], steps: 100 },
+              { offset: [1, -1], steps: 100 },
+              { offset: [-1, 1], steps: 100 },
+              { offset: [-1, -1], steps: 100 }
+            ],
+            capture: [
+              { offset: [1, 1], steps: 100 },
+              { offset: [1, -1], steps: 100 },
+              { offset: [-1, 1], steps: 100 },
+              { offset: [-1, -1], steps: 100 }
+            ]
+          },
+          graphics: {
+            local: {
+              white: 'chesspieces/wikipedia/wB.png',
+              black: 'chesspieces/wikipedia/bB.png'
+            }
+          }
+        }
+      })
+    }
+  }, {
+    Component: {
+      name: 'Queen',
+      data: JSON.stringify({
+        queen: {
+          mechanics: {
+            move: [
+              { offset: [0, 1], steps: 100 },
+              { offset: [0, -1], steps: 100 },
+              { offset: [1, 0], steps: 100 },
+              { offset: [-1, 0], steps: 100 },
+              { offset: [1, 1], steps: 100 },
+              { offset: [1, -1], steps: 100 },
+              { offset: [-1, 1], steps: 100 },
+              { offset: [-1, -1], steps: 100 }
+            ],
+            capture: [
+              { offset: [1, 1], steps: 100 },
+              { offset: [1, -1], steps: 100 },
+              { offset: [-1, 1], steps: 100 },
+              { offset: [-1, -1], steps: 100 },
+              { offset: [0, 1], steps: 100 },
+              { offset: [0, -1], steps: 100 },
+              { offset: [1, 0], steps: 100 },
+              { offset: [-1, 0], steps: 100 }
+            ]
+          },
+          graphics: {
+            local: {
+              white: 'chesspieces/wikipedia/wQ.png',
+              black: 'chesspieces/wikipedia/bQ.png'
             }
           }
         }
