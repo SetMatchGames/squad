@@ -31,7 +31,6 @@ const MECHANIC_FNS = {
   move: (params, from, position, turnNumber) => {
     // params = { offset, steps } // this might eventually support turns based on arbitrary formula
     // offset = [x, y]
-    console.log(`move(`, params, from, position, turnNumber)
     const turns = {}
     let to = stringToSquare(from)
     const pieceId = position[from].content.pieceId
@@ -50,7 +49,6 @@ const MECHANIC_FNS = {
         { content: { pieceId, player: turnNumber % 2 } }
       )
       turns[to] = turn
-      console.log('turns', turns)
     }
     return turns
   },
