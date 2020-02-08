@@ -38,11 +38,9 @@ const MECHANIC_FNS = {
     for (let i = 0; i < params.steps; i++) {
       to = [to[0] + params.offset[0], to[1] + params.offset[1]]
       if (!(to in position)) { break } // if off board
-      // TODO this was considering a promotable space "not empty" so you
-      //      couldn't move into it
-      if (position[to].content !== null && position[to].content.pieceId) { break } // if not empty
+      if (position[to].content !== null) { break } // if not empty
       const turn = {}
-      turn[from] = Object.assign({}, position[from], { content: null }) // TODO what if it was promotable?
+      turn[from] = Object.assign({}, position[from], { content: null })
       turn[to] = Object.assign(
         {},
         position[to],

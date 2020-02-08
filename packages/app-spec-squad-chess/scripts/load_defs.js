@@ -331,7 +331,7 @@ async function main () {
           },
           '1,0': {
             content: {
-              pieceId: 'rook',
+              pieceId: 'bishop',
               player: 1
             },
             promotion: 0
@@ -352,7 +352,7 @@ async function main () {
           },
           '4,0': {
             content: {
-              pieceId: 'rook',
+              pieceId: 'queen',
               player: 1
             },
             promotion: 0

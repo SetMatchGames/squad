@@ -40,15 +40,15 @@ async function main () {
     },
     '3,2': { content: null },
     '3,3': { content: null },
-    '4,0': { content: { promotion: 0 } },
+    '4,0': { content: null, promotion: 0 },
     '4,4': { content: null },
-    '5,0': { content: { promotion: 0 } },
+    '5,0': { content: null, promotion: 0 },
     '5,1': { content: null },
     '5,4': { content: null },
     '5,5': {
       content: { pieceId: 'pawn', player: 0 }
     },
-    '6,0': { content: { promotion: 0 } },
+    '6,0': { content: null, promotion: 0 },
     '6,2': { content: null },
     '6,4': {
       content: { pieceId: 'knight', player: 0 }
@@ -56,10 +56,10 @@ async function main () {
     '6,6': {
       content: { pieceId: 'rook', player: 0 }
     },
-    '7,0': { content: { promotion: 1 } },
-    '7,1': { content: { promotion: 1 } },
-    '7,2': { content: { promotion: 1 } },
-    '7,3': { content: { promotion: 1 } },
+    '7,0': { content: null, promotion: [1, 0] },
+    '7,1': { content: null, promotion: 1 },
+    '7,2': { content: null, promotion: 1 },
+    '7,3': { content: null, promotion: 1 },
     '7,4': {
       content: { pieceId: 'pawn', player: 0 },
       promotion: 1
