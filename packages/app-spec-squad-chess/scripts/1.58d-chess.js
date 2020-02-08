@@ -29,14 +29,14 @@ async function main () {
       promotion: 0
     },
     '2,2': {
-        content: { pieceId: 'pawn', player: 1 }
+      content: { pieceId: 'pawn', player: 1 }
     },
     '3,0': {
-        content: { pieceId: 'pawn', player: 1 },
-        promotion: 0
+      content: { pieceId: 'pawn', player: 1 },
+      promotion: 0
     },
     '3,1': {
-        content: { pieceId: 'knight', player: 1 }
+      content: { pieceId: 'knight', player: 1 }
     },
     '3,2': { content: null },
     '3,3': { content: null },
