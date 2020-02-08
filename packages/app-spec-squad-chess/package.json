@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "standard",
+    "test": "standard && jest",
     "start": "webpack src/index.js --output bin/app.js -d --watch"
   },
   "keywords": [],
@@ -15,9 +15,10 @@
     "mithril": "^2.0.4"
   },
   "devDependencies": {
+    "jest": "^25.1.0",
+    "standard": "^14.3.1",
     "webpack": "^4.41.5",
-    "webpack-cli": "^3.3.10",
-    "standard": "^14.3.1"
+    "webpack-cli": "^3.3.10"
   },
   "standard": {
     "ignore": [

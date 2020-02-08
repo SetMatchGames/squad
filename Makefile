@@ -32,7 +32,7 @@ app-spec-roshambo: build/bootstrap squad-sdk-js
 .PHONY: squad-chess
 squad-chess: build/bootstrap squad-sdk-js
 # TODO make this depend on metastore like things depend on build/devnet
-	cd $(squad-chess) && node load_defs.js
+	cd $(squad-chess) && node scripts/load_defs.js
 	cd $(squad-chess) && npm run start
 	echo "open `pwd`/index.html in your browser"
 
@@ -53,13 +53,13 @@ test: test-metastore test-squad-chess
 
 .PHONY: clean
 clean:
-	rm -rf build
-	rm -rf packages/curation-market/clients/js/contracts
-	rm -rf packages/curation-market/app/build
-	rm -rf packages/metastore/mock/build
-	rm -rf $(js-client-contracts)
-	rm $(curation-market-js)/curation-config.json
 	if [ -a build/devnet ]; then kill $(shell cat build/devnet); fi
+	-rm -rf build
+	-rm -rf packages/curation-market/clients/js/contracts
+	-rm -rf packages/curation-market/app/build
+	-rm -rf packages/metastore/mock/build
+	-rm -rf $(js-client-contracts)
+	-rm $(curation-market-js)/curation-config.json
 
 
 .PHONY: very-clean
