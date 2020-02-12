@@ -1,3 +1,5 @@
+/* global process require */
+
 const fs = require('fs')
 const WSServer = require('rpc-websockets').Server
 const crypto = require('crypto')

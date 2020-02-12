@@ -53,7 +53,6 @@ WIP
 To stand up a full dev environment, run the followin in separate
 terminals
 
-`make metastore`
 `make squad-games-web`
 `make app-spec-web`
 

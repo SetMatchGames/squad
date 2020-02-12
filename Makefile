@@ -20,30 +20,27 @@ ci: test-sdk-js
 
 
 .PHONY: squad-games-web
-squad-games-web: build/bootstrap squad-sdk-js build/devnet metastore
+squad-games-web: build/bootstrap squad-sdk-js build/devnet build/metastore
 	cd $(squad-games-web) && npm run start
 
 
 .PHONY: app-spec-roshambo
-app-spec-roshambo: build/bootstrap squad-sdk-js
+app-spec-roshambo: build/metastore squad-sdk-js
 	cd $(app-spec-roshambo) && npm run start
 
 
 .PHONY: squad-chess
-squad-chess: build/bootstrap squad-sdk-js
-# TODO make this depend on metastore like things depend on build/devnet
+squad-chess: build/metastore squad-sdk-js
 	cd $(squad-chess) && node scripts/load_defs.js
 	cd $(squad-chess) && npm run start
-	echo "open `pwd`/index.html in your browser"
+	cd $(squad-chess) && echo "open `pwd`/index.html in your browser"
 
 
-.PHONY: metastore
-metastore: build/bootstrap
-ifeq ($(MOCK_METASTORE), true)
-	cd $(mock-metastore) && npm run start
-else
-	$(metastore-shell) 'hc package && hc run --logging'
-endif
+.PHONY: squad-chess-alpha-server
+squad-chess-alpha-server: build/devnet build/metastore squad-sdk-js
+	cd $(squad-chess) && node scripts/load_defs.js
+	cd $(squad-chess) && npm run build
+	cd $(squad-chess) && npx http-server
 
 
 .PHONY test:
@@ -53,7 +50,8 @@ test: test-metastore test-squad-chess
 
 .PHONY: clean
 clean:
-	if [ -a build/devnet ]; then kill $(shell cat build/devnet); fi
+	-if [ -a build/devnet ]; then kill $(shell cat build/devnet); fi
+	-if [ -a build/metastore ]; then kill $(shell cat build/metastore); fi
 	-rm -rf build
 	-rm -rf packages/curation-market/clients/js/contracts
 	-rm -rf packages/curation-market/app/build
@@ -68,7 +66,7 @@ very-clean: clean
 
 
 .PHONY: test-squad-chess
-test-squad-chess: build/bootstrap
+test-squad-chess: build/metastore
 	cd $(squad-chess) && npm run test
 
 
@@ -111,6 +109,7 @@ test-curation-market: build/curation-market $(curation-market-js)/curation-confi
 .PHONY: squad-sdk-js
 squad-sdk-js: $(js-client-contracts) $(curation-market-js)/curation-config.json
 
+
 $(js-client-contracts): build/curation-market
 	cp -r $(curation-market-contracts) $(curation-market-js)
 
@@ -124,9 +123,18 @@ build/curation-market: build/devnet build/bootstrap
 	touch build/curation-market
 
 
+build/metastore: build/bootstrap
+ifeq ($(MOCK_METASTORE), true)
+	cd $(mock-metastore) && { npm run start & echo $$! > PID; }
+	mv $(mock-metastore)/PID build/metastore
+else
+	$(metastore-shell) 'hc package && hc run --logging'
+endif
+
+
 build/devnet: build/.
-	cd $(curation-market) && npx ganache-cli -b 1 &
-	echo "$!" > build/devnet
+	cd $(curation-market) && { npx ganache-cli -b 1 & echo $$! > PID; }
+	mv $(curation-market)/PID build/devnet
 
 
 build/bootstrap: build/.
