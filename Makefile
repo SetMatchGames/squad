@@ -66,7 +66,7 @@ very-clean: clean
 
 
 .PHONY: test-squad-chess
-test-squad-chess: build/metastore
+test-squad-chess: build/bootstrap
 	cd $(squad-chess) && npm run test
 
 
