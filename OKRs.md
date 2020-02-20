@@ -33,7 +33,8 @@ Build a small, devoted community
 
 Explore funding options
 - Describe 3 realistic funding methods
-  1. Whitepaper brings in support
+  1. Whitepaper brings in support, Continuous funding/ICO
+  1. Kickstarter/Patreon
 - 10 inquiries towards those funding methods
 
 Publish a whitepaper
