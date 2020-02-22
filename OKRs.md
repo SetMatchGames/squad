@@ -35,6 +35,7 @@ Explore funding options
 - Describe 3 realistic funding methods
   1. Whitepaper brings in support, Continuous funding/ICO
   1. Kickstarter/Patreon
+  1. Gitcoin
 - 10 inquiries towards those funding methods
 
 Publish a whitepaper
