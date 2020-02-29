@@ -57,7 +57,7 @@ clean:
 	-rm -rf packages/curation-market/app/build
 	-rm -rf packages/metastore/mock/build
 	-rm -rf $(js-client-contracts)
-	-rm $(curation-market-js)/curation-config.json
+	-rm $(curation-market-js)/development-curation-config.json
 
 
 .PHONY: very-clean
@@ -102,26 +102,30 @@ test-app-spec-roshambo:
 
 
 .PHONY: test-curation-market
-test-curation-market: build/curation-market $(curation-market-js)/curation-config.json
+test-curation-market: build/curation-market $(curation-market-js)/development-curation-config.json
 	cd $(curation-market) && npm run test
 	cd $(curation-market-js) && npm run test
 
 .PHONY: squad-sdk-js
-squad-sdk-js: $(js-client-contracts) $(curation-market-js)/curation-config.json
+squad-sdk-js: $(js-client-contracts) $(curation-market-js)/development-curation-config.json
 
 
-$(js-client-contracts): build/curation-market
+$(js-client-contracts): $(curation-market-contracts)
 	cp -r $(curation-market-contracts) $(curation-market-js)
 
+$(curation-market-contracts):
+	cd $(curation-market) && npm run build
 
-$(curation-market-js)/curation-config.json: build/curation-market
-	cp $(curation-market)/curation-config.json $(curation-market-js)/curation-config.json
+$(curation-market-js)/development-curation-config.json: build/curation-market
+	cp $(curation-market)/development-curation-config.json $(curation-market-js)/development-curation-config.json
 
-
-build/curation-market: build/devnet build/bootstrap
+build/development-curation-market: build/devnet build/bootstrap
 	cd $(curation-market) && npm run deploy-dev
 	touch build/curation-market
 
+build/%-curation-market: build/bootstrap
+	cd $(curation-market) && npm run deploy-$*
+	touch build/$*-curation-market
 
 build/metastore: build/bootstrap
 ifeq ($(MOCK_METASTORE), true)
@@ -131,16 +135,13 @@ else
 	$(metastore-shell) 'hc package && hc run --logging'
 endif
 
-
 build/devnet: build/.
 	cd $(curation-market) && { npx ganache-cli -b 1 & echo $$! > PID; }
 	mv $(curation-market)/PID build/devnet
 
-
 build/bootstrap: build/.
 	lerna bootstrap
 	touch build/bootstrap
-
 
 build/.:
 	mkdir build

@@ -7,6 +7,7 @@
     "test": "test"
   },
   "dependencies": {
+    "@truffle/hdwallet-provider": "^1.0.31",
     "dotenv": "^8.1.0",
     "fs": "0.0.1-security",
     "ganache-cli": "^6.5.0",
@@ -22,8 +23,10 @@
     "watch-contracts": "watch 'npx truffle migrate --reset --network development' contracts",
     "test": "npx truffle test",
     "_deploy": "npx truffle migrate --network",
+    "deploy-ropsten": "npm run _deploy ropsten",
     "deploy-local": "npm run _deploy local",
-    "deploy-dev": "NETWORK=development npm run _deploy development"
+    "deploy-dev": "NETWORK=development npm run _deploy development",
+    "build": "npx truffle build"
   },
   "author": "",
   "license": "Apache-2.0"
