@@ -13,7 +13,8 @@
   "license": "ISC",
   "dependencies": {
     "@squad/sdk": "^1.0.0",
-    "mithril": "^2.0.4"
+    "mithril": "^2.0.4",
+    "peerjs": "^1.2.0"
   },
   "devDependencies": {
     "jest": "^25.1.0",
