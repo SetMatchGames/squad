@@ -22,12 +22,12 @@
   "scripts": {
     "watch-contracts": "watch 'npx truffle migrate --reset --network development' contracts",
     "test": "npx truffle test",
-    "_deploy": "npx truffle migrate --network",
-    "deploy-ropsten": "npm run _deploy ropsten",
-    "deploy-local": "npm run _deploy local",
-    "deploy-dev": "NETWORK=development npm run _deploy development",
+    "deploy": "npx truffle migrate",
+    "deploy-to": "npx truffle migrate --network",
+    "deploy-ropsten": "npm run deploy-to ropsten",
+    "deploy-development": "npm run deploy-to development",
     "build": "npx truffle build"
   },
-  "author": "",
+  "author": "Set Match Games <hello@setmatchgames.com>",
   "license": "Apache-2.0"
 }

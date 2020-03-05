@@ -13,35 +13,36 @@ squad-chess = packages/app-spec-squad-chess
 
 metastore-shell = cd $(metastore) && nix-shell https://holochain.love --pure --command
 
-
 .PHONY: ci
 ci: build/bootstrap test-metastore test-mock-metastore test-squad-chess
 ci: test-sdk-js
 
-
 .PHONY: squad-games-web
-squad-games-web: build/bootstrap squad-sdk-js build/devnet build/metastore
+squad-games-web: build/squad-sdk-js build/metastore
 	cd $(squad-games-web) && npm run start
 
-
+#!!! clean up and remove roshambo completely?
 .PHONY: app-spec-roshambo
-app-spec-roshambo: build/metastore squad-sdk-js
+app-spec-roshambo: build/metastore build/squad-sdk-js
 	cd $(app-spec-roshambo) && npm run start
 
-
 .PHONY: squad-chess
-squad-chess: build/metastore squad-sdk-js
+squad-chess: build/metastore build/squad-sdk-js
 	cd $(squad-chess) && node scripts/load_defs.js
 	cd $(squad-chess) && npm run start
 	cd $(squad-chess) && echo "open `pwd`/index.html in your browser"
 
+.PHONY: %-squad-chess
+%-squad-chess: build/metastore build/%-squad-sdk-js
+#	cd $(squad-chess) && node scripts/load_defs.js
+	cd $(squad-chess) && npm run start
+	cd $(squad-chess) && echo "open `pwd`/index.html in your browser"
 
 .PHONY: squad-chess-alpha-server
-squad-chess-alpha-server: build/devnet build/metastore squad-sdk-js
+squad-chess-alpha-server: build/metastore build/squad-sdk-js
 	cd $(squad-chess) && node scripts/load_defs.js
 	cd $(squad-chess) && npm run build
 	cd $(squad-chess) && npx http-server
-
 
 .PHONY test:
 test: test-curation-market test-squad-games-web test-app-spec-roshambo
@@ -76,7 +77,7 @@ test-mock-metastore: build/bootstrap
 
 
 .PHONY: test-sdk-js
-test-sdk-js: build/bootstrap squad-sdk-js
+test-sdk-js: build/bootstrap build/squad-sdk-js
 	cd $(sdk-js) && npm run test
 
 
@@ -106,9 +107,11 @@ test-curation-market: build/curation-market $(curation-market-js)/development-cu
 	cd $(curation-market) && npm run test
 	cd $(curation-market-js) && npm run test
 
-.PHONY: squad-sdk-js
-squad-sdk-js: $(js-client-contracts) $(curation-market-js)/development-curation-config.json
+build/squad-sdk-js: $(js-client-contracts) $(curation-market-js)/development-curation-config.json
+	touch build/squad-sdk-js
 
+build/%-squad-sdk-js: $(js-client-contracts) $(curation-market-js)/%-curation-config.json
+	touch build/$*-squad-sdk-js
 
 $(js-client-contracts): $(curation-market-contracts)
 	cp -r $(curation-market-contracts) $(curation-market-js)
@@ -116,12 +119,13 @@ $(js-client-contracts): $(curation-market-contracts)
 $(curation-market-contracts):
 	cd $(curation-market) && npm run build
 
-$(curation-market-js)/development-curation-config.json: build/curation-market
-	cp $(curation-market)/development-curation-config.json $(curation-market-js)/development-curation-config.json
+$(curation-market-js)/%-curation-config.json: build/%-curation-market
+	cp $(curation-market)/$*-curation-config.json $(curation-market-js)/$*-curation-config.json
 
 build/development-curation-market: build/devnet build/bootstrap
-	cd $(curation-market) && npm run deploy-dev
-	touch build/curation-market
+	echo "makeing because of $?"
+	cd $(curation-market) && npm run deploy
+	touch build/development-curation-market
 
 build/%-curation-market: build/bootstrap
 	cd $(curation-market) && npm run deploy-$*
@@ -135,14 +139,12 @@ else
 	$(metastore-shell) 'hc package && hc run --logging'
 endif
 
-build/devnet: build/.
+build/devnet:
+	mkdir -p build
 	cd $(curation-market) && { npx ganache-cli -b 1 & echo $$! > PID; }
 	mv $(curation-market)/PID build/devnet
 
-build/bootstrap: build/.
+build/bootstrap:
+	mkdir -p build
 	lerna bootstrap
 	touch build/bootstrap
-
-build/.:
-	mkdir build
-
