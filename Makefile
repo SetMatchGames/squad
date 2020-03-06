@@ -19,22 +19,23 @@ ci: sdk-js-tests
 
 .PHONY: squad-games-web
 squad-games-web: build/squad-sdk-js build/metastore
+	make development-squad-games-web
+
+.PHONY: %-squad-games-web
+%-squad-games-web: build/%-squad-sdk-js build/metastore
 	cd $(squad-games-web) && npm run start
 
 #!!! clean up and remove roshambo completely?
-.PHONY: app-spec-roshambo
-app-spec-roshambo: build/metastore build/squad-sdk-js
-	cd $(app-spec-roshambo) && npm run start
+#.PHONY: app-spec-roshambo
+#app-spec-roshambo: build/metastore build/squad-sdk-js
+#	cd $(app-spec-roshambo) && npm run start
 
 .PHONY: squad-chess
 squad-chess: build/metastore build/squad-sdk-js
-	cd $(squad-chess) && node scripts/load_defs.js
-	cd $(squad-chess) && npm run start
-	cd $(squad-chess) && echo "open `pwd`/index.html in your browser"
+	make development-squad-chess
 
 .PHONY: %-squad-chess
-%-squad-chess: build/metastore build/%-squad-sdk-js
-#	cd $(squad-chess) && node scripts/load_defs.js
+%-squad-chess: build/metastore build/%-squad-sdk-js load-%-defs
 	cd $(squad-chess) && npm run start
 	cd $(squad-chess) && echo "open `pwd`/index.html in your browser"
 
@@ -44,6 +45,20 @@ squad-chess-alpha-server: build/metastore build/squad-sdk-js
 	cd $(squad-chess) && npm run build
 	cd $(squad-chess) && npx http-server
 
+.PHONY: %-squad-chess-alpha-server
+%-squad-chess-alpha-server: build/metastore build/%-squad-sdk-js load-%-defs
+	cd $(squad-chess) && npm run build
+	cd $(squad-chess) && npx http-server
+
+load-%-defs:
+	if [ -a $(squad-chess)/scripts/load_$*_defs.js ]; \
+	then \
+		echo "Loading $* definitions"; \
+		cd $(squad-chess) && node scripts/load_$*_defs.js; \
+	else \
+		echo "$(squad-chess)/scripts/load_$*_defs.js not found"; \
+	fi
+
 
 .PHONY: clean
 clean:
@@ -51,7 +66,6 @@ clean:
 	-if [ -a build/metastore ]; then kill $(shell cat build/metastore); fi
 	-rm -rf build
 	-rm -rf packages/curation-market/clients/js/contracts
-	-rm -rf packages/curation-market/app/build
 	-rm -rf packages/metastore/mock/build
 	-rm -rf $(js-client-contracts)
 	-rm $(curation-market-js)/development-curation-config.json
@@ -119,7 +133,6 @@ $(curation-market-js)/%-curation-config.json: build/%-curation-market
 	cp $(curation-market)/$*-curation-config.json $(curation-market-js)/$*-curation-config.json
 
 build/development-curation-market: build/devnet build/bootstrap
-	echo "makeing because of $?"
 	cd $(curation-market) && npm run deploy
 	touch build/development-curation-market
 
