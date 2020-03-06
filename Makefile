@@ -14,8 +14,8 @@ squad-chess = packages/app-spec-squad-chess
 metastore-shell = cd $(metastore) && nix-shell https://holochain.love --pure --command
 
 .PHONY: ci
-ci: build/bootstrap test-metastore test-mock-metastore test-squad-chess
-ci: test-sdk-js
+ci: build/bootstrap metastore-tests mock-metastore-tests squad-chess-tests
+ci: sdk-js-tests
 
 .PHONY: squad-games-web
 squad-games-web: build/squad-sdk-js build/metastore
@@ -44,10 +44,6 @@ squad-chess-alpha-server: build/metastore build/squad-sdk-js
 	cd $(squad-chess) && npm run build
 	cd $(squad-chess) && npx http-server
 
-.PHONY test:
-test: test-curation-market test-squad-games-web test-app-spec-roshambo
-test: test-metastore test-squad-chess
-
 
 .PHONY: clean
 clean:
@@ -66,23 +62,23 @@ very-clean: clean
 	lerna clean
 
 
-.PHONY: test-squad-chess
-test-squad-chess: build/bootstrap
+.PHONY: squad-chess-tests
+squad-chess-tests: build/bootstrap
 	cd $(squad-chess) && npm run test
 
 
-.PHONY: test-mock-metastore
-test-mock-metastore: build/bootstrap
+.PHONY: mock-metastore-tests
+mock-metastore-tests: build/bootstrap
 	cd $(mock-metastore) && npm run test
 
 
-.PHONY: test-sdk-js
-test-sdk-js: build/bootstrap build/squad-sdk-js
+.PHONY: sdk-js-tests
+sdk-js-tests: build/bootstrap build/squad-sdk-js
 	cd $(sdk-js) && npm run test
 
 
-.PHONY: test-metastore
-test-metastore: build/bootstrap
+.PHONY: metastore-tests
+metastore-tests: build/bootstrap
 	cd $(metastore-js) && npm run test
 	echo "Skipping holochain tests, reactivate when on current hc release"
 	echo "Skipping holochain tests, reactivate when on current hc release"
@@ -92,18 +88,18 @@ test-metastore: build/bootstrap
 #	$(metastore-shell) hc test
 
 
-.PHONY: test-squad-games-web
-test-squad-games-web:
+.PHONY: squad-games-web-tests
+squad-games-web-tests:
 	cd $(squad-games-web) && CI=true npm run test
 
 
-.PHONY: test-app-spec-roshambo
-test-app-spec-roshambo:
+.PHONY: app-spec-roshambo-tests
+app-spec-roshambo-tests:
 	cd $(app-spec-roshambo) && CI=true npm run test
 
 
-.PHONY: test-curation-market
-test-curation-market: build/curation-market $(curation-market-js)/development-curation-config.json
+.PHONY: curation-market-tests
+curation-market-tests: build/curation-market $(curation-market-js)/development-curation-config.json
 	cd $(curation-market) && npm run test
 	cd $(curation-market-js) && npm run test
 
