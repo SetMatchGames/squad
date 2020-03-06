@@ -23,6 +23,7 @@ squad_components.json
 
 packages/curation-market/clients/js/contracts
 packages/curation-market/clients/js/curation-config.json
+packages/curation-market/clients/js/development-curation-config.json
 
 // made by netwrking shim
 packages/squad-games-web/squad.games
@@ -30,3 +31,4 @@ packages/squad-sdk/js/squad.games
 
 // made during migration
 packages/curation-market/app/curation-config.json
+packages/curation-market/app/development-curation-config.json
