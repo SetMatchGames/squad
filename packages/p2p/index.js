@@ -21,8 +21,8 @@ function joinChannel(channel, opts = {}) {
     peers[peerId] = connection
     console.log(`First connection in channel ${channel} established: ${peerId}`)
     if (opts.matchFirst) {
-      matchById(peerId, channel)
       matchedPeer = peerId
+      matchById(matchedPeer, channel)
       connection.on('data', data => {
         console.log(String(data))
       })
@@ -32,7 +32,6 @@ function joinChannel(channel, opts = {}) {
 
 function matchById(targetId, oldChannel) {
   sw.leave(oldChannel)
-  peers = {}
   const hash = crypto.createHash('sha1')
   const newChannel = hash
     .update(consistentStringSplice(id.toString('hex'), targetId))
@@ -75,6 +74,6 @@ module.exports = {
   write
 }
 
-firstAvailableMatch('cheese').then()
+firstAvailableMatch('squadcheese').then()
 setInterval(() => write('hello'), 1000)
 
