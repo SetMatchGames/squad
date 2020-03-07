@@ -1,6 +1,7 @@
 const WebSocket = require('rpc-websockets').Client
 // const IPFS = require('ipfs')
 
+// TODO change 'squad' to 'metastore' here?
 const squad = {}
 
 function webSocketConnection (uri) {
