@@ -30,8 +30,9 @@ let channel
 // let receivingPeer = new Peer({ wrtc })
 const offeringPeer = new RTCPeerConnection()
 const answeringPeer = new RTCPeerConnection()
+let dc
 let answers = {}
-let connection = null
+// let connection = null
 
 function webSocketConnection (uri) {
   console.log('connecting')
@@ -85,6 +86,8 @@ async function sendAnswer (offer, targetId, targetUser) {
   await answeringPeer.setLocalDescription(new RTCSessionDescription(answer))
   console.log(`sending answer: ${answeringPeer.localDescription}, targetId: ${target}`)
   discovery.call('sendAnswer', [channel, target, id, answeringPeer.localDescription, user])
+
+  createDataChannel(answeringPeer, 'DataChannel')
   /*
   target = targetId
   receivingPeer.on('signal', (answer) => {
@@ -124,6 +127,8 @@ async function acceptAnswer (answerId) {
   const targetUser = answers[answerId].userName
 
   await offeringPeer.setRemoteDescription(answer)
+
+  createDataChannel(offeringPeer, 'DataChannel')
   /*
   initiatingPeer.signal(answer)
 
@@ -135,6 +140,29 @@ async function acceptAnswer (answerId) {
     initiatingPeer.send(`Greetings from ${user}!`)
   })
   */
+}
+
+function createDataChannel(peer, label) {
+  dc = peer.createDataChannel(label)
+
+  dc.onopen = () => {
+    console.log('datachannel opened')
+  }
+
+  dc.onmessage = (event) => {
+    console.log(`received: ${event.data}`)
+  }
+
+  dc.onclose = () => {
+    console.log('datachannel closed')
+  }
+
+}
+
+function send (str) {
+  if (dc && dc.send) {
+    dc.send(str)
+  }
 }
 
 function reset () {
@@ -175,5 +203,6 @@ on('open', async () => {
   watchAnswers((data) => {
     console.log('got answer data:', data)
     acceptAnswer(data.id)
+    send('Hello from the moon!')
   })
 })
