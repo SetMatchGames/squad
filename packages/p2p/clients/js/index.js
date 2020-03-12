@@ -46,7 +46,7 @@ function on (message, f) {
 function watchPeers (cb) {
   console.log(`Watching for peers in join-${channel}`)
   discovery.subscribe(`join-${channel}`)
-  discovery.on(`join-${channel}`, async ({ channel }) => {
+  discovery.on(`join-${channel}`, async () => {
     console.log(`Detected join in ${channel}`)
     const peers = await discovery.call('listPeers', [channel, id])
     cb(peers)
@@ -84,7 +84,7 @@ async function sendAnswer (offer, targetId, targetUser) {
   const answer = await answeringPeer.createAnswer()
   await answeringPeer.setLocalDescription(new RTCSessionDescription(answer))
   console.log(`sending answer: ${answeringPeer.localDescription}, targetId: ${target}`)
-  discovery.call('sendAnswer', [target, id, answeringPeer.localDescription, user])
+  discovery.call('sendAnswer', [channel, target, id, answeringPeer.localDescription, user])
   /*
   target = targetId
   receivingPeer.on('signal', (answer) => {
@@ -104,19 +104,22 @@ async function sendAnswer (offer, targetId, targetUser) {
 
 // Listen for answers to your offer.
 function watchAnswers (cb) {
-  const event = `answer-${id}`
-  console.log(`watching answers at ${event}`)
-  discovery.subscribe(`answer-${id}`)
-  discovery.on(`answer-${id}`, async (data) => {
-    console.log(`detected answer in ${event}`)
-    answers[data.id] = { answer: data.answer, userName: data.userName }
-    cb(data)
+  const event = `answer-${channel}`
+  console.log(`Watching for answers in ${event}`)
+  discovery.subscribe(event)
+  discovery.on(event, (data) => {
+    if (data.targetId === id) {
+      console.log(`Detected answer in ${event} to ${id}`)
+      answers[data.id] = { answer: data.answer, userName: data.userName }
+      cb(data)
+    }
   })
 }
 
 // Accept an answer to your offer, then wait for a connection.
 // Leave the channel and delete the unused peer.
 async function acceptAnswer (answerId) {
+  console.log('Accepting answer...')
   const answer = answers[answerId].answer
   const targetUser = answers[answerId].userName
 
@@ -161,9 +164,6 @@ on('open', async () => {
   // joinChannel('games', 'offer', 'ezra')
   await offerMatch('games', 'ezra')
   let peers
-  watchAnswers((data) => {
-    console.log('got answer data:', data)
-  })
   watchPeers(async (peerList) => {
     console.log('peerlist', peerList)
     peers = peerList
@@ -171,5 +171,9 @@ on('open', async () => {
     const offer = peers[peerId].offer
     const userName = peers[peerId].userName
     await sendAnswer(offer, peerId, userName)
+  })
+  watchAnswers((data) => {
+    console.log('got answer data:', data)
+    acceptAnswer(data.id)
   })
 })

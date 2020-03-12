@@ -44,7 +44,7 @@ server.register('joinChannel', ([channel, id, offer, userName]) => {
   }
   CHANNELS[channel][id] = { offer, userName, answers: {} }
   console.log(`emitting join-${channel} event`)
-  server.emit(`join-${channel}`, { channel })
+  server.emit(`join-${channel}`)
   console.log(CHANNELS[channel][id])
   return CHANNELS[channel]
 })
@@ -74,13 +74,13 @@ server.register('leaveChannel', ([channel, id]) => {
   if (Object.keys(CHANNELS[channel]).length === 0) { delete CHANNELS[channel] }
 })
 
-server.register('sendAnswer', ([targetId, sourceId, answer, userName]) => {
+server.register('sendAnswer', ([channel, targetId, sourceId, answer, userName]) => {
   console.log(`${sourceId} sending answer event to ${targetId}`)
-  const event = `answer-${targetId}`
+  const event = `answer-${channel}`
   if (!server.eventList().includes(event)) {
     server.event(event)
   }
   console.log(`server events: ${server.eventList()}`)
-  server.emit(event, { answer, userName, id: sourceId })
-  console.log(`emitting ${event} to ${sourceId}: ${answer}`)
+  server.emit(event, { answer, userName, sourceId, targetId })
+  console.log(`emitting ${event} to ${targetId}: ${answer}`)
 })
