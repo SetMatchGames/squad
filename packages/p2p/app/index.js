@@ -30,26 +30,57 @@ console.log(`Peer discovery server listening on ws://${host}:${port}`)
 
 const CHANNELS = {}
 
-server.register('joinChannel', ([channel, id, peer, userName]) => {
-  console.log('joining channel')
+server.register('joinChannel', ([channel, id, offer, userName]) => {
+  if (!server.eventList().includes(`join-${channel}`)) {
+    server.event(`join-${channel}`)
+  }
+  console.log(`Added new server event join-${channel} to event list: ${server.eventList()}`)
+
+  console.log(`${id} joining channel ${channel}`)
   if (!CHANNELS[channel]) { CHANNELS[channel] = {} }
-  if (CHANNELS[channel][id]) { console.log(`Error: ID '${id}' already in peer discovery channel '${channel}'`) }
-  CHANNELS[channel][id] = { peer, userName }
-  console.log(CHANNELS[channel])
+  if (CHANNELS[channel][id]) { 
+    console.log(`Error: ID '${id}' already in peer discovery channel '${channel}'`)
+    return
+  }
+  CHANNELS[channel][id] = { offer, userName, answers: {} }
+  console.log(`emitting join-${channel} event`)
+  server.emit(`join-${channel}`, { channel })
+  console.log(CHANNELS[channel][id])
+  return CHANNELS[channel]
 })
 
 server.register('listPeers', ([channel, id]) => {
-  console.log('listing peers')
-  if (!CHANNELS[channel]) { console.log(`Error: channel '${channel}' does not exist`) }
+  console.log(`listing peers of ${id} in channel ${channel}`)
+  if (!CHANNELS[channel]) { 
+    console.log(`Error: channel '${channel}' does not exist`) 
+    return
+  }
   let copy = Object.assign({}, CHANNELS[channel])
   delete copy[id]
-  console.log('copy', copy)
   return copy
 })
 
 server.register('leaveChannel', ([channel, id]) => {
-  if (!CHANNELS[channel]) { console.log(`Error: channel '${channel}' does not exist`) }
-  if (!CHANNELS[channel][id]) { console.log(`Error: ID '${id}' does not exist in channel '${channel}'`) }
+  console.log(`${id} leaving channel ${channel}`)
+  if (!CHANNELS[channel]) { 
+    console.log(`Error: channel '${channel}' does not exist`)
+    return 
+  }
+  if (!CHANNELS[channel][id]) { 
+    console.log(`Error: ID '${id}' does not exist in channel '${channel}'`) 
+    return
+  }
   delete CHANNELS[channel][id]
   if (Object.keys(CHANNELS[channel]).length === 0) { delete CHANNELS[channel] }
+})
+
+server.register('sendAnswer', ([targetId, sourceId, answer, userName]) => {
+  console.log(`${sourceId} sending answer event to ${targetId}`)
+  const event = `answer-${targetId}`
+  if (!server.eventList().includes(event)) {
+    server.event(event)
+  }
+  console.log(`server events: ${server.eventList()}`)
+  server.emit(event, { answer, userName, id: sourceId })
+  console.log(`emitting ${event} to ${sourceId}: ${answer}`)
 })
