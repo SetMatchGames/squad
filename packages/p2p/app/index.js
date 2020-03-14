@@ -84,3 +84,14 @@ server.register('sendAnswer', ([channel, targetId, sourceId, answer, userName]) 
   server.emit(event, { answer, userName, sourceId, targetId })
   console.log(`emitting ${event} to ${targetId}: ${answer}`)
 })
+
+server.register('sendCandidate', ([channel, targetId, sourceId, candidate, userName]) => {
+  console.log(`${sourceId} sending candidate event to ${targetId}`)
+  const event = `candidate-${channel}`
+  if (!server.eventList().includes(event)) {
+    server.event(event)
+  }
+  console.log(`server events: ${server.eventList()}`)
+  server.emit(event, { candidate, userName, sourceId, targetId })
+  console.log(`emitting ${event} to ${targetId}: ${candidate}`)
+})

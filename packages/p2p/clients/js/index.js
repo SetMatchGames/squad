@@ -14,6 +14,8 @@
  * then create an answer, set your local description to it, and upload the answer to the server.
  * If you see an answer to your offer, you can set your local description to that answer
  * 
+ * Maybe we need to pass ice candidates back and forth after this stuff??
+ * 
  */
 
 const crypto = require('crypto')
@@ -31,6 +33,36 @@ let channel
 const offeringPeer = new RTCPeerConnection()
 const answeringPeer = new RTCPeerConnection()
 let dc
+createDataChannel(offeringPeer, 'dataChannel')
+createDataChannel(answeringPeer, 'DataChannel')
+offeringPeer.onconnectionstatechange = (e) => {
+  console.log('Offering peer connection state changed', e)
+}
+answeringPeer.onconnectionstatechange = (e) => {
+  console.log('Answering peer connection state changed', e)
+}
+offeringPeer.onicecandidate = (e) => {
+  if (e.candidate) {
+    discovery.call('sendCandidate', [channel, target, id, e.candidate, user])
+    console.log('readyState:', offeringPeer.connectionState, dc.readyState)
+    console.log('Offering peer received ice candidate', e)
+  }
+}
+answeringPeer.onicecandidate = (e) => {
+  if (e.candidate) {
+    discovery.call('sendCandidate', [channel, target, id, e.candidate, user])
+    console.log('readyState:', answeringPeer.connectionState, dc.readyState)
+    console.log('Answering peer received ice candidate', e)
+  }
+}
+offeringPeer.ondatachannel = (e) => {
+  console.log('readyState:', offeringPeer.connectionState, dc.readyState)
+  console.log('Offering peer received data channel:', e)
+}
+answeringPeer.ondatachannel = (e) => {
+  console.log('readyState:', answeringPeer.connectionState, dc.readyState)
+  console.log('Answering peer received data channel:', e)
+}
 let answers = {}
 // let connection = null
 
@@ -44,7 +76,7 @@ function on (message, f) {
   discovery.on(message, f)
 }
 
-function watchPeers (cb) {
+function watchOffers (cb) {
   console.log(`Watching for peers in join-${channel}`)
   discovery.subscribe(`join-${channel}`)
   discovery.on(`join-${channel}`, async () => {
@@ -81,13 +113,12 @@ async function offerMatch (channelName, userName) {
 async function sendAnswer (offer, targetId, targetUser) {
   console.log('sending answer...')
   target = targetId
+  // createDataChannel(answeringPeer, 'DataChannel')
   await answeringPeer.setRemoteDescription(offer)
   const answer = await answeringPeer.createAnswer()
   await answeringPeer.setLocalDescription(new RTCSessionDescription(answer))
   console.log(`sending answer: ${answeringPeer.localDescription}, targetId: ${target}`)
   discovery.call('sendAnswer', [channel, target, id, answeringPeer.localDescription, user])
-
-  createDataChannel(answeringPeer, 'DataChannel')
   /*
   target = targetId
   receivingPeer.on('signal', (answer) => {
@@ -125,10 +156,8 @@ async function acceptAnswer (answerId) {
   console.log('Accepting answer...')
   const answer = answers[answerId].answer
   const targetUser = answers[answerId].userName
-
   await offeringPeer.setRemoteDescription(answer)
 
-  createDataChannel(offeringPeer, 'DataChannel')
   /*
   initiatingPeer.signal(answer)
 
@@ -142,26 +171,52 @@ async function acceptAnswer (answerId) {
   */
 }
 
+function watchCandidates (cb) {
+  const event = `candidate-${channel}`
+  console.log(`Watching for caandidates in ${event}`)
+  discovery.subscribe(event)
+  discovery.on(event, (data) => {
+    if (data.targetId === id) {
+      console.log(`Detected candidate in ${event} to ${id}`)
+      cb(data)
+    }
+  })
+}
+
 function createDataChannel(peer, label) {
+  console.log('peer when creating dc:', peer)
   dc = peer.createDataChannel(label)
+  console.log('creating data channel:', dc)
 
   dc.onopen = () => {
     console.log('datachannel opened')
   }
-
   dc.onmessage = (event) => {
     console.log(`received: ${event.data}`)
   }
-
   dc.onclose = () => {
     console.log('datachannel closed')
   }
 
 }
 
-function send (str) {
-  if (dc && dc.send) {
-    dc.send(str)
+const sendQueue = []
+
+function send (msg) {
+  switch(dc.readyState) {
+    case "connecting":
+      console.log("Connection not open; queueing: " + msg);
+      sendQueue.push(msg);
+      break;
+    case "open":
+      sendQueue.forEach((msg) => dataChannel.send(msg));
+      break;
+    case "closing":
+      console.log("Attempted to send message while closing: " + msg);
+      break;
+    case "closed":
+      console.log("Error! Attempt to send while connection closed.");
+      break;
   }
 }
 
@@ -192,7 +247,7 @@ on('open', async () => {
   // joinChannel('games', 'offer', 'ezra')
   await offerMatch('games', 'ezra')
   let peers
-  watchPeers(async (peerList) => {
+  watchOffers(async (peerList) => {
     console.log('peerlist', peerList)
     peers = peerList
     const peerId = Object.keys(peers)[Object.keys(peers).length-1]
@@ -200,9 +255,16 @@ on('open', async () => {
     const userName = peers[peerId].userName
     await sendAnswer(offer, peerId, userName)
   })
-  watchAnswers((data) => {
+  watchAnswers(async (data) => {
     console.log('got answer data:', data)
-    acceptAnswer(data.id)
+    await acceptAnswer(data.id)
     send('Hello from the moon!')
+  })
+  watchCandidates(data => {
+    console.log('got candidate data:', data)
+    if (data.candidate) {
+      offeringPeer.addIceCandidate(data.candidate)
+      answeringPeer.addIceCandidate(data.candidate)
+    }
   })
 })
