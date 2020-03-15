@@ -1,12 +1,4 @@
-/* P2P peer discovery server
- * 
- * join a channel
- * show peers in the channel
- * leave a channel
- * 
- * use a websocket server like the mock metastore
- * 
- */
+/* P2P peer discovery server */
 
 const WSServer = require('rpc-websockets').Server
 
@@ -27,6 +19,49 @@ const port = conf('PEER_DISCOVERY_PORT', '8889')
 const server = new WSServer({ host, port })
 
 console.log(`Peer discovery server listening on ws://${host}:${port}`)
+
+const ROOMS = {}
+
+server.register('sendOffer', ([offer, id, room]) => {
+  if (!ROOMS[room]) { ROOMS[room] = {} }
+  if (ROOMS[room][id]) {
+    console.log(`Error: ID '${id}' already in peer discovery channel '${room}'`)
+    return
+  }
+  ROOMS[room][id] = offer
+})
+
+server.register('getOffers', ([id, room]) => {
+  let copy = Object.assign({}, ROOMS[room])
+  delete copy[id]
+  return copy
+})
+
+server.register('triggerAnswerEvent', ([answer, event]) => {
+  addEvent(event)
+  console.log('sending answer', event)
+  server.emit(`${event}`, { answer })
+})
+
+server.register('triggerCandidateEvent', ([candidate, event]) => {
+  addEvent(event)
+  console.log('sending candidate', event)
+  server.emit(`${event}`, { candidate })
+})
+
+server.register('event', () => {
+  addEvent('answer-cfc5f600d6e337b86b9702cd4a80f399')
+  server.emit('answer-cfc5f600d6e337b86b9702cd4a80f399')
+})
+
+function addEvent(event) {
+  if (!server.eventList().includes(event)) {
+    server.event(`${event}`)
+    console.log('added event', event)
+  }
+}
+
+/*
 
 const CHANNELS = {}
 
@@ -95,3 +130,5 @@ server.register('sendCandidate', ([channel, targetId, sourceId, candidate, userN
   server.emit(event, { candidate, userName, sourceId, targetId })
   console.log(`emitting ${event} to ${targetId}: ${candidate}`)
 })
+
+*/

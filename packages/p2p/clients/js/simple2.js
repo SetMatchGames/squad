@@ -1,49 +1,212 @@
-let ourId
-let theirId
+/* How to use this library to create a p2p data connection:
+ * 
+ * init(userId, uri)
+ * joinRoom(roomName)
+ * acceptOffer(offerId) OR acceptAnswer(answerId)
+ * when the handleDCStatusChange shows the dataChannel is open, use send(message) to communicate with the remote peer
+ *
+ */
 
-let offeringPeer = new RTCPeerConnection()
-offeringPeer.onicecandidate = handleIceCandidate
+const crypto = require('crypto')
+const WebSocket = require('rpc-websockets').Client
 
-let dataChannel = offeringPeer.createDataChannel('offeringDC')
-dataChannel.onopen = handleDCStatusChange
-dataChannel.onmessage = handleReceiveMessage
-dataChannel.onclose = handleDCStatusChange
+/*** STATE ***/
+let ourId = null
+let theirId = null
+let room = null
+let offers = {}
+let offerWatchInterval = null
+let answers = {}
+let answerEvent = null
+let candidateEvent = null
+let peer = null
+let offeringPeer = null
+let answeringPeer = null
+let dataChannel = null
+let server = null
 
-let answeringPeer = new RTCPeerConnection()
-answeringPeer.onicecandidate = handleIceCandidate
-answeringPeer.ondatachannel = receiveDataChannelCallback
+/*** MAIN FUNCTIONS ***/
 
-/* Connection flow:
+function init(userId, uri) {
+  // Set user ID
+  ourId = userId
 
-join a channel/room (make an offer and put it in the the channel/room)
-watch for peers in the room 
-and
-watch for answers from peers in the room
-accept an offer from a peer (set theirId, stop watching for answers and peers, delete offering peer)
---> generate and send an answer to that peer
---> watch for and add any ice candidates from that peer
---> send that peer any ice candidates the offering peer generates
---> when data channel is 'open', we are ready to send messages
-or
-accept an answer from a peer (set theirId, stop watching for offers and peers, delete answering peer)
---> send that peer any ice candidates the offering peer generates
---> watch for and add any ice candidates from that peer
---> when data channel is 'open', we are ready to send messages
+  // Connect to server
+  server = new WebSocket(uri)
+
+  // Set up offering peer
+  offeringPeer = new RTCPeerConnection()
+
+  // Set up offer peer's data channel
+  dataChannel = offeringPeer.createDataChannel("dataChannel")
+  dataChannel.onopen = handleDCStatusChange
+  dataChannel.onmessage = handleReceiveMessage
+  dataChannel.onclose = handleDCStatusChange
+
+  // Set up answering peer
+  answeringPeer = new RTCPeerConnection()
+
+  // Allow answering peer to accept a data channel from an offer
+  answeringPeer.ondatachannel = receiveDataChannelCallback
+}
+
+function eventName(type, key) {
+  return `${type}-${key}`
+}
+
+async function joinRoom(roomName) {
+  // send offer to room
+  room = roomName
+  const offer = await offeringPeer.createOffer()
+  await offeringPeer.setLocalDescription(offer)
+  await sendOfferToRoom(offeringPeer.localDescription)
+
+  // watch for other offers sent to the room
+  watchOffers(1000)
+  
+  // listen for answers to our offer
+  answerEvent = eventName("answer", ourId)
+  subscribe(answerEvent, handleReceiveAnswer)
+}
+
+function watchOffers(interval) {
+  offerWatchInterval = setInterval(async () => {
+    offers = await getOffers()
+  }, interval)
+}
+
+function startCandidateExchange() {
+  // receive ICE candidates from remote peer
+  candidateEvent = eventName("candidate", ourId)
+  subscribe(candidateEvent, handleReceiveCandidate)
+
+  // send ICE candidates we generate to remote peer
+  peer.onicecandidate = handleSendCandidate
+}
+
+async function acceptOffer(offerId) {
+  // commit to a local peer and a remote peer
+  theirId = offerId
+  peer = answeringPeer
+  delete offeringPeer
+  // stop watching for other offers / answers
+  clearInterval(offerWatchInterval)
+  unsubscribe(answerEvent)
+
+  // accept their offer
+  const offer = offers[offerId]
+  await peer.setRemoteDescription(new RTCSessionDescription(offer))
+
+  // create your answer
+  const answer = await peer.createAnswer()
+  await peer.setLocalDescription(answer)
+
+  // send answer to remote peer
+  sendAnswer(peer.localDescription)
+
+  // exchange ICE candidates with remote peer until a match is found
+  startCandidateExchange()
+}
+
+async function acceptAnswer(answerId) {
+  // commit to a local peer and a remote peer
+  theirId = answerId
+  peer = offeringPeer
+  delete answeringPeer
+  // stop watching for other offers / answers
+  clearInterval(offerWatchInterval)
+  unsubscribe(answerEvent)
+
+  // accept their answer
+  const answer = answers[answerId]
+  await peer.setRemoteDescription(answer)
+
+  // exchange ICE candidates with remote peer until a match is found
+  startCandidateExchange()
+}
+
+// Once dataChannel is open, use this to send messages
+function send(message) {
+  peer.send(message)
+}
+
+// Reset everything except the server connection (leave matchmaking)
+function reset() {
+  ourId = null
+  theirId = null
+  room = null
+  offers = {}
+  clearInterval(offerWatchInterval)
+  offerWatchInterval = null
+  answers = {}
+  answerEvent = null
+  candidateEvent = null
+  peer = null
+  offeringPeer = null
+  answeringPeer = null
+  dataChannel = null
+}
 
 
-localConnection.createOffer()
-  .then(offer => localConnection.setLocalDescription(offer))
-  .then(() => remoteConnection.setRemoteDescription(localConnection.localDescription))
-  .then(() => remoteConnection.createAnswer())
-  .then(answer => remoteConnection.setLocalDescription(answer))
-  .then(() => localConnection.setRemoteDescription(remoteConnection.localDescription))
-  .catch(handleCreateDescriptionError)
+/*** PEER DISCOVERY SERVER FUNCTIONS ***/
 
-*/
+function onOpen(callback) {
+  server.on('open', callback)
+}
 
-const handleIceCandidate = (event) => {
+function subscribe(event, callback) {
+  // watch for events and call callback
+  console.log('subscribing to', event)
+  server.subscribe(event)
+  server.on(event, callback)
+}
+
+function unsubscribe(event) {
+  // stop watching for events
+  server.unsubscribe(event)
+}
+
+async function sendOfferToRoom(offer) {
+  // send data to server
+  await server.call('sendOffer', [offer, ourId, room])
+}
+
+async function getOffers() {
+  return await server.call('getOffers', [ourId, room])
+}
+
+async function sendAnswer(answer) {
+  // trigger server event
+  console.log('trying to send answer', eventName('answer', theirId))
+  await server.call('triggerAnswerEvent', [answer, eventName('answer', theirId)])
+}
+
+async function sendCandidate(candidate) {
+  // server function call
+  console.log('trying to send candidate', eventName('candidate', theirId))
+  await server.call('triggerCandidateEvent', [candidate, eventName('candidate', theirId)])
+}
+
+
+/*** HANDLERS AND CALLBACKS ***/
+
+const handleReceiveAnswer = (event) => {
+  if (event.id === ourId) {
+    console.log('received answer')
+    answers[event.id] = event.answer
+  }
+}
+
+const handleReceiveCandidate = (event) => {
+  if (event.candidate && event.id === ourId) {
+    console.log('received candidate')
+    peer.addIceCandidate(event.candidate)
+  }
+}
+
+const handleSendCandidate = (event) => {
   if (event.candidate) {
-    sendIceCandidate(event.candidate, theirId)
+    sendCandidate(event.candidate, theirId)
   }
 }
 
@@ -58,23 +221,41 @@ const handleReceiveMessage = (event) => {
 }
 
 const receiveDataChannelCallback = (event) => {
+  console.log('received data channel')
   dataChannel = event.channel
   dataChannel.onopen = handleDCStatusChange
   dataChannel.onmessage = handleReceiveMessage
   dataChannel.onclose = handleDCStatusChange
 }
 
-const receiveChannelCallback = (e) => {
-  receiveChannel = e.channel
-  receiveChannel.onmessage = handleReceiveMessage
-  receiveChannel.onopen = handleReceiveChannelStatusChange
-  receiveChannel.onclose = handleReceiveChannelStatusChange
+module.exports = {
+  init,
+  joinRoom,
+  offers,
+  acceptOffer,
+  answers,
+  acceptAnswer,
+  send,
+  reset
 }
 
-function sendIceCandidate(candidate, target) {
-  // server function call
-}
+/*** TESTING ***/
+const userId = crypto.randomBytes(16).toString('hex')
 
-function reset() {
-
-}
+init(userId, 'ws://localhost:8889')
+console.log(server)
+onOpen(async () => {
+  await joinRoom('squadChess')
+  server.subscribe('answer-cfc5f600d6e337b86b9702cd4a80f399')
+  server.on('answer-cfc5f600d6e337b86b9702cd4a80f399', (e) => {
+    console.log('event!', e)
+  })
+  server.call('event')
+  const intId = setInterval(async () => {
+    const l = Object.keys(offers).length
+    if (l > 0) {
+      await acceptOffer(Object.keys(offers)[l-1])
+      clearInterval(intId)
+    }
+  }, 2000)
+})
