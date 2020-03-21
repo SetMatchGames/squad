@@ -2,6 +2,7 @@
  * 
  * init(userId, uri)
  * joinRoom(roomName)
+ * watchOffersAnswers(interval)
  * acceptOffer(offerId) OR acceptAnswer(answerId)
  * when the handleDCStatusChange shows the dataChannel is open, use send(message) to communicate with the remote peer
  *
@@ -57,22 +58,20 @@ function eventName(type, key) {
 async function joinRoom(roomName) {
   // send offer to room
   room = roomName
+  answerEvent = eventName("answer", ourId)
   const offer = await offeringPeer.createOffer()
   await offeringPeer.setLocalDescription(offer)
-  await sendOfferToRoom(offeringPeer.localDescription)
-
-  // watch for other offers sent to the room
-  watchOffers(1000)
-  
-  // listen for answers to our offer
-  answerEvent = eventName("answer", ourId)
-  subscribe(answerEvent, handleReceiveAnswer)
+  sendOfferToRoom(offeringPeer.localDescription)
 }
 
-function watchOffers(interval) {
+function watchOffersAndAnswers(interval) {
+  // watch for other offers sent to the room
   offerWatchInterval = setInterval(async () => {
     offers = await getOffers()
   }, interval)
+
+  // listen for answers to our offer
+  subscribe(answerEvent, handleReceiveAnswer)
 }
 
 function startCandidateExchange() {
@@ -166,25 +165,25 @@ function unsubscribe(event) {
   server.unsubscribe(event)
 }
 
-async function sendOfferToRoom(offer) {
+function sendOfferToRoom(offer) {
   // send data to server
-  await server.call('sendOffer', [offer, ourId, room])
+  server.call('sendOffer', [offer, ourId, room, answerEvent])
 }
 
 async function getOffers() {
   return await server.call('getOffers', [ourId, room])
 }
 
-async function sendAnswer(answer) {
+function sendAnswer(answer) {
   // trigger server event
   console.log('trying to send answer', eventName('answer', theirId))
-  await server.call('triggerAnswerEvent', [answer, eventName('answer', theirId)])
+  server.call('triggerAnswerEvent', [answer, eventName('answer', theirId)])
 }
 
-async function sendCandidate(candidate) {
+function sendCandidate(candidate) {
   // server function call
   console.log('trying to send candidate', eventName('candidate', theirId))
-  await server.call('triggerCandidateEvent', [candidate, eventName('candidate', theirId)])
+  server.call('triggerCandidateEvent', [candidate, eventName('candidate', theirId)])
 }
 
 
@@ -246,11 +245,13 @@ init(userId, 'ws://localhost:8889')
 console.log(server)
 onOpen(async () => {
   await joinRoom('squadChess')
-  server.subscribe('answer-cfc5f600d6e337b86b9702cd4a80f399')
-  server.on('answer-cfc5f600d6e337b86b9702cd4a80f399', (e) => {
-    console.log('event!', e)
-  })
-  server.call('event')
+  await watchOffersAndAnswers(1000)
+  // server.call('addEvent')
+  // server.subscribe('answer-cfc5f600d6e337b86b9702cd4a80f399')
+  //server.on('answer-cfc5f600d6e337b86b9702cd4a80f399', (e) => {
+  //  console.log('event!', e)
+  // })
+  server.call('triggerEvent')
   const intId = setInterval(async () => {
     const l = Object.keys(offers).length
     if (l > 0) {
