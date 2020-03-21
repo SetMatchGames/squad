@@ -58,20 +58,20 @@ function eventName(type, key) {
 async function joinRoom(roomName) {
   // send offer to room
   room = roomName
-  answerEvent = eventName("answer", ourId)
+  // answerEvent = eventName("answer", ourId)
   const offer = await offeringPeer.createOffer()
   await offeringPeer.setLocalDescription(offer)
   sendOfferToRoom(offeringPeer.localDescription)
 }
 
-function watchOffersAndAnswers(interval) {
+function watchOffers(interval) {
   // watch for other offers sent to the room
   offerWatchInterval = setInterval(async () => {
     offers = await getOffers()
   }, interval)
 
   // listen for answers to our offer
-  subscribe(answerEvent, handleReceiveAnswer)
+  // subscribe(answerEvent, handleReceiveAnswer)
 }
 
 function startCandidateExchange() {
@@ -167,7 +167,7 @@ function unsubscribe(event) {
 
 function sendOfferToRoom(offer) {
   // send data to server
-  server.call('sendOffer', [offer, ourId, room, answerEvent])
+  server.call('sendOffer', [offer, ourId, room])
 }
 
 async function getOffers() {
@@ -242,16 +242,32 @@ module.exports = {
 const userId = crypto.randomBytes(16).toString('hex')
 
 init(userId, 'ws://localhost:8889')
-console.log(server)
 onOpen(async () => {
+  console.log('ourId:', ourId)
   await joinRoom('squadChess')
-  await watchOffersAndAnswers(1000)
-  // server.call('addEvent')
+  await watchOffers(1000)
+  answerEvent = eventName("answer", ourId)
+  candidateEvent = eventName("candidate", ourId)
+  server.call('addEvent', [answerEvent])
+  server.call('addEvent', [candidateEvent])
+  server.subscribe(answerEvent)
+  server.subscribe(candidateEvent)
+  server.on(answerEvent, (e) => {
+    console.log(`Received answer! ${e}`)
+  })
+  server.on(candidateEvent, (e) => {
+    console.log(`Received candidate! ${e}`)
+  })
+  console.log(offers)
+  console.log(server)
+  server.call('triggerAnswerEvent', ['answer', eventName('answer', 'a45a163f8265bbb8915328d7f700be6a')])
+  // server.call('addEvent', ['answer-cfc5f600d6e337b86b9702cd4a80f399'])
   // server.subscribe('answer-cfc5f600d6e337b86b9702cd4a80f399')
-  //server.on('answer-cfc5f600d6e337b86b9702cd4a80f399', (e) => {
-  //  console.log('event!', e)
+  // server.on('answer-cfc5f600d6e337b86b9702cd4a80f399', (e) => {
+  //   console.log('event!', e)
   // })
-  server.call('triggerEvent')
+  // server.call('triggerEvent', ['answer-cfc5f600d6e337b86b9702cd4a80f399'])
+  /*
   const intId = setInterval(async () => {
     const l = Object.keys(offers).length
     if (l > 0) {
@@ -259,4 +275,5 @@ onOpen(async () => {
       clearInterval(intId)
     }
   }, 2000)
+  */
 })

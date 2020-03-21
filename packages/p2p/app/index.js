@@ -22,14 +22,14 @@ console.log(`Peer discovery server listening on ws://${host}:${port}`)
 
 const ROOMS = {}
 
-server.register('sendOffer', ([offer, id, room, answerEvent]) => {
+server.register('sendOffer', ([offer, id, room]) => {
   if (!ROOMS[room]) { ROOMS[room] = {} }
   if (ROOMS[room][id]) {
     console.log(`Error: ID '${id}' already in peer discovery channel '${room}'`)
     return
   }
+  console.log('sending offer to room', room, offer)
   ROOMS[room][id] = offer
-  addEvent(answerEvent)
 })
 
 server.register('getOffers', ([id, room]) => {
@@ -39,7 +39,7 @@ server.register('getOffers', ([id, room]) => {
 })
 
 server.register('triggerAnswerEvent', ([answer, event]) => {
-  // addEvent(event)
+  addEvent(event)
   console.log('sending answer', event)
   server.emit(`${event}`, { answer })
 })
@@ -50,12 +50,12 @@ server.register('triggerCandidateEvent', ([candidate, event]) => {
   server.emit(`${event}`, { candidate })
 })
 
-server.register('addEvent', () => {
-  addEvent('answer-cfc5f600d6e337b86b9702cd4a80f399')
+server.register('addEvent', ([event]) => {
+  addEvent(event)
 })
 
-server.register('triggerEvent', () => {
-  server.emit('answer-cfc5f600d6e337b86b9702cd4a80f399')
+server.register('triggerEvent', ([event]) => {
+  server.emit(event, { data: "hello world" })
 })
 
 server.register('eventList', () => {
