@@ -22,6 +22,8 @@ let survivingPeer = null
 let offeringPeer = null
 let answeringPeer = null
 let dataChannel = null
+let connectionStatusCB = null
+let messageCB = null
 
 /*** MAIN FUNCTIONS ***/
 
@@ -37,15 +39,23 @@ function init(userId, uri) {
 
   // Set up offering peer's data channel
   dataChannel = offeringPeer.createDataChannel("dataChannel")
-  dataChannel.onopen = handleDCStatusChange
-  dataChannel.onmessage = handleReceiveMessage
-  dataChannel.onclose = handleDCStatusChange
 
   // Set up answering peer
   answeringPeer = new RTCPeerConnection()
 
   // Allow answering peer to accept a data channel from an offer
   answeringPeer.ondatachannel = handleReceiveDataChannel
+}
+
+function listenConnectionStatus(callback) {
+  connectionStatusCB = callback
+  dataChannel.onopen = callback
+  dataChannel.onclose = callback
+}
+
+function listenMessage(callback) {
+  messageCB = callback
+  dataChannel.onmessage = callback
 }
 
 function whenServerReady(callback) {
@@ -82,11 +92,6 @@ function listenEvent(eventType, callback) {
 
 function stopListen(eventType) {
   server.unsubscribe(events[eventType])
-}
-
-function connectionStatus() {
-  if (!dataChannel) { return 'No connection' }
-  return dataChannel.readyState
 }
 
 async function updatePeers() {
@@ -157,6 +162,10 @@ function addCandidate(id, candidate) {
   survivingPeer.addIceCandidate(candidate).catch(e => { throw new Error(e) })
 }
 
+function sendMessage(msg) {
+  dataChannel.send(msg)
+}
+
 /*** CALLBACKS ***/
 
 const handleDCStatusChange = (event) => {
@@ -175,9 +184,9 @@ const handleReceiveMessage = (event) => {
 const handleReceiveDataChannel = (event) => {
   console.log('Received data channel')
   dataChannel = event.channel
-  dataChannel.onopen = handleDCStatusChange
-  dataChannel.onmessage = handleReceiveMessage
-  dataChannel.onclose = handleDCStatusChange
+  dataChannel.onopen = connectionStatusCB
+  dataChannel.onclose = connectionStatusCB
+  dataChannel.onmessage = messageCB
 }
 
 const handleSendCandidate = (event) => {
@@ -192,6 +201,8 @@ const handleSendCandidate = (event) => {
 
 module.exports = {
   init,
+  listenConnectionStatus,
+  listenMessage,
   whenServerReady,
   joinRoom,
   rollCall,
@@ -200,6 +211,6 @@ module.exports = {
   sendAnswer,
   acceptAnswer,
   addCandidate,
-  peers,
-  connectionStatus
+  sendMessage,
+  peers
 }

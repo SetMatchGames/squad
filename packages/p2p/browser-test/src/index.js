@@ -1,14 +1,80 @@
 import m from "mithril"
 import matchmaking from "../../clients/js"
 
+let connectionStatus = 'placeholder'
+let messages = []
 const room = 'squadChess'
 let peers = []
 const offers = {}
-let connectionStatus = null
+let rollCallInterval = null
+let savedMessage = 'Hello world!'
 
 const Matchmaking = {
   oninit: () => {
     matchmaking.init(id, 'ws://localhost:8889')
+  },
+  view: () => {
+    return m(
+      'div#matchmaking',
+      m(Messages),
+      m(OfferList),
+      m(PeerList)
+    )
+  }
+}
+
+const Messages = {
+  oninit: () => {
+    matchmaking.listenConnectionStatus((e) => {
+      if (e.target) {
+        connectionStatus = e.target.readyState
+        console.log(`Connection status:`, connectionStatus)
+      }
+    })
+    matchmaking.listenMessage((e) => {
+      if (e.data) {
+        console.log(`Received message:`, e)
+        messages.push(e.data)
+      }
+    })
+  },
+  view: () => {
+    return m(
+      'div#messages',
+      m('div#messagesReceived', messages),
+      m(MessageForm),
+      m(ConnectionStatus)
+    )
+  }
+}
+
+const MessageForm = {
+  view: () => {
+    let content = [
+      m(`input#message-field[type=text][placeholder=${savedMessage}]`, { oninput: saveMessage }),
+      m('button#message-button[type=submit]', { onclick: sendMessage }, 'Send')
+    ]
+    if (connectionStatus != 'open') {
+      content = 'Waiting for open connection to display message form...'
+    }
+    return m(
+      'form#message-form',
+      content
+    )
+  }
+}
+
+const ConnectionStatus = {
+  view: () => {
+    return m(
+      'div#connection-status',
+      `Connection status: ${connectionStatus}`
+    )
+  }
+}
+
+const OfferList = {
+  oninit: () => {
     matchmaking.whenServerReady(async () => {
       matchmaking.joinRoom(room)
       matchmaking.listenEvent('offer', (e) => {
@@ -25,18 +91,6 @@ const Matchmaking = {
       })
     })
   },
-  view: () => {
-    return m(
-      'div#matchmaking',
-      { onmouseover: rollCall },
-      m('div#connection-status', `Connection status: ${connectionStatus}`),
-      m(OfferList),
-      m(PeerList)
-    )
-  }
-}
-
-const OfferList = {
   view: () => {
     let content = "No offers yet. Waiting..."
     if (Object.keys(offers).length) {
@@ -66,6 +120,12 @@ const Offer = {
 }
 
 const PeerList = {
+  oninit: () => {
+    rollCallInterval = setInterval(async () => {
+      await rollCall()
+      m.redraw()
+    }, 300)
+  },
   view: () => {
     let content = 'No peers yet. Loading...'
     if (peers.length > 0) {
@@ -95,29 +155,34 @@ const Peer = {
 
 const sendOffer = (event) => {
   event.preventDefault()
-  console.log(event)
+  console.log('Send offer event:', event)
   matchmaking.sendOffer(event.target.id)
 }
 
 const sendAnswer = (event) => {
   event.preventDefault()
-  console.log(event)
+  console.log('Send answer event:', event)
   matchmaking.sendAnswer(event.target.id, offers[event.target.id])
   delete offers[event.target.id]
+}
+
+const saveMessage = (event) => {
+  event.preventDefault()
+  console.log('Save message event:', event)
+  savedMessage = event.target.value
+}
+
+const sendMessage = (event) => {
+  event.preventDefault()
+  console.log('Send message event:', event)
+  matchmaking.sendMessage(savedMessage)
+  savedMessage = ''
+  document.getElementById('message-field').value = ''
 }
 
 const rollCall = async () => {
   peers = await matchmaking.rollCall()
   console.log(`Current peers in ${room} room: ${peers.length}`)
-  // checkConnection()
-}
-
-const checkConnection = () => {
-  const newStatus = matchmaking.connectionStatus()
-  if (newStatus != connectionStatus) {
-    connectionStatus = newStatus
-    console.log(`Connection status changed: ${connectionStatus}`)
-  }
 }
 
 import crypto from 'crypto'
