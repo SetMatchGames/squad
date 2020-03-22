@@ -1,4 +1,4 @@
-/* global module require */
+/* global module require process */
 
 /**
  * Use this file to configure your truffle project. It's seeded with some
@@ -24,7 +24,12 @@ const HDWalletProvider = require('@truffle/hdwallet-provider');
 const infuraKey = "46801402492348e480a7e18d9830eab8";
 
 const fs = require('fs');
-const defaultMnemonic = fs.readFileSync(".secret").toString().trim();
+
+let defaultMnemonic
+// Load the secret mnemonic unless it's the development network
+if (!process.argv.includes("development")) {
+  defaultMnemonic = fs.readFileSync(".secret").toString().trim();
+}
 
 module.exports = {
   /**
