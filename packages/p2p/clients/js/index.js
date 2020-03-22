@@ -1,270 +1,197 @@
-/* 
- * p2p library for connecting with peers
- * join a channel (call to the peer discovery server)
- * show peers in a channel (call to the peer discovery server)
- * send an offer to one specific peer at a time using an initiating node (sending a new offer replaces)
- * store incoming offers sent to a non-initiating node
- * accept a specific offer using the non-initiating node
- * if your offer is accepted, delete your non-initiating node and leave the channel
- * if you accept an offer, delete your initiating node and leave the channel
+/* How to use this library to create a p2p data connection:
  * 
- * To do this without simple-peer, directly with webRTC, we need:
- * on start up, create an offer, and join a channel with it.
- * if you see an offer you like in the channel, set your local description to it,
- * then create an answer, set your local description to it, and upload the answer to the server.
- * If you see an answer to your offer, you can set your local description to that answer
- * 
- * Maybe we need to pass ice candidates back and forth after this stuff??
- * 
+ * init(userId, uri)
+ * joinRoom(roomName)
+ * watchOffersAnswers(interval)
+ * acceptOffer(offerId) OR acceptAnswer(answerId)
+ * when the handleDCStatusChange shows the dataChannel is open, use send(message) to communicate with the remote peer
+ *
  */
 
-const crypto = require('crypto')
 const WebSocket = require('rpc-websockets').Client
-// const Peer = require('simple-peer')
-// var wrtc = require('wrtc')
 
-const id = crypto.randomBytes(32).toString('hex')
-let discovery
-let user
-let target
-let channel
-// let initiatingPeer = new Peer({ initiator: true, wrtc })
-// let receivingPeer = new Peer({ wrtc })
-const offeringPeer = new RTCPeerConnection()
-const answeringPeer = new RTCPeerConnection()
-let dc
-createDataChannel(offeringPeer, 'dataChannel')
-createDataChannel(answeringPeer, 'DataChannel')
-offeringPeer.onconnectionstatechange = (e) => {
-  console.log('Offering peer connection state changed', e)
-}
-answeringPeer.onconnectionstatechange = (e) => {
-  console.log('Answering peer connection state changed', e)
-}
-offeringPeer.onicecandidate = (e) => {
-  if (e.candidate) {
-    discovery.call('sendCandidate', [channel, target, id, e.candidate, user])
-    console.log('readyState:', offeringPeer.connectionState, dc.readyState)
-    console.log('Offering peer received ice candidate', e)
-  }
-}
-answeringPeer.onicecandidate = (e) => {
-  if (e.candidate) {
-    discovery.call('sendCandidate', [channel, target, id, e.candidate, user])
-    console.log('readyState:', answeringPeer.connectionState, dc.readyState)
-    console.log('Answering peer received ice candidate', e)
-  }
-}
-offeringPeer.ondatachannel = (e) => {
-  console.log('readyState:', offeringPeer.connectionState, dc.readyState)
-  console.log('Offering peer received data channel:', e)
-}
-answeringPeer.ondatachannel = (e) => {
-  console.log('readyState:', answeringPeer.connectionState, dc.readyState)
-  console.log('Answering peer received data channel:', e)
-}
-let answers = {}
-// let connection = null
+/*** STATE ***/
 
-function webSocketConnection (uri) {
-  console.log('connecting')
-  discovery = new WebSocket(uri)
-  return discovery
+let server = null
+let ourId = null
+let theirId = null
+let room = 'empty'
+const events = {}
+const peers = {}
+let survivingPeer = null
+let offeringPeer = null
+let answeringPeer = null
+let dataChannel = null
+
+/*** MAIN FUNCTIONS ***/
+
+function init(userId, uri) {
+  // Set user ID
+  ourId = userId
+
+  // Connect to server
+  server = new WebSocket(uri)
+
+  // Set up offering peer
+  offeringPeer = new RTCPeerConnection()
+
+  // Set up offering peer's data channel
+  dataChannel = offeringPeer.createDataChannel("dataChannel")
+  dataChannel.onopen = handleDCStatusChange
+  dataChannel.onmessage = handleReceiveMessage
+  dataChannel.onclose = handleDCStatusChange
+
+  // Set up answering peer
+  answeringPeer = new RTCPeerConnection()
+
+  // Allow answering peer to accept a data channel from an offer
+  answeringPeer.ondatachannel = handleReceiveDataChannel
 }
 
-function on (message, f) {
-  discovery.on(message, f)
+function whenServerReady(callback) {
+  server.on('open', callback)
 }
 
-function watchOffers (cb) {
-  console.log(`Watching for peers in join-${channel}`)
-  discovery.subscribe(`join-${channel}`)
-  discovery.on(`join-${channel}`, async () => {
-    console.log(`Detected join in ${channel}`)
-    const peers = await discovery.call('listPeers', [channel, id])
-    cb(peers)
+function eventName(type, key) {
+  return `${type}-${key}`
+}
+
+function joinRoom(roomName) {
+  room = roomName
+  server.call('joinRoom', [room, ourId])
+}
+
+function leaveRoom() {
+  server.call('leaveRoom', [room, ourId])
+  room = 'empty'
+}
+
+async function rollCall() {
+  const peers = await server.call('rollCall', [room])
+  return peers.filter(id => id != ourId)
+}
+
+function listenEvent(eventType, callback) {
+  events[eventType] = eventName(eventType, ourId)
+  server.call('addEvent', [events[eventType]])
+  server.subscribe(events[eventType])
+  server.on(events[eventType], async (e) => {
+    callback(e)
   })
 }
 
-function leaveChannel (channel) {
-  discovery.call('leaveChannel', [channel, id])
+function stopListen(eventType) {
+  server.unsubscribe(events[eventType])
 }
 
-// Record your username, create your peers, and register your offer in a matchmaking channel.
-async function offerMatch (channelName, userName) {
-  user = userName
-  channel = channelName
-  const offer = await offeringPeer.createOffer()
-  await offeringPeer.setLocalDescription(new RTCSessionDescription(offer))
-  discovery.call('joinChannel', [channel, id, offeringPeer.localDescription, user])
-  /* 
-  initiatingPeer.on('signal', (offer) => {
-    console.log(offer)
-    user = userName
-    channel = channelName
-    // discovery.call('joinChannel', [channel, id, JSON.stringify(offer), user])
-  })
-  */
-}
+async function updatePeers() {
+  const ids = await rollCall()
 
-// Respond to another person's offer, generating an "answer."
-// Send that answer to your target via a server event, then listen for a connection.
-// Leave the channel and delete the unused peer.
-async function sendAnswer (offer, targetId, targetUser) {
-  console.log('sending answer...')
-  target = targetId
-  // createDataChannel(answeringPeer, 'DataChannel')
-  await answeringPeer.setRemoteDescription(offer)
-  const answer = await answeringPeer.createAnswer()
-  await answeringPeer.setLocalDescription(new RTCSessionDescription(answer))
-  console.log(`sending answer: ${answeringPeer.localDescription}, targetId: ${target}`)
-  discovery.call('sendAnswer', [channel, target, id, answeringPeer.localDescription, user])
-  /*
-  target = targetId
-  receivingPeer.on('signal', (answer) => {
-    discovery.call('sendAnswer', [target, id, answer, user])
-  })
-  receivingPeer.signal(incomingOffer)
-
-  initiatingPeer = null
-  leaveChannel(channel)
-
-  receivingPeer.on('connect', () => {
-    connection = { id: target, userName: targetUser }
-    initiatingPeer.send(`Greetings from ${user}!`)
-  })
-  */
-}
-
-// Listen for answers to your offer.
-function watchAnswers (cb) {
-  const event = `answer-${channel}`
-  console.log(`Watching for answers in ${event}`)
-  discovery.subscribe(event)
-  discovery.on(event, (data) => {
-    if (data.targetId === id) {
-      console.log(`Detected answer in ${event} to ${id}`)
-      answers[data.id] = { answer: data.answer, userName: data.userName }
-      cb(data)
+  // add any new ids on the server to client storage
+  ids.forEach(id => {
+    if (!peers[id]) {
+      peers[id] = "Here!"
     }
   })
-}
 
-// Accept an answer to your offer, then wait for a connection.
-// Leave the channel and delete the unused peer.
-async function acceptAnswer (answerId) {
-  console.log('Accepting answer...')
-  const answer = answers[answerId].answer
-  const targetUser = answers[answerId].userName
-  await offeringPeer.setRemoteDescription(answer)
-
-  /*
-  initiatingPeer.signal(answer)
-
-  receivingPeer = null
-  leaveChannel(channel)
-
-  initiatingPeer.on('connect', () => {
-    connection = { id: answerId, userName: targetUser }
-    initiatingPeer.send(`Greetings from ${user}!`)
-  })
-  */
-}
-
-function watchCandidates (cb) {
-  const event = `candidate-${channel}`
-  console.log(`Watching for caandidates in ${event}`)
-  discovery.subscribe(event)
-  discovery.on(event, (data) => {
-    if (data.targetId === id) {
-      console.log(`Detected candidate in ${event} to ${id}`)
-      cb(data)
+  // remove any ids in the client missing from the server
+  for (id in peers) {
+    if (ids.indexOf(id) < 0) {
+      delete peers[id]
     }
-  })
-}
-
-function createDataChannel(peer, label) {
-  console.log('peer when creating dc:', peer)
-  dc = peer.createDataChannel(label)
-  console.log('creating data channel:', dc)
-
-  dc.onopen = () => {
-    console.log('datachannel opened')
-  }
-  dc.onmessage = (event) => {
-    console.log(`received: ${event.data}`)
-  }
-  dc.onclose = () => {
-    console.log('datachannel closed')
-  }
-
-}
-
-const sendQueue = []
-
-function send (msg) {
-  switch(dc.readyState) {
-    case "connecting":
-      console.log("Connection not open; queueing: " + msg);
-      sendQueue.push(msg);
-      break;
-    case "open":
-      sendQueue.forEach((msg) => dataChannel.send(msg));
-      break;
-    case "closing":
-      console.log("Attempted to send message while closing: " + msg);
-      break;
-    case "closed":
-      console.log("Error! Attempt to send while connection closed.");
-      break;
   }
 }
 
-function reset () {
-  user = null
-  target = null
-  channel = null
-  initiatingPeer = new Peer({ initiator: true })
-  receivingPeer = new Peer()
-  answers = {}
-  connection = null
+async function sendOffer(id) {
+  // leave the matchmaking system & start the connecting process
+  delete answeringPeer
+  leaveRoom()
+  stopListen('offer')
+  survivingPeer = offeringPeer
+  theirId = id
+
+  // send the offer
+  const offer = await survivingPeer.createOffer()
+  await survivingPeer.setLocalDescription(offer)
+  server.call('triggerEvent', [eventName('offer', theirId), offer, ourId])
 }
 
-function close () {
-  discovery.close()
+async function sendAnswer(id, offer) {
+  // leave the matchmaking system & start the connecting process
+  delete offeringPeer
+  leaveRoom()
+  stopListen('offer')
+  stopListen('answer')
+  survivingPeer = answeringPeer
+  theirId = id
+
+  // send the answer
+  await survivingPeer.setRemoteDescription(new RTCSessionDescription(offer))
+  const answer = await survivingPeer.createAnswer()
+  await survivingPeer.setLocalDescription(answer)
+  server.call('triggerEvent', [eventName('answer', theirId), answer, ourId])
+
+  // be ready to start candidate exchange
+  survivingPeer.onicecandidate = handleSendCandidate
 }
 
-webSocketConnection('ws://localhost:8889')
+async function acceptAnswer(id, answer) {
+  // finish leaving matchmaking
+  stopListen('answer')
+
+  if (id != theirId) { throw new Error(`Answer ID ${id} does not match target id ${theirId}`)}
+  await survivingPeer.setRemoteDescription(new RTCSessionDescription(answer))
+
+  // be ready to start candidate exchange
+  survivingPeer.onicecandidate = handleSendCandidate
+}
+
+function addCandidate(id, candidate) {
+  if (id != theirId) { throw new Error(`Candidate ID ${id} does not match target id ${theirId}`)}
+  console.log(`Adding candidate ${candidate} from ID ${id}`)
+  survivingPeer.addIceCandidate(candidate).catch(e => { throw new Error(e) })
+}
+
+/*** CALLBACKS ***/
+
+const handleDCStatusChange = (event) => {
+  if (dataChannel) {
+    console.log(`Data channel's status has changed: ${dataChannel.readyState}`)
+  }
+}
+
+const handleReceiveMessage = (event) => {
+  console.log(`Data channel received a message: ${event.data}`)
+}
+
+const handleReceiveDataChannel = (event) => {
+  console.log('Received data channel')
+  dataChannel = event.channel
+  dataChannel.onopen = handleDCStatusChange
+  dataChannel.onmessage = handleReceiveMessage
+  dataChannel.onclose = handleDCStatusChange
+}
+
+const handleSendCandidate = (event) => {
+  console.log('on candidate event')
+  if (event.candidate) {
+    const candidate = event.candidate
+    console.log(`Sending candidate ${candidate} to ID ${theirId}`)
+    server.call('triggerEvent', [eventName('candidate', theirId), candidate, ourId])
+  }
+}
+
+/*** EXPORTS ***/
 
 module.exports = {
-  webSocketConnection,
-  offerMatch
+  init,
+  whenServerReady,
+  joinRoom,
+  rollCall,
+  listenEvent,
+  sendOffer,
+  sendAnswer,
+  acceptAnswer,
+  addCandidate,
+  peers
 }
-
-
-on('open', async () => {
-  console.log('Peer discovery server connection open')
-  // joinChannel('games', 'offer', 'ezra')
-  await offerMatch('games', 'ezra')
-  let peers
-  watchOffers(async (peerList) => {
-    console.log('peerlist', peerList)
-    peers = peerList
-    const peerId = Object.keys(peers)[Object.keys(peers).length-1]
-    const offer = peers[peerId].offer
-    const userName = peers[peerId].userName
-    await sendAnswer(offer, peerId, userName)
-  })
-  watchAnswers(async (data) => {
-    console.log('got answer data:', data)
-    await acceptAnswer(data.id)
-    send('Hello from the moon!')
-  })
-  watchCandidates(data => {
-    console.log('got candidate data:', data)
-    if (data.candidate) {
-      offeringPeer.addIceCandidate(data.candidate)
-      answeringPeer.addIceCandidate(data.candidate)
-    }
-  })
-})

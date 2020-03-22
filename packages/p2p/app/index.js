@@ -22,121 +22,47 @@ console.log(`Peer discovery server listening on ws://${host}:${port}`)
 
 const ROOMS = {}
 
-server.register('sendOffer', ([offer, id, room]) => {
-  if (!ROOMS[room]) { ROOMS[room] = {} }
+server.register('joinRoom', ([room, id]) => {
+  if (!ROOMS[room]) { ROOMS[room] = [] }
   if (ROOMS[room][id]) {
     console.log(`Error: ID '${id}' already in peer discovery channel '${room}'`)
     return
   }
-  console.log('sending offer to room', room, offer)
-  ROOMS[room][id] = offer
+  console.log(`Id ${id} joining room ${room}`)
+  ROOMS[room].push(id)
+
+  // Time out from the room after 1 minute
+  setTimeout(() => {
+    console.log(`ID ${id} timed out from room ${room}`)
+    leaveRoom(room, id)
+  }, 240000)
 })
 
-server.register('getOffers', ([id, room]) => {
-  let copy = Object.assign({}, ROOMS[room])
-  delete copy[id]
-  return copy
+server.register('leaveRoom', ([room, id]) => {
+  console.log(`ID ${id} leaving room ${room}`)
+  leaveRoom(room, id)
 })
 
-server.register('triggerAnswerEvent', ([answer, event]) => {
-  addEvent(event)
-  console.log('sending answer', event)
-  server.emit(`${event}`, { answer })
-})
-
-server.register('triggerCandidateEvent', ([candidate, event]) => {
-  addEvent(event)
-  console.log('sending candidate', event)
-  server.emit(`${event}`, { candidate })
+server.register('rollCall', ([room]) => {
+  if (ROOMS[room]) {
+    return ROOMS[room]
+  }
+  return []
 })
 
 server.register('addEvent', ([event]) => {
-  addEvent(event)
-})
-
-server.register('triggerEvent', ([event]) => {
-  server.emit(event, { data: "hello world" })
-})
-
-server.register('eventList', () => {
-  return server.eventList()
-})
-
-function addEvent(event) {
   if (!server.eventList().includes(event)) {
     server.event(`${event}`)
-    console.log('added event', event)
+    console.log('Added event', event)
   }
+})
+
+server.register('triggerEvent', ([event, data, from]) => {
+  console.log(`Triggering ${event} event`)
+  server.emit(event, { data, from })
+})
+
+function leaveRoom(room, id) {
+  const index = ROOMS[room].indexOf(id)
+  ROOMS[room].splice(index, 1)
 }
-
-/*
-
-const CHANNELS = {}
-
-server.register('joinChannel', ([channel, id, offer, userName]) => {
-  if (!server.eventList().includes(`join-${channel}`)) {
-    server.event(`join-${channel}`)
-  }
-  console.log(`Added new server event join-${channel} to event list: ${server.eventList()}`)
-
-  console.log(`${id} joining channel ${channel}`)
-  if (!CHANNELS[channel]) { CHANNELS[channel] = {} }
-  if (CHANNELS[channel][id]) { 
-    console.log(`Error: ID '${id}' already in peer discovery channel '${channel}'`)
-    return
-  }
-  CHANNELS[channel][id] = { offer, userName, answers: {} }
-  console.log(`emitting join-${channel} event`)
-  server.emit(`join-${channel}`)
-  console.log(CHANNELS[channel][id])
-  return CHANNELS[channel]
-})
-
-server.register('listPeers', ([channel, id]) => {
-  console.log(`listing peers of ${id} in channel ${channel}`)
-  if (!CHANNELS[channel]) { 
-    console.log(`Error: channel '${channel}' does not exist`) 
-    return
-  }
-  let copy = Object.assign({}, CHANNELS[channel])
-  delete copy[id]
-  return copy
-})
-
-server.register('leaveChannel', ([channel, id]) => {
-  console.log(`${id} leaving channel ${channel}`)
-  if (!CHANNELS[channel]) { 
-    console.log(`Error: channel '${channel}' does not exist`)
-    return 
-  }
-  if (!CHANNELS[channel][id]) { 
-    console.log(`Error: ID '${id}' does not exist in channel '${channel}'`) 
-    return
-  }
-  delete CHANNELS[channel][id]
-  if (Object.keys(CHANNELS[channel]).length === 0) { delete CHANNELS[channel] }
-})
-
-server.register('sendAnswer', ([channel, targetId, sourceId, answer, userName]) => {
-  console.log(`${sourceId} sending answer event to ${targetId}`)
-  const event = `answer-${channel}`
-  if (!server.eventList().includes(event)) {
-    server.event(event)
-  }
-  console.log(`server events: ${server.eventList()}`)
-  server.emit(event, { answer, userName, sourceId, targetId })
-  console.log(`emitting ${event} to ${targetId}: ${answer}`)
-})
-
-server.register('sendCandidate', ([channel, targetId, sourceId, candidate, userName]) => {
-  console.log(`${sourceId} sending candidate event to ${targetId}`)
-  const event = `candidate-${channel}`
-  if (!server.eventList().includes(event)) {
-    server.event(event)
-  }
-  console.log(`server events: ${server.eventList()}`)
-  server.emit(event, { candidate, userName, sourceId, targetId })
-  console.log(`emitting ${event} to ${targetId}: ${candidate}`)
-})
-
-*/
