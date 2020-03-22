@@ -4,11 +4,32 @@ import matchmaking from "../../clients/js"
 const room = 'squadChess'
 let peers = []
 const offers = {}
+let connectionStatus = null
 
 const Matchmaking = {
+  oninit: () => {
+    matchmaking.init(id, 'ws://localhost:8889')
+    matchmaking.whenServerReady(async () => {
+      matchmaking.joinRoom(room)
+      matchmaking.listenEvent('offer', (e) => {
+        console.log('Received an offer', e)
+        offers[e.from] = e.data
+      })
+      matchmaking.listenEvent('answer', (e) => {
+        console.log('Received an answer', e)
+        matchmaking.acceptAnswer(e.from, e.data)
+      })
+      matchmaking.listenEvent('candidate', (e) => {
+        console.log('Received a candidate', e)
+        matchmaking.addCandidate(e.from, e.data)
+      })
+    })
+  },
   view: () => {
     return m(
       'div#matchmaking',
+      { onmouseover: rollCall },
+      m('div#connection-status', `Connection status: ${connectionStatus}`),
       m(OfferList),
       m(PeerList)
     )
@@ -45,24 +66,6 @@ const Offer = {
 }
 
 const PeerList = {
-  oninit: () => {
-    matchmaking.init(id, 'ws://localhost:8889')
-    matchmaking.whenServerReady(async () => {
-      matchmaking.joinRoom(room)
-      matchmaking.listenEvent('offer', (e) => {
-        console.log('Received an offer', e)
-        offers[e.from] = e.data
-      })
-      matchmaking.listenEvent('answer', (e) => {
-        console.log('Received an answer', e)
-        matchmaking.acceptAnswer(e.from, e.data)
-      })
-      matchmaking.listenEvent('candidate', (e) => {
-        console.log('Received a candidate', e)
-        matchmaking.addCandidate(e.from, e.data)
-      })
-    })
-  },
   view: () => {
     let content = 'No peers yet. Loading...'
     if (peers.length > 0) {
@@ -71,8 +74,7 @@ const PeerList = {
       })
     }
     return m(
-      'div#peers', 
-      { onmouseover: rollCall },
+      'div#peers',
       content
     )
   }
@@ -107,6 +109,15 @@ const sendAnswer = (event) => {
 const rollCall = async () => {
   peers = await matchmaking.rollCall()
   console.log(`Current peers in ${room} room: ${peers.length}`)
+  // checkConnection()
+}
+
+const checkConnection = () => {
+  const newStatus = matchmaking.connectionStatus()
+  if (newStatus != connectionStatus) {
+    connectionStatus = newStatus
+    console.log(`Connection status changed: ${connectionStatus}`)
+  }
 }
 
 import crypto from 'crypto'

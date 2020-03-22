@@ -84,6 +84,11 @@ function stopListen(eventType) {
   server.unsubscribe(events[eventType])
 }
 
+function connectionStatus() {
+  if (!dataChannel) { return 'No connection' }
+  return dataChannel.readyState
+}
+
 async function updatePeers() {
   const ids = await rollCall()
 
@@ -157,6 +162,9 @@ function addCandidate(id, candidate) {
 const handleDCStatusChange = (event) => {
   if (dataChannel) {
     console.log(`Data channel's status has changed: ${dataChannel.readyState}`)
+    if (dataChannel.readyState === 'open') {
+      dataChannel.send(`Hello from ${ourId}!`)
+    }
   }
 }
 
@@ -173,7 +181,6 @@ const handleReceiveDataChannel = (event) => {
 }
 
 const handleSendCandidate = (event) => {
-  console.log('on candidate event')
   if (event.candidate) {
     const candidate = event.candidate
     console.log(`Sending candidate ${candidate} to ID ${theirId}`)
@@ -193,5 +200,6 @@ module.exports = {
   sendAnswer,
   acceptAnswer,
   addCandidate,
-  peers
+  peers,
+  connectionStatus
 }
