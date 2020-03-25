@@ -12,24 +12,32 @@ const WebSocket = require('rpc-websockets').Client
 
 /*** STATE ***/
 
-let server = null
-let ourId = null
-let theirId = null
-let room = 'empty'
-const events = {}
-const peers = {}
-let survivingPeer = null
-let offeringPeer = null
-let answeringPeer = null
-let dataChannel = null
-let connectionStatusCB = null
-let messageCB = null
+let server
+let ourId
+let theirId
+let room
+let events = {}
+let survivingPeer
+let offeringPeer
+let answeringPeer
+let dataChannel
+let connectionStatusCB
+let messageCB
 
 /*** MAIN FUNCTIONS ***/
 
-function init(userId, uri) {
+function connect(userId, uri) {
   // Set user ID
   ourId = userId
+
+  server = null
+  theirId = null
+  room = 'empty'
+  survivingPeer = null
+  offeringPeer = null
+  answeringPeer = null
+  dataChannel = null
+  connectionStatusCB = null
 
   // Connect to server
   server = new WebSocket(uri)
@@ -47,6 +55,15 @@ function init(userId, uri) {
   answeringPeer.ondatachannel = handleReceiveDataChannel
 }
 
+function disconnect() {
+  leaveRoom()
+  server = null
+  theirId = null
+  events = {}
+  dataChannel.close()
+  messageCB = null
+}
+
 function listenConnectionStatus(callback) {
   connectionStatusCB = callback
   dataChannel.onopen = callback
@@ -60,6 +77,10 @@ function listenMessage(callback) {
 
 function whenServerReady(callback) {
   server.on('open', callback)
+}
+
+function whenServerDisconnect(callback) {
+  server.on('close', callback)
 }
 
 function eventName(type, key) {
@@ -81,6 +102,16 @@ async function rollCall() {
   return peers.filter(id => id != ourId)
 }
 
+function listenOffers(callback) {
+  listenEvent('offer', callback)
+  listenEvent('answer', (e) => {
+    acceptAnswer(e.from, e.data)
+  })
+  listenEvent('candidate', (e) => {
+    addCandidate(e.from, e.data)
+  })
+}
+
 function listenEvent(eventType, callback) {
   events[eventType] = eventName(eventType, ourId)
   server.call('addEvent', [events[eventType]])
@@ -92,24 +123,6 @@ function listenEvent(eventType, callback) {
 
 function stopListen(eventType) {
   server.unsubscribe(events[eventType])
-}
-
-async function updatePeers() {
-  const ids = await rollCall()
-
-  // add any new ids on the server to client storage
-  ids.forEach(id => {
-    if (!peers[id]) {
-      peers[id] = "Here!"
-    }
-  })
-
-  // remove any ids in the client missing from the server
-  for (id in peers) {
-    if (ids.indexOf(id) < 0) {
-      delete peers[id]
-    }
-  }
 }
 
 async function sendOffer(id) {
@@ -168,19 +181,6 @@ function sendMessage(msg) {
 
 /*** CALLBACKS ***/
 
-const handleDCStatusChange = (event) => {
-  if (dataChannel) {
-    console.log(`Data channel's status has changed: ${dataChannel.readyState}`)
-    if (dataChannel.readyState === 'open') {
-      dataChannel.send(`Hello from ${ourId}!`)
-    }
-  }
-}
-
-const handleReceiveMessage = (event) => {
-  console.log(`Data channel received a message: ${event.data}`)
-}
-
 const handleReceiveDataChannel = (event) => {
   console.log('Received data channel')
   dataChannel = event.channel
@@ -200,17 +200,19 @@ const handleSendCandidate = (event) => {
 /*** EXPORTS ***/
 
 module.exports = {
-  init,
+  connect,
+  disconnect,
   listenConnectionStatus,
   listenMessage,
   whenServerReady,
+  whenServerDisconnect,
   joinRoom,
   rollCall,
+  listenOffers,
   listenEvent,
   sendOffer,
   sendAnswer,
   acceptAnswer,
   addCandidate,
-  sendMessage,
-  peers
+  sendMessage
 }

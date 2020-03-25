@@ -1,21 +1,19 @@
 import m from "mithril"
 import matchmaking from "../../clients/js"
 
-let connectionStatus = 'placeholder'
+let connectionStatus = 'closed'
 let messages = []
 const room = 'squadChess'
 let peers = []
-const offers = {}
-let rollCallInterval = null
+let offers = {}
+let rollCallInterval
 let savedMessage = 'Hello world!'
 
 const Matchmaking = {
-  oninit: () => {
-    matchmaking.init(id, 'ws://localhost:8889')
-  },
   view: () => {
     return m(
       'div#matchmaking',
+      m(ConnectDisconnectButton),
       m(Messages),
       m(OfferList),
       m(PeerList)
@@ -23,27 +21,43 @@ const Matchmaking = {
   }
 }
 
+import crypto from 'crypto'
+const id = crypto.randomBytes(16).toString('hex')
+console.log(`Our ID: ${id}`)
+
+const ConnectDisconnectButton = {
+  view: () => {
+    switch (connectionStatus) {
+      case 'open': {
+        return m(
+          `button#disconnect-button`,
+          { onclick: disconnect },
+          'Disconnect'
+        )
+      }
+      case 'connecting': {
+        return m(
+          `div#connecting`,
+          'Connecting...'
+        )
+      }
+      default: {
+        return m(
+          `button#connect-button`,
+          { onclick: connect },
+          'Connect'
+        )
+      }
+    }
+  }
+}
+
 const Messages = {
-  oninit: () => {
-    matchmaking.listenConnectionStatus((e) => {
-      if (e.target) {
-        connectionStatus = e.target.readyState
-        console.log(`Connection status:`, connectionStatus)
-      }
-    })
-    matchmaking.listenMessage((e) => {
-      if (e.data) {
-        console.log(`Received message:`, e)
-        messages.push(e.data)
-      }
-    })
-  },
   view: () => {
     return m(
-      'div#messages',
+      'p#messages',
       m('div#messagesReceived', messages),
-      m(MessageForm),
-      m(ConnectionStatus)
+      m(MessageForm)
     )
   }
 }
@@ -64,34 +78,14 @@ const MessageForm = {
   }
 }
 
-const ConnectionStatus = {
-  view: () => {
-    return m(
-      'div#connection-status',
-      `Connection status: ${connectionStatus}`
-    )
-  }
-}
-
 const OfferList = {
-  oninit: () => {
-    matchmaking.whenServerReady(async () => {
-      matchmaking.joinRoom(room)
-      matchmaking.listenEvent('offer', (e) => {
-        console.log('Received an offer', e)
-        offers[e.from] = e.data
-      })
-      matchmaking.listenEvent('answer', (e) => {
-        console.log('Received an answer', e)
-        matchmaking.acceptAnswer(e.from, e.data)
-      })
-      matchmaking.listenEvent('candidate', (e) => {
-        console.log('Received a candidate', e)
-        matchmaking.addCandidate(e.from, e.data)
-      })
-    })
-  },
   view: () => {
+    if (connectionStatus === 'open') {
+      return m(
+        'p#offers',
+        'Not accepting offers while a connection is live'
+      )
+    }
     let content = "No offers yet. Waiting..."
     if (Object.keys(offers).length) {
       content = Object.keys(offers).map(id => {
@@ -99,7 +93,7 @@ const OfferList = {
       })
     }
     return m(
-      'div#offers',
+      'p#offers',
       content
     )
   }
@@ -120,13 +114,13 @@ const Offer = {
 }
 
 const PeerList = {
-  oninit: () => {
-    rollCallInterval = setInterval(async () => {
-      await rollCall()
-      m.redraw()
-    }, 300)
-  },
   view: () => {
+    if (connectionStatus === 'open') {
+      return m(
+        'p#peers',
+        'Not listening for peers while a connection is live'
+      )
+    }
     let content = 'No peers yet. Loading...'
     if (peers.length > 0) {
       content = peers.map(id => {
@@ -134,7 +128,7 @@ const PeerList = {
       })
     }
     return m(
-      'div#peers',
+      'p#peers',
       content
     )
   }
@@ -151,6 +145,46 @@ const Peer = {
       }, 'Send offer')
     )
   }
+}
+
+const connect = (event) => {
+  event.preventDefault()
+  console.log('Connecting...')
+  matchmaking.connect(id, 'ws://localhost:8889')
+  matchmaking.whenServerReady(async () => {
+    matchmaking.joinRoom(room)
+    matchmaking.listenOffers((e) => {
+      console.log('Received an offer', e)
+      offers[e.from] = e.data
+    })
+    matchmaking.listenConnectionStatus((e) => {
+      if (e.target) {
+        connectionStatus = e.target.readyState
+        console.log(`Connection status:`, connectionStatus)
+      }
+    })
+    matchmaking.listenMessage((e) => {
+      if (e.data) {
+        console.log(`Received message:`, e)
+        messages.push(e.data)
+      }
+    })
+    rollCallInterval = setInterval(async () => {
+      await rollCall()
+      m.redraw()
+    }, 300)
+  })
+  connectionStatus = 'connecting'
+}
+
+const disconnect = (event) => {
+  event.preventDefault()
+  console.log('Disconnecting...')
+  matchmaking.disconnect()
+  peers = []
+  offers = {}
+  clearInterval(rollCallInterval)
+  m.redraw()
 }
 
 const sendOffer = (event) => {
@@ -184,9 +218,5 @@ const rollCall = async () => {
   peers = await matchmaking.rollCall()
   console.log(`Current peers in ${room} room: ${peers.length}`)
 }
-
-import crypto from 'crypto'
-const id = crypto.randomBytes(16).toString('hex')
-console.log(`Our ID: ${id}`)
 
 m.mount(document.body, Matchmaking)
