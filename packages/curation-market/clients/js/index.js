@@ -1,8 +1,11 @@
+/* global web3 ethereum require module */
+
 const Web3 = require("web3")
-const AutoBond = require("./contracts/AutoBond.json")
-const config = require("./curation-config.json")
-const contractAddresses = config.contracts
-const network = config.network
+const AutoBondJSON = require("../../app/build/contracts/AutoBond.json")
+const SimpleLinearCurveJSON = require(
+  "../../app/build/contracts/SimpleLinearCurve.json"
+)
+const contract = require("@truffle/contract")
 
 async function addWeb3() {
     // Modern dapp browsers...
@@ -22,14 +25,17 @@ async function addWeb3() {
     }
     // Non-dapp browsers...
     else {
-        console.log('Minting, buying, or selling tokens requires a connection to Ethereum. \
-                     Consider installing/logging into the Metamask browser extension.')
+      console.log(
+        'Minting, buying, or selling tokens requires a connection to Ethereum. \
+         Consider installing/logging into the Metamask browser extension.'
+      )
     }
 }
 
 let web3
 let accounts
 let autoBond
+let simpleLinearCurve
 let options
 
 // TODO race condition bug when init is called concurrently for the first time
@@ -38,15 +44,8 @@ async function init(defaults) {
   if (web3 !== undefined) { return }
   console.log("running init...")
 
-  // Development env (non-browser)
-  if (network === 'development') {
-    // add ganache web3
-    const provider = new Web3.providers.WebsocketProvider('ws://127.0.0.1:8545')
-    web3 = new Web3(provider)
-  } else {
-    await addWeb3()
-    web3 = window.web3
-  }
+  await addWeb3()
+  web3 = window.web3
 
   accounts = await web3.eth.getAccounts()
 
@@ -57,11 +56,8 @@ async function init(defaults) {
     }
   }
   options = defaults
-  autoBond = await new web3.eth.Contract(
-    AutoBond.abi,
-    contractAddresses.autoBond,
-    defaults
-  )
+  autoBond= await contract(AutoBondJSON).deployed()
+  simpleLinearCurve = await contract(SimpleLinearCurveJSON).deployed()
   console.log("init finished")
 }
 
@@ -72,17 +68,22 @@ class BondAlreadyExists extends Error {
   }
 }
 
-async function newBond(addressOfCurve = contractAddresses.simpleLinearCurve, bondId, initialBuyNumber, opts = {}) {
+async function newBond(
+  addressOfCurve = simpleLinearCurve.address,
+  bondId,
+  initialBuyNumber,
+  opts = {}
+) {
   await init()
   let bondSha = web3.utils.sha3(bondId)
   let o = Object.assign({}, options, opts)
-  let curve = await autoBond.methods.getCurve(bondSha).call({})
+  let curve = await autoBond.getCurve(bondSha)
   if (curve === '0x0000000000000000000000000000000000000000') {
-    return await autoBond.methods.newBond(
+    return await autoBond.newBond(
       addressOfCurve,
       bondSha,
       initialBuyNumber,
-    ).send(o)
+    )
   }
   throw new BondAlreadyExists(`Bond ${bondId} already exists.`)
 }
@@ -90,58 +91,57 @@ async function newBond(addressOfCurve = contractAddresses.simpleLinearCurve, bon
 async function getSupply(bondId) {
   await init()
   let bondSha = web3.utils.sha3(bondId)
-  return await autoBond.methods.getSupply(bondSha).call({})
+  return await autoBond.getSupply(bondSha)
 }
 
 async function getBalance(bondId, holderAddress) {
   await init()
   let bondSha = web3.utils.sha3(bondId)
-  return await autoBond.methods.getBalance(
+  return await autoBond.getBalance(
     bondSha,
     holderAddress,
-  ).call({})
+  )
 }
 
 async function buy(units, bondId, opts) {
   await init()
   let bondSha = web3.utils.sha3(bondId)
   let o = Object.assign({}, options, opts)
-  return await autoBond.methods.buy(
+  return await autoBond.buy(
     units,
     bondSha,
-  ).send(o)
+  )
 }
 
 async function sell(units, bondId, opts) {
   await init()
   let bondSha = web3.utils.sha3(bondId)
   let o = Object.assign({}, options, opts)
-  return await autoBond.methods.sell(
+  return await autoBond.sell(
     units,
     bondSha,
-  ).send(o)
+  )
 }
 
 async function getBuyPrice(units, bondId) {
   await init()
   let bondSha = web3.utils.sha3(bondId)
-  return await autoBond.methods.getBuyPrice(
+  return await autoBond.getBuyPrice(
     units,
     bondSha,
-  ).call({})
+  )
 }
 
 async function getSellPrice(units, bondId) {
   await init()
   let bondSha = web3.utils.sha3(bondId)
-  return await autoBond.methods.getSellPrice(
+  return await autoBond.getSellPrice(
     units,
     bondSha,
-  ).call({})
+  )
 }
 
 module.exports = {
-  config,
   init,
   newBond,
   getSupply,

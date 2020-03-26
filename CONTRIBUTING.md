@@ -50,17 +50,16 @@ WIP
 1. lerna
 1. c++ buildtools (gcc-c++ in rpm based systems)
 
-To stand up a full dev environment, run the followin in separate
-terminals
+To stand up a dev environment to work on squad games, run the
+following in separate terminals
 
 `make squad-games-web`
 `make app-spec-web`
 
-If you are not doing development work on the metastore, you may
-want to use the mock metastore. In order to do so, set the
-`MOCK_METASTORE` environment variable to `true` and skip making the
-metastore. This makes the build process much quicker and does not
-depend on nix-shell.
+If you are not doing development work on the metastore, you may want
+to use the mock metastore. In order to do so, set the `MOCK_METASTORE`
+environment variable to `true` and skip making the metastore. This
+makes the build process much quicker and does not depend on nix-shell.
 
 `MOCK_METASTORE=true make squad-games-web`
 `MOCK_METASTORE=true make app-spec-web`
@@ -100,6 +99,7 @@ Rust: Clippy? Maybe not necessary because of Rust's built in linting
 TODO
 
 ### Pull Requests
+
 Squad uses a [develop -->
 master](https://nvie.com/posts/a-successful-git-branching-model/#the-main-branches)
 git branch structure. Your contribution should start with a fork of

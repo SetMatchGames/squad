@@ -1,11 +1,6 @@
-/*
-* unneeded libraries?
-* const { spawn } = require('child_process')
-* const fs = require('fs')
-* const process = require('process')
-* const path = require('path')
-*/
-const curation = require('@squad/curation')
+/* global require URL */
+
+const curationMarket = require('@squad/curation-client')
 const metastore = require('@squad/metastore')
 const squadConfig = require('./squad-config.json')
 
@@ -33,12 +28,12 @@ async function runGame (definition) {
 // handle submitting a definition and creating a new bond at the same time
 async function newDefinitionWithBond (
   definition,
-  addressOfCurve = curation.config.contracts.simpleLinearCurve,
+  addressOfCurve = curationMarket.config.contracts.simpleLinearCurve,
   initialBuyUnits = 0,
   opts = {}
 ) {
   const bondId = await metastore.createDefinition(definition)
-  await curation.newBond(addressOfCurve, bondId, initialBuyUnits, opts)
+  await curationMarket.newBond(addressOfCurve, bondId, initialBuyUnits, opts)
   return bondId
 }
 
@@ -46,7 +41,7 @@ async function newDefinitionWithBond (
 // it will check to see if the definition exists before creating it
 async function definition (
   definition,
-  addressOfCurve = curation.config.contracts.simpleLinearCurve,
+  addressOfCurve = curationMarket.config.contracts.simpleLinearCurve,
   initialBuyUnits = 0,
   opts = {}
 ) {
@@ -58,7 +53,7 @@ async function definition (
       opts
     )
   } catch (e) {
-    if (e instanceof curation.BondAlreadyExists) {
+    if (e instanceof curationMarket.BondAlreadyExists) {
       return metastore.createDefinition(definition)
     } else {
       throw e
@@ -70,7 +65,7 @@ module.exports = {
   runGame,
   registerRunner,
   metastore,
-  curation,
+  curationMarket,
   definition,
   newDefinitionWithBond
 }

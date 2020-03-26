@@ -1,3 +1,5 @@
+/* global contract assert artifacts it beforeEach */
+
 const AutoBond = artifacts.require("AutoBond")
 const SimpleLinearCurve = artifacts.require("SimpleLinearCurve")
 
