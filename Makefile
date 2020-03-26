@@ -1,7 +1,6 @@
 squad-games-web = packages/squad-games-web
 app-spec-roshambo = packages/app-spec-roshambo
-curation-market-js = packages/curation-market/clients/js
-curation-market = packages/curation-market/app
+curation-market = packages/curation-market
 metastore-js = packages/metastore/clients/js
 metastore = packages/metastore/app
 mock-metastore = packages/metastore/mock
@@ -10,55 +9,25 @@ js-client-contracts = packages/curation-market/clients/js/contracts
 curation-market-contracts = packages/curation-market/app/build/contracts
 squad-chess = packages/app-spec-squad-chess
 
-
 metastore-shell = cd $(metastore) && nix-shell https://holochain.love --pure --command
 
 .PHONY: ci
-ci: build/bootstrap metastore-tests mock-metastore-tests squad-chess-tests
-ci: sdk-js-tests
+ci: metastore-tests mock-metastore-tests squad-chess-tests sdk-js-tests
 
 .PHONY: squad-games-web
-squad-games-web: build/squad-sdk-js build/metastore
-	make development-squad-games-web
-
-.PHONY: %-squad-games-web
-%-squad-games-web: build/%-squad-sdk-js build/metastore
+squad-games-web: build/metastore
 	cd $(squad-games-web) && npm run start
 
-#!!! clean up and remove roshambo completely?
-#.PHONY: app-spec-roshambo
-#app-spec-roshambo: build/metastore build/squad-sdk-js
-#	cd $(app-spec-roshambo) && npm run start
-
 .PHONY: squad-chess
-squad-chess: build/metastore build/squad-sdk-js
-	make development-squad-chess
-
-.PHONY: %-squad-chess
-%-squad-chess: build/metastore build/%-squad-sdk-js load-%-defs
+squad-chess: build/metastore
 	cd $(squad-chess) && npm run start
 	cd $(squad-chess) && echo "open `pwd`/index.html in your browser"
 
 .PHONY: squad-chess-alpha-server
-squad-chess-alpha-server: build/metastore build/squad-sdk-js
+squad-chess-alpha-server: build/metastore
 	cd $(squad-chess) && node scripts/load_defs.js
 	cd $(squad-chess) && npm run build
 	cd $(squad-chess) && npx http-server
-
-.PHONY: %-squad-chess-alpha-server
-%-squad-chess-alpha-server: build/metastore build/%-squad-sdk-js load-%-defs
-	cd $(squad-chess) && npm run build
-	cd $(squad-chess) && npx http-server
-
-load-%-defs:
-	if [ -a $(squad-chess)/scripts/load_$*_defs.js ]; \
-	then \
-		echo "Loading $* definitions"; \
-		cd $(squad-chess) && node scripts/load_$*_defs.js; \
-	else \
-		echo "$(squad-chess)/scripts/load_$*_defs.js not found"; \
-	fi
-
 
 .PHONY: clean
 clean:
@@ -68,28 +37,22 @@ clean:
 	-rm -rf packages/curation-market/clients/js/contracts
 	-rm -rf packages/metastore/mock/build
 	-rm -rf $(js-client-contracts)
-	-rm $(curation-market-js)/development-curation-config.json
-
 
 .PHONY: very-clean
 very-clean: clean
 	lerna clean
 
-
 .PHONY: squad-chess-tests
 squad-chess-tests: build/bootstrap
 	cd $(squad-chess) && npm run test
-
 
 .PHONY: mock-metastore-tests
 mock-metastore-tests: build/bootstrap
 	cd $(mock-metastore) && npm run test
 
-
 .PHONY: sdk-js-tests
-sdk-js-tests: build/bootstrap build/squad-sdk-js
+sdk-js-tests: build/bootstrap
 	cd $(sdk-js) && npm run test
-
 
 .PHONY: metastore-tests
 metastore-tests: build/bootstrap
@@ -101,44 +64,24 @@ metastore-tests: build/bootstrap
 	echo "Skipping holochain tests, reactivate when on current hc release"
 #	$(metastore-shell) hc test
 
-
 .PHONY: squad-games-web-tests
 squad-games-web-tests:
 	cd $(squad-games-web) && CI=true npm run test
-
 
 .PHONY: app-spec-roshambo-tests
 app-spec-roshambo-tests:
 	cd $(app-spec-roshambo) && CI=true npm run test
 
-
 .PHONY: curation-market-tests
-curation-market-tests: build/curation-market $(curation-market-js)/development-curation-config.json
+curation-market-tests: build/curation-market
 	cd $(curation-market) && npm run test
-	cd $(curation-market-js) && npm run test
-
-build/squad-sdk-js: $(js-client-contracts) $(curation-market-js)/development-curation-config.json
-	touch build/squad-sdk-js
-
-build/%-squad-sdk-js: $(js-client-contracts) $(curation-market-js)/%-curation-config.json
-	touch build/$*-squad-sdk-js
-
-$(js-client-contracts): $(curation-market-contracts)
-	cp -r $(curation-market-contracts) $(curation-market-js)
 
 $(curation-market-contracts):
 	cd $(curation-market) && npm run build
 
-$(curation-market-js)/%-curation-config.json: build/%-curation-market
-	cp $(curation-market)/$*-curation-config.json $(curation-market-js)/$*-curation-config.json
-
 build/development-curation-market: build/devnet build/bootstrap
 	cd $(curation-market) && npm run deploy
 	touch build/development-curation-market
-
-build/%-curation-market: build/bootstrap
-	cd $(curation-market) && npm run deploy-$*
-	touch build/$*-curation-market
 
 build/metastore: build/bootstrap
 ifeq ($(MOCK_METASTORE), true)
