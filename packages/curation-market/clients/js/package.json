@@ -1,17 +1,15 @@
 {
-  "name": "@squad/curation",
-  "version": "0.0.0",
-  "description": "Squad Games JavaScript Curation Market client",
+  "name": "@squad/curation-client",
+  "version": "1.0.0",
+  "description": "",
   "main": "index.js",
   "scripts": {
     "test": "jest"
   },
-  "author": "",
-  "license": "ISC",
   "dependencies": {
-    "web3": "^1.2.2"
+    "@truffle/contract": "^4.1.13",
+    "jest": "^25.2.3"
   },
-  "devDependencies": {
-    "jest": "^24.9.0"
-  }
+  "author": "Set Match Games <hello@setmatchgames.com>",
+  "license": "Apache-2.0"
 }

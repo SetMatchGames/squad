@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "standard && jest",
-    "start": "webpack src/index.js --output bin/app.js -d --watch",
+    "start": "node scripts/load_development_defs.js && npm run watch",
+    "watch": "webpack src/index.js --output bin/app.js -d --watch",
     "build": "webpack src/index.js --output bin/app.js -d"
   },
   "keywords": [],

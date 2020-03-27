@@ -1,7 +1,6 @@
 squad-games-web = packages/squad-games-web
 app-spec-roshambo = packages/app-spec-roshambo
-curation-market-js = packages/curation-market/clients/js
-curation-market = packages/curation-market/app
+curation-market = packages/curation-market
 metastore-js = packages/metastore/clients/js
 metastore = packages/metastore/app
 mock-metastore = packages/metastore/mock
@@ -10,43 +9,25 @@ js-client-contracts = packages/curation-market/clients/js/contracts
 curation-market-contracts = packages/curation-market/app/build/contracts
 squad-chess = packages/app-spec-squad-chess
 
-
 metastore-shell = cd $(metastore) && nix-shell https://holochain.love --pure --command
 
-
 .PHONY: ci
-ci: build/bootstrap test-metastore test-mock-metastore test-squad-chess
-ci: test-sdk-js
-
+ci: metastore-tests mock-metastore-tests squad-chess-tests sdk-js-tests
 
 .PHONY: squad-games-web
-squad-games-web: build/bootstrap squad-sdk-js build/devnet build/metastore
+squad-games-web: build/metastore
 	cd $(squad-games-web) && npm run start
 
-
-.PHONY: app-spec-roshambo
-app-spec-roshambo: build/metastore squad-sdk-js
-	cd $(app-spec-roshambo) && npm run start
-
-
 .PHONY: squad-chess
-squad-chess: build/metastore squad-sdk-js
-	cd $(squad-chess) && node scripts/load_defs.js
+squad-chess: build/metastore
 	cd $(squad-chess) && npm run start
 	cd $(squad-chess) && echo "open `pwd`/index.html in your browser"
 
-
 .PHONY: squad-chess-alpha-server
-squad-chess-alpha-server: build/devnet build/metastore squad-sdk-js
+squad-chess-alpha-server: build/metastore
 	cd $(squad-chess) && node scripts/load_defs.js
 	cd $(squad-chess) && npm run build
 	cd $(squad-chess) && npx http-server
-
-
-.PHONY test:
-test: test-curation-market test-squad-games-web test-app-spec-roshambo
-test: test-metastore test-squad-chess
-
 
 .PHONY: clean
 clean:
@@ -54,34 +35,27 @@ clean:
 	-if [ -a build/metastore ]; then kill $(shell cat build/metastore); fi
 	-rm -rf build
 	-rm -rf packages/curation-market/clients/js/contracts
-	-rm -rf packages/curation-market/app/build
 	-rm -rf packages/metastore/mock/build
 	-rm -rf $(js-client-contracts)
-	-rm $(curation-market-js)/curation-config.json
-
 
 .PHONY: very-clean
 very-clean: clean
 	lerna clean
 
-
-.PHONY: test-squad-chess
-test-squad-chess: build/bootstrap
+.PHONY: squad-chess-tests
+squad-chess-tests: build/bootstrap
 	cd $(squad-chess) && npm run test
 
-
-.PHONY: test-mock-metastore
-test-mock-metastore: build/bootstrap
+.PHONY: mock-metastore-tests
+mock-metastore-tests: build/bootstrap
 	cd $(mock-metastore) && npm run test
 
-
-.PHONY: test-sdk-js
-test-sdk-js: build/bootstrap squad-sdk-js
+.PHONY: sdk-js-tests
+sdk-js-tests: build/bootstrap
 	cd $(sdk-js) && npm run test
 
-
-.PHONY: test-metastore
-test-metastore: build/bootstrap
+.PHONY: metastore-tests
+metastore-tests: build/bootstrap
 	cd $(metastore-js) && npm run test
 	echo "Skipping holochain tests, reactivate when on current hc release"
 	echo "Skipping holochain tests, reactivate when on current hc release"
@@ -90,38 +64,24 @@ test-metastore: build/bootstrap
 	echo "Skipping holochain tests, reactivate when on current hc release"
 #	$(metastore-shell) hc test
 
-
-.PHONY: test-squad-games-web
-test-squad-games-web:
+.PHONY: squad-games-web-tests
+squad-games-web-tests:
 	cd $(squad-games-web) && CI=true npm run test
 
-
-.PHONY: test-app-spec-roshambo
-test-app-spec-roshambo:
+.PHONY: app-spec-roshambo-tests
+app-spec-roshambo-tests:
 	cd $(app-spec-roshambo) && CI=true npm run test
 
-
-.PHONY: test-curation-market
-test-curation-market: build/curation-market $(curation-market-js)/curation-config.json
+.PHONY: curation-market-tests
+curation-market-tests: build/curation-market
 	cd $(curation-market) && npm run test
-	cd $(curation-market-js) && npm run test
 
-.PHONY: squad-sdk-js
-squad-sdk-js: $(js-client-contracts) $(curation-market-js)/curation-config.json
+$(curation-market-contracts):
+	cd $(curation-market) && npm run build
 
-
-$(js-client-contracts): build/curation-market
-	cp -r $(curation-market-contracts) $(curation-market-js)
-
-
-$(curation-market-js)/curation-config.json: build/curation-market
-	cp $(curation-market)/curation-config.json $(curation-market-js)/curation-config.json
-
-
-build/curation-market: build/devnet build/bootstrap
-	cd $(curation-market) && npm run deploy-dev
-	touch build/curation-market
-
+build/development-curation-market: build/devnet build/bootstrap
+	cd $(curation-market) && npm run deploy
+	touch build/development-curation-market
 
 build/metastore: build/bootstrap
 ifeq ($(MOCK_METASTORE), true)
@@ -131,17 +91,12 @@ else
 	$(metastore-shell) 'hc package && hc run --logging'
 endif
 
-
-build/devnet: build/.
+build/devnet:
+	mkdir -p build
 	cd $(curation-market) && { npx ganache-cli -b 1 & echo $$! > PID; }
 	mv $(curation-market)/PID build/devnet
 
-
-build/bootstrap: build/.
+build/bootstrap:
+	mkdir -p build
 	lerna bootstrap
 	touch build/bootstrap
-
-
-build/.:
-	mkdir build
-

@@ -1,4 +1,6 @@
-const curation = require("./index")
+/* global require process test expect */
+
+const curation = require("./index.js")
 
 function assert(statement, error) {
   if (statement === true) {
