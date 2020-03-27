@@ -9,7 +9,7 @@ RUN npm install
 
 COPY . .
 
-ENV METASTORE_URL https://mock-metastore.azurewebsites.net/
+ENV METASTORE_PORT 80
 EXPOSE 80
 
 CMD npm run start

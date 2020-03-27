@@ -1,3 +1,5 @@
+/* global URLSearchParams */
+
 import m from 'mithril'
 import { metastore } from '@squad/sdk'
 import chess from './rules.js'
@@ -20,7 +22,9 @@ const App = {
 async function init () {
   console.log('init squad chess', settings)
 
-  const formatDefs = await metastore.getGameFormats(settings.gameAddress) // metastore will load any new formats here
+  // metastore will load any new formats here
+  const formatDefs = await metastore.getGameFormats(settings.gameAddress)
+
   state.rawFormats = formatDefs.map(def => def.Format)
   const urlParams = new URLSearchParams(window.location.search)
   const formatToLoad = state.rawFormats[urlParams.get('format')]
