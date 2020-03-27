@@ -181,10 +181,12 @@ const disconnect = (event) => {
   event.preventDefault()
   console.log('Disconnecting...')
   matchmaking.disconnect()
-  peers = []
-  offers = {}
-  clearInterval(rollCallInterval)
-  m.redraw()
+  matchmaking.whenServerDisconnect(() => {
+    peers = []
+    offers = {}
+    clearInterval(rollCallInterval)
+    m.redraw()
+  })
 }
 
 const sendOffer = (event) => {

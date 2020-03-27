@@ -1,13 +1,3 @@
-/* How to use this library to create a p2p data connection:
- * 
- * init(userId, uri)
- * joinRoom(roomName)
- * watchOffersAnswers(interval)
- * acceptOffer(offerId) OR acceptAnswer(answerId)
- * when the handleDCStatusChange shows the dataChannel is open, use send(message) to communicate with the remote peer
- *
- */
-
 const WebSocket = require('rpc-websockets').Client
 
 /*** STATE ***/

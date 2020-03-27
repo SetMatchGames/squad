@@ -7,6 +7,7 @@
 */
 const curation = require('@squad/curation')
 const metastore = require('@squad/metastore')
+const p2p = require('@squad/p2p')
 const squadConfig = require('./squad-config.json')
 
 const runners = {
@@ -71,6 +72,7 @@ module.exports = {
   registerRunner,
   metastore,
   curation,
+  p2p,
   definition,
   newDefinitionWithBond
 }

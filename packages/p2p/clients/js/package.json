@@ -1,6 +1,6 @@
 {
-  "name": "p2p",
-  "version": "1.0.0",
+  "name": "@squad/p2p",
+  "version": "0.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
