@@ -1,3 +1,4 @@
+/* global process require */
 const {
   on,
   webSocketConnection,
@@ -5,7 +6,18 @@ const {
   getCatalogAddresses
 } = require('@squad/sdk').metastore
 
-webSocketConnection('ws://localhost:8888')
+function conf (name, defaultValue) {
+  var value = process.env[name]
+  if (value === undefined) {
+    value = defaultValue
+  }
+  if (value === undefined) {
+    throw new Error(`Required configuration "${name}" not found.`)
+  }
+  return value
+}
+
+webSocketConnection(conf('METASTORE_URL', 'ws://localhost:8888'))
 
 process.on('unhandledRejection', r => console.log(r))
 
