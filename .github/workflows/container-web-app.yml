@@ -10,25 +10,9 @@ jobs:
     - name: 'Checkout Github Action'
       uses: actions/checkout@master
 
-    - name: 'Login via Azure CLI'
-      uses: azure/login@v1
-      with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-    - uses: azure/docker-login@v1
-      with:
-        username: ${{ secrets.DOCKER_HUB_USERNAME }}
-        password: ${{ secrets.DOCKER_HUB_PASSWORD }}
-
-    - run: |
-        docker build packages/metastore/mock -t squadgames/mock-metastore:${{ github.sha }}
-        docker push squadgames/mock-metastore:${{ github.sha }}
-
     - uses: azure/webapps-deploy@v2
       with:
         app-name: 'mock-metastore'
-        images: 'squadgames/mock-metastore:${{ github.sha }}'
+        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+        package: '.'
 
-    - name: Azure logout
-      run: |
-        az logout
