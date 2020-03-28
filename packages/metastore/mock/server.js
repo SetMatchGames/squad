@@ -158,10 +158,7 @@ const MOCK_INSTANCE_ID = conf('MOCK_INSTANCE_ID', 'mock_instance_id')
 console.log(`mock metastore configured MOCK_INSTANCE_ID=${MOCK_INSTANCE_ID}`)
 
 const host = conf('MOCK_METASTORE_HOST', 'localhost')
-const port = conf(
-  'MOCK_METASTORE_PORT',
-  conf('port', '8888'),
-)
+const port = conf('MOCK_METASTORE_PORT', '8888')
 
 console.log(`mock metastore configured host=${host}, port=${port}`)
 
