@@ -5,6 +5,9 @@ const WSServer = require('rpc-websockets').Server
 const crypto = require('crypto')
 const toml = require('@iarna/toml')
 
+// HTTP Server for cloud health checks
+const http = require('http')
+
 const DEF_TYPES = ['Game', 'Component', 'Format']
 
 function conf (name, defaultValue) {
@@ -163,8 +166,15 @@ const port = conf('MOCK_METASTORE_PORT', '8888')
 console.log(`mock metastore configured host=${host}, port=${port}`)
 
 const server = new WSServer({ host, port })
-
 console.log(`Mock Metastore Listening on ws://${host}:${port}`)
+
+const healthCheckServer = http.createServer((req, res) => {
+  res.end()
+})
+healthCheckServer.on('clientError', (err, socket) => {
+  socket.end('HTTP/1.1 400 Bad Request\r\n\r\n')
+})
+healthCheckServer.listen(port)
 
 server.register('info/instances', () => {
   console.log('info/instances')
