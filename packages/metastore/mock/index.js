@@ -154,7 +154,10 @@ const MOCK_ZOMES = {
 const MOCK_INSTANCE_ID = conf('MOCK_INSTANCE_ID', 'mock_instance_id')
 
 const host = conf('MOCK_METASTORE_HOST', 'localhost')
-const port = conf('MOCK_METASTORE_PORT', '8888')
+const port = conf(
+  'MOCK_METASTORE_PORT',
+  conf('port', '8888'),
+)
 
 const server = new WSServer({ host, port })
 
