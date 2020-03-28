@@ -174,7 +174,8 @@ const healthCheckServer = http.createServer((req, res) => {
 healthCheckServer.on('clientError', (err, socket) => {
   socket.end('HTTP/1.1 400 Bad Request\r\n\r\n')
 })
-healthCheckServer.listen(port)
+healthCheckServer.listen(process.env.PORT)
+console.log(`health check server listening on port ${process.env.PORT}`)
 
 server.register('info/instances', () => {
   console.log('info/instances')
