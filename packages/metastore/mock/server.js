@@ -169,9 +169,11 @@ const server = new WSServer({ host, port })
 console.log(`mock metastore Listening on ws://${host}:${port}`)
 
 const healthCheckServer = http.createServer((req, res) => {
+  console.log('health check server OK')
   res.end()
 })
 healthCheckServer.on('clientError', (err, socket) => {
+  console.log('health check server ERROR', err)
   socket.end('HTTP/1.1 400 Bad Request\r\n\r\n')
 })
 healthCheckServer.listen(process.env.PORT)
