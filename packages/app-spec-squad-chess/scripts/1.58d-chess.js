@@ -1,3 +1,5 @@
+/* global require, process */
+
 const {
   on,
   webSocketConnection,

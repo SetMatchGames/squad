@@ -1,4 +1,5 @@
 /* global process require */
+
 const {
   on,
   webSocketConnection,
@@ -17,7 +18,8 @@ function conf (name, defaultValue) {
   return value
 }
 
-webSocketConnection(conf('METASTORE_URL', 'ws://localhost:8888'))
+// TODO refactor system configuration
+webSocketConnection(conf('MOCK_METASTORE_HOST', 'ws://localhost:8888'))
 
 process.on('unhandledRejection', r => console.log(r))
 
@@ -229,7 +231,10 @@ async function main () {
     await createDefinition(definition, [squadChessAddress])
   })
 
-  const squadChessCatalog = await getCatalogAddresses('Component', `${squadChessAddress} Component Catalog`)
+  const squadChessCatalog = await getCatalogAddresses(
+    'Component',
+    `${squadChessAddress} Component Catalog`
+  )
 
   const pnrkFormat = {
     Format: {

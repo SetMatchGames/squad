@@ -1,3 +1,5 @@
+/* global require */
+
 const WebSocket = require('rpc-websockets').Client
 // const IPFS = require('ipfs')
 

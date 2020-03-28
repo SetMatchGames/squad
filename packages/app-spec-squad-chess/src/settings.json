@@ -1,4 +1,4 @@
 {
-  "metastoreWs": "wss://mock-metastore.azurewebsites.net:8888",
+  "metastoreWs": "wss://mock-metastore.azurewebsites.net",
   "gameAddress": "8c875b7990077c166479df9ee2aafff7cc7bf82c54741ff47d169a56f18fe5d5"
 }

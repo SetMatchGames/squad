@@ -1,4 +1,4 @@
-/* global require URL */
+/* global module require URL */
 
 const curationMarket = require('@squad/curation-client')
 const metastore = require('@squad/metastore')
