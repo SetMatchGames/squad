@@ -166,7 +166,7 @@ const port = conf('MOCK_METASTORE_PORT', '8888')
 console.log(`mock metastore configured host=${host}, port=${port}`)
 
 const server = new WSServer({ host, port })
-console.log(`Mock Metastore Listening on ws://${host}:${port}`)
+console.log(`mock metastore Listening on ws://${host}:${port}`)
 
 const healthCheckServer = http.createServer((req, res) => {
   res.end()
