@@ -37,7 +37,7 @@ function squadInit () {
     const formatDefs = await metastore.getGameFormats(settings.gameAddress) // metastore will load any new formats here
     state.squad.rawFormats = formatDefs.map(def => def.Format)
     const urlParams = new URLSearchParams(window.location.search)
-    state.squad['loadedFormatIndex'] = urlParams.get('format')
+    state.squad.loadedFormatIndex = urlParams.get('format')
     const formatToLoad = state.squad.rawFormats[state.squad.loadedFormatIndex]
 
     if (formatToLoad) {
@@ -55,7 +55,7 @@ function squadInit () {
 
       state.game = chess.createGame(state.squad.loadedFormat)
     }
-    state.squad['connection'] = 'connected'
+    state.squad.connection = 'connected'
     console.log('Squad Connection:', state.squad.connection)
     m.redraw()
   })

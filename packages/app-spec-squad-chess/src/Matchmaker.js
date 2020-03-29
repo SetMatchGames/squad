@@ -7,13 +7,13 @@ import { checkWinner } from './Board.js'
 
 export const Matchmaker = {
   oninit: () => {
-    state.p2p['id'] = crypto.randomBytes(16).toString('hex')
+    state.p2p.id = crypto.randomBytes(16).toString('hex')
     console.log(`Our matchmaking Id: ${state.p2p.id}`)
 
-    state.p2p['room'] = "Room name"
-    state.p2p['peers'] = []
-    state.p2p['offers'] = {}
-    state.p2p['player'] = 0
+    state.p2p.room = 'Room name'
+    state.p2p.peers = []
+    state.p2p.offers = {}
+    state.p2p.player = 0
   },
   view: () => {
     return m(
@@ -70,7 +70,7 @@ const FindMatchButton = {
         return
       }
       case 'connecting': {
-        return 
+        return
       }
       default: {
         return m(
@@ -110,7 +110,7 @@ const Peer = {
   view: (vnode) => {
     return m(
       '.peer',
-      vnode.key, 
+      vnode.key,
       m('button.offer', {
         onclick: handleSendOffer,
         id: vnode.key
@@ -128,7 +128,7 @@ const OfferList = {
         'Not accepting offers while a connection is live'
       )
     }
-    let content = "No offers yet. Waiting..."
+    let content = 'No offers yet. Waiting...'
     if (Object.keys(state.p2p.offers).length) {
       content = Object.keys(state.p2p.offers).map(id => {
         return m(Offer, { key: id })
@@ -148,10 +148,10 @@ const Offer = {
       '.offer',
       vnode.key,
       m('button.answer',
-      { 
-        onclick: handleSendAnswer,
-        id: vnode.key
-      }, 'Accept offer')
+        {
+          onclick: handleSendAnswer,
+          id: vnode.key
+        }, 'Accept offer')
     )
   }
 }
@@ -173,7 +173,7 @@ export const sendMessage = (message) => {
 // handlers
 const handleSaveRoom = (event) => {
   event.preventDefault()
-  state.p2p['room'] = `${event.target.value}-${state.squad.loadedFormatIndex}`
+  state.p2p.room = `${event.target.value}-${state.squad.loadedFormatIndex}`
 }
 
 const handleConnect = (event) => {
@@ -189,13 +189,13 @@ const handleConnect = (event) => {
     p2p.listenOffers(handleReceiveOffer)
     p2p.listenConnectionStatus(handleConnectionStatus)
     p2p.listenMessage(handleReceiveMessage)
-    state.p2p['rollCallInterval'] = setInterval(async () => {
+    state.p2p.rollCallInterval = setInterval(async () => {
       await rollCall()
       m.redraw()
     }, 1000)
     p2p.whenServerReady(() => {})
   })
-  state.p2p['connection'] = 'connecting'
+  state.p2p.connection = 'connecting'
 }
 
 const handleReceiveOffer = (event) => {
@@ -206,8 +206,8 @@ const handleReceiveOffer = (event) => {
 
 const handleConnectionStatus = (event) => {
   if (event.target) {
-    state.p2p['connection'] = event.target.readyState
-    console.log(`Connection status:`, state.p2p.connection)
+    state.p2p.connection = event.target.readyState
+    console.log('Connection status:', state.p2p.connection)
     if (state.p2p.connection === 'open' && state.p2p.rollCallInterval) {
       m.redraw()
       clearInterval(state.p2p.rollCallInterval)
@@ -217,7 +217,7 @@ const handleConnectionStatus = (event) => {
 
 const handleReceiveMessage = (event) => {
   if (event.data) {
-    console.log(`Received message:`, event.data)
+    console.log('Received message:', event.data)
     state.game = JSON.parse(event.data)
     checkWinner()
     m.redraw()
@@ -225,7 +225,7 @@ const handleReceiveMessage = (event) => {
 }
 
 const rollCall = async () => {
-  state.p2p['peers'] = await p2p.rollCall()
+  state.p2p.peers = await p2p.rollCall()
   console.log(`Current peers in ${state.p2p.room} room: ${state.p2p.peers.length}`)
 }
 

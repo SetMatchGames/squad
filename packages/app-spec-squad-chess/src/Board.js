@@ -136,7 +136,7 @@ function handleTurn () {
   }
 }
 
-export function checkWinner() {
+export function checkWinner () {
   if (state.game.legalTurns.length === 0) {
     let winner = 'White'
     if (state.game.turnNumber % 2 === 0) { winner = 'Black' }
@@ -200,10 +200,10 @@ export const Board = {
   view: () => {
     switch (state.p2p.connection) {
       case 'open':
-        state.board.matchStatus = "Match started!"
+        state.board.matchStatus = 'Match started!'
         break
-      default: 
-        state.board.matchStatus = "Match not started."
+      default:
+        state.board.matchStatus = 'Match not started.'
     }
     if (!state.game.position) {
       return m('#board', 'Load a format!')
@@ -225,7 +225,7 @@ export const Board = {
             { key: squareId, content, graphics }
           )
         }),
-        m("#match-status", `${state.board.matchStatus} ${state.board.winner}`)
+        m('#match-status', `${state.board.matchStatus} ${state.board.winner}`)
       )
     }
   }

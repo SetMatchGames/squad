@@ -117,7 +117,7 @@ function stopListen(eventType) {
 
 async function sendOffer(id) {
   // leave the matchmaking system & start the connecting process
-  delete answeringPeer
+  answeringPeer = null
   leaveRoom()
   stopListen('offer')
   survivingPeer = offeringPeer
@@ -131,7 +131,7 @@ async function sendOffer(id) {
 
 async function sendAnswer(id, offer) {
   // leave the matchmaking system & start the connecting process
-  delete offeringPeer
+  offeringPeer = null
   leaveRoom()
   stopListen('offer')
   stopListen('answer')
