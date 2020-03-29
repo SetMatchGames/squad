@@ -46,11 +46,11 @@ function connect(userId, uri) {
 }
 
 function disconnect() {
+  dataChannel.close()
   leaveRoom()
   server = null
   theirId = null
   events = {}
-  dataChannel.close()
   messageCB = null
 }
 

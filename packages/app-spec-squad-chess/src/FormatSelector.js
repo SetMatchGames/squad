@@ -6,7 +6,7 @@ const FormatSelector = {
     return m(
       '#format-selector',
       m('h3', 'Available Formats'),
-      state.rawFormats.map((rawFormat, index) => {
+      state.squad.rawFormats.map((rawFormat, index) => {
         const url = new URL(window.location)
         url.search = `?format=${index}`
         return m(`a[href=${url}]`, rawFormat.name)

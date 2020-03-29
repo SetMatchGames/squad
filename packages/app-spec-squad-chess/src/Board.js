@@ -1,5 +1,7 @@
 import m from 'mithril'
 import chess from './rules.js'
+
+import { sendMessage } from './Matchmaker.js'
 import state from './state.js'
 
 const BOARD_CONFIG = {
@@ -11,6 +13,16 @@ const BOARD_CONFIG = {
 }
 
 const squareSize = BOARD_CONFIG.squares.size
+
+/*
+ *    Display a message when a match is found X
+ *    don't allow moves before a match is found X
+ *    give each player in the match a color X
+ *    don't allow them to make moves not of their color X
+ *    when they make a move, send the new board state to the other player X
+ *    when you receive a board state, update your board state X
+ * when the game ends, display a message for both players
+ */
 
 /* I don't totally understand what this general dragover listener is doing:
  * When I add similar 'ondragover' listeners on each component,
@@ -26,7 +38,9 @@ function resetBoardState () {
   state.board = {
     from: [],
     highlightedSquares: [],
-    deselectable: []
+    deselectable: [],
+    matchStatus: 'not started',
+    winner: ''
   }
 }
 
@@ -68,8 +82,14 @@ const BoardPiece = {
     }
     const coordinates = chess.stringToSquare(vnode.key)
     const highlighted = squareInArray(coordinates, state.board.highlightedSquares)
+    const player = state.game.position[vnode.key].content.player
+    // if a match hasn't started, don't add events
+    if (state.p2p.connection !== 'open') {
+      /* do nothing */
+    // if it isn't our turn and its not highlighted, don't add events
+    } else if ((player !== state.p2p.player) && !highlighted) {
     // if highlighted, click to attempt turn
-    if (highlighted) {
+    } else if (highlighted) {
       attrs.onclick = handleTurn()
     // if deselect is queued, handle it
     } else if (squareInArray(coordinates, [state.board.deselectable])) {
@@ -78,8 +98,7 @@ const BoardPiece = {
     } else if (squareInArray(coordinates, [state.board.from])) {
       attrs.onmousedown = queueDeselect()
     // if not highlighted or selected, select the piece
-    } else if (state.game.position[vnode.key].content.player ===
-    state.game.turnNumber % 2) {
+    } else if (player === state.game.turnNumber % 2) {
       attrs.onmousedown = handleSelectPiece()
     }
     return m('img#' + vnode.key, attrs)
@@ -88,8 +107,7 @@ const BoardPiece = {
 
 function squareStyle (coordinates, squareColor, highlighted) {
   const result = {
-    // TODO move the static CSS elsewhere
-    right: (40 + squareSize * coordinates[0]) + 'vw',
+    right: (20 + squareSize * coordinates[0]) + 'vw',
     top: (10 + squareSize * coordinates[1]) + 'vw',
     width: squareSize + 'vw',
     height: squareSize + 'vw',
@@ -111,13 +129,19 @@ function handleTurn () {
     const newState = chess.takeTurn(state.game, [from, to])
     // update the state if takeTurn doesn't throw
     state.game = newState
+    sendMessage(JSON.stringify(state.game))
     state.board.highlightedSquares = []
     // if no legal turns, the game is over
-    if (newState.legalTurns.length === 0) {
-      let winner = 'White'
-      if (newState.turnNumber % 2 === 0) { winner = 'Black' }
-      console.log(`${winner} wins!`)
-    }
+    checkWinner()
+  }
+}
+
+export function checkWinner() {
+  if (state.game.legalTurns.length === 0) {
+    let winner = 'White'
+    if (state.game.turnNumber % 2 === 0) { winner = 'Black' }
+    state.board.winner = `${winner} wins!`
+    console.log(state.board.winner)
   }
 }
 
@@ -171,9 +195,16 @@ const BoardSquare = {
   }
 }
 
-const Board = {
+export const Board = {
   oninit: resetBoardState,
   view: () => {
+    switch (state.p2p.connection) {
+      case 'open':
+        state.board.matchStatus = "Match started!"
+        break
+      default: 
+        state.board.matchStatus = "Match not started."
+    }
     if (!state.game) {
       return m('#board', 'Load a format!')
     } else {
@@ -186,17 +217,16 @@ const Board = {
           // if there is a piece, grab links to piece images
           let graphics
           if (content) {
-            graphics = state.loadedFormat.pieces[content.pieceId].graphics
+            graphics = state.squad.loadedFormat.pieces[content.pieceId].graphics
           }
           // add the square to the board
           return m(
             BoardSquare,
             { key: squareId, content, graphics }
           )
-        })
+        }),
+        m("#match-status", `${state.board.matchStatus} ${state.board.winner}`)
       )
     }
   }
 }
-
-export default Board

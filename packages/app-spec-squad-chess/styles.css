@@ -1,3 +1,8 @@
+/* App */
+#app {
+  display: flex;
+  flex-direction: column;
+}
 /* Board */
 .square {
   position: absolute;

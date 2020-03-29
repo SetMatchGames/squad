@@ -67,6 +67,7 @@ module.exports = {
   registerRunner,
   metastore,
   curationMarket,
+  p2p,
   definition,
   newDefinitionWithBond
 }
