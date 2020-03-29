@@ -205,7 +205,7 @@ export const Board = {
       default: 
         state.board.matchStatus = "Match not started."
     }
-    if (!state.game) {
+    if (!state.game.position) {
       return m('#board', 'Load a format!')
     } else {
       return m(

@@ -11,6 +11,11 @@
   align-items: center;
   justify-content: center;
 }
+#match-status {
+  position: absolute;
+  right: 30vw;
+  top: 5vw;
+}
 /* Format Selector */
 #format-selector {
   display: flex;

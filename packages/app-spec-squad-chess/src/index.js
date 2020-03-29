@@ -37,7 +37,8 @@ function squadInit () {
     const formatDefs = await metastore.getGameFormats(settings.gameAddress) // metastore will load any new formats here
     state.squad.rawFormats = formatDefs.map(def => def.Format)
     const urlParams = new URLSearchParams(window.location.search)
-    const formatToLoad = state.squad.rawFormats[urlParams.get('format')]
+    state.squad['loadedFormatIndex'] = urlParams.get('format')
+    const formatToLoad = state.squad.rawFormats[state.squad.loadedFormatIndex]
 
     if (formatToLoad) {
       const components = await Promise.all(

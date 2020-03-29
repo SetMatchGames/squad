@@ -173,7 +173,7 @@ export const sendMessage = (message) => {
 // handlers
 const handleSaveRoom = (event) => {
   event.preventDefault()
-  state.p2p['room'] = event.target.value
+  state.p2p['room'] = `${event.target.value}-${state.squad.loadedFormatIndex}`
 }
 
 const handleConnect = (event) => {
