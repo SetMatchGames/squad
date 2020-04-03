@@ -1,6 +1,8 @@
+/* global RTCPeerConnection RTCSessionDescription */
+
 const WebSocket = require('rpc-websockets').Client
 
-/*** STATE ***/
+/** * STATE ***/
 
 let server
 let ourId
@@ -14,11 +16,12 @@ let dataChannel
 let connectionStatusCB
 let messageCB
 
-/*** MAIN FUNCTIONS ***/
+/** * MAIN FUNCTIONS ***/
 
-function connect(userId, uri) {
+function connect (userId, uri) {
   // Set user ID
   ourId = userId
+  console.log(ourId)
 
   resetState()
 
@@ -29,7 +32,7 @@ function connect(userId, uri) {
   offeringPeer = new RTCPeerConnection()
 
   // Set up offering peer's data channel
-  dataChannel = offeringPeer.createDataChannel("dataChannel")
+  dataChannel = offeringPeer.createDataChannel('dataChannel')
 
   // Set up answering peer
   answeringPeer = new RTCPeerConnection()
@@ -38,7 +41,7 @@ function connect(userId, uri) {
   answeringPeer.ondatachannel = handleReceiveDataChannel
 }
 
-function resetState() {
+function resetState () {
   server = null
   theirId = null
   room = 'empty'
@@ -49,7 +52,7 @@ function resetState() {
   connectionStatusCB = null
 }
 
-function disconnect() {
+function disconnect () {
   dataChannel.close()
   leaveRoom()
   server = null
@@ -58,45 +61,46 @@ function disconnect() {
   messageCB = null
 }
 
-function listenConnectionStatus(callback) {
+function listenConnectionStatus (callback) {
   connectionStatusCB = callback
   dataChannel.onopen = callback
   dataChannel.onclose = callback
 }
 
-function listenMessage(callback) {
+function listenMessage (callback) {
   messageCB = callback
   dataChannel.onmessage = callback
 }
 
-function whenServerReady(callback) {
+function whenServerReady (callback) {
   server.on('open', callback)
 }
 
-function whenServerDisconnect(callback) {
+function whenServerDisconnect (callback) {
   server.on('close', callback)
 }
 
-function eventName(type, key) {
+function eventName (type, key) {
   return `${type}-${key}`
 }
 
-function joinRoom(roomName) {
+function joinRoom (roomName) {
   room = roomName
   server.call('joinRoom', [room, ourId])
 }
 
-function leaveRoom() {
+function leaveRoom () {
   server.call('leaveRoom', [room, ourId])
+  server.close()
   room = 'empty'
 }
 
-async function rollCall() {
+async function rollCall () {
   const peers = await server.call('rollCall', [room])
-  return peers.filter(id => id != ourId)
+  return peers.filter(id => id !== ourId)
 }
 
-function listenOffers(callback) {
+function listenOffers (callback) {
   subscribe('offer', callback)
   subscribe('answer', (e) => {
     acceptAnswer(e.from, e.data)
@@ -106,7 +110,7 @@ function listenOffers(callback) {
   })
 }
 
-function subscribe(eventType, callback) {
+function subscribe (eventType, callback) {
   events[eventType] = eventName(eventType, ourId)
   server.call('addEvent', [events[eventType]])
   server.subscribe(events[eventType])
@@ -115,11 +119,11 @@ function subscribe(eventType, callback) {
   })
 }
 
-function unsubscribe(eventType) {
+function unsubscribe (eventType) {
   server.unsubscribe(events[eventType])
 }
 
-async function sendOffer(id) {
+async function sendOffer (id) {
   // leave the matchmaking system & start the connecting process
   answeringPeer = null
   leaveRoom()
@@ -133,7 +137,7 @@ async function sendOffer(id) {
   server.call('triggerEvent', [eventName('offer', theirId), offer, ourId])
 }
 
-async function sendAnswer(id, offer) {
+async function sendAnswer (id, offer) {
   // leave the matchmaking system & start the connecting process
   offeringPeer = null
   leaveRoom()
@@ -152,28 +156,28 @@ async function sendAnswer(id, offer) {
   survivingPeer.onicecandidate = handleSendCandidate
 }
 
-async function acceptAnswer(id, answer) {
+async function acceptAnswer (id, answer) {
   // finish leaving matchmaking
   unsubscribe('answer')
 
-  if (id != theirId) { throw new Error(`Answer ID ${id} does not match target id ${theirId}`)}
+  if (id !== theirId) { throw new Error(`Answer ID ${id} does not match target id ${theirId}`) }
   await survivingPeer.setRemoteDescription(new RTCSessionDescription(answer))
 
   // be ready to start candidate exchange
   survivingPeer.onicecandidate = handleSendCandidate
 }
 
-function addCandidate(id, candidate) {
-  if (id != theirId) { throw new Error(`Candidate ID ${id} does not match target id ${theirId}`)}
+function addCandidate (id, candidate) {
+  if (id !== theirId) { throw new Error(`Candidate ID ${id} does not match target id ${theirId}`) }
   console.log(`Adding candidate ${candidate} from ID ${id}`)
   survivingPeer.addIceCandidate(candidate).catch(e => { throw new Error(e) })
 }
 
-function sendMessage(msg) {
+function sendMessage (msg) {
   dataChannel.send(msg)
 }
 
-/*** HANDLERS ***/
+/** * HANDLERS ***/
 
 const handleReceiveDataChannel = (event) => {
   console.log('Received data channel')
@@ -191,7 +195,7 @@ const handleSendCandidate = (event) => {
   }
 }
 
-/*** EXPORTS ***/
+/** * EXPORTS ***/
 
 module.exports = {
   connect,

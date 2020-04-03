@@ -2,9 +2,6 @@
 
 const WSServer = require('rpc-websockets').Server
 
-// TODO grab this variable from config somewhere
-const ROOM_TIMEOUT=240000
-
 function conf (name, defaultValue) {
   var value = process.env[name]
   if (value === undefined) {
@@ -18,6 +15,7 @@ function conf (name, defaultValue) {
 
 const host = conf('PEER_DISCOVERY_HOST', 'localhost')
 const port = conf('PEER_DISCOVERY_PORT', '8889')
+const roomTimeout = conf('ROOM_TIMEOUT', 240000)
 
 const server = new WSServer({ host, port })
 
@@ -38,7 +36,7 @@ server.register('joinRoom', ([room, id]) => {
   setTimeout(() => {
     console.log(`ID ${id} timed out from room ${room}`)
     leaveRoom(room, id)
-  }, ROOM_TIMEOUT)
+  }, roomTimeout)
 })
 
 server.register('leaveRoom', ([room, id]) => {
@@ -65,7 +63,7 @@ server.register('triggerEvent', ([event, data, from]) => {
   server.emit(event, { data, from })
 })
 
-function leaveRoom(room, id) {
+function leaveRoom (room, id) {
   const index = rooms[room].indexOf(id)
   rooms[room].splice(index, 1)
 }
