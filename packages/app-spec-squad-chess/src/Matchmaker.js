@@ -10,7 +10,7 @@ export const Matchmaker = {
     state.p2p.id = crypto.randomBytes(16).toString('hex')
     console.log(`Our matchmaking Id: ${state.p2p.id}`)
 
-    state.p2p.room = 'Room name'
+    state.p2p.room = ''
     state.p2p.peers = []
     state.p2p.offers = {}
     state.p2p.player = 0
@@ -55,7 +55,7 @@ const RoomField = {
           '.room',
           m('h4', 'Enter room name:'),
           m(
-            `input#room-field[type=text][placeholder=${state.p2p.room}`,
+            `input#room-field[type=text][placeholder=Room name`,
             { oninput: handleSaveRoom }
           )
         )
@@ -185,6 +185,7 @@ const handleConnect = (event) => {
 
   p2p.connect(state.p2p.id, settings.p2pWs)
   p2p.whenServerReady(async () => {
+    console.log('Peer discovery server ready.')
     p2p.joinRoom(state.p2p.room)
     p2p.listenOffers(handleReceiveOffer)
     p2p.listenConnectionStatus(handleConnectionStatus)
@@ -193,7 +194,6 @@ const handleConnect = (event) => {
       await rollCall()
       m.redraw()
     }, 1000)
-    p2p.whenServerReady(() => {})
   })
   state.p2p.connection = 'connecting'
 }

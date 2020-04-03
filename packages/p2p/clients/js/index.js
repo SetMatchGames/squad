@@ -20,14 +20,7 @@ function connect(userId, uri) {
   // Set user ID
   ourId = userId
 
-  server = null
-  theirId = null
-  room = 'empty'
-  survivingPeer = null
-  offeringPeer = null
-  answeringPeer = null
-  dataChannel = null
-  connectionStatusCB = null
+  resetState()
 
   // Connect to server
   server = new WebSocket(uri)
@@ -43,6 +36,17 @@ function connect(userId, uri) {
 
   // Allow answering peer to accept a data channel from an offer
   answeringPeer.ondatachannel = handleReceiveDataChannel
+}
+
+function resetState() {
+  server = null
+  theirId = null
+  room = 'empty'
+  survivingPeer = null
+  offeringPeer = null
+  answeringPeer = null
+  dataChannel = null
+  connectionStatusCB = null
 }
 
 function disconnect() {
@@ -93,16 +97,16 @@ async function rollCall() {
 }
 
 function listenOffers(callback) {
-  listenEvent('offer', callback)
-  listenEvent('answer', (e) => {
+  subscribe('offer', callback)
+  subscribe('answer', (e) => {
     acceptAnswer(e.from, e.data)
   })
-  listenEvent('candidate', (e) => {
+  subscribe('candidate', (e) => {
     addCandidate(e.from, e.data)
   })
 }
 
-function listenEvent(eventType, callback) {
+function subscribe(eventType, callback) {
   events[eventType] = eventName(eventType, ourId)
   server.call('addEvent', [events[eventType]])
   server.subscribe(events[eventType])
@@ -111,7 +115,7 @@ function listenEvent(eventType, callback) {
   })
 }
 
-function stopListen(eventType) {
+function unsubscribe(eventType) {
   server.unsubscribe(events[eventType])
 }
 
@@ -119,7 +123,7 @@ async function sendOffer(id) {
   // leave the matchmaking system & start the connecting process
   answeringPeer = null
   leaveRoom()
-  stopListen('offer')
+  unsubscribe('offer')
   survivingPeer = offeringPeer
   theirId = id
 
@@ -133,8 +137,8 @@ async function sendAnswer(id, offer) {
   // leave the matchmaking system & start the connecting process
   offeringPeer = null
   leaveRoom()
-  stopListen('offer')
-  stopListen('answer')
+  unsubscribe('offer')
+  unsubscribe('answer')
   survivingPeer = answeringPeer
   theirId = id
 
@@ -150,7 +154,7 @@ async function sendAnswer(id, offer) {
 
 async function acceptAnswer(id, answer) {
   // finish leaving matchmaking
-  stopListen('answer')
+  unsubscribe('answer')
 
   if (id != theirId) { throw new Error(`Answer ID ${id} does not match target id ${theirId}`)}
   await survivingPeer.setRemoteDescription(new RTCSessionDescription(answer))
@@ -169,7 +173,7 @@ function sendMessage(msg) {
   dataChannel.send(msg)
 }
 
-/*** CALLBACKS ***/
+/*** HANDLERS ***/
 
 const handleReceiveDataChannel = (event) => {
   console.log('Received data channel')
@@ -199,7 +203,6 @@ module.exports = {
   joinRoom,
   rollCall,
   listenOffers,
-  listenEvent,
   sendOffer,
   sendAnswer,
   acceptAnswer,

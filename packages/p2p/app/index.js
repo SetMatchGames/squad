@@ -2,6 +2,9 @@
 
 const WSServer = require('rpc-websockets').Server
 
+// TODO grab this variable from config somewhere
+const ROOM_TIMEOUT=240000
+
 function conf (name, defaultValue) {
   var value = process.env[name]
   if (value === undefined) {
@@ -20,22 +23,22 @@ const server = new WSServer({ host, port })
 
 console.log(`Peer discovery server listening on ws://${host}:${port}`)
 
-const ROOMS = {}
+const rooms = {}
 
 server.register('joinRoom', ([room, id]) => {
-  if (!ROOMS[room]) { ROOMS[room] = [] }
-  if (ROOMS[room][id]) {
+  if (!rooms[room]) { rooms[room] = [] }
+  if (rooms[room][id]) {
     console.log(`Error: ID '${id}' already in peer discovery channel '${room}'`)
     return
   }
   console.log(`Id ${id} joining room ${room}`)
-  ROOMS[room].push(id)
+  rooms[room].push(id)
 
   // Time out from the room after 1 minute
   setTimeout(() => {
     console.log(`ID ${id} timed out from room ${room}`)
     leaveRoom(room, id)
-  }, 240000)
+  }, ROOM_TIMEOUT)
 })
 
 server.register('leaveRoom', ([room, id]) => {
@@ -44,8 +47,8 @@ server.register('leaveRoom', ([room, id]) => {
 })
 
 server.register('rollCall', ([room]) => {
-  if (ROOMS[room]) {
-    return ROOMS[room]
+  if (rooms[room]) {
+    return rooms[room]
   }
   return []
 })
@@ -63,6 +66,6 @@ server.register('triggerEvent', ([event, data, from]) => {
 })
 
 function leaveRoom(room, id) {
-  const index = ROOMS[room].indexOf(id)
-  ROOMS[room].splice(index, 1)
+  const index = rooms[room].indexOf(id)
+  rooms[room].splice(index, 1)
 }
