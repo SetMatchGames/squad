@@ -1,7 +1,7 @@
 {
   "name": "@squad/p2p",
   "version": "0.0.0",
-  "description": "",
+  "description": "Squad SDK peer to peer discovery and data channels js client",
   "main": "index.js",
   "scripts": {
     "test": "standard && jest"
