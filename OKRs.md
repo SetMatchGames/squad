@@ -5,22 +5,40 @@ _Key Results: 3-5 quantifiable, measurable results for an objective_
 
 ## Quarterly
 ### Q1 2020
-Alpha release of Squad Chess
+Alpha release of Squad Chess (7/10)
 - Real matches playable online
 - Submittable and shareable components and formats
 - Curation of components and formats
 
-Make the stream good!
+Make the stream good! (6/10)
 - Good setup
 - 12 streams
 - 2 streams with guests
-- 3 interactions w/ new viewers (lol)
+- 3 interactions w/ new viewers
 
 ### Q2 2020
-Hold a Squad Game Jam (or play a large role in a game jam)
+Finish Squad Chess Alpha release
+- 2 game developers get interested
+- 10 community contributions to squad chess
+- all KRs from Q1 alpha release
+
+Alpha release of Squad SDK
+
+Continue the streaming work
+- 12 more streams
+- tweet about streams
+- 2 more demos w/ guests
 
 ### Q3 2020
-Alpha release of Automatic Chess?
+Another game built on squad is consistently worked on
+
+Better squad dev tools
+
+Squad chess beta release targeting wider crypto audience
+
+Squad game jam
+
+Progress on whitepaper
 
 ## Yearly
 ### 2020
@@ -43,3 +61,9 @@ Publish a whitepaper
 - 3 people post about it on social media because they like the paper, not because they like us
 - 1 well-known community figure mentions it
 - 1 supporter/investor reaches out with serious interest
+
+# Future
+Governance DAO
+- track and reward contributions
+- place for fees to go
+- control terms of service
