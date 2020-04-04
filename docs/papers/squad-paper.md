@@ -4,6 +4,11 @@ A cryptoeconomic mechanism for the decentralized development of video
 games (software?), following the principle that
 *contribution and curation are sufficient for progress*.
 
+This is a system for coordination for situations which want to accept many answers as the "right answer"
+Not like accounting but more like art. The system intends to allow many solutions to exist and for people to coordinate
+around their style of the "right answer". It's almost the opposite of a blockchain that looks for a single
+consensus. We do still want to mix that with an accounting system to create the economic incentives.
+
 In this paper, we 
 1. outline the opportunity we see in game design and balance, 
 1. propose a cryptoeconomic mechanism to capture that opportunity, 
