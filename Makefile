@@ -21,7 +21,7 @@ squad-games-web: build/metastore
 	cd $(squad-games-web) && npm run start
 
 .PHONY: squad-chess
-squad-chess: build/metastore
+squad-chess: build/p2p build/metastore
 	cd $(squad-chess) && npm run start
 	cd $(squad-chess) && echo "open `pwd`/index.html in your browser"
 
@@ -87,7 +87,7 @@ p2p-js-tests: build/p2p
 p2p-tests:
 	cd $(p2p) && npm run test
 
-build/p2p: 
+build/p2p: build/bootstrap
 	cd $(p2p) && npm run server &
 	touch build/p2p
 

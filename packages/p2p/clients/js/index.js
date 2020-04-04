@@ -55,6 +55,7 @@ function resetState () {
 function disconnect () {
   dataChannel.close()
   leaveRoom()
+  server.close()
   server = null
   theirId = null
   events = {}
@@ -91,7 +92,6 @@ function joinRoom (roomName) {
 
 function leaveRoom () {
   server.call('leaveRoom', [room, ourId])
-  server.close()
   room = 'empty'
 }
 
