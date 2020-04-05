@@ -29,7 +29,7 @@ function conf (name, defaultValue) {
 }
 
 const host = conf('PEER_DISCOVERY_HOST', 'localhost')
-const port = conf('PEER_DISCOVERY_PORT', '8889')
+const port = conf('PORT', '8889')
 const roomTimeout = conf('ROOM_TIMEOUT', 240000)
 
 const server = new WSServer({ host, port })
