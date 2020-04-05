@@ -165,26 +165,26 @@ const port = conf('PORT', '8888')
 
 console.log(`mock metastore configured host=${host}, port=${port}`)
 
-const healthCheckServer = http.createServer((req, res) => {
+const server = http.createServer((req, res) => {
   console.log('health check server OK')
   res.end()
 })
-healthCheckServer.on('clientError', (err, socket) => {
+server.on('clientError', (err, socket) => {
   console.log('health check server ERROR', err)
   socket.end('HTTP/1.1 400 Bad Request\r\n\r\n')
 })
-healthCheckServer.listen(process.env.PORT)
+server.listen(process.env.PORT)
 console.log(`health check server listening on port ${process.env.PORT}`)
 
-const server = new WSServer({ host, port })
+const wsServer = new WSServer({ server })
 console.log(`mock metastore Listening on ${host}:${port}`)
 
-server.register('info/instances', () => {
+wsServer.register('info/instances', () => {
   console.log('info/instances')
   return [{ id: MOCK_INSTANCE_ID }]
 })
 
-server.register('call', ({
+wsServer.register('call', ({
   instance_id: instanceId,
   zome,
   function: method,
