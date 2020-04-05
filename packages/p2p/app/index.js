@@ -1,3 +1,5 @@
+/* global require process setTimeout */
+
 /* P2P peer discovery server */
 
 const WSServer = require('rpc-websockets').Server
