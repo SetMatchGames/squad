@@ -177,7 +177,7 @@ healthCheckServer.listen(process.env.PORT)
 console.log(`health check server listening on port ${process.env.PORT}`)
 
 const server = new WSServer({ host, port })
-console.log(`mock metastore Listening on ws://${host}:${port}`)
+console.log(`mock metastore Listening on ${host}:${port}`)
 
 server.register('info/instances', () => {
   console.log('info/instances')

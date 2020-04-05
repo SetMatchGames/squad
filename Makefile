@@ -8,18 +8,20 @@ sdk-js = packages/squad-sdk/js
 js-client-contracts = packages/curation-market/clients/js/contracts
 curation-market-contracts = packages/curation-market/app/build/contracts
 squad-chess = packages/app-spec-squad-chess
+p2p-js = packages/p2p/clients/js
+p2p = packages/p2p/app
 
 metastore-shell = cd $(metastore) && nix-shell https://holochain.love --pure --command
 
 .PHONY: ci
-ci: metastore-tests mock-metastore-tests squad-chess-tests sdk-js-tests
+ci: metastore-tests mock-metastore-tests squad-chess-tests sdk-js-tests p2p-js-tests p2p-tests
 
 .PHONY: squad-games-web
 squad-games-web: build/metastore
 	cd $(squad-games-web) && npm run start
 
 .PHONY: squad-chess
-squad-chess: build/metastore
+squad-chess: build/p2p build/metastore
 	cd $(squad-chess) && npm run start
 	cd $(squad-chess) && echo "open `pwd`/index.html in your browser"
 
@@ -33,6 +35,7 @@ squad-chess-alpha-server: build/metastore
 clean:
 	-if [ -a build/devnet ]; then kill $(shell cat build/devnet); fi
 	-if [ -a build/metastore ]; then kill $(shell cat build/metastore); fi
+	-if [ -a build/p2p ]; then kill $(shell cat build/p2p); fi
 	-rm -rf build
 	-rm -rf packages/curation-market/clients/js/contracts
 	-rm -rf packages/metastore/mock/build
@@ -75,6 +78,18 @@ app-spec-roshambo-tests:
 .PHONY: curation-market-tests
 curation-market-tests: build/curation-market
 	cd $(curation-market) && npm run test
+
+.PHONY: p2p-js-tests
+p2p-js-tests: build/p2p
+	cd $(p2p-js) && npm run test
+
+.PHONY: p2p-tests
+p2p-tests:
+	cd $(p2p) && npm run test
+
+build/p2p: build/bootstrap
+	cd $(p2p) && npm run server &
+	touch build/p2p
 
 $(curation-market-contracts):
 	cd $(curation-market) && npm run build

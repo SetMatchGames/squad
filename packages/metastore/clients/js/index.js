@@ -1,8 +1,8 @@
 /* global require */
 
 const WebSocket = require('rpc-websockets').Client
-// const IPFS = require('ipfs')
 
+// TODO change 'squad' to 'metastore' here?
 const squad = {}
 
 function webSocketConnection (uri) {
@@ -84,61 +84,6 @@ function close () {
   squad.connection.close()
 }
 
-/*
-
-// Networking functions
-// Create a node before trying to share definitions
-function createNode(url) {
-  return new IPFS({
-    repo: `${url}/ipfsRepo/${Math.random()}`,
-    EXPERIMENTAL: {
-      pubsub: true
-    },
-    config: {
-      Addresses: {
-        Swarm: [
-          '/dns4/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-websocket-star'
-        ]
-      }
-    }
-  })
-}
-
-const submitted = {}
-
-function shareDefinitions(node, TOPIC, typeArray, shareFunction) {
-  // when someone sends deffinions, submit them
-  setTimeout(
-    () => {
-      node.pubsub.subscribe(TOPIC, (message) => {
-        const data = JSON.parse(message.data.toString())
-        data.forEach((def) => {
-          let key = JSON.stringify(def)
-          if (!submitted[key]) {
-            shareFunction(def)
-            submitted[key] = true
-          }
-        })
-      })
-    },
-    4000
-  )
-
-  // periodically send all the definitions you have
-  setInterval(
-    () => {
-      typeArray.forEach(type => {
-        getAllDefinitionsOfType(type).then(defs => {
-          node.pubsub.publish(TOPIC, Buffer.from(JSON.stringify(defs), 'utf-8'))
-        })
-      })
-    },
-    10000
-  )
-}
-
-*/
-
 module.exports = {
   webSocketConnection,
   on,
@@ -152,9 +97,5 @@ module.exports = {
   getGameDefinitions,
   getGameComponents,
   getGameFormats,
-  close/*,
-  networking: {
-    createNode,
-    shareDefinitions
-  } */
+  close
 }

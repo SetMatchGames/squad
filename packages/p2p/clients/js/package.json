@@ -1,0 +1,19 @@
+{
+  "name": "@squad/p2p",
+  "version": "0.0.0",
+  "description": "Squad SDK peer to peer discovery and data channels js client",
+  "main": "index.js",
+  "scripts": {
+    "test": "standard && jest"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "rpc-websockets": "^5.0.14"
+  },
+  "devDependencies": {
+    "jest": "^25.2.6",
+    "standard": "^14.3.3"
+  }
+}
