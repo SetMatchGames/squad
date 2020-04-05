@@ -16,7 +16,7 @@ server.on('clientError', (err, socket) => {
   console.log('health check server ERROR', err)
   socket.end('HTTP/1.1 400 Bad Request\r\n\r\n')
 })
-server.listen(`${host}:${port}`)
+server.listen(port)
 console.log(`health check server listening on http://${host}:${port}`)
 
 
