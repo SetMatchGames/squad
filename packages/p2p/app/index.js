@@ -5,16 +5,19 @@
 const WSServer = require('rpc-websockets').Server
 const http = require('http')
 
-const healthCheckServer = http.createServer((req, res) => {
+const host = conf('PEER_DISCOVERY_HOST', 'localhost')
+const port = conf('PORT', '8889')
+
+const server = http.createServer((req, res) => {
   console.log('health check server OK')
   res.end()
 })
-healthCheckServer.on('clientError', (err, socket) => {
+server.on('clientError', (err, socket) => {
   console.log('health check server ERROR', err)
   socket.end('HTTP/1.1 400 Bad Request\r\n\r\n')
 })
-healthCheckServer.listen(process.env.PORT)
-console.log(`health check server listening on port ${process.env.PORT}`)
+server.listen(host, port)
+console.log(`health check server listening on ${host}:${port}`)
 
 
 function conf (name, defaultValue) {
@@ -28,17 +31,15 @@ function conf (name, defaultValue) {
   return value
 }
 
-const host = conf('PEER_DISCOVERY_HOST', 'localhost')
-const port = conf('PORT', '8889')
 const roomTimeout = conf('ROOM_TIMEOUT', 240000)
 
-const server = new WSServer({ host, port })
+const wsServer = new WSServer({ server })
 
 console.log(`Peer discovery server listening on ws://${host}:${port}`)
 
 const rooms = {}
 
-server.register('joinRoom', ([room, id]) => {
+wsServer.register('joinRoom', ([room, id]) => {
   if (!rooms[room]) { rooms[room] = [] }
   if (rooms[room][id]) {
     console.log(`Error: ID '${id}' already in peer discovery channel '${room}'`)
@@ -54,28 +55,28 @@ server.register('joinRoom', ([room, id]) => {
   }, roomTimeout)
 })
 
-server.register('leaveRoom', ([room, id]) => {
+wsServer.register('leaveRoom', ([room, id]) => {
   console.log(`ID ${id} leaving room ${room}`)
   leaveRoom(room, id)
 })
 
-server.register('rollCall', ([room]) => {
+wsServer.register('rollCall', ([room]) => {
   if (rooms[room]) {
     return rooms[room]
   }
   return []
 })
 
-server.register('addEvent', ([event]) => {
-  if (!server.eventList().includes(event)) {
-    server.event(`${event}`)
+wsServer.register('addEvent', ([event]) => {
+  if (!wsServer.eventList().includes(event)) {
+    wsServer.event(`${event}`)
     console.log('Added event', event)
   }
 })
 
-server.register('triggerEvent', ([event, data, from]) => {
+wsServer.register('triggerEvent', ([event, data, from]) => {
   console.log(`Triggering ${event} event`)
-  server.emit(event, { data, from })
+  wsServer.emit(event, { data, from })
 })
 
 function leaveRoom (room, id) {

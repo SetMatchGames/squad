@@ -1,5 +1,5 @@
 {
   "metastoreWs": "ws://localhost:8888",
-  "p2pWs": "ws://localhost:8889",
+  "p2pWs": "ws://squad-p2p-discovery.herokuapp.com/",
   "gameAddress": "8c875b7990077c166479df9ee2aafff7cc7bf82c54741ff47d169a56f18fe5d5"
 }
