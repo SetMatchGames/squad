@@ -3,6 +3,19 @@
 /* P2P peer discovery server */
 
 const WSServer = require('rpc-websockets').Server
+const http = require('http')
+
+const healthCheckServer = http.createServer((req, res) => {
+  console.log('health check server OK')
+  res.end()
+})
+healthCheckServer.on('clientError', (err, socket) => {
+  console.log('health check server ERROR', err)
+  socket.end('HTTP/1.1 400 Bad Request\r\n\r\n')
+})
+healthCheckServer.listen(process.env.PORT)
+console.log(`health check server listening on port ${process.env.PORT}`)
+
 
 function conf (name, defaultValue) {
   var value = process.env[name]
