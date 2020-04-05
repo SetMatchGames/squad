@@ -13,7 +13,7 @@ healthCheckServer.on('clientError', (err, socket) => {
   console.log('health check server ERROR', err)
   socket.end('HTTP/1.1 400 Bad Request\r\n\r\n')
 })
-healthCheckServer.listen(process.env.PORT)
+healthCheckServer.listen("0.0.0.0:80")
 console.log(`health check server listening on port ${process.env.PORT}`)
 
 
