@@ -33,13 +33,6 @@ const App = {
 async function squadInit () {
   console.log('Initializing squad chess with settings:', settings)
 
-  // metastore will load any new formats here
-  const formatDefs = await metastore.getGameFormats(settings.gameAddress)
-
-  state.rawFormats = formatDefs.map(def => def.Format)
-  const urlParams = new URLSearchParams(window.location.search)
-  const formatToLoad = state.rawFormats[urlParams.get('format')]
-
   metastore.webSocketConnection(settings.metastoreWs)
 
   metastore.on('open', async () => {

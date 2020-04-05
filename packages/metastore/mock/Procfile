@@ -1,1 +1,1 @@
-web: npm run start
+web: cd packages/metastore/mock && npm install && npm run start
