@@ -7,6 +7,8 @@ const {
   getCatalogAddresses
 } = require('@squad/sdk').metastore
 
+const metastoreWs = require('../src/settings.json').metastoreWs
+
 function conf (name, defaultValue) {
   var value = process.env[name]
   if (value === undefined) {
@@ -19,7 +21,7 @@ function conf (name, defaultValue) {
 }
 
 // TODO refactor system configuration
-webSocketConnection(conf('MOCK_METASTORE_HOST', 'ws://localhost:8888'))
+webSocketConnection(conf(metastoreWs, 'ws://localhost:8888'))
 
 process.on('unhandledRejection', r => console.log(r))
 
