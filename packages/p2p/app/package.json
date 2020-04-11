@@ -1,0 +1,20 @@
+{
+  "name": "@squad/p2p-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "standard",
+    "server": "node index",
+    "start": "node index"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "rpc-websockets": "^5.0.14"
+  },
+  "devDependencies": {
+    "standard": "^14.3.3"
+  }
+}

@@ -1,6 +1,6 @@
 /* global test require expect jest */
 
-const squad = require('./index')
+const squad = require('./index.js')
 
 // mock the curation market and metastore
 const curation = require('@squad/curation-client')

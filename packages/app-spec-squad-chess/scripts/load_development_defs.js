@@ -1,3 +1,5 @@
+/* global process require */
+
 const {
   on,
   webSocketConnection,
@@ -5,7 +7,21 @@ const {
   getCatalogAddresses
 } = require('@squad/sdk').metastore
 
-webSocketConnection('ws://localhost:8888')
+const metastoreWs = require('../src/settings.json').metastoreWs
+
+function conf (name, defaultValue) {
+  var value = process.env[name]
+  if (value === undefined) {
+    value = defaultValue
+  }
+  if (value === undefined) {
+    throw new Error(`Required configuration "${name}" not found.`)
+  }
+  return value
+}
+
+// TODO refactor system configuration
+webSocketConnection(conf(metastoreWs, 'ws://localhost:8888'))
 
 process.on('unhandledRejection', r => console.log(r))
 
@@ -217,7 +233,10 @@ async function main () {
     await createDefinition(definition, [squadChessAddress])
   })
 
-  const squadChessCatalog = await getCatalogAddresses('Component', `${squadChessAddress} Component Catalog`)
+  const squadChessCatalog = await getCatalogAddresses(
+    'Component',
+    `${squadChessAddress} Component Catalog`
+  )
 
   const pnrkFormat = {
     Format: {

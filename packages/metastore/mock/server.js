@@ -5,6 +5,9 @@ const WSServer = require('rpc-websockets').Server
 const crypto = require('crypto')
 const toml = require('@iarna/toml')
 
+// HTTP Server for cloud health checks
+const http = require('http')
+
 const DEF_TYPES = ['Game', 'Component', 'Format']
 
 function conf (name, defaultValue) {
@@ -24,6 +27,8 @@ function entryAddress (entry) {
 
 const definitionsPath = conf('MOCK_DEFINITIONS_PATH', './build/definitions')
 const catalogsPath = conf('MOCK_CATALOGS_PATH', './build/catalogs')
+
+console.log(`mock metastore configured ${definitionsPath}, ${catalogsPath}`)
 
 // create definitions and catalogs folders if they don't exist
 if (!fs.existsSync(catalogsPath)) {
@@ -153,19 +158,33 @@ const MOCK_ZOMES = {
 
 const MOCK_INSTANCE_ID = conf('MOCK_INSTANCE_ID', 'mock_instance_id')
 
+console.log(`mock metastore configured MOCK_INSTANCE_ID=${MOCK_INSTANCE_ID}`)
+
 const host = conf('MOCK_METASTORE_HOST', 'localhost')
-const port = conf('MOCK_METASTORE_PORT', '8888')
+const port = conf('PORT', '8888')
 
-const server = new WSServer({ host, port })
+console.log(`mock metastore configured host=${host}, port=${port}`)
 
-console.log(`Mock Metastore Listening on ws://${host}:${port}`)
+const server = http.createServer((req, res) => {
+  console.log('health check server OK')
+  res.end()
+})
+server.on('clientError', (err, socket) => {
+  console.log('health check server ERROR', err)
+  socket.end('HTTP/1.1 400 Bad Request\r\n\r\n')
+})
+server.listen(process.env.PORT)
+console.log(`health check server listening on port ${process.env.PORT}`)
 
-server.register('info/instances', () => {
+const wsServer = new WSServer({ server })
+console.log(`mock metastore Listening on ${host}:${port}`)
+
+wsServer.register('info/instances', () => {
   console.log('info/instances')
   return [{ id: MOCK_INSTANCE_ID }]
 })
 
-server.register('call', ({
+wsServer.register('call', ({
   instance_id: instanceId,
   zome,
   function: method,

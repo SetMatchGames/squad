@@ -1,0 +1,1 @@
+web: cd packages/p2p/app && npm install && npm run server
