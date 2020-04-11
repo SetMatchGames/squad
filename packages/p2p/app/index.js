@@ -19,7 +19,6 @@ server.on('clientError', (err, socket) => {
 server.listen(port)
 console.log(`health check server listening on http://${host}:${port}`)
 
-
 function conf (name, defaultValue) {
   var value = process.env[name]
   if (value === undefined) {
