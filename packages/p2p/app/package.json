@@ -1,5 +1,5 @@
 {
-  "name": "app",
+  "name": "@squad/p2p-app",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
