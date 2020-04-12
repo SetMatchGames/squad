@@ -1,5 +1,5 @@
 {
-  "name": "@squad/p2p-app",
+  "name": "@squad/matchmaking-server",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",

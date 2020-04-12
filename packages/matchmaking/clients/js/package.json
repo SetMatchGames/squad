@@ -1,5 +1,5 @@
 {
-  "name": "@squad/p2p-client",
+  "name": "@squad/matchmaking-client",
   "version": "0.0.0",
   "description": "Squad SDK peer to peer discovery and data channels js client",
   "main": "index.js",

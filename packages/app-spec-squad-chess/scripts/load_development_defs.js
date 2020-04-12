@@ -21,7 +21,8 @@ function conf (name, defaultValue) {
 }
 
 // TODO refactor system configuration
-webSocketConnection(conf(metastoreWs, 'ws://localhost:8888'))
+const uri = metastoreWs || conf(metastoreWs, 'ws://localhost:8888')
+webSocketConnection(uri)
 
 process.on('unhandledRejection', r => console.log(r))
 
@@ -231,6 +232,7 @@ async function main () {
 
   squadChessComponents.forEach(async (definition) => {
     await createDefinition(definition, [squadChessAddress])
+    console.log('creating definition', definition)
   })
 
   const squadChessCatalog = await getCatalogAddresses(
@@ -658,6 +660,7 @@ async function main () {
 }
 
 on('open', () => {
+  console.log('connection open')
   main().then(() => {
     console.log('done')
     process.exit(0)
