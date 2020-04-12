@@ -183,7 +183,7 @@ const handleConnect = (event) => {
   if (!state.matchmaking.id) { throw new Error("Can't connect: Id not set") }
   if (!state.matchmaking.room) { throw new Error("Can't connect: Room not chosen") }
 
-  matchmaking.connect(state.matchmaking.id, settings.p2pWs)
+  matchmaking.connect(state.matchmaking.id, settings.matchmakingWs)
   matchmaking.whenReady(() => {
     matchmaking.joinRoom(state.matchmaking.room)
     matchmaking.listenOffers(handleReceiveOffer)
