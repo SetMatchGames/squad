@@ -116,7 +116,7 @@ const PeerList = {
         )
       }
       default: {
-        return
+
       }
     }
   }
@@ -166,7 +166,7 @@ const OfferList = {
         )
       }
       default: {
-        return
+
       }
     }
   }
