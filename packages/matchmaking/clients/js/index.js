@@ -63,11 +63,12 @@ function order (s1, s2) {
 function sendOffer (targetId, callback) {
   const orderedIds = order(state.id, targetId)
   // start the match
-  console.log('setting matchId', state.matchId)
   subscribe('match', eventName(orderedIds), callback)
   // send the suggested match Id to another user
   console.log('trying to send offer:', state.events.match)
   state.server.call('triggerEvent', [eventName(['offer', state.room, targetId]), null, state.id])
+  // leave the room
+  leaveRoom()
 }
 
 function sendAnswer (targetId, callback) {
@@ -75,7 +76,9 @@ function sendAnswer (targetId, callback) {
   // start the match
   subscribe('match', eventName(orderedIds), callback)
   // send confirmation message
-  sendMessage('Connection open')
+  sendMessage('match started')
+  // leave the room
+  leaveRoom()
 }
 
 function endMatch () {

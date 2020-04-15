@@ -84,7 +84,7 @@ const BoardPiece = {
     const highlighted = squareInArray(coordinates, state.board.highlightedSquares)
     const player = state.game.position[vnode.key].content.player
     // if a match hasn't started, don't add events
-    if (state.matchmaking.connection !== 'open') {
+    if (state.matchmaking.connection !== 'match started') {
       /* do nothing */
     // if it isn't our turn and its not highlighted, don't add events
     } else if ((player !== state.matchmaking.player) && !highlighted) {
@@ -199,7 +199,7 @@ export const Board = {
   oninit: resetBoardState,
   view: () => {
     switch (state.matchmaking.connection) {
-      case 'open':
+      case 'match started':
         state.board.matchStatus = 'Match started!'
         break
       default:

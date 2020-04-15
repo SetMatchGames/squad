@@ -40,14 +40,19 @@ const FindMatchForm = {
 const RoomField = {
   view: () => {
     switch (state.matchmaking.connection) {
-      case 'open':
+      case 'match started':
         return m(
-          'div#connected',
+          'div#connection',
           `Active peer connection in room "${state.matchmaking.room}"`
         )
-      case 'connected':
+      case 'offer sent':
         return m(
-          'div#connected',
+          'div#connection',
+          'Offer sent'
+        )
+      case 'matchmaking connected':
+        return m(
+          'div#connection',
           `Listening in room "${state.matchmaking.room}"...`
         )
       default:
@@ -66,12 +71,9 @@ const RoomField = {
 const FindMatchButton = {
   view: () => {
     switch (state.matchmaking.connection) {
-      case 'open': {
-        return
-      }
-      case 'connected': {
-        return
-      }
+      case 'match started': { return }
+      case 'offer sent': { return }
+      case 'matchmaking connected': { return }
       default: {
         return m(
           'button#connect-button',
@@ -85,24 +87,38 @@ const FindMatchButton = {
 
 const PeerList = {
   view: () => {
-    if (state.matchmaking.connection === 'open') {
-      return m(
-        '#peers',
-        m('h4', 'Peer List'),
-        'Not listening for peers while a connection is live'
-      )
+    switch (state.matchmaking.connection) {
+      case 'match started': {
+        return m(
+          '#peers',
+          m('h4', 'Peer List'),
+          'Not listening for peers while a connection is live'
+        )
+      }
+      case 'offer sent': {
+        return m(
+          '#peers',
+          m('h4', 'Peer List'),
+          'Not listening for peers while your offer is pending'
+        )
+      }
+      case 'matchmaking connected': {
+        let content = 'No peers yet. Loading...'
+        if (state.matchmaking.peers.length > 0) {
+          content = state.matchmaking.peers.map(id => {
+            return m(Peer, { key: id })
+          })
+        }
+        return m(
+          '#peers',
+          m('h4', 'Peer List'),
+          content
+        )
+      }
+      default: {
+        return
+      }
     }
-    let content = 'No peers yet. Loading...'
-    if (state.matchmaking.peers.length > 0) {
-      content = state.matchmaking.peers.map(id => {
-        return m(Peer, { key: id })
-      })
-    }
-    return m(
-      '#peers',
-      m('h4', 'Peer List'),
-      content
-    )
   }
 }
 
@@ -121,24 +137,38 @@ const Peer = {
 
 const OfferList = {
   view: () => {
-    if (state.matchmaking.connection === 'open') {
-      return m(
-        '#offers',
-        m('h4', 'Offer List'),
-        'Not accepting offers while a connection is live'
-      )
+    switch (state.matchmaking.connection) {
+      case 'match started': {
+        return m(
+          '#offers',
+          m('h4', 'Offer List'),
+          'Not accepting offers while a connection is live'
+        )
+      }
+      case 'offer sent': {
+        return m(
+          '#peers',
+          m('h4', 'Peer List'),
+          'Not accepting offers while your offer is pending'
+        )
+      }
+      case 'matchmaking connected': {
+        let content = 'No offers yet. Waiting...'
+        if (Object.keys(state.matchmaking.offers).length) {
+          content = Object.keys(state.matchmaking.offers).map(id => {
+            return m(Offer, { key: id })
+          })
+        }
+        return m(
+          '#offers',
+          m('h4', 'Offer List'),
+          content
+        )
+      }
+      default: {
+        return
+      }
     }
-    let content = 'No offers yet. Waiting...'
-    if (Object.keys(state.matchmaking.offers).length) {
-      content = Object.keys(state.matchmaking.offers).map(id => {
-        return m(Offer, { key: id })
-      })
-    }
-    return m(
-      '#offers',
-      m('h4', 'Offer List'),
-      content
-    )
   }
 }
 
@@ -193,7 +223,7 @@ const handleConnect = (event) => {
     }, 1000)
   })
 
-  state.matchmaking.connection = 'connected'
+  state.matchmaking.connection = 'matchmaking connected'
   m.redraw()
 }
 
@@ -213,7 +243,8 @@ const handleSendOffer = (event) => {
   console.log('Sending offer event:', event.target.id)
   matchmaking.sendOffer(event.target.id, handleReceiveMessage)
 
-  state.matchmaking.connection = 'opening'
+  state.matchmaking.connection = 'offer sent'
+  clearInterval(state.matchmaking.rollCallInterval)
   m.redraw()
 }
 
@@ -225,15 +256,16 @@ const handleSendAnswer = (event) => {
   // If we are sending the answer, we are player 2
   state.matchmaking.player = 1
 
-  state.matchmaking.connection = 'open'
+  state.matchmaking.connection = 'match started'
+  clearInterval(state.matchmaking.rollCallInterval)
   m.redraw()
 }
 
 const handleReceiveMessage = (event) => {
   if (event.from !== state.matchmaking.id) {
     console.log('Received message:', event)
-    if (event.data === 'Connection open') {
-      state.matchmaking.connection = 'open'
+    if (event.data === 'match started') {
+      state.matchmaking.connection = event.data
     } else {
       state.game = event.data
       checkWinner()
