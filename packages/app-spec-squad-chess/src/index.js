@@ -36,9 +36,9 @@ async function squadInit () {
   metastore.webSocketConnection(settings.metastoreWs)
 
   metastore.on('open', async () => {
-    if (state.squad.loadedFormat) { 
+    if (state.squad.loadedFormat) {
       console.log('Skipping on open')
-      return 
+      return
     }
     console.log('metastore open')
     const formatDefs = await metastore.getGameFormats(settings.gameAddress) // metastore will load any new formats here
