@@ -8,20 +8,33 @@ sdk-js = packages/squad-sdk/js
 js-client-contracts = packages/curation-market/clients/js/contracts
 curation-market-contracts = packages/curation-market/app/build/contracts
 squad-chess = packages/app-spec-squad-chess
+<<<<<<< HEAD
 matchmaking-js = packages/matchmaking/clients/js
 matchmaking = packages/matchmaking/server
+=======
+p2p-js = packages/p2p/clients/js
+p2p = packages/p2p/app
+>>>>>>> develop
 
 metastore-shell = cd $(metastore) && nix-shell https://holochain.love --pure --command
 
 .PHONY: ci
+<<<<<<< HEAD
 ci: metastore-tests mock-metastore-tests squad-chess-tests sdk-js-tests matchmaking-js-tests matchmaking-tests
+=======
+ci: metastore-tests mock-metastore-tests squad-chess-tests sdk-js-tests p2p-js-tests p2p-tests
+>>>>>>> develop
 
 .PHONY: squad-games-web
 squad-games-web: build/metastore
 	cd $(squad-games-web) && npm run start
 
 .PHONY: squad-chess
+<<<<<<< HEAD
 squad-chess: build/matchmaking build/metastore
+=======
+squad-chess: build/p2p build/metastore
+>>>>>>> develop
 	cd $(squad-chess) && npm run start
 	cd $(squad-chess) && echo "open `pwd`/index.html in your browser"
 
@@ -79,6 +92,7 @@ app-spec-roshambo-tests:
 curation-market-tests: build/curation-market
 	cd $(curation-market) && npm run test
 
+<<<<<<< HEAD
 .PHONY: matchmaking-js-tests
 matchmaking-js-tests: build/matchmaking
 	cd $(matchmaking-js) && npm run test
@@ -90,6 +104,19 @@ matchmaking-tests:
 build/matchmaking: build/bootstrap
 	cd $(matchmaking) && npm run server &
 	touch build/matchmaking
+=======
+.PHONY: p2p-js-tests
+p2p-js-tests: build/p2p
+	cd $(p2p-js) && npm run test
+
+.PHONY: p2p-tests
+p2p-tests:
+	cd $(p2p) && npm run test
+
+build/p2p: build/bootstrap
+	cd $(p2p) && npm run server &
+	touch build/p2p
+>>>>>>> develop
 
 $(curation-market-contracts):
 	cd $(curation-market) && npm run build

@@ -9,20 +9,7 @@ const {
 
 const metastoreWs = require('../src/settings.json').metastoreWs
 
-function conf (name, defaultValue) {
-  var value = process.env[name]
-  if (value === undefined) {
-    value = defaultValue
-  }
-  if (value === undefined) {
-    throw new Error(`Required configuration "${name}" not found.`)
-  }
-  return value
-}
-
-// TODO refactor system configuration
-const uri = metastoreWs || conf(metastoreWs, 'ws://localhost:8888')
-webSocketConnection(uri)
+webSocketConnection(metastoreWs)
 
 process.on('unhandledRejection', r => console.log(r))
 
