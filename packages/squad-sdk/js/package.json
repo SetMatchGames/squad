@@ -11,11 +11,7 @@
   "dependencies": {
     "@squad/curation-client": "^1.0.0",
     "@squad/metastore": "^1.0.0",
-<<<<<<< HEAD
     "@squad/matchmaking-client": "^0.0.0",
-=======
-    "@squad/p2p-client": "^0.0.0",
->>>>>>> develop
     "rpc-websockets": "^4.4.0"
   },
   "devDependencies": {
