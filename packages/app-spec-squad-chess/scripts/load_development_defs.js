@@ -9,19 +9,7 @@ const {
 
 const metastoreWs = require('../src/settings.json').metastoreWs
 
-function conf (name, defaultValue) {
-  var value = process.env[name]
-  if (value === undefined) {
-    value = defaultValue
-  }
-  if (value === undefined) {
-    throw new Error(`Required configuration "${name}" not found.`)
-  }
-  return value
-}
-
-// TODO refactor system configuration
-webSocketConnection(conf(metastoreWs, 'ws://localhost:8888'))
+webSocketConnection(metastoreWs)
 
 process.on('unhandledRejection', r => console.log(r))
 
@@ -231,6 +219,7 @@ async function main () {
 
   squadChessComponents.forEach(async (definition) => {
     await createDefinition(definition, [squadChessAddress])
+    console.log('creating definition', definition)
   })
 
   const squadChessCatalog = await getCatalogAddresses(
@@ -658,6 +647,7 @@ async function main () {
 }
 
 on('open', () => {
+  console.log('connection open')
   main().then(() => {
     console.log('done')
     process.exit(0)

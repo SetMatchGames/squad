@@ -84,10 +84,10 @@ const BoardPiece = {
     const highlighted = squareInArray(coordinates, state.board.highlightedSquares)
     const player = state.game.position[vnode.key].content.player
     // if a match hasn't started, don't add events
-    if (state.p2p.connection !== 'open') {
+    if (state.matchmaking.connection !== 'match started') {
       /* do nothing */
     // if it isn't our turn and its not highlighted, don't add events
-    } else if ((player !== state.p2p.player) && !highlighted) {
+    } else if ((player !== state.matchmaking.player) && !highlighted) {
     // if highlighted, click to attempt turn
     } else if (highlighted) {
       attrs.onclick = handleTurn()
@@ -129,7 +129,7 @@ function handleTurn () {
     const newState = chess.takeTurn(state.game, [from, to])
     // update the state if takeTurn doesn't throw
     state.game = newState
-    sendMessage(JSON.stringify(state.game))
+    sendMessage(state.game)
     state.board.highlightedSquares = []
     // if no legal turns, the game is over
     checkWinner()
@@ -198,8 +198,8 @@ const BoardSquare = {
 export const Board = {
   oninit: resetBoardState,
   view: () => {
-    switch (state.p2p.connection) {
-      case 'open':
+    switch (state.matchmaking.connection) {
+      case 'match started':
         state.board.matchStatus = 'Match started!'
         break
       default:

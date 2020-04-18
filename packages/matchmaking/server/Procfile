@@ -1,0 +1,1 @@
+web: cd packages/matchmaking/server && npm install && npm run server

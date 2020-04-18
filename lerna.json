@@ -2,6 +2,7 @@
   "packages": [
     "packages/*/clients/js/",
     "packages/*/app",
+    "packages/*/server",
     "packages/*/js/",
     "packages/*/mock",
     "packages/*"
