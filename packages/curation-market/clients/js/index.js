@@ -56,7 +56,9 @@ async function init(defaults) {
     }
   }
   options = defaults
-  autoBond= await contract(AutoBondJSON).deployed()
+  console.log(AutoBondJSON)
+  console.log(SimpleLinearCurveJSON)
+  autoBond = await contract(AutoBondJSON).deployed()
   simpleLinearCurve = await contract(SimpleLinearCurveJSON).deployed()
   console.log("init finished")
 }

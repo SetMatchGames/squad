@@ -1,6 +1,6 @@
 squad-games-web = packages/squad-games-web
 app-spec-roshambo = packages/app-spec-roshambo
-curation-market = packages/curation-market
+curation-market = packages/curation-market/app
 metastore-js = packages/metastore/clients/js
 metastore = packages/metastore/app
 mock-metastore = packages/metastore/mock
@@ -35,7 +35,7 @@ squad-chess-alpha-server: build/metastore
 clean:
 	-if [ -a build/devnet ]; then kill $(shell cat build/devnet); fi
 	-if [ -a build/metastore ]; then kill $(shell cat build/metastore); fi
-	-if [ -a build/p2p ]; then kill $(shell cat build/p2p); fi
+	-if [ -a build/matchmaking ]; then kill $(shell cat build/matchmaking); fi
 	-rm -rf build
 	-rm -rf packages/curation-market/clients/js/contracts
 	-rm -rf packages/metastore/mock/build
@@ -76,7 +76,7 @@ app-spec-roshambo-tests:
 	cd $(app-spec-roshambo) && CI=true npm run test
 
 .PHONY: curation-market-tests
-curation-market-tests: build/curation-market
+curation-market-tests: build/development-curation-market
 	cd $(curation-market) && npm run test
 
 .PHONY: matchmaking-js-tests
