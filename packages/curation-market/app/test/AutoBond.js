@@ -43,24 +43,29 @@ contract("AutoBond", ([alice, bob, ...accounts]) => {
     // supply of A should be 0
     assert.equal((await autoBond.bonds(bondAId)).supply, 0)
     assert.equal(await autoBond.getSupply(bondAId), 0)
+    // assert.equal(await autoBond.getBuyPrice(199, bondAId), await curve.buyPrice(0, 199))
 
     // Bob fails to buy 200 for the price of 199
+    let price = await autoBond.getBuyPrice(199, bondAId)
+    console.log("Got price for 199:", price)
     throws(
       async () => {
         await autoBond.buy(
           200,
           bondAId,
-          {from: bob, value: await curve.buyPrice(0, 199)}
+          {from: bob, value: price}
         )
       },
       "Failed: Bought 200 from bond A for the price of 199."
     )
 
     // Bob buys 200 for the price of 200
+    price = await autoBond.getBuyPrice(200, bondAId)
+    console.log("Got price for 200:", price)
     await autoBond.buy(
       200,
       bondAId,
-      {from: bob, value: await curve.buyPrice(0, 200)}
+      {from: bob, value: price}
     )
 
     // supply of A should be 200
@@ -88,7 +93,7 @@ contract("AutoBond", ([alice, bob, ...accounts]) => {
         await autoBond.buy(
           100,
           bondBId,
-          {from: alice, value: await curve.buyPrice(100, 99)}
+          {from: alice, value: await autoBond.getBuyPrice(99, bondBId)}
         )
       },
       "Failed: Bought 100 from bond B for the price of 99."
@@ -98,7 +103,7 @@ contract("AutoBond", ([alice, bob, ...accounts]) => {
     await autoBond.buy(
       100,
       bondBId,
-      {from: alice, value: await curve.buyPrice(100, 100)}
+      {from: alice, value: await autoBond.getBuyPrice(100, bondBId)}
     )
 
     // bond B supply should be 200 but alice should have 100, so should bob

@@ -29,12 +29,13 @@ async function runGame (definition) {
 // handle submitting a definition and creating a new bond at the same time
 async function newDefinitionWithBond (
   definition,
-  addressOfCurve = curationMarket.config.contracts.simpleLinearCurve,
+  games,
   initialBuyUnits = 0,
-  opts = {}
+  opts = {},
+  addressOfCurve
 ) {
-  const bondId = await metastore.createDefinition(definition)
-  await curationMarket.newBond(addressOfCurve, bondId, initialBuyUnits, opts)
+  const bondId = await metastore.createDefinition( definition, games )
+  await curationMarket.newBond(bondId, initialBuyUnits, opts, addressOfCurve)
   return bondId
 }
 
@@ -42,20 +43,22 @@ async function newDefinitionWithBond (
 // it will check to see if the definition exists before creating it
 async function definition (
   definition,
-  addressOfCurve = curationMarket.config.contracts.simpleLinearCurve,
+  games = [],
   initialBuyUnits = 0,
-  opts = {}
+  opts = {},
+  addressOfCurve
 ) {
   try {
     return await newDefinitionWithBond(
       definition,
-      addressOfCurve,
+      games,
       initialBuyUnits,
-      opts
+      opts,
+      addressOfCurve
     )
   } catch (e) {
     if (e instanceof curationMarket.BondAlreadyExists) {
-      return metastore.createDefinition(definition)
+      return metastore.createDefinition( definition, games )
     } else {
       throw e
     }

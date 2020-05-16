@@ -9,6 +9,8 @@ import state from './state.js'
 import { Board } from './Board.js'
 import FormatSelector from './FormatSelector.js'
 import { Matchmaker } from './Matchmaker.js'
+import ComponentForm from './ComponentForm.js'
+import FormatForm from './FormatForm.js'
 
 const App = {
   oninit: () => {
@@ -25,7 +27,9 @@ const App = {
       '#app',
       m(Board),
       m(FormatSelector),
-      m(Matchmaker)
+      m(Matchmaker),
+      m(ComponentForm),
+      m(FormatForm)
     )
   }
 }
@@ -42,7 +46,9 @@ async function squadInit () {
     }
     console.log('metastore open')
     const formatDefs = await metastore.getGameFormats(settings.gameAddress) // metastore will load any new formats here
+    const componentDefs = await metastore.getGameComponents(settings.gameAddress)
     state.squad.rawFormats = formatDefs.map(def => def.Format)
+    state.squad.components = componentDefs.map(def => def.Component)
     const urlParams = new URLSearchParams(window.location.search)
     state.squad.loadedFormatIndex = urlParams.get('format')
     const formatToLoad = state.squad.rawFormats[state.squad.loadedFormatIndex]

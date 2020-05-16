@@ -22,8 +22,9 @@ squad-games-web: build/metastore
 
 .PHONY: squad-chess
 squad-chess: build/matchmaking build/metastore
-	cd $(squad-chess) && npm run start
-	cd $(squad-chess) && echo "open `pwd`/index.html in your browser"
+	cd $(squad-chess) && npm run start &
+	cd $(squad-chess) && npx http-server
+	cd $(squad-chess) && echo "open localhost:8080 in your browser"
 
 .PHONY: squad-chess-alpha-server
 squad-chess-alpha-server: build/metastore

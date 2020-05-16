@@ -60,7 +60,7 @@ const RoomField = {
           '.room',
           m('h4', 'Enter room name:'),
           m(
-            'input#room-field[type=text][placeholder=Room name',
+            'input#room-field[type=text][placeholder=Room name]',
             { oninput: handleSaveRoom }
           )
         )

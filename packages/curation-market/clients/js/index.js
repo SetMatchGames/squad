@@ -1,66 +1,59 @@
-/* global web3 ethereum require module */
-
-const Web3 = require("web3")
+const ethers = require('ethers')
 const AutoBondJSON = require("../../app/build/contracts/AutoBond.json")
-const SimpleLinearCurveJSON = require(
-  "../../app/build/contracts/SimpleLinearCurve.json"
-)
-const contract = require("@truffle/contract")
+const SimpleLinearCurveJSON = require("../../app/build/contracts/SimpleLinearCurve.json")
 
-async function addWeb3() {
-    // Modern dapp browsers...
-    if (window.ethereum) {
-        window.web3 = new Web3(ethereum)
-        try {
-            // Request account access if needed
-            await ethereum.enable();
-        } catch (error) {
-            // User denied account access...
-            console.log(error)
-        }
-    }
-    // Legacy dapp browsers...
-    else if (window.web3) {
-        window.web3 = new Web3(web3.currentProvider)
-    }
-    // Non-dapp browsers...
-    else {
-      console.log(
-        'Minting, buying, or selling tokens requires a connection to Ethereum. \
-         Consider installing/logging into the Metamask browser extension.'
-      )
-    }
+const networkIds = {
+  'ropsten': 3
 }
 
-let web3
-let accounts
+const network = 'ropsten'
+const devUrl = 'http://localhost:8545'
+
+let initialized = false
+let provider
+let walletOrSigner
 let autoBond
 let simpleLinearCurve
-let options
+let autoBondAddress
+let simpleLinearCurveAddress
+let defaults
 
-// TODO race condition bug when init is called concurrently for the first time
-// consider requiring an explicit call to init by client code
-async function init(defaults) {
-  if (web3 !== undefined) { return }
-  console.log("running init...")
+function init (defaults) {
+  if (initialized) { 
+    console.log('Skipping init')
+    return 
+  }
 
-  await addWeb3()
-  web3 = window.web3
+  console.log('Initializing...')
 
-  accounts = await web3.eth.getAccounts()
+  switch (network) {
+    case 'development': {
+      // I think this might not be working right -- maybe instead we should be creating a wallet using one of the ganache keys
+      provider = new ethers.providers.JsonRpcProvider(devUrl)
+      walletOrSigner = provider.getSigner(0)
+      const mostRecentDevnet = Object.keys(AutoBondJSON.networks).pop()
+      autoBondAddress = AutoBondJSON.networks[mostRecentDevnet].address
+      simpleLinearCurveAddress = SimpleLinearCurveJSON.networks[mostRecentDevnet].address
+      break
+    }
+    default: {
+      console.log('Trying to make provider...')
+      provider = new ethers.providers.Web3Provider(web3.currentProvider)
+      walletOrSigner = provider.getSigner()
+      autoBondAddress = AutoBondJSON.networks[networkIds[network]].address
+      simpleLinearCurveAddress = SimpleLinearCurveJSON.networks[networkIds[network]].address
+    }
+  }
+  autoBond = new ethers.Contract(autoBondAddress, AutoBondJSON.abi, walletOrSigner)
+  simpleLinearCurve = new ethers.Contract(simpleLinearCurveAddress, SimpleLinearCurveJSON.abi, walletOrSigner)
 
   if (defaults === undefined) {
     defaults = {
-      from: accounts[0],
       gas: 900000
     }
   }
-  options = defaults
-  console.log(AutoBondJSON)
-  console.log(SimpleLinearCurveJSON)
-  autoBond = await contract(AutoBondJSON).deployed()
-  simpleLinearCurve = await contract(SimpleLinearCurveJSON).deployed()
-  console.log("init finished")
+
+  initialized = true
 }
 
 class BondAlreadyExists extends Error {
@@ -70,77 +63,72 @@ class BondAlreadyExists extends Error {
   }
 }
 
-async function newBond(
-  addressOfCurve = simpleLinearCurve.address,
+async function newBond (
   bondId,
   initialBuyNumber,
-  opts = {}
+  options = {},
+  addressOfCurve,
 ) {
-  await init()
-  let bondSha = web3.utils.sha3(bondId)
-  let o = Object.assign({}, options, opts)
-  let curve = await autoBond.getCurve(bondSha)
+  init()
+  if (!addressOfCurve) { addressOfCurve = simpleLinearCurveAddress }
+  let bondHash = ethers.utils.id(bondId)
+  const fullOptions = Object.assign({}, defaults, options)
+  let curve = await autoBond.getCurve(bondHash)
   if (curve === '0x0000000000000000000000000000000000000000') {
     return await autoBond.newBond(
       addressOfCurve,
-      bondSha,
+      bondHash,
       initialBuyNumber,
+      fullOptions
     )
   }
   throw new BondAlreadyExists(`Bond ${bondId} already exists.`)
 }
 
-async function getSupply(bondId) {
-  await init()
-  let bondSha = web3.utils.sha3(bondId)
-  return await autoBond.getSupply(bondSha)
+async function getSupply (bondId) {
+  init()
+  let bondHash = ethers.utils.id(bondId)
+  return await autoBond.getSupply(bondHash)
 }
 
-async function getBalance(bondId, holderAddress) {
-  await init()
-  let bondSha = web3.utils.sha3(bondId)
-  return await autoBond.getBalance(
-    bondSha,
-    holderAddress,
-  )
+async function getBalance (bondId, holderAddress) {
+  init()
+  let bondHash = ethers.utils.id(bondId)
+  return await autoBond.getBalance(bondHash, holderAddress)
 }
 
-async function buy(units, bondId, opts) {
-  await init()
-  let bondSha = web3.utils.sha3(bondId)
-  let o = Object.assign({}, options, opts)
+async function buy (units, bondId, options = {}) {
+  init()
+  let bondHash = ethers.utils.id(bondId)
+  const fullOptions = Object.assign({}, defaults, options)
   return await autoBond.buy(
     units,
-    bondSha,
+    bondHash,
+    fullOptions
   )
 }
 
-async function sell(units, bondId, opts) {
-  await init()
-  let bondSha = web3.utils.sha3(bondId)
-  let o = Object.assign({}, options, opts)
+async function sell (units, bondId, options = {}) {
+  init()
+  let bondHash = ethers.utils.id(bondId)
+  const fullOptions = Object.assign({}, defaults, options)
   return await autoBond.sell(
     units,
-    bondSha,
+    bondHash,
+    fullOptions
   )
 }
 
-async function getBuyPrice(units, bondId) {
-  await init()
-  let bondSha = web3.utils.sha3(bondId)
-  return await autoBond.getBuyPrice(
-    units,
-    bondSha,
-  )
+async function getBuyPrice (units, bondId) {
+  init()
+  let bondHash = ethers.utils.id(bondId)
+  return await autoBond.getBuyPrice(units, bondHash)
 }
 
-async function getSellPrice(units, bondId) {
-  await init()
-  let bondSha = web3.utils.sha3(bondId)
-  return await autoBond.getSellPrice(
-    units,
-    bondSha,
-  )
+async function getSellPrice (units, bondId) {
+  init()
+  let bondHash = ethers.utils.id(bondId)
+  return await autoBond.getSellPrice(units, bondHash)
 }
 
 module.exports = {
@@ -154,6 +142,3 @@ module.exports = {
   sell,
   BondAlreadyExists
 }
-
-
-
