@@ -6,10 +6,10 @@ const FormatSelector = {
     return m(
       '#format-selector',
       m('h3', 'Available Formats'),
-      state.squad.rawFormats.map((rawFormat, index) => {
+      Object.keys(state.squad.rawFormats).map(address => {
         const url = new URL(window.location)
-        url.search = `?format=${index}`
-        return m(`a[href=${url}]`, rawFormat.name)
+        url.search = `?format=${address}`
+        return m(`a[href=${url}]`, state.squad.rawFormats[address].name)
       })
     )
   }

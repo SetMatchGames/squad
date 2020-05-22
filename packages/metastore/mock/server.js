@@ -140,9 +140,11 @@ const getDefinitionsFromCatalog = ({
   const catalog = MOCK_ZOMES.definitions.get_catalog_links(
     { catalog_type: catalogType, catalog_name: catalogName }
   )
-  return catalog.map(address => {
-    return MOCK_ZOMES.definitions.get_definition({ address })
+  const definitions = {}
+  catalog.forEach(address => {
+    definitions[address] = MOCK_ZOMES.definitions.get_definition({ address })
   })
+  return definitions
 }
 
 const MOCK_ZOMES = {
@@ -173,8 +175,8 @@ server.on('clientError', (err, socket) => {
   console.log('health check server ERROR', err)
   socket.end('HTTP/1.1 400 Bad Request\r\n\r\n')
 })
-server.listen(process.env.PORT)
-console.log(`health check server listening on port ${process.env.PORT}`)
+server.listen(port)
+console.log(`health check server listening on port ${port}`)
 
 const wsServer = new WSServer({ server })
 console.log(`mock metastore Listening on ${host}:${port}`)

@@ -45,10 +45,17 @@ async function squadInit () {
       return
     }
     console.log('metastore open')
-    const formatDefs = await metastore.getGameFormats(settings.gameAddress) // metastore will load any new formats here
+    const formatDefs = await metastore.getGameFormats(settings.gameAddress)
     const componentDefs = await metastore.getGameComponents(settings.gameAddress)
-    state.squad.rawFormats = formatDefs.map(def => def.Format)
-    state.squad.components = componentDefs.map(def => def.Component)
+    for (const key in formatDefs) {
+      formatDefs[key] = formatDefs[key].Format
+    }
+    state.squad.rawFormats = formatDefs
+    for (const key in componentDefs) {
+      componentDefs[key] = componentDefs[key].Component
+    }
+    state.squad.components = componentDefs
+    console.log(state.squad.rawFormats, state.squad.components)
     const urlParams = new URLSearchParams(window.location.search)
     state.squad.loadedFormatIndex = urlParams.get('format')
     const formatToLoad = state.squad.rawFormats[state.squad.loadedFormatIndex]
@@ -62,12 +69,12 @@ async function squadInit () {
       ).reduce((ps, p) => {
         return Object.assign(ps, p)
       })
-
       state.squad.loadedFormat = Object.assign(JSON.parse(formatToLoad.data), { pieces })
       console.log('Loaded format', state.squad.loadedFormat)
 
       state.game = chess.createGame(state.squad.loadedFormat)
     }
+
     state.squad.connection = 'connected'
     console.log('Squad Connection:', state.squad.connection)
     m.redraw()

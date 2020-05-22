@@ -2,7 +2,7 @@
 
 const curation = require("./index.js")
 
-const curationMarket = require('./index-ethers.js')
+const curationMarket = require('./index.js')
 const ethers = require('ethers')
 
 function assert(statement, error) {

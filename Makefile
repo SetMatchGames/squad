@@ -23,7 +23,7 @@ squad-games-web: build/metastore
 .PHONY: squad-chess
 squad-chess: build/matchmaking build/metastore
 	cd $(squad-chess) && npm run start &
-	cd $(squad-chess) && npx http-server
+	cd $(squad-chess) && npx http-server -c-1
 	cd $(squad-chess) && echo "open localhost:8080 in your browser"
 
 .PHONY: squad-chess-alpha-server
