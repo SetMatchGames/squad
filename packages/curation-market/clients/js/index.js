@@ -1,5 +1,6 @@
 const ethers = require('ethers')
 const AutoBondJSON = require("../../app/build/contracts/AutoBond.json")
+const CurveJSON = require("../../app/build/contracts/Curve.json")
 const SimpleLinearCurveJSON = require("../../app/build/contracts/SimpleLinearCurve.json")
 
 const networkIds = {
@@ -13,7 +14,7 @@ let initialized = false
 let provider
 let walletOrSigner
 let autoBond
-let simpleLinearCurve
+let curve
 let autoBondAddress
 let simpleLinearCurveAddress
 let defaults
@@ -45,7 +46,7 @@ function init (defaults) {
     }
   }
   autoBond = new ethers.Contract(autoBondAddress, AutoBondJSON.abi, walletOrSigner)
-  simpleLinearCurve = new ethers.Contract(simpleLinearCurveAddress, SimpleLinearCurveJSON.abi, walletOrSigner)
+  curve = new ethers.Contract(simpleLinearCurveAddress, CurveJSON.abi, walletOrSigner)
 
   if (defaults === undefined) {
     defaults = {
@@ -125,6 +126,14 @@ async function getBuyPrice (units, bondId) {
   return await autoBond.getBuyPrice(units, bondHash)
 }
 
+async function getBuyPriceFromCurve (supply, units, curveAddress) {
+  init()
+  if (curveAddress) {
+    curve = new ethers.Contract(curveAddress, CurveJSON.abi, walletOrSigner)
+  }
+  return await curve.buyPrice(supply, units)
+}
+
 async function getSellPrice (units, bondId) {
   init()
   let bondHash = ethers.utils.id(bondId)
@@ -137,6 +146,7 @@ module.exports = {
   getSupply,
   getBalance,
   getBuyPrice,
+  getBuyPriceFromCurve,
   getSellPrice,
   buy,
   sell,

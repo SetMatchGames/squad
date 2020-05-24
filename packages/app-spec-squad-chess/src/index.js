@@ -55,20 +55,16 @@ async function squadInit () {
       componentDefs[key] = componentDefs[key].Component
     }
     state.squad.components = componentDefs
-    console.log(state.squad.rawFormats, state.squad.components)
     const urlParams = new URLSearchParams(window.location.search)
     state.squad.loadedFormatIndex = urlParams.get('format')
     const formatToLoad = state.squad.rawFormats[state.squad.loadedFormatIndex]
 
     if (formatToLoad) {
-      const components = await Promise.all(
-        formatToLoad.components.map(metastore.getDefinition)
-      )
-      const pieces = components.map(
-        c => JSON.parse(c.Component.data)
-      ).reduce((ps, p) => {
-        return Object.assign(ps, p)
-      })
+      const components = await metastore.getDefinitions(formatToLoad.components)
+      const pieces = {}
+      for (const address in components) {
+        pieces[address] = JSON.parse(components[address].Component.data)
+      }
       state.squad.loadedFormat = Object.assign(JSON.parse(formatToLoad.data), { pieces })
       console.log('Loaded format', state.squad.loadedFormat)
 

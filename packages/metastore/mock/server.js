@@ -95,12 +95,15 @@ const createDefinition = ({ definition, games = [] }) => {
   return address
 }
 
-const getDefinition = ({ address }) => {
-  const definition = readDefinition(address)
-  if (!definition) {
-    throw new Error(`No definition found for address ${address}`)
-  }
-  return definition
+const getDefinitions = ({ addresses }) => {
+  const definitions = {}
+  addresses.forEach(address => {
+    definitions[address] = readDefinition(address)
+    if (!definitions[address]) {
+      throw new Error(`No definition found for address ${address}`)
+    }
+  })
+  return definitions
 }
 
 const getEntryAddress = ({ entry }) => entryAddress(entry)
@@ -140,17 +143,14 @@ const getDefinitionsFromCatalog = ({
   const catalog = MOCK_ZOMES.definitions.get_catalog_links(
     { catalog_type: catalogType, catalog_name: catalogName }
   )
-  const definitions = {}
-  catalog.forEach(address => {
-    definitions[address] = MOCK_ZOMES.definitions.get_definition({ address })
-  })
+  const definitions = MOCK_ZOMES.definitions.get_definitions({ addresses: catalog })
   return definitions
 }
 
 const MOCK_ZOMES = {
   definitions: {
     create_definition: createDefinition,
-    get_definition: getDefinition,
+    get_definitions: getDefinitions,
     get_entry_address: getEntryAddress,
     get_catalog_links: getCatalogLinks,
     get_all_definitions_of_type: getAllDefinitionsOfType,

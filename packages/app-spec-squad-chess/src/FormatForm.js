@@ -9,13 +9,16 @@ const FormatForm = {
   oninit: () => {
     state.formatForm.components = []
     state.formatForm.startingPosition = {}
+    state.formatForm.whiteOrientation = 2
+    state.formatForm.blackOrientation = 0
+    state.formatForm.initialBuy = 0
+    state.formatForm.value = 0
   },
   view: () => {
     const form = m(
       'form#format-form',
       m(DefinitionFields),
       m(InitialBuyField),
-      m(OptionsField),
       m(CurveAddressField),
       m(
         'button',
@@ -130,7 +133,6 @@ const StartingPositionSquares = {
     const newNotShared = [ ...newSquares ]
     newSquares.forEach(square => {
       if (oldSquares.includes(square)) {
-        shared.push(square)
         oldNotShared.splice(oldNotShared.indexOf(square), 1)
         newNotShared.splice(newNotShared.indexOf(square), 1)
       }
@@ -145,8 +147,10 @@ const StartingPositionSquares = {
     })
     // Order squares properly
     const squares = Object.keys(state.formatForm.startingPosition).sort((a, b) => {
-      if (a[0] != b[0]) { return a[0] - b[0] }
-      return a[1] - b[1]
+      a = stringToSquare(a)
+      b = stringToSquare(b)
+      if (a[1] != b[1]) { return a[1] - b[1] }
+      return a[0] - b[0]
     })
     return squares.map(square => {
       return m(StartingPositionSquare, { key: square })
@@ -161,6 +165,7 @@ const StartingPositionSquare = {
       { key: vnode.key },
       `${vnode.key} `,
       m(SelectPiece, { square: vnode.key }),
+      m(Promotion, { square: vnode.key }),
       m(DeleteSquareSelect, { square: vnode.key })
     )
   }
@@ -241,6 +246,49 @@ const SelectPieceColor = {
   }
 }
 
+const Promotion = {
+  view: (vnode) => {
+    if (state.formatForm.startingPosition[vnode.attrs.square].deleted === true) {
+      return
+    }
+    let noneSelected = 'selected'
+    let whiteSelected = ''
+    let blackSelected = ''
+    switch (state.formatForm.startingPosition[vnode.attrs.square].promotion) {
+      case 0: 
+        whiteSelected = 'selected'
+        noneSelected = ''
+        break
+      case 1:
+        blackSelected = 'selected'
+        noneSelected = ''
+        break
+      default: 
+    }
+    return [
+      m('label', 'Promotion square?'),
+      m(
+        'select.format-form-field',
+        { oninput: handlePiecePromotionFactory(vnode.attrs.square) },
+        [
+          m(
+            `option.format-form-field[value=None][${noneSelected}]`,
+            'None'
+          ),
+          m(
+            `option.format-form-field[value=White][${whiteSelected}]`,
+            'White'
+          ),
+          m(
+            `option.format-form-field[value=Black][${blackSelected}]`,
+            'Black'
+          )
+        ]
+      )
+    ]
+  }
+}
+
 const DeleteSquareSelect = {
   view: (vnode) => {
     return [
@@ -288,21 +336,9 @@ const InitialBuyField = {
       m('label', 'Enter number of tokens to buy:'),
       m(
         'input[type=number][placeholder=0]',
-        { oninput: handleSaveFactory('initialBuy') }
-      )
-    )
-  }
-}
-
-const OptionsField = {
-  view: () => {
-    return m(
-      '.format-form-field',
-      m('label', 'Enter transaction options:'),
-      m(
-        'input[type=text][placeholder=Leave blank!]',
-        { oninput: handleSaveFactory('options') }
-      )
+        { oninput: handleSaveInitialBuy }
+      ),
+      m('#value', `Cost: ${state.formatForm.value}`)
     )
   }
 }
@@ -331,7 +367,7 @@ const handleAddOrRemoveComponent = (event) => {
   const address = event.target.value
   if (state.formatForm.components.includes(address)) {
     const index = state.formatForm.components.indexOf(address)
-    state.formatForm.components.pop(index)
+    state.formatForm.components.splice(index, 1)
   } else {
     state.formatForm.components.push(address)
   }
@@ -342,7 +378,6 @@ const handleDeleteSquareFactory = (squareId) => {
     let bool = false
     if (event.target.value === 'true') { bool = true }
     state.formatForm.startingPosition[squareId].deleted = bool
-    console.log(state.formatForm.startingPosition)
   }
 }
 
@@ -355,7 +390,6 @@ const handleSelectPieceFactory = (squareId) => {
       state.formatForm.startingPosition[squareId].content = {}
       state.formatForm.startingPosition[squareId].content.pieceId = pieceId
     }
-    console.log(state.formatForm.startingPosition)
   }
 }
 
@@ -367,39 +401,66 @@ const handlePieceColorFactory = (squareId) => {
     } else if (color === 'Black') {
       state.formatForm.startingPosition[squareId].content.player = 1
     }
-    console.log(state.formatForm.startingPosition)
   }
+}
+
+const handlePiecePromotionFactory = (squareId) => {
+  return (event) => {
+    let promotion = event.target.value
+    if (promotion === 'White') {
+      state.formatForm.startingPosition[squareId].promotion = 0
+    } else if (promotion === 'Black') {
+      state.formatForm.startingPosition[squareId].promotion = 1
+    }
+  }
+}
+
+const handleSaveInitialBuy = (event) => {
+  state.formatForm.initialBuy = event.target.value
+  squad.curationMarket.getBuyPriceFromCurve(0, state.formatForm.initialBuy, state.formatForm.curveAddress).then(res => {
+    state.formatForm.value = res
+    m.redraw()
+  })
 }
 
 const handleSubmit = (event) => {
   event.preventDefault()
-  // build the definition
-    // elements of a squad chess format
-    // name (string)
-    // components [array of addresses]
-    // data: stringified JSON:
-      // starting position
-      // orientation
+  const startingPosition = cleanStartingPosition(state.formatForm.startingPosition)
   const orientation = {}
-  if (state.formatForm.whiteOrientation) { orientation['white'] = state.formatForm.whiteOrientation }
-  if (state.formatForm.blackOrientation) { orientation['black'] = state.formatForm.blackOrientation }
+  orientation['white'] = state.formatForm.whiteOrientation
+  orientation['black'] = state.formatForm.blackOrientation
   const definition = {
     Format: {
       name: state.formatForm.name,
       components: state.formatForm.components,
       data: JSON.stringify({
-        startingPosition: JSON.parse(state.formatForm.startingPosition),
+        startingPosition,
         orientation
       })
     }
   }
-  squad.definition(
-    definition,
-    [ settings.gameAddress ],
-    state.formatForm['initialBuy'],
-    JSON.parse(state.formatForm['options']),
-    state.formatForm['curveAddress']
-  )
+  // make sure we get the right value before submitting, if not enough time has already passed
+  squad.curationMarket.getBuyPriceFromCurve(0, state.formatForm.initialBuy, state.formatForm.curveAddress).then(res => {
+    const value = res
+    squad.definition(
+      definition,
+      [ settings.gameAddress ],
+      state.formatForm.initialBuy,
+      { value },
+      state.formatForm.curveAddress
+    )
+  })
+}
+
+function cleanStartingPosition(sp) {
+  const cleanPosition = {}
+  for (const square in sp) {
+    if (sp[square].deleted === false) {
+      cleanPosition[square] = Object.assign({}, sp[square])
+      delete cleanPosition[square].deleted
+    }
+  }
+  return cleanPosition
 }
 
 export default FormatForm

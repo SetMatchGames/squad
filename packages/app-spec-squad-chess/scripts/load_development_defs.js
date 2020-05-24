@@ -28,26 +28,24 @@ async function main () {
     Component: {
       name: 'Rook',
       data: JSON.stringify({
-        rook: {
-          mechanics: {
-            move: [
-              { offset: [0, 1], steps: 100 },
-              { offset: [0, -1], steps: 100 },
-              { offset: [1, 0], steps: 100 },
-              { offset: [-1, 0], steps: 100 }
-            ],
-            capture: [
-              { offset: [0, 1], steps: 100 },
-              { offset: [0, -1], steps: 100 },
-              { offset: [1, 0], steps: 100 },
-              { offset: [-1, 0], steps: 100 }
-            ]
-          },
-          graphics: {
-            local: {
-              white: 'chesspieces/wikipedia/wR.png',
-              black: 'chesspieces/wikipedia/bR.png'
-            }
+        mechanics: {
+          move: [
+            { offset: [0, 1], steps: 100 },
+            { offset: [0, -1], steps: 100 },
+            { offset: [1, 0], steps: 100 },
+            { offset: [-1, 0], steps: 100 }
+          ],
+          capture: [
+            { offset: [0, 1], steps: 100 },
+            { offset: [0, -1], steps: 100 },
+            { offset: [1, 0], steps: 100 },
+            { offset: [-1, 0], steps: 100 }
+          ]
+        },
+        graphics: {
+          local: {
+            white: 'chesspieces/wikipedia/wR.png',
+            black: 'chesspieces/wikipedia/bR.png'
           }
         }
       })
@@ -56,35 +54,33 @@ async function main () {
     Component: {
       name: 'King',
       data: JSON.stringify({
-        king: {
-          king: true,
-          mechanics: {
-            move: [
-              { offset: [0, 1], steps: 1 },
-              { offset: [0, -1], steps: 1 },
-              { offset: [1, 0], steps: 1 },
-              { offset: [-1, 0], steps: 1 },
-              { offset: [1, 1], steps: 1 },
-              { offset: [-1, -1], steps: 1 },
-              { offset: [1, -1], steps: 1 },
-              { offset: [-1, 1], steps: 1 }
-            ],
-            capture: [
-              { offset: [0, 1], steps: 1 },
-              { offset: [0, -1], steps: 1 },
-              { offset: [1, 0], steps: 1 },
-              { offset: [-1, 0], steps: 1 },
-              { offset: [1, 1], steps: 1 },
-              { offset: [-1, -1], steps: 1 },
-              { offset: [1, -1], steps: 1 },
-              { offset: [-1, 1], steps: 1 }
-            ]
-          },
-          graphics: {
-            local: {
-              white: 'chesspieces/wikipedia/wK.png',
-              black: 'chesspieces/wikipedia/bK.png'
-            }
+        king: true,
+        mechanics: {
+          move: [
+            { offset: [0, 1], steps: 1 },
+            { offset: [0, -1], steps: 1 },
+            { offset: [1, 0], steps: 1 },
+            { offset: [-1, 0], steps: 1 },
+            { offset: [1, 1], steps: 1 },
+            { offset: [-1, -1], steps: 1 },
+            { offset: [1, -1], steps: 1 },
+            { offset: [-1, 1], steps: 1 }
+          ],
+          capture: [
+            { offset: [0, 1], steps: 1 },
+            { offset: [0, -1], steps: 1 },
+            { offset: [1, 0], steps: 1 },
+            { offset: [-1, 0], steps: 1 },
+            { offset: [1, 1], steps: 1 },
+            { offset: [-1, -1], steps: 1 },
+            { offset: [1, -1], steps: 1 },
+            { offset: [-1, 1], steps: 1 }
+          ]
+        },
+        graphics: {
+          local: {
+            white: 'chesspieces/wikipedia/wK.png',
+            black: 'chesspieces/wikipedia/bK.png'
           }
         }
       })
@@ -93,24 +89,22 @@ async function main () {
     Component: {
       name: 'Pawn',
       data: JSON.stringify({
-        pawn: {
-          mechanics: {
-            move: [
-              { offset: [0, 1], steps: 1 }
-            ],
-            capture: [
-              { offset: [1, 1], steps: 1 },
-              { offset: [-1, 1], steps: 1 }
-            ]
-          },
-          admechanics: {
-            randomPromotion: ['default']
-          },
-          graphics: {
-            local: {
-              white: 'chesspieces/wikipedia/wP.png',
-              black: 'chesspieces/wikipedia/bP.png'
-            }
+        mechanics: {
+          move: [
+            { offset: [0, 1], steps: 1 }
+          ],
+          capture: [
+            { offset: [1, 1], steps: 1 },
+            { offset: [-1, 1], steps: 1 }
+          ]
+        },
+        admechanics: {
+          randomPromotion: ['default']
+        },
+        graphics: {
+          local: {
+            white: 'chesspieces/wikipedia/wP.png',
+            black: 'chesspieces/wikipedia/bP.png'
           }
         }
       })
@@ -119,34 +113,32 @@ async function main () {
     Component: {
       name: 'Knight',
       data: JSON.stringify({
-        knight: {
-          mechanics: {
-            move: [
-              { offset: [2, 1], steps: 1 },
-              { offset: [1, 2], steps: 1 },
-              { offset: [-2, 1], steps: 1 },
-              { offset: [-1, 2], steps: 1 },
-              { offset: [1, -2], steps: 1 },
-              { offset: [2, -1], steps: 1 },
-              { offset: [-2, -1], steps: 1 },
-              { offset: [-1, -2], steps: 1 }
-            ],
-            capture: [
-              { offset: [2, 1], steps: 1 },
-              { offset: [1, 2], steps: 1 },
-              { offset: [-2, 1], steps: 1 },
-              { offset: [-1, 2], steps: 1 },
-              { offset: [1, -2], steps: 1 },
-              { offset: [2, -1], steps: 1 },
-              { offset: [-2, -1], steps: 1 },
-              { offset: [-1, -2], steps: 1 }
-            ]
-          },
-          graphics: {
-            local: {
-              white: 'chesspieces/wikipedia/wN.png',
-              black: 'chesspieces/wikipedia/bN.png'
-            }
+        mechanics: {
+          move: [
+            { offset: [2, 1], steps: 1 },
+            { offset: [1, 2], steps: 1 },
+            { offset: [-2, 1], steps: 1 },
+            { offset: [-1, 2], steps: 1 },
+            { offset: [1, -2], steps: 1 },
+            { offset: [2, -1], steps: 1 },
+            { offset: [-2, -1], steps: 1 },
+            { offset: [-1, -2], steps: 1 }
+          ],
+          capture: [
+            { offset: [2, 1], steps: 1 },
+            { offset: [1, 2], steps: 1 },
+            { offset: [-2, 1], steps: 1 },
+            { offset: [-1, 2], steps: 1 },
+            { offset: [1, -2], steps: 1 },
+            { offset: [2, -1], steps: 1 },
+            { offset: [-2, -1], steps: 1 },
+            { offset: [-1, -2], steps: 1 }
+          ]
+        },
+        graphics: {
+          local: {
+            white: 'chesspieces/wikipedia/wN.png',
+            black: 'chesspieces/wikipedia/bN.png'
           }
         }
       })
@@ -155,26 +147,24 @@ async function main () {
     Component: {
       name: 'Bishop',
       data: JSON.stringify({
-        bishop: {
-          mechanics: {
-            move: [
-              { offset: [1, 1], steps: 100 },
-              { offset: [1, -1], steps: 100 },
-              { offset: [-1, 1], steps: 100 },
-              { offset: [-1, -1], steps: 100 }
-            ],
-            capture: [
-              { offset: [1, 1], steps: 100 },
-              { offset: [1, -1], steps: 100 },
-              { offset: [-1, 1], steps: 100 },
-              { offset: [-1, -1], steps: 100 }
-            ]
-          },
-          graphics: {
-            local: {
-              white: 'chesspieces/wikipedia/wB.png',
-              black: 'chesspieces/wikipedia/bB.png'
-            }
+        mechanics: {
+          move: [
+            { offset: [1, 1], steps: 100 },
+            { offset: [1, -1], steps: 100 },
+            { offset: [-1, 1], steps: 100 },
+            { offset: [-1, -1], steps: 100 }
+          ],
+          capture: [
+            { offset: [1, 1], steps: 100 },
+            { offset: [1, -1], steps: 100 },
+            { offset: [-1, 1], steps: 100 },
+            { offset: [-1, -1], steps: 100 }
+          ]
+        },
+        graphics: {
+          local: {
+            white: 'chesspieces/wikipedia/wB.png',
+            black: 'chesspieces/wikipedia/bB.png'
           }
         }
       })
@@ -183,34 +173,32 @@ async function main () {
     Component: {
       name: 'Queen',
       data: JSON.stringify({
-        queen: {
-          mechanics: {
-            move: [
-              { offset: [0, 1], steps: 100 },
-              { offset: [0, -1], steps: 100 },
-              { offset: [1, 0], steps: 100 },
-              { offset: [-1, 0], steps: 100 },
-              { offset: [1, 1], steps: 100 },
-              { offset: [1, -1], steps: 100 },
-              { offset: [-1, 1], steps: 100 },
-              { offset: [-1, -1], steps: 100 }
-            ],
-            capture: [
-              { offset: [1, 1], steps: 100 },
-              { offset: [1, -1], steps: 100 },
-              { offset: [-1, 1], steps: 100 },
-              { offset: [-1, -1], steps: 100 },
-              { offset: [0, 1], steps: 100 },
-              { offset: [0, -1], steps: 100 },
-              { offset: [1, 0], steps: 100 },
-              { offset: [-1, 0], steps: 100 }
-            ]
-          },
-          graphics: {
-            local: {
-              white: 'chesspieces/wikipedia/wQ.png',
-              black: 'chesspieces/wikipedia/bQ.png'
-            }
+        mechanics: {
+          move: [
+            { offset: [0, 1], steps: 100 },
+            { offset: [0, -1], steps: 100 },
+            { offset: [1, 0], steps: 100 },
+            { offset: [-1, 0], steps: 100 },
+            { offset: [1, 1], steps: 100 },
+            { offset: [1, -1], steps: 100 },
+            { offset: [-1, 1], steps: 100 },
+            { offset: [-1, -1], steps: 100 }
+          ],
+          capture: [
+            { offset: [1, 1], steps: 100 },
+            { offset: [1, -1], steps: 100 },
+            { offset: [-1, 1], steps: 100 },
+            { offset: [-1, -1], steps: 100 },
+            { offset: [0, 1], steps: 100 },
+            { offset: [0, -1], steps: 100 },
+            { offset: [1, 0], steps: 100 },
+            { offset: [-1, 0], steps: 100 }
+          ]
+        },
+        graphics: {
+          local: {
+            white: 'chesspieces/wikipedia/wQ.png',
+            black: 'chesspieces/wikipedia/bQ.png'
           }
         }
       })
@@ -218,8 +206,8 @@ async function main () {
   }]
 
   squadChessComponents.forEach(async (definition) => {
-    await createDefinition(definition, [squadChessAddress])
-    console.log('creating definition', definition)
+    const address = await createDefinition(definition, [squadChessAddress])
+    console.log('creating definition', definition, address)
   })
 
   const squadChessCatalog = await getCatalogAddresses(
@@ -235,7 +223,7 @@ async function main () {
         startingPosition: {
           '0,0': {
             content: {
-              pieceId: 'pawn',
+              pieceId: 'e9612e5ce2baa9b763477aaf717fbef4369f8a161c5764ce9f80d6e94a5c3c36',
               player: 0
             },
             promotion: 1
@@ -248,21 +236,21 @@ async function main () {
           },
           '0,3': {
             content: {
-              pieceId: 'knight',
+              pieceId: '73d86593b34ff58458be603db6cc9e71a162eb22a92222eb9024ca229674a0b0',
               player: 0
             },
             promotion: 0
           },
           '1,0': {
             content: {
-              pieceId: 'rook',
+              pieceId: 'ec9b5c716d2afec3340f9695501b2ac922dac77ebae52e4a0cba545185de4299',
               player: 0
             },
             promotion: 1
           },
           '1,1': {
             content: {
-              pieceId: 'king',
+              pieceId: 'c859fb4af46e35b010a7a9668266e1729dcd6baa12c0ba2bcca03ced24e0d495',
               player: 0
             }
           },
@@ -271,7 +259,7 @@ async function main () {
           },
           '1,3': {
             content: {
-              pieceId: 'king',
+              pieceId: 'c859fb4af46e35b010a7a9668266e1729dcd6baa12c0ba2bcca03ced24e0d495',
               player: 1
             },
             promotion: 0
@@ -282,7 +270,7 @@ async function main () {
           },
           '2,1': {
             content: {
-              pieceId: 'pawn',
+              pieceId: 'e9612e5ce2baa9b763477aaf717fbef4369f8a161c5764ce9f80d6e94a5c3c36',
               player: 1
             }
           },
@@ -299,13 +287,13 @@ async function main () {
           },
           '3,1': {
             content: {
-              pieceId: 'knight',
+              pieceId: 'ec9b5c716d2afec3340f9695501b2ac922dac77ebae52e4a0cba545185de4299',
               player: 1
             }
           },
           '3,2': {
             content: {
-              pieceId: 'rook',
+              pieceId: '5bb997a86edd4498863841a78dd8aaf6afb4e409f912b14abd06d4cfdff66393',
               player: 1
             }
           },
@@ -332,105 +320,105 @@ async function main () {
         startingPosition: {
           '0,0': {
             content: {
-              pieceId: 'rook',
+              pieceId: '5bb997a86edd4498863841a78dd8aaf6afb4e409f912b14abd06d4cfdff66393',
               player: 1
             },
             promotion: 0
           },
           '1,0': {
             content: {
-              pieceId: 'bishop',
+              pieceId: 'c859fb4af46e35b010a7a9668266e1729dcd6baa12c0ba2bcca03ced24e0d495',
               player: 1
             },
             promotion: 0
           },
           '2,0': {
             content: {
-              pieceId: 'knight',
+              pieceId: '73d86593b34ff58458be603db6cc9e71a162eb22a92222eb9024ca229674a0b0',
               player: 1
             },
             promotion: 0
           },
           '3,0': {
             content: {
-              pieceId: 'king',
+              pieceId: 'c859fb4af46e35b010a7a9668266e1729dcd6baa12c0ba2bcca03ced24e0d495',
               player: 1
             },
             promotion: 0
           },
           '4,0': {
             content: {
-              pieceId: 'queen',
+              pieceId: '775c16ba93f83d5955041dd828467a49675a4779917b906ffda0683afac7cc52',
               player: 1
             },
             promotion: 0
           },
           '5,0': {
             content: {
-              pieceId: 'knight',
+              pieceId: 'ec9b5c716d2afec3340f9695501b2ac922dac77ebae52e4a0cba545185de4299',
               player: 1
             },
             promotion: 0
           },
           '6,0': {
             content: {
-              pieceId: 'rook',
+              pieceId: '5bb997a86edd4498863841a78dd8aaf6afb4e409f912b14abd06d4cfdff66393',
               player: 1
             },
             promotion: 0
           },
           '7,0': {
             content: {
-              pieceId: 'rook',
+              pieceId: '5bb997a86edd4498863841a78dd8aaf6afb4e409f912b14abd06d4cfdff66393',
               player: 1
             },
             promotion: 0
           },
           '0,1': {
             content: {
-              pieceId: 'pawn',
+              pieceId: 'e9612e5ce2baa9b763477aaf717fbef4369f8a161c5764ce9f80d6e94a5c3c36',
               player: 1
             }
           },
           '1,1': {
             content: {
-              pieceId: 'pawn',
+              pieceId: 'e9612e5ce2baa9b763477aaf717fbef4369f8a161c5764ce9f80d6e94a5c3c36',
               player: 1
             }
           },
           '2,1': {
             content: {
-              pieceId: 'pawn',
+              pieceId: 'e9612e5ce2baa9b763477aaf717fbef4369f8a161c5764ce9f80d6e94a5c3c36',
               player: 1
             }
           },
           '3,1': {
             content: {
-              pieceId: 'pawn',
+              pieceId: 'e9612e5ce2baa9b763477aaf717fbef4369f8a161c5764ce9f80d6e94a5c3c36',
               player: 1
             }
           },
           '4,1': {
             content: {
-              pieceId: 'pawn',
+              pieceId: 'e9612e5ce2baa9b763477aaf717fbef4369f8a161c5764ce9f80d6e94a5c3c36',
               player: 1
             }
           },
           '5,1': {
             content: {
-              pieceId: 'pawn',
+              pieceId: 'e9612e5ce2baa9b763477aaf717fbef4369f8a161c5764ce9f80d6e94a5c3c36',
               player: 1
             }
           },
           '6,1': {
             content: {
-              pieceId: 'pawn',
+              pieceId: 'e9612e5ce2baa9b763477aaf717fbef4369f8a161c5764ce9f80d6e94a5c3c36',
               player: 1
             }
           },
           '7,1': {
             content: {
-              pieceId: 'pawn',
+              pieceId: 'e9612e5ce2baa9b763477aaf717fbef4369f8a161c5764ce9f80d6e94a5c3c36',
               player: 1
             }
           },
@@ -532,104 +520,104 @@ async function main () {
           },
           '0,6': {
             content: {
-              pieceId: 'pawn',
+              pieceId: 'e9612e5ce2baa9b763477aaf717fbef4369f8a161c5764ce9f80d6e94a5c3c36',
               player: 0
             }
           },
           '1,6': {
             content: {
-              pieceId: 'pawn',
+              pieceId: 'e9612e5ce2baa9b763477aaf717fbef4369f8a161c5764ce9f80d6e94a5c3c36',
               player: 0
             }
           },
           '2,6': {
             content: {
-              pieceId: 'pawn',
+              pieceId: 'e9612e5ce2baa9b763477aaf717fbef4369f8a161c5764ce9f80d6e94a5c3c36',
               player: 0
             }
           },
           '3,6': {
             content: {
-              pieceId: 'pawn',
+              pieceId: 'e9612e5ce2baa9b763477aaf717fbef4369f8a161c5764ce9f80d6e94a5c3c36',
               player: 0
             }
           },
           '4,6': {
             content: {
-              pieceId: 'pawn',
+              pieceId: 'e9612e5ce2baa9b763477aaf717fbef4369f8a161c5764ce9f80d6e94a5c3c36',
               player: 0
             }
           },
           '5,6': {
             content: {
-              pieceId: 'pawn',
+              pieceId: 'e9612e5ce2baa9b763477aaf717fbef4369f8a161c5764ce9f80d6e94a5c3c36',
               player: 0
             }
           },
           '6,6': {
             content: {
-              pieceId: 'pawn',
+              pieceId: 'e9612e5ce2baa9b763477aaf717fbef4369f8a161c5764ce9f80d6e94a5c3c36',
               player: 0
             }
           },
           '7,6': {
             content: {
-              pieceId: 'pawn',
+              pieceId: 'e9612e5ce2baa9b763477aaf717fbef4369f8a161c5764ce9f80d6e94a5c3c36',
               player: 0
             }
           },
           '0,7': {
             content: {
-              pieceId: 'rook',
+              pieceId: '5bb997a86edd4498863841a78dd8aaf6afb4e409f912b14abd06d4cfdff66393',
               player: 0
             },
             promotion: 1
           },
           '1,7': {
             content: {
-              pieceId: 'rook',
+              pieceId: '5bb997a86edd4498863841a78dd8aaf6afb4e409f912b14abd06d4cfdff66393',
               player: 0
             },
             promotion: 1
           },
           '2,7': {
             content: {
-              pieceId: 'knight',
+              pieceId: '73d86593b34ff58458be603db6cc9e71a162eb22a92222eb9024ca229674a0b0',
               player: 0
             },
             promotion: 1
           },
           '3,7': {
             content: {
-              pieceId: 'rook',
+              pieceId: '5bb997a86edd4498863841a78dd8aaf6afb4e409f912b14abd06d4cfdff66393',
               player: 0
             },
             promotion: 1
           },
           '4,7': {
             content: {
-              pieceId: 'king',
+              pieceId: 'ec9b5c716d2afec3340f9695501b2ac922dac77ebae52e4a0cba545185de4299',
               player: 0
             },
             promotion: 1
           },
           '5,7': {
             content: {
-              pieceId: 'knight',
+              pieceId: '73d86593b34ff58458be603db6cc9e71a162eb22a92222eb9024ca229674a0b0',
               player: 0
             },
             promotion: 1
           },
           '6,7': {
             content: {
-              pieceId: 'rook',
+              pieceId: '5bb997a86edd4498863841a78dd8aaf6afb4e409f912b14abd06d4cfdff66393',
               player: 0
             },
             promotion: 1
           },
           '7,7': {
             content: {
-              pieceId: 'rook',
+              pieceId: '5bb997a86edd4498863841a78dd8aaf6afb4e409f912b14abd06d4cfdff66393',
               player: 0
             },
             promotion: 1
