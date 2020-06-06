@@ -10,6 +10,7 @@ const ComponentForm = {
   oninit: () => {
     state.componentForm.mechanics = {}
     state.componentForm.admechanics = {}
+    state.componentForm.graphics = ''
     state.componentForm.initialBuy = 0
     state.componentForm.value = 0
   },
@@ -192,8 +193,12 @@ const GraphicsButtons = {
     for (const piece in graphicsPaths) {
       buttons.push(
         m(
-          '.input[type="radio"]',
-          { value: 'hello' }
+          'input[type="radio"]',
+          { 
+            value: piece, 
+            onclick: handleSaveFactory('graphics'),
+            checked: state.componentForm.graphics === piece
+          }
         ),
         m(
           'label',
