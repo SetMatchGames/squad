@@ -1,3 +1,5 @@
+/* global require module web3 */
+
 const ethers = require('ethers')
 const AutoBondJSON = require("../../app/build/contracts/AutoBond.json")
 const CurveJSON = require("../../app/build/contracts/Curve.json")
@@ -20,9 +22,8 @@ let simpleLinearCurveAddress
 let defaults
 
 function init (defaults) {
-  if (initialized) { 
-    console.log('Skipping init')
-    return 
+  if (initialized) {
+    return
   }
 
   console.log('Initializing...')
@@ -94,6 +95,8 @@ async function getSupply (bondId) {
 
 async function getBalance (bondId, holderAddress) {
   init()
+  await window.ethereum.enable()
+  holderAddress = holderAddress ? holderAddress : await walletOrSigner.getAddress()
   let bondHash = ethers.utils.id(bondId)
   return await autoBond.getBalance(bondHash, holderAddress)
 }
@@ -123,6 +126,7 @@ async function sell (units, bondId, options = {}) {
 async function getBuyPrice (units, bondId) {
   init()
   let bondHash = ethers.utils.id(bondId)
+  console.log("getting buy price", units, bondHash)
   return await autoBond.getBuyPrice(units, bondHash)
 }
 
