@@ -11,7 +11,6 @@ import FormatSelector from './FormatSelector.js'
 import { Matchmaker } from './Matchmaker.js'
 import ComponentForm from './ComponentForm.js'
 import FormatForm from './FormatForm.js'
-import BuyDefinitionForm from './BuyDefinitionForm.js'
 
 const App = {
   oninit: () => {
@@ -30,8 +29,7 @@ const App = {
       m(FormatSelector),
       m(Matchmaker),
       m(ComponentForm),
-      m(FormatForm),
-      m(BuyDefinitionForm)
+      m(FormatForm)
     )
   }
 }
