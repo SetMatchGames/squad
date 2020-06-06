@@ -77,6 +77,7 @@ async function newBond (
   const fullOptions = Object.assign({}, defaults, options)
   let curve = await autoBond.getCurve(bondHash)
   if (curve === '0x0000000000000000000000000000000000000000') {
+    console.log(addressOfCurve, bondHash, initialBuyNumber, fullOptions)
     return await autoBond.newBond(
       addressOfCurve,
       bondHash,
