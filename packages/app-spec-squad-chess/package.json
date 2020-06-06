@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "standard && jest",
-    "start": "node scripts/load_development_defs.js && npm run watch",
+    "start": "node scripts/load_development_defs.js && node scripts/find-graphics-paths && npm run watch",
     "watch": "webpack src/index.js --output bin/app.js -d --watch",
     "build": "webpack src/index.js --output bin/app.js -d"
   },

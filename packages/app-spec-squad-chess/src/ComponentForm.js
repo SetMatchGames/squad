@@ -4,6 +4,7 @@ import squad from '@squad/sdk'
 import state from './state.js'
 import settings from './settings.json'
 import { mechanics, admechanics } from './rules.js'
+import graphicsPaths from './graphics-paths.json'
 
 const ComponentForm = {
   oninit: () => {
@@ -176,12 +177,43 @@ const ComponentGraphics = {
   view: () => {
     return m(
       '.component-form-field', 
-      'Graphics'
+      m('label', 'Select graphics:'),
+      m(
+        '.radio',
+        m(GraphicsButtons)
+      )
     )
   }
 }
 
-// Icons made by <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon"> www.flaticon.com</a>
+const GraphicsButtons = {
+  view: () => {
+    const buttons = []
+    for (const piece in graphicsPaths) {
+      buttons.push(
+        m(
+          '.input[type="radio"]',
+          { value: 'hello' }
+        ),
+        m(
+          'label',
+          m('img', { 
+            src: graphicsPaths[piece].white,
+            height: '25vw',
+            width: '25vw'
+          }),
+          m('img', { 
+            src: graphicsPaths[piece].black,
+            height: '25vw',
+            width: '25vw'
+          })
+        )
+      )
+    }
+    console.log(buttons)
+    return buttons
+  }
+}
 
 // Component Definition type:
 /*
