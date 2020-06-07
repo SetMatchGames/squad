@@ -93,7 +93,7 @@ const ComponentMechanic = {
     }
     return m(
       '.component-form-field',
-      vnode.key,
+      m('div', vnode.key),
       vnode.attrs.description,
       m(
         'button', 
@@ -110,7 +110,7 @@ const MechanicOffset = {
     const instance = state.componentForm.mechanics[vnode.attrs.mechanic][vnode.key]
     return m(
       '.mechanic-offset',
-      m('h6', 'Enter offset:'),
+      m('div', 'Enter offset:'),
       m('label', 'X'),
       m(
         `input[type=number][value=${instance.offset[0]}].offset-input`,
@@ -150,7 +150,7 @@ const ComponentAdmechanic = {
     }
     return m(
       '.component-form-field', 
-      vnode.key,
+      m('div', vnode.key),
       vnode.attrs.description,
       m(
         'input[type=checkbox]',
@@ -215,30 +215,9 @@ const GraphicsButtons = {
         )
       )
     }
-    console.log(buttons)
     return buttons
   }
 }
-
-// Component Definition type:
-/*
-{
-  String name
-  data: {
-    mechanics: {
-      mechanic name: [
-        { offset: [x, y], Number steps }
-      ]
-    },
-    graphics: {
-      local: {
-        white: path,
-        black, path
-      }
-    }
-  }, 
-}
-*/
 
 
 const InitialBuyField = {
@@ -247,7 +226,7 @@ const InitialBuyField = {
       '.component-form-field',
       m('label', 'Enter number of tokens to buy:'),
       m(
-        'input[type=number][value=0]',
+        'input[type=number][placeholder=0]',
         { oninput: handleSaveInitialBuy }
       ),
       m('#value', `Cost: ${state.componentForm.value}`)
@@ -330,6 +309,7 @@ const handleToggleKing = () => {
   } else {
     state.componentForm.king = true
   }
+  console.log(state.componentForm)
 }
 
 const handleSaveInitialBuy = (event) => {
@@ -340,8 +320,53 @@ const handleSaveInitialBuy = (event) => {
   })
 }
 
+// Component Definition type:
+/*
+{
+  String name
+  data: {
+    mechanics: {
+      mechanic name: [
+        { offset: [x, y], Number steps }
+      ]
+    },
+    graphics: {
+      local: {
+        white: path,
+        black, path
+      }
+    }
+  }, 
+}
+*/
+
 const handleSubmit = (event) => {
   event.preventDefault()
+  const whiteGraphicPath = graphicsPaths[state.componentForm.graphics].white
+  const blackGraphicPath = graphicsPaths[state.componentForm.graphics].black
+  const mechanics = {}
+  for(const mechanic in state.componentForm.mechanics) {
+    mechanics[mechanic] = []
+    for (const key in state.componentForm.mechanics[mechanic]) {
+      mechanics[mechanic].push(state.componentForm.mechanics[mechanic][key])
+    }
+  }
+  const definition = {
+    Component: {
+      name: state.componentForm.name,
+      data: {
+        mechanics,
+        admechanics: state.componentForm.admechanics,
+        king: state.componentForm.king,
+        graphics: {
+          local: {
+            white: whiteGraphicPath,
+            black: blackGraphicPath
+          }
+        }
+      }
+    }
+  }
 
   // make sure we get the right value before submitting, if not enough time has already passed
   squad.curationMarket.getBuyPriceFromCurve(0, state.componentForm.initialBuy, state.componentForm.curveAddress).then(res => {
