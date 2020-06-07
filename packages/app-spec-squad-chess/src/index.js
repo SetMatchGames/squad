@@ -71,6 +71,7 @@ async function squadInit () {
     if (formatToLoad) {
       const components = await metastore.getDefinitions(formatToLoad.components)
       const pieces = {}
+      console.log(components)
       for (const address in components) {
         pieces[address] = JSON.parse(components[address].Component.data)
       }

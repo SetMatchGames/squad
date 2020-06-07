@@ -123,14 +123,14 @@ const StartingPositionSquares = {
   view: () => {
     const oldSquares = Object.keys(state.formatForm.startingPosition)
     const newSquares = []
-    for(let w = 0; w < state.formatForm.startingPositionWidth; w++) {
-      for(let h = 0; h < state.formatForm.startingPositionHeight; h++) {
+    for (let w = 0; w < state.formatForm.startingPositionWidth; w++) {
+      for (let h = 0; h < state.formatForm.startingPositionHeight; h++) {
         const square = `${w},${h}`
         newSquares.push(square)
       }
     }
-    const oldNotShared = [ ...oldSquares ]
-    const newNotShared = [ ...newSquares ]
+    const oldNotShared = [...oldSquares]
+    const newNotShared = [...newSquares]
     newSquares.forEach(square => {
       if (oldSquares.includes(square)) {
         oldNotShared.splice(oldNotShared.indexOf(square), 1)
@@ -149,7 +149,7 @@ const StartingPositionSquares = {
     const squares = Object.keys(state.formatForm.startingPosition).sort((a, b) => {
       a = stringToSquare(a)
       b = stringToSquare(b)
-      if (a[1] != b[1]) { return a[1] - b[1] }
+      if (a[1] !== b[1]) { return a[1] - b[1] }
       return a[0] - b[0]
     })
     return squares.map(square => {
@@ -181,12 +181,12 @@ const SelectPiece = {
     if (state.formatForm.startingPosition[vnode.attrs.square].content) {
       selection = state.formatForm.startingPosition[vnode.attrs.square].content.pieceId
     }
-    let components = [...state.formatForm.components]
+    const components = [...state.formatForm.components]
     // if the selected piece is no longer in the selected piece list, still include it
     if (selection && !components.includes(selection)) {
       components.push(selection)
     }
-    let options = components.map(address => {
+    const options = components.map(address => {
       if (selection === address) {
         selected = 'selected'
       } else {
@@ -198,7 +198,7 @@ const SelectPiece = {
       )
     })
     options.unshift(m(
-      `option.format-form-field[value=null]`,
+      'option.format-form-field[value=null]',
       'None'
     ))
     const contentBool = !!state.formatForm.startingPosition[vnode.attrs.square].content
@@ -217,8 +217,8 @@ const SelectPiece = {
 const SelectPieceColor = {
   view: (vnode) => {
     if (!vnode.attrs.contentBool) { return }
-    if (!state.formatForm.startingPosition[vnode.attrs.square].content.player) { 
-      state.formatForm.startingPosition[vnode.attrs.square].content.player = 0 
+    if (!state.formatForm.startingPosition[vnode.attrs.square].content.player) {
+      state.formatForm.startingPosition[vnode.attrs.square].content.player = 0
     }
     let whiteSelected = 'selected'
     let blackSelected = ''
@@ -255,7 +255,7 @@ const Promotion = {
     let whiteSelected = ''
     let blackSelected = ''
     switch (state.formatForm.startingPosition[vnode.attrs.square].promotion) {
-      case 0: 
+      case 0:
         whiteSelected = 'selected'
         noneSelected = ''
         break
@@ -263,7 +263,7 @@ const Promotion = {
         blackSelected = 'selected'
         noneSelected = ''
         break
-      default: 
+      default:
     }
     return [
       m('label', 'Promotion square?'),
@@ -383,9 +383,9 @@ const handleDeleteSquareFactory = (squareId) => {
 
 const handleSelectPieceFactory = (squareId) => {
   return (event) => {
-    let pieceId = event.target.value
-    if (pieceId === 'null') { 
-      state.formatForm.startingPosition[squareId].content = null 
+    const pieceId = event.target.value
+    if (pieceId === 'null') {
+      state.formatForm.startingPosition[squareId].content = null
     } else {
       state.formatForm.startingPosition[squareId].content = {}
       state.formatForm.startingPosition[squareId].content.pieceId = pieceId
@@ -395,8 +395,8 @@ const handleSelectPieceFactory = (squareId) => {
 
 const handlePieceColorFactory = (squareId) => {
   return (event) => {
-    let color = event.target.value
-    if (color === 'White') { 
+    const color = event.target.value
+    if (color === 'White') {
       state.formatForm.startingPosition[squareId].content.player = 0
     } else if (color === 'Black') {
       state.formatForm.startingPosition[squareId].content.player = 1
@@ -406,7 +406,7 @@ const handlePieceColorFactory = (squareId) => {
 
 const handlePiecePromotionFactory = (squareId) => {
   return (event) => {
-    let promotion = event.target.value
+    const promotion = event.target.value
     if (promotion === 'White') {
       state.formatForm.startingPosition[squareId].promotion = 0
     } else if (promotion === 'Black') {
@@ -427,8 +427,8 @@ const handleSubmit = (event) => {
   event.preventDefault()
   const startingPosition = cleanStartingPosition(state.formatForm.startingPosition)
   const orientation = {}
-  orientation['white'] = state.formatForm.whiteOrientation
-  orientation['black'] = state.formatForm.blackOrientation
+  orientation.white = state.formatForm.whiteOrientation
+  orientation.black = state.formatForm.blackOrientation
   const definition = {
     Format: {
       name: state.formatForm.name,
@@ -442,18 +442,18 @@ const handleSubmit = (event) => {
   // make sure we get the right value before submitting, if not enough time has already passed
   squad.curationMarket.getBuyPriceFromCurve(0, state.formatForm.initialBuy, state.formatForm.curveAddress).then(res => {
     const value = res
-    console.log("definition return", squad.definition(
+    console.log('definition return', squad.definition(
       definition,
-      [ settings.gameAddress ],
+      [settings.gameAddress],
       state.formatForm.initialBuy,
       { value },
       state.formatForm.curveAddress
     )
-               )
+    )
   })
 }
 
-function cleanStartingPosition(sp) {
+function cleanStartingPosition (sp) {
   const cleanPosition = {}
   for (const square in sp) {
     if (sp[square].deleted === false) {

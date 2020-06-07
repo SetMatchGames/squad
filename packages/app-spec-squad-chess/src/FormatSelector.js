@@ -3,7 +3,6 @@
 import m from 'mithril'
 import state from './state.js'
 import BuyDefinitionButton from './BuyDefinitionButton.js'
-import squad from '@squad/sdk'
 
 const FormatSelector = {
   view: () => {
@@ -11,7 +10,7 @@ const FormatSelector = {
       '#format-selector',
       m('h3', 'Available Formats'),
       Object.keys(state.squad.rawFormats).map(address => {
-        if(state.owned[address]) {
+        if (state.owned[address]) {
           const url = new URL(window.location)
           url.search = `?format=${address}`
           return m(`a[href=${url}]`, state.squad.rawFormats[address].name)

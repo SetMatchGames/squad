@@ -28,7 +28,7 @@
 // Mechanics are qualities of pieces that come with sets of params.
 // Mechanic functions are their corresponding functions that generate legal turns using those params.
 const MECHANICS = {
-  move: "Move to an empty square.",
+  move: 'Move to an empty square.',
   capture: "Move to a square filled by an opponent's piece and capture it."
 }
 
@@ -86,8 +86,7 @@ const MECHANIC_FNS = {
  * Use admechanics when you need a mechanic that modifies all of a piece's other mechanics.
  */
 const ADMECHANICS = {
-  randomPromotion: "If a turn ends with this piece on an allied promotion square, \
-                    promote it to a random piece from the same format."
+  randomPromotion: 'If a turn ends with this piece on an allied promotion square, promote it to a random piece from the same format.'
 }
 
 const ADMECHANIC_FNS = {
@@ -216,9 +215,9 @@ const stringToSquare = (string) => {
 }
 
 // Exports
-module.exports = { 
-  createGame, 
-  takeTurn, 
+module.exports = {
+  createGame,
+  takeTurn,
   stringToSquare,
   mechanics: MECHANICS,
   admechanics: ADMECHANICS

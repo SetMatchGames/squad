@@ -34,7 +34,7 @@ async function newDefinitionWithBond (
   opts = {},
   addressOfCurve
 ) {
-  const bondId = await metastore.createDefinition( definition, games )
+  const bondId = await metastore.createDefinition(definition, games)
   await curationMarket.newBond(bondId, initialBuyUnits, opts, addressOfCurve)
   return bondId
 }
@@ -58,7 +58,7 @@ async function definition (
     )
   } catch (e) {
     if (e instanceof curationMarket.BondAlreadyExists) {
-      return metastore.createDefinition( definition, games )
+      return metastore.createDefinition(definition, games)
     } else {
       throw e
     }

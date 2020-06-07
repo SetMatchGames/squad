@@ -66,13 +66,13 @@ const ComponentMechanics = {
       m('label', 'Choose mechanics:'),
       Object.keys(mechanics).map(mechanic => {
         return m(
-          ComponentMechanic, 
+          ComponentMechanic,
           { key: mechanic, description: mechanics[mechanic] }
         )
       }),
       Object.keys(admechanics).map(admechanic => {
         return m(
-          ComponentAdmechanic, 
+          ComponentAdmechanic,
           { key: admechanic, description: admechanics[admechanic] }
         )
       })
@@ -82,7 +82,7 @@ const ComponentMechanics = {
 
 const ComponentMechanic = {
   view: (vnode) => {
-    let instances = []
+    const instances = []
     if (state.componentForm.mechanics[vnode.key]) {
       Object.keys(state.componentForm.mechanics[vnode.key]).forEach(key => {
         instances.push(m(
@@ -96,7 +96,7 @@ const ComponentMechanic = {
       m('div', vnode.key),
       vnode.attrs.description,
       m(
-        'button', 
+        'button',
         { onclick: handleAddMechanicInstanceFactory(vnode.key) },
         'Add instance'
       ),
@@ -149,7 +149,7 @@ const ComponentAdmechanic = {
       )
     }
     return m(
-      '.component-form-field', 
+      '.component-form-field',
       m('div', vnode.key),
       vnode.attrs.description,
       m(
@@ -177,7 +177,7 @@ const ComponentKing = {
 const ComponentGraphics = {
   view: () => {
     return m(
-      '.component-form-field', 
+      '.component-form-field',
       m('label', 'Select graphics:'),
       m(
         '.radio',
@@ -194,20 +194,20 @@ const GraphicsButtons = {
       buttons.push(
         m(
           'input[type="radio"]',
-          { 
-            value: piece, 
+          {
+            value: piece,
             onclick: handleSaveFactory('graphics'),
             checked: state.componentForm.graphics === piece
           }
         ),
         m(
           'label',
-          m('img', { 
+          m('img', {
             src: graphicsPaths[piece].white,
             height: '25vw',
             width: '25vw'
           }),
-          m('img', { 
+          m('img', {
             src: graphicsPaths[piece].black,
             height: '25vw',
             width: '25vw'
@@ -218,7 +218,6 @@ const GraphicsButtons = {
     return buttons
   }
 }
-
 
 const InitialBuyField = {
   view: () => {
@@ -262,7 +261,7 @@ const handleAddMechanicInstanceFactory = (mechanic) => {
     }
     const key = Math.random()
     state.componentForm.mechanics[mechanic][key] = ({
-      offset: [0,0],
+      offset: [0, 0],
       steps: 0
     })
   }
@@ -336,7 +335,7 @@ const handleSaveInitialBuy = (event) => {
         black, path
       }
     }
-  }, 
+  },
 }
 */
 
@@ -345,7 +344,7 @@ const handleSubmit = (event) => {
   const whiteGraphicPath = graphicsPaths[state.componentForm.graphics].white
   const blackGraphicPath = graphicsPaths[state.componentForm.graphics].black
   const mechanics = {}
-  for(const mechanic in state.componentForm.mechanics) {
+  for (const mechanic in state.componentForm.mechanics) {
     mechanics[mechanic] = []
     for (const key in state.componentForm.mechanics[mechanic]) {
       mechanics[mechanic].push(state.componentForm.mechanics[mechanic][key])
@@ -354,7 +353,7 @@ const handleSubmit = (event) => {
   const definition = {
     Component: {
       name: state.componentForm.name,
-      data: {
+      data: JSON.stringify({
         mechanics,
         admechanics: state.componentForm.admechanics,
         king: state.componentForm.king,
@@ -364,7 +363,7 @@ const handleSubmit = (event) => {
             black: blackGraphicPath
           }
         }
-      }
+      })
     }
   }
 
@@ -373,7 +372,7 @@ const handleSubmit = (event) => {
     const value = res
     squad.definition(
       definition,
-      [ settings.gameAddress ],
+      [settings.gameAddress],
       state.componentForm.initialBuy,
       { value },
       state.componentForm.curveAddress
@@ -382,4 +381,3 @@ const handleSubmit = (event) => {
 }
 
 export default ComponentForm
-
