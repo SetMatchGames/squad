@@ -1,7 +1,7 @@
 /* global URLSearchParams */
 
 import m from 'mithril'
-import { metastore } from '@squad/sdk'
+import { metastore, curationMarket } from '@squad/sdk'
 
 import chess from './rules.js'
 import settings from './settings.json'
@@ -51,6 +51,15 @@ async function squadInit () {
       formatDefs[key] = formatDefs[key].Format
     }
     state.squad.rawFormats = formatDefs
+
+    // see if they own the format
+    Object.keys(formatDefs).forEach((address) => {
+      curationMarket.getBalance(address).then((balance) => {
+        state.owned[address] = balance.toNumber()
+        m.redraw()
+      })
+    })
+
     for (const key in componentDefs) {
       componentDefs[key] = componentDefs[key].Component
     }

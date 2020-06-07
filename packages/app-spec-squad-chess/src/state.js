@@ -6,5 +6,6 @@ export default state = {
   matchmaking: {},
   game: {},
   board: {},
-  squad: {}
+  squad: {},
+  owned: {}
 }

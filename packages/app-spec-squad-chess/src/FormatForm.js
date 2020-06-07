@@ -442,13 +442,14 @@ const handleSubmit = (event) => {
   // make sure we get the right value before submitting, if not enough time has already passed
   squad.curationMarket.getBuyPriceFromCurve(0, state.formatForm.initialBuy, state.formatForm.curveAddress).then(res => {
     const value = res
-    squad.definition(
+    console.log("definition return", squad.definition(
       definition,
       [ settings.gameAddress ],
       state.formatForm.initialBuy,
       { value },
       state.formatForm.curveAddress
     )
+               )
   })
 }
 
