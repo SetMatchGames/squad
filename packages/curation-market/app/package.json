@@ -7,14 +7,12 @@
     "test": "test"
   },
   "dependencies": {
-    "@truffle/hdwallet-provider": "^1.0.31",
     "dotenv": "^8.1.0",
     "fs": "0.0.1-security",
     "ganache-cli": "^6.5.0",
     "openzeppelin-solidity": "^2.3.0",
     "rpc-websockets": "^4.6.1",
-    "truffle": "^5.1.0",
-    "web3": "^1.2.1"
+    "truffle": "^5.1.0"
   },
   "devDependencies": {
     "watch": "^1.0.2"

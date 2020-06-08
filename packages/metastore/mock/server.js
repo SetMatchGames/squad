@@ -95,12 +95,15 @@ const createDefinition = ({ definition, games = [] }) => {
   return address
 }
 
-const getDefinition = ({ address }) => {
-  const definition = readDefinition(address)
-  if (!definition) {
-    throw new Error(`No definition found for address ${address}`)
-  }
-  return definition
+const getDefinitions = ({ addresses }) => {
+  const definitions = {}
+  addresses.forEach(address => {
+    definitions[address] = readDefinition(address)
+    if (!definitions[address]) {
+      throw new Error(`No definition found for address ${address}`)
+    }
+  })
+  return definitions
 }
 
 const getEntryAddress = ({ entry }) => entryAddress(entry)
@@ -140,15 +143,14 @@ const getDefinitionsFromCatalog = ({
   const catalog = MOCK_ZOMES.definitions.get_catalog_links(
     { catalog_type: catalogType, catalog_name: catalogName }
   )
-  return catalog.map(address => {
-    return MOCK_ZOMES.definitions.get_definition({ address })
-  })
+  const definitions = MOCK_ZOMES.definitions.get_definitions({ addresses: catalog })
+  return definitions
 }
 
 const MOCK_ZOMES = {
   definitions: {
     create_definition: createDefinition,
-    get_definition: getDefinition,
+    get_definitions: getDefinitions,
     get_entry_address: getEntryAddress,
     get_catalog_links: getCatalogLinks,
     get_all_definitions_of_type: getAllDefinitionsOfType,
@@ -173,8 +175,8 @@ server.on('clientError', (err, socket) => {
   console.log('health check server ERROR', err)
   socket.end('HTTP/1.1 400 Bad Request\r\n\r\n')
 })
-server.listen(process.env.PORT)
-console.log(`health check server listening on port ${process.env.PORT}`)
+server.listen(port)
+console.log(`health check server listening on port ${port}`)
 
 const wsServer = new WSServer({ server })
 console.log(`mock metastore Listening on ${host}:${port}`)

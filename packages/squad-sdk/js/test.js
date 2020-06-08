@@ -26,25 +26,27 @@ test('newDefinitionWithBond', async () => {
     }
   }
 
+  const gameAddress = '0xmockgameaddress'
   const curveAddress = '0xmockcurveaddress'
   const initialBuyUnits = 10
   const value = 55
 
   await squad.newDefinitionWithBond(
     component,
-    curveAddress,
+    [gameAddress],
     initialBuyUnits,
-    { value }
+    { value },
+    curveAddress
   )
 
   // should have created a metastore deffinition
-  expect(metastore.createDefinition).toBeCalledWith(component)
+  expect(metastore.createDefinition).toBeCalledWith(component, [gameAddress])
 
   // should have used the returned bond id for a new curation market bond
   expect(curation.newBond).toBeCalledWith(
-    curveAddress,
     'mockBondId',
     initialBuyUnits,
-    { value }
+    { value },
+    curveAddress
   )
 })

@@ -1,7 +1,7 @@
 /* global URLSearchParams */
 
 import m from 'mithril'
-import { metastore } from '@squad/sdk'
+import { metastore, curationMarket } from '@squad/sdk'
 
 import chess from './rules.js'
 import settings from './settings.json'
@@ -9,6 +9,8 @@ import state from './state.js'
 import { Board } from './Board.js'
 import FormatSelector from './FormatSelector.js'
 import { Matchmaker } from './Matchmaker.js'
+import ComponentForm from './ComponentForm.js'
+import FormatForm from './FormatForm.js'
 
 const App = {
   oninit: () => {
@@ -25,7 +27,9 @@ const App = {
       '#app',
       m(Board),
       m(FormatSelector),
-      m(Matchmaker)
+      m(Matchmaker),
+      m(ComponentForm),
+      m(FormatForm)
     )
   }
 }
@@ -41,27 +45,42 @@ async function squadInit () {
       return
     }
     console.log('metastore open')
-    const formatDefs = await metastore.getGameFormats(settings.gameAddress) // metastore will load any new formats here
-    state.squad.rawFormats = formatDefs.map(def => def.Format)
+    const formatDefs = await metastore.getGameFormats(settings.gameAddress)
+    const componentDefs = await metastore.getGameComponents(settings.gameAddress)
+    for (const key in formatDefs) {
+      formatDefs[key] = formatDefs[key].Format
+    }
+    state.squad.rawFormats = formatDefs
+
+    // see if they own the format
+    Object.keys(formatDefs).forEach((address) => {
+      curationMarket.getBalance(address).then((balance) => {
+        state.owned[address] = balance.toNumber()
+        m.redraw()
+      })
+    })
+
+    for (const key in componentDefs) {
+      componentDefs[key] = componentDefs[key].Component
+    }
+    state.squad.components = componentDefs
     const urlParams = new URLSearchParams(window.location.search)
     state.squad.loadedFormatIndex = urlParams.get('format')
     const formatToLoad = state.squad.rawFormats[state.squad.loadedFormatIndex]
 
     if (formatToLoad) {
-      const components = await Promise.all(
-        formatToLoad.components.map(metastore.getDefinition)
-      )
-      const pieces = components.map(
-        c => JSON.parse(c.Component.data)
-      ).reduce((ps, p) => {
-        return Object.assign(ps, p)
-      })
-
+      const components = await metastore.getDefinitions(formatToLoad.components)
+      const pieces = {}
+      console.log(components)
+      for (const address in components) {
+        pieces[address] = JSON.parse(components[address].Component.data)
+      }
       state.squad.loadedFormat = Object.assign(JSON.parse(formatToLoad.data), { pieces })
       console.log('Loaded format', state.squad.loadedFormat)
 
       state.game = chess.createGame(state.squad.loadedFormat)
     }
+
     state.squad.connection = 'connected'
     console.log('Squad Connection:', state.squad.connection)
     m.redraw()

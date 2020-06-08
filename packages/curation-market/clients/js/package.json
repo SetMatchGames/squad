@@ -1,13 +1,14 @@
 {
   "name": "@squad/curation-client",
   "version": "1.0.0",
-  "description": "",
+  "description": "Client-side node library for interacting with squad curation market smart contracts",
   "main": "index.js",
   "scripts": {
     "test": "jest"
   },
   "dependencies": {
     "@truffle/contract": "^4.1.13",
+    "ethers": "^4.0.46",
     "jest": "^25.2.3",
     "web3": "^1.2.6"
   },

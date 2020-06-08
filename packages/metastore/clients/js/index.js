@@ -35,8 +35,8 @@ async function createDefinition (definition, games = []) {
   return call('definitions', 'create_definition', { definition, games })
 }
 
-async function getDefinition (address) {
-  return call('definitions', 'get_definition', { address })
+async function getDefinitions (addresses) {
+  return call('definitions', 'get_definitions', { addresses })
 }
 
 async function getAddress (entry) {
@@ -89,7 +89,7 @@ module.exports = {
   on,
   call,
   createDefinition,
-  getDefinition,
+  getDefinitions,
   getAddress,
   getCatalogAddresses,
   getAllDefinitionsOfType,

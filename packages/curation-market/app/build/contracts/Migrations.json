@@ -68,15 +68,15 @@
       "type": "function"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.5.12+commit.7709ece9\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"constant\":true,\"inputs\":[],\"name\":\"last_completed_migration\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"completed\",\"type\":\"uint256\"}],\"name\":\"setCompleted\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address\",\"name\":\"new_address\",\"type\":\"address\"}],\"name\":\"upgrade\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/home/jesse/squad/packages/curation-market/app/contracts/Migrations.sol\":\"Migrations\"},\"evmVersion\":\"petersburg\",\"libraries\":{},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/home/jesse/squad/packages/curation-market/app/contracts/Migrations.sol\":{\"keccak256\":\"0xfdb731592344e2a2890faf03baec7b4bee7057ffba18ba6dbb6eec8db85f8f4c\",\"urls\":[\"bzz-raw://f9b488bbb84816dd04c1b155e943319758db16ee943943648fb264bccecc9879\",\"dweb:/ipfs/QmbW34mYrj3uLteyHf3S46pnp9bnwovtCXHbdBHfzMkSZx\"]}},\"version\":1}",
-  "bytecode": "0x608060405234801561001057600080fd5b50336000806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055506102b7806100606000396000f3fe608060405234801561001057600080fd5b506004361061004c5760003560e01c80630900f01014610051578063445df0ac146100955780638da5cb5b146100b3578063fdacd576146100fd575b600080fd5b6100936004803603602081101561006757600080fd5b81019080803573ffffffffffffffffffffffffffffffffffffffff16906020019092919050505061012b565b005b61009d6101f7565b6040518082815260200191505060405180910390f35b6100bb6101fd565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b6101296004803603602081101561011357600080fd5b8101908080359060200190929190505050610222565b005b6000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff1614156101f45760008190508073ffffffffffffffffffffffffffffffffffffffff1663fdacd5766001546040518263ffffffff1660e01b815260040180828152602001915050600060405180830381600087803b1580156101da57600080fd5b505af11580156101ee573d6000803e3d6000fd5b50505050505b50565b60015481565b6000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1681565b6000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff16141561027f57806001819055505b5056fea265627a7a723158205f396ecdad103818c5560d51f5ecaaaf00113ee7c07be05aa41dc37a49ddf62664736f6c634300050c0032",
-  "deployedBytecode": "0x608060405234801561001057600080fd5b506004361061004c5760003560e01c80630900f01014610051578063445df0ac146100955780638da5cb5b146100b3578063fdacd576146100fd575b600080fd5b6100936004803603602081101561006757600080fd5b81019080803573ffffffffffffffffffffffffffffffffffffffff16906020019092919050505061012b565b005b61009d6101f7565b6040518082815260200191505060405180910390f35b6100bb6101fd565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b6101296004803603602081101561011357600080fd5b8101908080359060200190929190505050610222565b005b6000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff1614156101f45760008190508073ffffffffffffffffffffffffffffffffffffffff1663fdacd5766001546040518263ffffffff1660e01b815260040180828152602001915050600060405180830381600087803b1580156101da57600080fd5b505af11580156101ee573d6000803e3d6000fd5b50505050505b50565b60015481565b6000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1681565b6000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff16141561027f57806001819055505b5056fea265627a7a723158205f396ecdad103818c5560d51f5ecaaaf00113ee7c07be05aa41dc37a49ddf62664736f6c634300050c0032",
+  "metadata": "{\"compiler\":{\"version\":\"0.5.12+commit.7709ece9\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"constant\":true,\"inputs\":[],\"name\":\"last_completed_migration\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"completed\",\"type\":\"uint256\"}],\"name\":\"setCompleted\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address\",\"name\":\"new_address\",\"type\":\"address\"}],\"name\":\"upgrade\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/Users/ezra/workspace/Holochain/squad/packages/curation-market/app/contracts/Migrations.sol\":\"Migrations\"},\"evmVersion\":\"petersburg\",\"libraries\":{},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/Users/ezra/workspace/Holochain/squad/packages/curation-market/app/contracts/Migrations.sol\":{\"keccak256\":\"0xfdb731592344e2a2890faf03baec7b4bee7057ffba18ba6dbb6eec8db85f8f4c\",\"urls\":[\"bzz-raw://f9b488bbb84816dd04c1b155e943319758db16ee943943648fb264bccecc9879\",\"dweb:/ipfs/QmbW34mYrj3uLteyHf3S46pnp9bnwovtCXHbdBHfzMkSZx\"]}},\"version\":1}",
+  "bytecode": "0x608060405234801561001057600080fd5b50336000806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055506102b7806100606000396000f3fe608060405234801561001057600080fd5b506004361061004c5760003560e01c80630900f01014610051578063445df0ac146100955780638da5cb5b146100b3578063fdacd576146100fd575b600080fd5b6100936004803603602081101561006757600080fd5b81019080803573ffffffffffffffffffffffffffffffffffffffff16906020019092919050505061012b565b005b61009d6101f7565b6040518082815260200191505060405180910390f35b6100bb6101fd565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b6101296004803603602081101561011357600080fd5b8101908080359060200190929190505050610222565b005b6000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff1614156101f45760008190508073ffffffffffffffffffffffffffffffffffffffff1663fdacd5766001546040518263ffffffff1660e01b815260040180828152602001915050600060405180830381600087803b1580156101da57600080fd5b505af11580156101ee573d6000803e3d6000fd5b50505050505b50565b60015481565b6000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1681565b6000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff16141561027f57806001819055505b5056fea265627a7a723158209f7a65cbb2f4296c8151a88bdf286d3f4f021954ba94bcca6e69831bcfa9a0ac64736f6c634300050c0032",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b506004361061004c5760003560e01c80630900f01014610051578063445df0ac146100955780638da5cb5b146100b3578063fdacd576146100fd575b600080fd5b6100936004803603602081101561006757600080fd5b81019080803573ffffffffffffffffffffffffffffffffffffffff16906020019092919050505061012b565b005b61009d6101f7565b6040518082815260200191505060405180910390f35b6100bb6101fd565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b6101296004803603602081101561011357600080fd5b8101908080359060200190929190505050610222565b005b6000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff1614156101f45760008190508073ffffffffffffffffffffffffffffffffffffffff1663fdacd5766001546040518263ffffffff1660e01b815260040180828152602001915050600060405180830381600087803b1580156101da57600080fd5b505af11580156101ee573d6000803e3d6000fd5b50505050505b50565b60015481565b6000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1681565b6000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff16141561027f57806001819055505b5056fea265627a7a723158209f7a65cbb2f4296c8151a88bdf286d3f4f021954ba94bcca6e69831bcfa9a0ac64736f6c634300050c0032",
   "sourceMap": "34:480:1:-;;;123:50;8:9:-1;5:2;;;30:1;27;20:12;5:2;123:50:1;158:10;150:5;;:18;;;;;;;;;;;;;;;;;;34:480;;;;;;",
   "deployedSourceMap": "34:480:1:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;34:480:1;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;347:165;;;;;;13:2:-1;8:3;5:11;2:2;;;29:1;26;19:12;2:2;347:165:1;;;;;;;;;;;;;;;;;;;:::i;:::-;;82:36;;;:::i;:::-;;;;;;;;;;;;;;;;;;;58:20;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;240:103;;;;;;13:2:-1;8:3;5:11;2:2;;;29:1;26;19:12;2:2;240:103:1;;;;;;;;;;;;;;;;;:::i;:::-;;347:165;223:5;;;;;;;;;;;209:19;;:10;:19;;;205:26;;;409:19;442:11;409:45;;460:8;:21;;;482:24;;460:47;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;460:47:1;;;;8:9:-1;5:2;;;45:16;42:1;39;24:38;77:16;74:1;67:27;5:2;460:47:1;;;;230:1;205:26;347:165;:::o;82:36::-;;;;:::o;58:20::-;;;;;;;;;;;;;:::o;240:103::-;223:5;;;;;;;;;;;209:19;;:10;:19;;;205:26;;;329:9;302:24;:36;;;;205:26;240:103;:::o",
   "source": "pragma solidity >=0.4.21 <0.6.0;\n\ncontract Migrations {\n  address public owner;\n  uint public last_completed_migration;\n\n  constructor() public {\n    owner = msg.sender;\n  }\n\n  modifier restricted() {\n    if (msg.sender == owner) _;\n  }\n\n  function setCompleted(uint completed) public restricted {\n    last_completed_migration = completed;\n  }\n\n  function upgrade(address new_address) public restricted {\n    Migrations upgraded = Migrations(new_address);\n    upgraded.setCompleted(last_completed_migration);\n  }\n}\n",
-  "sourcePath": "/home/jesse/squad/packages/curation-market/app/contracts/Migrations.sol",
+  "sourcePath": "/Users/ezra/workspace/Holochain/squad/packages/curation-market/app/contracts/Migrations.sol",
   "ast": {
-    "absolutePath": "/home/jesse/squad/packages/curation-market/app/contracts/Migrations.sol",
+    "absolutePath": "/Users/ezra/workspace/Holochain/squad/packages/curation-market/app/contracts/Migrations.sol",
     "exportedSymbols": {
       "Migrations": [
         504
@@ -725,7 +725,7 @@
     "src": "0:515:1"
   },
   "legacyAST": {
-    "absolutePath": "/home/jesse/squad/packages/curation-market/app/contracts/Migrations.sol",
+    "absolutePath": "/Users/ezra/workspace/Holochain/squad/packages/curation-market/app/contracts/Migrations.sol",
     "exportedSymbols": {
       "Migrations": [
         504
@@ -1401,10 +1401,106 @@
       "links": {},
       "address": "0x0deF0f15b248FD0992008C0eC9F7E9760b032a46",
       "transactionHash": "0xe0fca1da405ab131d394347dde2b74eb3e7f34fb6b54619db8d79c76a112ea26"
+    },
+    "1587312131092": {
+      "events": {},
+      "links": {},
+      "address": "0xC77252f953cccDEae09491eC2Ec3bADA5552f93c",
+      "transactionHash": "0x268f1080a52874867a26a7c8be14a4921a350dfbde86930abbe1204642481f40"
+    },
+    "1587912501226": {
+      "events": {},
+      "links": {},
+      "address": "0xbf555F8388c9D6cD6CefBe6233f3708A525dbDDA",
+      "transactionHash": "0x68b341dae106180f073edda691353e923f2c9a16876cdcc1df69ddf27f54f4a0"
+    },
+    "1587912548363": {
+      "events": {},
+      "links": {},
+      "address": "0x5E52eE485A1f77a0B0511a087e4E96E2ddF0F6B2",
+      "transactionHash": "0x5db941f841a09bc12299d4a6a6decd748bb545c49c32c8e02e487dc7114fb42e"
+    },
+    "1587913025016": {
+      "events": {},
+      "links": {},
+      "address": "0xaeF4079faCbCA05f96b0696B8112445D18baDF54",
+      "transactionHash": "0x547c9e5af238aea3cd71fa9e96ede0ec2d3cd4d5e2253c2f0f35a968445fa0c1"
+    },
+    "1587914067811": {
+      "events": {},
+      "links": {},
+      "address": "0x19E26214F6F5F740F3A8957ef2B4AB8Cc214745C",
+      "transactionHash": "0x8809b5ddb0d76ce14f3283dff1b993b5650874896c26fd12508331844390e535"
+    },
+    "1587914249803": {
+      "events": {},
+      "links": {},
+      "address": "0x5237a3A70715271c2aA008b6051BDb3b4Fc28e31",
+      "transactionHash": "0xb1dcbc1dd7971e9ee35836937270787a381dcfeed038c0a975bfee71c75d54af"
+    },
+    "1587914670236": {
+      "events": {},
+      "links": {},
+      "address": "0x0e0F48A5187EDD4Dc8A8Dc6bF04C942B1eBcA0F1",
+      "transactionHash": "0xfa0e0239ffea421a1ba02ce43561a777d4a5fd038c7c93cc25b16c8d3964a2d3"
+    },
+    "1587915006943": {
+      "events": {},
+      "links": {},
+      "address": "0x4e3590b8dBd2b3799E804863E555DEf519C0E339",
+      "transactionHash": "0x608ea1bc5f469475f0365ffa2c096284ccc48c94e4ed373f40fa490b1dec560f"
+    },
+    "1587920846984": {
+      "events": {},
+      "links": {},
+      "address": "0xdE6870fBEa7CbDF673f1e8173778d7aC4326f2Fe",
+      "transactionHash": "0x022a96f49d4137796b56bebde8a83d3392060a98eda24fccbeab8c4929493757"
+    },
+    "1587920962066": {
+      "events": {},
+      "links": {},
+      "address": "0xBe0A6317A718056379019b4F31bdF06221dFCFCE",
+      "transactionHash": "0xc2830bf24a3325d2fd32310f47e503f5cbcd774637352cc3d744d2a5b02d9f6a"
+    },
+    "1587921564779": {
+      "events": {},
+      "links": {},
+      "address": "0x957cA1F6801b6D4b7bA1548a0e3ACeD60f4021d5",
+      "transactionHash": "0x2ca95c2867d9e1dc36e62475e936c00ec88bbfa5b7c198fc6863a9abfbf2e721"
+    },
+    "1587936457758": {
+      "events": {},
+      "links": {},
+      "address": "0x0E779D43057F82f970E12571a6B265cBb8FAb8fd",
+      "transactionHash": "0x1ac24c5b5bd9f5846d9d23b573353fba2fc83ac49ddcc8893cf9b79564c01e54"
+    },
+    "1588016631668": {
+      "events": {},
+      "links": {},
+      "address": "0x644b86346162D890b7B6c5cACE0019DEe6701090",
+      "transactionHash": "0xa853a6405bb74a2776a6a072183d8fbd823e93bb9cc7cab486faaf614103fb07"
+    },
+    "1588434561552": {
+      "events": {},
+      "links": {},
+      "address": "0x07b831E74A17508AcCA64ae7d38f09d3dEfb474F",
+      "transactionHash": "0x1ca19312bcba2a7a7ba13d7f17a5b222f2444483867668d289a3981d0d887435"
+    },
+    "1588438385845": {
+      "events": {},
+      "links": {},
+      "address": "0x963A31B11765583d8aFfCE03919Cf683F73Cd6e8",
+      "transactionHash": "0x297c51f0bfab804535e087fa6396cafdb3fb4f6caf890d2134f124c131f0731a"
+    },
+    "1588545071746": {
+      "events": {},
+      "links": {},
+      "address": "0xb7821216E3D2c594bCf1c96C887D6eb2A90E2Ed0",
+      "transactionHash": "0xaef4b63a514d229e0fae9daf240187f85e32d7bc79076acc148ed95718736ef0"
     }
   },
   "schemaVersion": "3.0.19",
-  "updatedAt": "2020-03-24T02:11:05.752Z",
+  "updatedAt": "2020-05-03T23:01:06.381Z",
   "networkType": "ethereum",
   "devdoc": {
     "methods": {}

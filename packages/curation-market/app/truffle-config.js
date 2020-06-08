@@ -27,7 +27,8 @@ const fs = require('fs');
 
 let defaultMnemonic
 // Load the secret mnemonic unless it's the development network
-if (!process.argv.includes("development")) {
+if (!process.argv.includes("development") && !process.argv.includes("test")) {
+  console.log(process.argv)
   defaultMnemonic = fs.readFileSync(".secret").toString().trim();
 }
 

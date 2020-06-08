@@ -2,6 +2,9 @@
 
 const curation = require("./index.js")
 
+const curationMarket = require('./index.js')
+const ethers = require('ethers')
+
 function assert(statement, error) {
   if (statement === true) {
     return
@@ -23,6 +26,7 @@ async function main() {
   let supply = await curation.getSupply(bondId)
   console.log("supply of new bond:", supply)
 
+  /*
   // buying successfully
   let units = 1e8
   console.log("units to buy", units)
@@ -50,11 +54,22 @@ async function main() {
   // check unsuccessful buys
 
   // check refund
+  */
 
 }
 
-test("Tests run", () => {
+test("Tests run", async () => {
   console.warn("Old tests don't pass, FIX THEM")
   expect(true).toBe(true)
+})
+
+test("create a new bond with 100 initial buys", async () => {
+  const bondId = Date.now().toString()
+
+  await curationMarket.newBond(bondId, 0)
+  console.log('buy price', await curationMarket.getBuyPrice(100, bondId))
+
+  const supply = await curationMarket.getSupply(bondId)
+  expect(supply).toEqual(ethers.utils.bigNumberify(0))
 })
 

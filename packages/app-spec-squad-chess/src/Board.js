@@ -76,8 +76,8 @@ const BoardPiece = {
     const attrs = {
       src: vnode.attrs.imgLink,
       style: {
-        width: squareSize + 'vw',
-        height: squareSize + 'vw'
+        width: squareSize - 0.5 + 'vw',
+        height: squareSize - 0.5 + 'vw'
       }
     }
     const coordinates = chess.stringToSquare(vnode.key)

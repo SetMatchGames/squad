@@ -2,6 +2,9 @@ pragma solidity >=0.5.0 <0.6.0;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
+// TODO the contract needs events so apps can watch for when purchases go through, etc.
+// TODO curve tokens currently can't be sold in external markets -- do we want that?
+
 contract AutoBond {
   using SafeMath for uint256;
 
@@ -16,32 +19,37 @@ contract AutoBond {
   // mapping from definition address to it's bond
   mapping(bytes32 => Bond) public bonds;
 
-  function getBalance(bytes32 bondId, address holder) public view returns (uint256) {
+  function getBalance(bytes32 bondId, address holder) public view bondExists(bondId) returns (uint256) {
     return bonds[bondId].balances[holder];
   }
 
-  function getSupply(bytes32 bondId) public view returns (uint256) {
+  function getSupply(bytes32 bondId) public view bondExists(bondId) returns (uint256) {
     return bonds[bondId].supply;
   }
 
-  function getCurve(bytes32 bondId) public view returns (address) {
+  function getCurve(bytes32 bondId) public view bondExists(bondId) returns (address) {
     return bonds[bondId].curve;
   }
 
-  function getBuyPrice(uint256 units, bytes32 bondId) public view returns (uint256) {
+  function getBuyPrice(uint256 units, bytes32 bondId) public view bondExists(bondId) returns (uint256) {
     Bond memory b = bonds[bondId];
     return Curve(b.curve).buyPrice(b.supply, units);
   }
 
-  function getSellPrice(uint256 units, bytes32 bondId) public view returns (uint256) {
+  function getSellPrice(uint256 units, bytes32 bondId) public view bondExists(bondId) returns (uint256) {
     Bond memory b = bonds[bondId];
     return Curve(b.curve).sellPrice(b.supply, units);
+  }
+
+  modifier bondExists(bytes32 bondId) {
+    require(bonds[bondId].curve != address(0), "Bond id must already exist");
+    _;
   }
 
   // newBond makes a new bond and buys the first set of units
   function newBond(address curve, bytes32 bondId, uint256 units) public payable {
     require(curve != address(0), "Must specify a curve address");
-    require(bonds[bondId].curve == address(0), "Bond id exists");
+    require(bonds[bondId].curve == address(0), "Bond id already exists");
     Bond memory bond = Bond({ curve: curve, supply: 0 });
     bonds[bondId] = bond;
     if (units > 0) {
@@ -54,7 +62,7 @@ contract AutoBond {
     bytes32 bondId,
     address payable purchaser,
     uint256 value
-  ) internal {
+  ) internal bondExists(bondId) {
     require(units > 0, "cannot buy zero or less units");
     Bond storage b = bonds[bondId];
     uint256 price = Curve(b.curve).buyPrice(b.supply, units);
@@ -70,7 +78,7 @@ contract AutoBond {
     _buy(units, bondId, msg.sender, msg.value);
   }
 
-  function sell(uint256 units, bytes32 bondId) public {
+  function sell(uint256 units, bytes32 bondId) public bondExists(bondId) {
     // TODO users will want some way to control whether they want to hold
     // depending on price
     require(units > 0, "cannot sell zero or fewer units");
