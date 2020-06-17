@@ -178,9 +178,9 @@ const ComponentAdmechanic = {
       vnode.attrs.description,
       m(
         'input[type=checkbox]',
-        { 
-          checked: state.componentForm.admechanics[vnode.key], 
-          oninput: handleToggleAdmechanicFactory(vnode.key) 
+        {
+          checked: state.componentForm.admechanics[vnode.key],
+          oninput: handleToggleAdmechanicFactory(vnode.key)
         }
       ),
       form
@@ -195,9 +195,9 @@ const ComponentKing = {
       m('label', 'King?'),
       m(
         'input[type=checkbox]',
-        { 
+        {
           checked: state.componentForm.king,
-          oninput: handleToggleKing 
+          oninput: handleToggleKing
         }
       )
     )

@@ -70,7 +70,6 @@ const DefinitionFields = {
 
 const FormatNameField = {
   view: () => {
-
     return m(
       '.format-form-field',
       m('label', 'Enter format name:'),
