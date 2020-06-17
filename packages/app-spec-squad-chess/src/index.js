@@ -78,12 +78,10 @@ async function squadInit () {
     const urlParams = new URLSearchParams(window.location.search)
     state.squad.loadedFormatKey = urlParams.get('format')
     const formatToLoad = state.squad.rawFormats[state.squad.loadedFormatKey]
-    console.log('format to load', formatToLoad)
 
     if (formatToLoad) {
       const components = await metastore.getDefinitions(formatToLoad.components)
       const pieces = {}
-      console.log('Components', components)
       for (const address in components) {
         pieces[address] = JSON.parse(components[address].Component.data)
       }

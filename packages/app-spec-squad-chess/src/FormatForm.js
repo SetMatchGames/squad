@@ -7,7 +7,7 @@ import { stringToSquare } from './rules.js'
 
 const FormatForm = {
   oninit: () => {
-    clearFormat()
+    clearForm()
   },
   view: () => {
     const form = m(
@@ -40,7 +40,7 @@ const FormatPreloader = {
       }),
       m(
         'button',
-        { onclick: handleClearFormat },
+        { onclick: handleClearForm },
         'Clear'
       )
     )
@@ -408,12 +408,12 @@ const handleLoadFormat = (event) => {
   state.formatForm.loadedStartingPosition = Object.assign({}, data.startingPosition)
 }
 
-const handleClearFormat = () => {
+const handleClearForm = (event) => {
   event.preventDefault()
-  clearFormat()
+  clearForm()
 }
 
-function clearFormat () {
+function clearForm () {
   state.formatForm = Object.assign(
     {},
     {
