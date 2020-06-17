@@ -7,16 +7,12 @@ import { stringToSquare } from './rules.js'
 
 const FormatForm = {
   oninit: () => {
-    state.formatForm.components = []
-    state.formatForm.startingPosition = {}
-    state.formatForm.whiteOrientation = 2
-    state.formatForm.blackOrientation = 0
-    state.formatForm.initialBuy = 0
-    state.formatForm.value = 0
+    clearFormat()
   },
   view: () => {
     const form = m(
       'form#format-form',
+      m(FormatPreloader),
       m(DefinitionFields),
       m(InitialBuyField),
       m(CurveAddressField),
@@ -34,6 +30,33 @@ const FormatForm = {
   }
 }
 
+const FormatPreloader = {
+  view: () => {
+    return m(
+      '.format-form-field',
+      m('label', 'Preload a format:'),
+      Object.keys(state.squad.rawFormats).map(key => {
+        return m(FormatButton, { key, name: state.squad.rawFormats[key].name })
+      }),
+      m(
+        'button',
+        { onclick: handleClearFormat },
+        'Clear'
+      )
+    )
+  }
+}
+
+const FormatButton = {
+  view: (vnode) => {
+    return m(
+      'button',
+      { value: vnode.key, onclick: handleLoadFormat },
+      vnode.attrs.name
+    )
+  }
+}
+
 const DefinitionFields = {
   view: () => {
     return m(
@@ -47,12 +70,13 @@ const DefinitionFields = {
 
 const FormatNameField = {
   view: () => {
+
     return m(
       '.format-form-field',
       m('label', 'Enter format name:'),
       m(
         'input[type=text]',
-        { oninput: handleSaveFactory('name') }
+        { value: state.formatForm.name, oninput: handleSaveFactory('name') }
       )
     )
   }
@@ -63,10 +87,12 @@ const FormatComponentsList = {
     let componentBoxes = []
     for (const address in state.squad.components) {
       const name = state.squad.components[address].name
+      let checked = false
+      if (state.formatForm.components.includes(address)) { checked = true }
       componentBoxes = componentBoxes.concat([
         m(
           `input.format-form-checkbox[type=checkbox][name=${name}][value=${address}]`,
-          { oninput: handleAddOrRemoveComponent }
+          { oninput: handleAddOrRemoveComponent, checked }
         ),
         m(
           `label[for=${name}]`,
@@ -141,6 +167,15 @@ const StartingPositionSquares = {
       // for keys only in old keys, delete the key and value
       delete state.formatForm.startingPosition[square]
     })
+    // if we've loaded a format, add that back in
+    if (state.formatForm.loadedStartingPosition) {
+      console.log('did we get here', state.formatForm.loadedStartingPosition)
+      state.formatForm.startingPosition = Object.assign(
+        state.formatForm.startingPosition,
+        state.formatForm.loadedStartingPosition
+      )
+      console.log(state.formatForm.startingPosition)
+    }
     newNotShared.forEach(square => {
       // for keys only in new keys, add default values
       state.formatForm.startingPosition[square] = { content: null, deleted: false }
@@ -318,12 +353,12 @@ const FormatOrientation = {
       m('label', 'Choose orientation for white (0-3):'),
       m(
         'input[type=number][placeholder=2]',
-        { oninput: handleSaveFactory('whiteOrientation') }
+        { value: state.formatForm.whiteOrientation, oninput: handleSaveFactory('whiteOrientation') }
       ),
       m('label', 'Choose orientation for black (0-3):'),
       m(
         'input[type=number][placeholder=0]',
-        { oninput: handleSaveFactory('blackOrientation') }
+        { value: state.formatForm.blackOrientation, oninput: handleSaveFactory('blackOrientation') }
       )
     )
   }
@@ -357,9 +392,45 @@ const CurveAddressField = {
 }
 
 // handlers
+const handleLoadFormat = (event) => {
+  event.preventDefault()
+  const format = state.squad.rawFormats[event.target.value]
+  const data = JSON.parse(format.data)
+
+  state.formatForm = Object.assign(state.formatForm, {
+    startingPosition: data.startingPosition,
+    whiteOrientation: data.orientation.white,
+    blackOrientation: data.orientation.black,
+    name: format.name,
+    components: [...format.components]
+  })
+
+  state.formatForm.loadedStartingPosition = Object.assign({}, data.startingPosition)
+}
+
+const handleClearFormat = () => {
+  event.preventDefault()
+  clearFormat()
+}
+
+function clearFormat () {
+  state.formatForm = Object.assign(
+    {},
+    {
+      components: [],
+      startingPosition: {},
+      whiteOrientation: 2,
+      blackOrientation: 0,
+      initialBuy: 0,
+      value: 0
+    }
+  )
+}
+
 const handleSaveFactory = (dataType) => {
   return (event) => {
     state.formatForm[dataType] = event.target.value
+    console.log(state.formatForm, state.squad.rawFormats)
   }
 }
 
@@ -439,16 +510,16 @@ const handleSubmit = (event) => {
       })
     }
   }
+  console.log('Definition being submitted', definition)
   // make sure we get the right value before submitting, if not enough time has already passed
   squad.curationMarket.getBuyPriceFromCurve(0, state.formatForm.initialBuy, state.formatForm.curveAddress).then(res => {
     const value = res
-    console.log('definition return', squad.definition(
+    squad.definition(
       definition,
       [settings.gameAddress],
       state.formatForm.initialBuy,
       { value },
       state.formatForm.curveAddress
-    )
     )
   })
 }
