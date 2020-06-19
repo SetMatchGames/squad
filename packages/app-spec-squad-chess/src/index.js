@@ -57,7 +57,6 @@ async function squadInit () {
     })
 
     const formatDefs = await metastore.getGameFormats(settings.gameAddress)
-    console.log("defs", formatDefs)
     const componentDefs = await metastore.getGameComponents(settings.gameAddress)
     for (const key in formatDefs) {
       formatDefs[key] = formatDefs[key].Format
