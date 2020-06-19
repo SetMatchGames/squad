@@ -8,15 +8,12 @@ import graphicsPaths from './graphics-paths.json'
 
 const ComponentForm = {
   oninit: () => {
-    state.componentForm.mechanics = {}
-    state.componentForm.admechanics = {}
-    state.componentForm.graphics = ''
-    state.componentForm.initialBuy = 0
-    state.componentForm.value = 0
+    clearForm()
   },
   view: () => {
     const form = m(
       'form#component-form',
+      m(ComponentPreloader),
       m(DefinitionFields),
       m(InitialBuyField),
       m(CurveAddressField),
@@ -30,6 +27,33 @@ const ComponentForm = {
       'p#component-form-section',
       m('h3', 'New Component'),
       form
+    )
+  }
+}
+
+const ComponentPreloader = {
+  view: () => {
+    return m(
+      '.component-form-field',
+      m('label', 'Preload a component:'),
+      Object.keys(state.squad.components).map(key => {
+        return m(ComponentButton, { key, name: state.squad.components[key].name })
+      }),
+      m(
+        'button',
+        { onclick: handleClearForm },
+        'Clear'
+      )
+    )
+  }
+}
+
+const ComponentButton = {
+  view: (vnode) => {
+    return m(
+      'button',
+      { value: vnode.key, onclick: handleLoadComponent },
+      vnode.attrs.name
     )
   }
 }
@@ -53,7 +77,7 @@ const ComponentNameField = {
       m('label', 'Enter component name:'),
       m(
         'input[type=text]',
-        { oninput: handleSaveFactory('name') }
+        { value: state.componentForm.name, oninput: handleSaveFactory('name') }
       )
     )
   }
@@ -154,7 +178,10 @@ const ComponentAdmechanic = {
       vnode.attrs.description,
       m(
         'input[type=checkbox]',
-        { oninput: handleToggleAdmechanicFactory(vnode.key) }
+        {
+          checked: state.componentForm.admechanics[vnode.key],
+          oninput: handleToggleAdmechanicFactory(vnode.key)
+        }
       ),
       form
     )
@@ -168,7 +195,10 @@ const ComponentKing = {
       m('label', 'King?'),
       m(
         'input[type=checkbox]',
-        { oninput: handleToggleKing }
+        {
+          checked: state.componentForm.king,
+          oninput: handleToggleKing
+        }
       )
     )
   }
@@ -247,6 +277,40 @@ const CurveAddressField = {
 }
 
 // handlers
+const handleLoadComponent = (event) => {
+  event.preventDefault()
+  const component = state.squad.components[event.target.value]
+  const data = JSON.parse(component.data)
+
+  const graphics = data.graphics.local.white.split('/').pop().slice(1)
+
+  state.componentForm = Object.assign(state.componentForm, {
+    name: component.name,
+    mechanics: data.mechanics || {},
+    admechanics: data.admechanics || {},
+    king: data.king,
+    graphics
+  })
+}
+
+const handleClearForm = (event) => {
+  event.preventDefault()
+  clearForm()
+}
+
+function clearForm () {
+  state.componentForm = Object.assign(
+    {},
+    {
+      mechanics: {},
+      admechanics: {},
+      graphics: '',
+      initialBuy: 0,
+      value: 0
+    }
+  )
+}
+
 const handleSaveFactory = (dataType) => {
   return (event) => {
     state.componentForm[dataType] = event.target.value
@@ -308,7 +372,6 @@ const handleToggleKing = () => {
   } else {
     state.componentForm.king = true
   }
-  console.log(state.componentForm)
 }
 
 const handleSaveInitialBuy = (event) => {
@@ -318,26 +381,6 @@ const handleSaveInitialBuy = (event) => {
     m.redraw()
   })
 }
-
-// Component Definition type:
-/*
-{
-  String name
-  data: {
-    mechanics: {
-      mechanic name: [
-        { offset: [x, y], Number steps }
-      ]
-    },
-    graphics: {
-      local: {
-        white: path,
-        black, path
-      }
-    }
-  },
-}
-*/
 
 const handleSubmit = (event) => {
   event.preventDefault()
@@ -366,6 +409,8 @@ const handleSubmit = (event) => {
       })
     }
   }
+
+  console.log('Submitting definition:', definition)
 
   // make sure we get the right value before submitting, if not enough time has already passed
   squad.curationMarket.getBuyPriceFromCurve(0, state.componentForm.initialBuy, state.componentForm.curveAddress).then(res => {
