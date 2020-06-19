@@ -1,5 +1,5 @@
 {
-  "metastoreWs": "https://squad-matchmaking.herokuapp.com/",
+  "metastoreWs": "ws://squad-matchmaking.herokuapp.com/",
   "matchmakingWs": "ws://squad-matchmaking.herokuapp.com",
   "gameAddress": "8c875b7990077c166479df9ee2aafff7cc7bf82c54741ff47d169a56f18fe5d5"
 }
