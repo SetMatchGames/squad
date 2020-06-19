@@ -23,6 +23,7 @@ async function call (zome, method, inputs) {
     function: method,
     args: inputs
   }
+  console.log(params)
   const result = JSON.parse(await squad.connection.call('call', params))
 
   if (result.Ok === undefined) {

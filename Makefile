@@ -40,6 +40,7 @@ clean:
 	-rm -rf build
 	-rm -rf packages/curation-market/clients/js/contracts
 	-rm -rf packages/metastore/mock/build
+	-rm -rf packages/app-spec-squad/chess/bin
 	-rm -rf $(js-client-contracts)
 
 .PHONY: very-clean
