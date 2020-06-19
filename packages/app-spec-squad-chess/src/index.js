@@ -1,7 +1,7 @@
 /* global URLSearchParams */
 
 import m from 'mithril'
-import { metastore, curationMarket } from '@squad/sdk'
+import squad, { metastore, curationMarket } from '@squad/sdk'
 
 import chess from './rules.js'
 import settings from './settings.json'
@@ -11,6 +11,8 @@ import FormatSelector from './FormatSelector.js'
 import { Matchmaker } from './Matchmaker.js'
 import ComponentForm from './ComponentForm.js'
 import FormatForm from './FormatForm.js'
+
+import defs from '../scripts/load_development_defs.js'
 
 const App = {
   oninit: () => {
@@ -45,6 +47,15 @@ async function squadInit () {
       return
     }
     console.log('metastore open')
+
+    const defaultDefs = await defs()
+
+    console.log('default defs', defaultDefs)
+
+    defaultDefs.forEach(async (def) => {
+      await squad.definition(def, [settings.gameAddress])
+    })
+
     const formatDefs = await metastore.getGameFormats(settings.gameAddress)
     const componentDefs = await metastore.getGameComponents(settings.gameAddress)
     for (const key in formatDefs) {
@@ -65,13 +76,12 @@ async function squadInit () {
     }
     state.squad.components = componentDefs
     const urlParams = new URLSearchParams(window.location.search)
-    state.squad.loadedFormatIndex = urlParams.get('format')
-    const formatToLoad = state.squad.rawFormats[state.squad.loadedFormatIndex]
+    state.squad.loadedFormatKey = urlParams.get('format')
+    const formatToLoad = state.squad.rawFormats[state.squad.loadedFormatKey]
 
     if (formatToLoad) {
       const components = await metastore.getDefinitions(formatToLoad.components)
       const pieces = {}
-      console.log(components)
       for (const address in components) {
         pieces[address] = JSON.parse(components[address].Component.data)
       }
