@@ -4,6 +4,7 @@ import squad from '@squad/sdk'
 import state from './state.js'
 import settings from './settings.json'
 import { stringToSquare } from './rules.js'
+import { shortHash } from './utils.js'
 
 const FormatForm = {
   oninit: () => {
@@ -36,7 +37,10 @@ const FormatPreloader = {
       '.format-form-field',
       m('label', 'Preload a format:'),
       Object.keys(state.squad.rawFormats).map(key => {
-        return m(FormatButton, { key, name: state.squad.rawFormats[key].name })
+        return m(FormatButton, { 
+          key, 
+          name: `${state.squad.rawFormats[key].name} (${shortHash(key)})`
+        })
       }),
       m(
         'button',
@@ -85,7 +89,7 @@ const FormatComponentsList = {
   view: () => {
     let componentBoxes = []
     for (const address in state.squad.components) {
-      const name = state.squad.components[address].name
+      const name = `${state.squad.components[address].name} (${shortHash(address)})`
       let checked = false
       if (state.formatForm.components.includes(address)) { checked = true }
       componentBoxes = componentBoxes.concat([
