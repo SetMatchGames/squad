@@ -47,7 +47,6 @@ function subscribe (eventType, id, callback) {
   state.server.subscribe(state.events[eventType])
   console.log('listening for events:', state.events[eventType])
   state.server.on(state.events[eventType], async (e) => {
-    console.log('** received event of type:', state.events[eventType])
     callback(e)
   })
 }
@@ -89,7 +88,6 @@ function endMatch () {
 
 function sendMessage (data) {
   // send match event with data and author id
-  console.log('** match event name:', state.events.match)
   state.server.call('triggerEvent', [state.events.match, data, state.id])
 }
 
