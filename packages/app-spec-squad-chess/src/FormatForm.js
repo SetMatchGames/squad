@@ -166,14 +166,12 @@ const StartingPositionSquares = {
       // for keys only in old keys, delete the key and value
       delete state.formatForm.startingPosition[square]
     })
-    // if we've loaded a format, add that back in
+    // if we've preloaded a format, add that back in
     if (state.formatForm.loadedStartingPosition) {
-      console.log('did we get here', state.formatForm.loadedStartingPosition)
       state.formatForm.startingPosition = Object.assign(
         state.formatForm.startingPosition,
         state.formatForm.loadedStartingPosition
       )
-      console.log(state.formatForm.startingPosition)
     }
     newNotShared.forEach(square => {
       // for keys only in new keys, add default values
@@ -496,6 +494,7 @@ const handleSaveInitialBuy = (event) => {
 const handleSubmit = (event) => {
   event.preventDefault()
   const startingPosition = cleanStartingPosition(state.formatForm.startingPosition)
+  console.log(state.formatForm.startingPosition, startingPosition)
   const orientation = {}
   orientation.white = state.formatForm.whiteOrientation
   orientation.black = state.formatForm.blackOrientation
@@ -526,7 +525,7 @@ const handleSubmit = (event) => {
 function cleanStartingPosition (sp) {
   const cleanPosition = {}
   for (const square in sp) {
-    if (sp[square].deleted === false) {
+    if (sp[square].deleted === false || sp[square].deleted === undefined) {
       cleanPosition[square] = Object.assign({}, sp[square])
       delete cleanPosition[square].deleted
     }

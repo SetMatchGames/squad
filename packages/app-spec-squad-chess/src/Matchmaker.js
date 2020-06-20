@@ -14,6 +14,7 @@ export const Matchmaker = {
     state.matchmaking.peers = []
     state.matchmaking.offers = {}
     state.matchmaking.player = 0
+    state.matchmaking.connection = 'not connected'
   },
   view: () => {
     return m(
@@ -203,7 +204,7 @@ export const sendMessage = (message) => {
 // handlers
 const handleSaveRoom = (event) => {
   event.preventDefault()
-  state.matchmaking.room = `${event.target.value}-${state.squad.loadedFormatIndex}`
+  state.matchmaking.room = `${event.target.value}-${state.squad.loadedFormatKey}`
 }
 
 const handleConnect = (event) => {
@@ -213,17 +214,23 @@ const handleConnect = (event) => {
   if (!state.matchmaking.id) { throw new Error("Can't connect: Id not set") }
   if (!state.matchmaking.room) { throw new Error("Can't connect: Room not chosen") }
 
-  matchmaking.connect(state.matchmaking.id, settings.matchmakingWs)
+  if (state.matchmaking.connection === 'not connected') {
+    console.log('** trying to connect bc connection status was "not connected"')
+    matchmaking.connect(state.matchmaking.id, settings.matchmakingWs)
+    state.matchmaking.connection = 'matchmaking connected'
+  }
   matchmaking.whenReady(() => {
-    matchmaking.joinRoom(state.matchmaking.room)
-    matchmaking.listenOffers(handleReceiveOffer)
-    state.matchmaking.rollCallInterval = setInterval(async () => {
-      await rollCall()
-      m.redraw()
-    }, 1000)
+    console.log('** when ready triggered with connection:', state.matchmaking.connection)
+    if (state.matchmaking.connection !== 'match started') {
+      console.log('** connecting to room')
+      matchmaking.joinRoom(state.matchmaking.room)
+      matchmaking.listenOffers(handleReceiveOffer)
+      state.matchmaking.rollCallInterval = setInterval(async () => {
+        await rollCall()
+        m.redraw()
+      }, 1000)
+    }
   })
-
-  state.matchmaking.connection = 'matchmaking connected'
   m.redraw()
 }
 
