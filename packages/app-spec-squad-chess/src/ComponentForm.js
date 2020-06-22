@@ -38,8 +38,8 @@ const ComponentPreloader = {
       '.component-form-field',
       m('label', 'Preload a component:'),
       Object.keys(state.squad.components).map(key => {
-        return m(ComponentButton, { 
-          key, 
+        return m(ComponentButton, {
+          key,
           name: `${state.squad.components[key].name} (${shortHash(key)})`
         })
       }),

@@ -4,7 +4,7 @@ import squad from '@squad/sdk'
 import state from './state.js'
 import settings from './settings.json'
 import { stringToSquare } from './rules.js'
-import { shortHash } from './utils.js'
+import { shortHash, findBoardRange } from './utils.js'
 
 const FormatForm = {
   oninit: () => {
@@ -37,8 +37,8 @@ const FormatPreloader = {
       '.format-form-field',
       m('label', 'Preload a format:'),
       Object.keys(state.squad.rawFormats).map(key => {
-        return m(FormatButton, { 
-          key, 
+        return m(FormatButton, {
+          key,
           name: `${state.squad.rawFormats[key].name} (${shortHash(key)})`
         })
       }),
@@ -188,18 +188,53 @@ const StartingPositionSquares = {
       if (a[1] !== b[1]) { return a[1] - b[1] }
       return a[0] - b[0]
     })
-    return squares.map(square => {
-      return m(StartingPositionSquare, { key: square })
-    })
+
+    // if no board is being rendered, return nothing
+    if (squares.length === 0) { return }
+
+    // Get the right sizing
+    const xRange = findBoardRange(0, state.formatForm.startingPosition)
+    const yRange = findBoardRange(1, state.formatForm.startingPosition)
+
+    return m(
+      '#format-form-position',
+      {
+        style: {
+          width: (xRange + 1) * squareSize + 'px',
+          height: (yRange + 1) * squareSize + 'px'
+        }
+      },
+      squares.map(square => {
+        return m(StartingPositionSquare, { key: square })
+      })
+    )
+  }
+}
+
+const squareSize = 150
+
+function squareStyle (coordinates, deleted) {
+  let squareColor = settings.boardConfig.squares.lightColor
+  if ((coordinates[0] + coordinates[1]) % 2 === 1) { squareColor = settings.boardConfig.squares.darkColor }
+  if (deleted) { squareColor = 'white' }
+
+  return {
+    right: (squareSize * coordinates[0]) + 'px',
+    top: (squareSize * coordinates[1]) + 'px',
+    width: squareSize + 'px',
+    height: squareSize + 'px',
+    background: squareColor
   }
 }
 
 const StartingPositionSquare = {
   view: (vnode) => {
     return m(
-      'p.format-form-field',
-      { key: vnode.key },
-      `${vnode.key} `,
+      '.format-form-field.square',
+      {
+        key: vnode.key,
+        style: squareStyle(stringToSquare(vnode.key), state.formatForm.startingPosition[vnode.key].deleted)
+      },
       m(SelectPiece, { square: vnode.key }),
       m(Promotion, { square: vnode.key }),
       m(DeleteSquareSelect, { square: vnode.key })
@@ -238,15 +273,45 @@ const SelectPiece = {
       'None'
     ))
     const contentBool = !!state.formatForm.startingPosition[vnode.attrs.square].content
+    let imgLink
+    if (contentBool) {
+      const pieceId = state.formatForm.startingPosition[vnode.attrs.square].content.pieceId
+      const graphics = JSON.parse(state.squad.components[pieceId].data).graphics
+      const player = state.formatForm.startingPosition[vnode.attrs.square].content.player
+      let pieceColor = 'white'
+      if (player === 1) { pieceColor = 'black' }
+      // prioritize local images
+      if (graphics.local) {
+        imgLink = `./img/${graphics.local[pieceColor]}`
+      } // else if (graphics.remote)...
+    }
     return [
-      m('label', 'Select piece:'),
+      m(PieceImage, { imgLink, contentBool }),
       m(
-        'select.format-form-field',
-        { oninput: handleSelectPieceFactory(vnode.attrs.square) },
-        options
+        'label',
+        'Select piece:',
+        m(
+          'select.format-form-field',
+          { oninput: handleSelectPieceFactory(vnode.attrs.square) },
+          options
+        )
       ),
       m(SelectPieceColor, { contentBool, square: vnode.attrs.square })
     ]
+  }
+}
+
+const PieceImage = {
+  view: (vnode) => {
+    if (!vnode.attrs.contentBool) { return }
+    const attrs = {
+      src: vnode.attrs.imgLink,
+      style: {
+        width: settings.boardConfig.squares.size + 'vw',
+        height: settings.boardConfig.squares.size + 'vw'
+      }
+    }
+    return m('img#' + vnode.key, attrs)
   }
 }
 
@@ -263,20 +328,23 @@ const SelectPieceColor = {
       blackSelected = 'selected'
     }
     return [
-      m('label', 'Select piece color:'),
       m(
-        'select.format-form-field',
-        { oninput: handlePieceColorFactory(vnode.attrs.square) },
-        [
-          m(
-            `option.format-form-field[value=White][${whiteSelected}]`,
-            'White'
-          ),
-          m(
-            `option.format-form-field[value=Black][${blackSelected}]`,
-            'Black'
-          )
-        ]
+        'label',
+        'Select piece color:',
+        m(
+          'select.format-form-field',
+          { oninput: handlePieceColorFactory(vnode.attrs.square) },
+          [
+            m(
+              `option.format-form-field[value=White][${whiteSelected}]`,
+              'White'
+            ),
+            m(
+              `option.format-form-field[value=Black][${blackSelected}]`,
+              'Black'
+            )
+          ]
+        )
       )
     ]
   }
@@ -302,24 +370,27 @@ const Promotion = {
       default:
     }
     return [
-      m('label', 'Promotion square?'),
       m(
-        'select.format-form-field',
-        { oninput: handlePiecePromotionFactory(vnode.attrs.square) },
-        [
-          m(
-            `option.format-form-field[value=None][${noneSelected}]`,
-            'None'
-          ),
-          m(
-            `option.format-form-field[value=White][${whiteSelected}]`,
-            'White'
-          ),
-          m(
-            `option.format-form-field[value=Black][${blackSelected}]`,
-            'Black'
-          )
-        ]
+        'label',
+        'Promotion square?',
+        m(
+          'select.format-form-field',
+          { oninput: handlePiecePromotionFactory(vnode.attrs.square) },
+          [
+            m(
+              `option.format-form-field[value=None][${noneSelected}]`,
+              'None'
+            ),
+            m(
+              `option.format-form-field[value=White][${whiteSelected}]`,
+              'White'
+            ),
+            m(
+              `option.format-form-field[value=Black][${blackSelected}]`,
+              'Black'
+            )
+          ]
+        )
       )
     ]
   }
@@ -328,20 +399,23 @@ const Promotion = {
 const DeleteSquareSelect = {
   view: (vnode) => {
     return [
-      m('label', 'Delete square?'),
       m(
-        'select.format-form-field',
-        { oninput: handleDeleteSquareFactory(vnode.attrs.square) },
-        [
-          m(
-            'option.format-form-field[value=false]',
-            'No'
-          ),
-          m(
-            'option.format-form-field[value=true]',
-            'Yes'
-          )
-        ]
+        'label',
+        'Delete square?',
+        m(
+          'select.format-form-field',
+          { oninput: handleDeleteSquareFactory(vnode.attrs.square) },
+          [
+            m(
+              'option.format-form-field[value=false]',
+              'No'
+            ),
+            m(
+              'option.format-form-field[value=true]',
+              'Yes'
+            )
+          ]
+        )
       )
     ]
   }
