@@ -73,11 +73,10 @@ async function newBond (
 ) {
   init()
   if (!addressOfCurve) { addressOfCurve = simpleLinearCurveAddress }
-  let bondHash = ethers.utils.id(bondId)
+  const bondHash = ethers.utils.id(bondId)
   const fullOptions = Object.assign({}, defaults, options)
-  let curve = await autoBond.getCurve(bondHash)
+  const curve = await autoBond.getCurve(bondHash)
   if (curve === '0x0000000000000000000000000000000000000000') {
-    console.log(addressOfCurve, bondHash, initialBuyNumber, fullOptions)
     return await autoBond.newBond(
       addressOfCurve,
       bondHash,
@@ -90,7 +89,7 @@ async function newBond (
 
 async function getSupply (bondId) {
   init()
-  let bondHash = ethers.utils.id(bondId)
+  const bondHash = ethers.utils.id(bondId)
   return await autoBond.getSupply(bondHash)
 }
 
@@ -98,13 +97,13 @@ async function getBalance (bondId, holderAddress) {
   init()
   await window.ethereum.enable()
   holderAddress = holderAddress ? holderAddress : await walletOrSigner.getAddress()
-  let bondHash = ethers.utils.id(bondId)
+  const bondHash = ethers.utils.id(bondId)
   return await autoBond.getBalance(bondHash, holderAddress)
 }
 
 async function buy (units, bondId, options = {}) {
   init()
-  let bondHash = ethers.utils.id(bondId)
+  const bondHash = ethers.utils.id(bondId)
   const fullOptions = Object.assign({}, defaults, options)
   return await autoBond.buy(
     units,
@@ -115,7 +114,7 @@ async function buy (units, bondId, options = {}) {
 
 async function sell (units, bondId, options = {}) {
   init()
-  let bondHash = ethers.utils.id(bondId)
+  const bondHash = ethers.utils.id(bondId)
   const fullOptions = Object.assign({}, defaults, options)
   return await autoBond.sell(
     units,
@@ -126,7 +125,7 @@ async function sell (units, bondId, options = {}) {
 
 async function getBuyPrice (units, bondId) {
   init()
-  let bondHash = ethers.utils.id(bondId)
+  const bondHash = ethers.utils.id(bondId)
   console.log("getting buy price", units, bondHash)
   return await autoBond.getBuyPrice(units, bondHash)
 }
@@ -141,8 +140,17 @@ async function getBuyPriceFromCurve (supply, units, curveAddress) {
 
 async function getSellPrice (units, bondId) {
   init()
-  let bondHash = ethers.utils.id(bondId)
+  const bondHash = ethers.utils.id(bondId)
   return await autoBond.getSellPrice(units, bondHash)
+}
+
+async function getMarketCap (bondId) {
+  init()
+  const bondHash = ethers.utils.id(bondId)
+  const bond = await autoBond.bonds(bondHash)
+  const curveAddress = bond.curve
+  const supply = bond.supply
+  return (await getBuyPriceFromCurve(0, supply, curveAddress)).toString()
 }
 
 module.exports = {
@@ -153,6 +161,7 @@ module.exports = {
   getBuyPrice,
   getBuyPriceFromCurve,
   getSellPrice,
+  getMarketCap,
   buy,
   sell,
   BondAlreadyExists

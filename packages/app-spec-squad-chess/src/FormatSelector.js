@@ -7,20 +7,28 @@ import { shortHash } from './utils.js'
 
 const FormatSelector = {
   view: () => {
+    const orderedFormats = Object.keys(state.squad.rawFormats).sort((a, b) => {
+      return state.marketCaps[b] - state.marketCaps[a]
+    })
     return m(
       '#format-selector',
       m('h3', 'Available Formats'),
-      Object.keys(state.squad.rawFormats).map(address => {
+      orderedFormats.map(address => {
         const name = `${state.squad.rawFormats[address].name} (${shortHash(address)})`
         if (state.owned[address]) {
           const url = new URL(window.location)
           url.search = `?format=${address}`
-          return m(`a[href=${url}]`, name)
+          return m(
+            'div',
+            m(`a[href=${url}]`, name),
+            ` – Market size: ${state.marketCaps[address]}`
+          )
         } else {
           return m(
             'div',
             name,
-            m(BuyDefinitionButton, { bondId: address })
+            m(BuyDefinitionButton, { bondId: address }),
+            ` – Market size: ${state.marketCaps[address]}`
           )
         }
       })
