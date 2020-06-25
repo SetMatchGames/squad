@@ -276,7 +276,7 @@ export const sendMessage = (message) => {
   console.log('Sending message:', message)
   matchmaking.sendMessage(message)
   setTimeout(() => {
-    console.log("resending message number", message.number)
+    console.log('resending message number', message.number)
     sendMessage(message)
   }, 3000)
 }
@@ -284,7 +284,7 @@ export const sendMessage = (message) => {
 const handleReceiveMessage = (event) => {
   if (event.from !== state.matchmaking.id) {
     if (event.data.number <= state.matchmaking.messageNumber) {
-      console.log("revieved old message number", event.data.number)
+      console.log('revieved old message number', event.data.number)
       return
     }
     console.log('Received message:', event)
