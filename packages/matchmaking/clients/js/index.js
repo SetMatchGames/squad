@@ -55,7 +55,7 @@ function subscribe (eventType, id, callback) {
   _subscribe(eventType, id, callback)
   // reconnect when connection reopens
   state.server.on('open', () => {
-    console.log("resubscribing", eventType, id)
+    console.log('resubscribing', eventType, id)
     _subscribe(eventType, id, callback)
   })
 }
