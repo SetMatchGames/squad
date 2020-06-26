@@ -40,7 +40,7 @@ function eventName (stringArray) {
   return name
 }
 
-function subscribe (eventType, id, callback) {
+function _subscribe (eventType, id, callback) {
   if (!state.events) { state.events = {} }
   state.events[eventType] = eventName([eventType, state.room, id])
   state.server.call('addEvent', [state.events[eventType]])
@@ -48,6 +48,15 @@ function subscribe (eventType, id, callback) {
   console.log('listening for events:', state.events[eventType])
   state.server.on(state.events[eventType], async (e) => {
     callback(e)
+  })
+}
+
+function subscribe (eventType, id, callback) {
+  _subscribe(eventType, id, callback)
+  // reconnect when connection reopens
+  state.server.on('open', () => {
+    console.log('resubscribing', eventType, id)
+    _subscribe(eventType, id, callback)
   })
 }
 

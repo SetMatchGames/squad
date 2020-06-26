@@ -5,6 +5,7 @@ import state from './state.js'
 import settings from './settings.json'
 import { mechanics, admechanics } from './rules.js'
 import graphicsPaths from './graphics-paths.json'
+import { shortHash } from './utils.js'
 
 const ComponentForm = {
   oninit: () => {
@@ -37,7 +38,10 @@ const ComponentPreloader = {
       '.component-form-field',
       m('label', 'Preload a component:'),
       Object.keys(state.squad.components).map(key => {
-        return m(ComponentButton, { key, name: state.squad.components[key].name })
+        return m(ComponentButton, {
+          key,
+          name: `${state.squad.components[key].name} (${shortHash(key)})`
+        })
       }),
       m(
         'button',
