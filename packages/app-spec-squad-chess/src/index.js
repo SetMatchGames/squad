@@ -67,6 +67,10 @@ async function squadInit () {
     // submit the default definitions to make sure they have bonds on ethereum
     localDefs.forEach(async (def) => {
       console.log("loading local def", def)
+    })
+
+    // submit the default definitions to make sure they have bonds on ethereum
+    localDefs.forEach(async (def) => {
       await squad.definition(def, [settings.gameAddress])
     })
 
