@@ -1,3 +1,5 @@
+/* global localStorage */
+
 import m from 'mithril'
 import squad from '@squad/sdk'
 
@@ -415,7 +417,7 @@ const handleSubmit = (event) => {
   }
 
   const localDefs = JSON.parse(localStorage.getItem('localDefinitions'))
-  console.log("local components", localDefs)
+  console.log('local components', localDefs)
   localStorage.setItem('localDefinitions', JSON.stringify([...localDefs, definition]))
 
   console.log('Submitting definition:', definition)

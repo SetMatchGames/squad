@@ -1,4 +1,4 @@
-/* global URLSearchParams */
+/* global URLSearchParams localStorage */
 
 import m from 'mithril'
 import squad, { metastore, curationMarket } from '@squad/sdk'
@@ -61,12 +61,12 @@ async function squadInit () {
     if (!storedDefs) {
       storedDefs = []
     }
-    console.log("Stored Defs", storedDefs)
+    console.log('Stored Defs', storedDefs)
     const localDefs = [...defaultDefs, ...storedDefs]
 
     // submit the default definitions to make sure they have bonds on ethereum
     localDefs.forEach(async (def) => {
-      console.log("loading local def", def)
+      console.log('loading local def', def)
     })
 
     // submit the default definitions to make sure they have bonds on ethereum
@@ -89,7 +89,7 @@ async function squadInit () {
     for (const key in componentDefs) {
       localCatalog.push(componentDefs[key])
     }
-    console.log("local Catalog", localCatalog)
+    console.log('local Catalog', localCatalog)
     localStorage.setItem('localDefinitions', JSON.stringify(localCatalog))
 
     // for each format, see if the current user owns the format

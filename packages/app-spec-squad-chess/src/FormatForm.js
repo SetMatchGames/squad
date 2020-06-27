@@ -1,3 +1,5 @@
+/* global localStorage */
+
 import m from 'mithril'
 import squad from '@squad/sdk'
 
