@@ -56,8 +56,17 @@ async function squadInit () {
     const defaultDefs = await defs()
     console.log('default defs', defaultDefs)
 
+    // load up the local storage definitions along with the defaults (for now)
+    let storedDefs = JSON.parse(localStorage.getItem('localDefinitions'))
+    if (!storedDefs) {
+      storedDefs = []
+    }
+    console.log("Stored Defs", storedDefs)
+    const localDefs = [...defaultDefs, ...storedDefs]
+
     // submit the default definitions to make sure they have bonds on ethereum
-    defaultDefs.forEach(async (def) => {
+    localDefs.forEach(async (def) => {
+      console.log("loading local def", def)
       await squad.definition(def, [settings.gameAddress])
     })
 
@@ -68,6 +77,16 @@ async function squadInit () {
       formatDefs[key] = formatDefs[key].Format
     }
     state.squad.rawFormats = formatDefs
+
+    const localCatalog = []
+    for (const key in formatDefs) {
+      localCatalog.push(formatDefs[key])
+    }
+    for (const key in componentDefs) {
+      localCatalog.push(componentDefs[key])
+    }
+    console.log("local Catalog", localCatalog)
+    localStorage.setItem('localDefinitions', JSON.stringify(localCatalog))
 
     // for each format, see if the current user owns the format
     Object.keys(formatDefs).forEach((address) => {

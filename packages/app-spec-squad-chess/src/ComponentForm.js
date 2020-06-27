@@ -414,6 +414,10 @@ const handleSubmit = (event) => {
     }
   }
 
+  const localDefs = JSON.parse(localStorage.getItem('localDefinitions'))
+  console.log("local components", localDefs)
+  localStorage.setItem('localDefinitions', JSON.stringify([...localDefs, definition]))
+
   console.log('Submitting definition:', definition)
 
   // make sure we get the right value before submitting, if not enough time has already passed

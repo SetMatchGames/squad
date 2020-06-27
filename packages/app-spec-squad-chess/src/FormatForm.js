@@ -586,6 +586,8 @@ const handleSubmit = (event) => {
       })
     }
   }
+  const localDefs = JSON.parse(localStorage.getItem('localDefinitions'))
+  localStorage.setItem('localDefinitions', JSON.stringify([...localDefs, definition]))
   console.log('Definition being submitted', definition)
   // make sure we get the right value before submitting, if not enough time has already passed
   squad.curationMarket.getBuyPriceFromCurve(0, state.formatForm.initialBuy, state.formatForm.curveAddress).then(res => {
