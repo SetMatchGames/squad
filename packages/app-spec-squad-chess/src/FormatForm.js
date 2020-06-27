@@ -572,7 +572,6 @@ const handleSaveInitialBuy = (event) => {
 const handleSubmit = (event) => {
   event.preventDefault()
   const startingPosition = cleanStartingPosition(state.formatForm.startingPosition)
-  console.log(state.formatForm.startingPosition, startingPosition)
   const orientation = {}
   orientation.white = state.formatForm.whiteOrientation
   orientation.black = state.formatForm.blackOrientation
