@@ -91,6 +91,7 @@ async function squadInit () {
         m.redraw()
       })
     }
+
     state.squad.components = componentDefs
 
     // if a format is being loaded, get its key from the url

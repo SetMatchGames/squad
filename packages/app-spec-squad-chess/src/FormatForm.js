@@ -289,7 +289,7 @@ const SelectPiece = {
       m(PieceImage, { imgLink, contentBool }),
       m(
         'label',
-        'Select piece:',
+        'Piece:',
         m(
           'select.format-form-field',
           { oninput: handleSelectPieceFactory(vnode.attrs.square) },
@@ -307,8 +307,8 @@ const PieceImage = {
     const attrs = {
       src: vnode.attrs.imgLink,
       style: {
-        width: settings.boardConfig.squares.size + 'vw',
-        height: settings.boardConfig.squares.size + 'vw'
+        width: 10 * settings.boardConfig.squares.size + 'px',
+        height: 10 * settings.boardConfig.squares.size + 'px'
       }
     }
     return m('img#' + vnode.key, attrs)
@@ -330,7 +330,7 @@ const SelectPieceColor = {
     return [
       m(
         'label',
-        'Select piece color:',
+        'Color:',
         m(
           'select.format-form-field',
           { oninput: handlePieceColorFactory(vnode.attrs.square) },
@@ -372,7 +372,7 @@ const Promotion = {
     return [
       m(
         'label',
-        'Promotion square?',
+        'Promotion?',
         m(
           'select.format-form-field',
           { oninput: handlePiecePromotionFactory(vnode.attrs.square) },
@@ -401,7 +401,7 @@ const DeleteSquareSelect = {
     return [
       m(
         'label',
-        'Delete square?',
+        'Delete?',
         m(
           'select.format-form-field',
           { oninput: handleDeleteSquareFactory(vnode.attrs.square) },
