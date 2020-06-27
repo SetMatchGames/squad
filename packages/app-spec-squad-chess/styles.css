@@ -6,26 +6,16 @@
 }
 
 /* Board */
-<<<<<<< HEAD
-=======
-
->>>>>>> develop
 #board {
   display: flex;
   flex-direction: column;
   position: relative;
 }
-<<<<<<< HEAD
-#play-area {
-  position: relative;
-}
-=======
 
 #play-area {
   position: relative;
 }
 
->>>>>>> develop
 .square {
   position: absolute;
   display: flex;
@@ -33,35 +23,19 @@
   align-items: center;
   justify-content: center;
 }
-<<<<<<< HEAD
-=======
-
->>>>>>> develop
 /* Format Selector */
 
 #format-selector {
   display: flex;
   flex-direction: column;
 }
-<<<<<<< HEAD
-/* Format Form */
-=======
 
 /* Format Form */
 
->>>>>>> develop
 #format-form-position {
   position: relative;
   margin: 2vw;
 }
-<<<<<<< HEAD
-.format-form-field.square {
-  font-size: 12px;
-}
-.format-form-field.square select {
-  font-size: 10px;
-}
-=======
 
 .format-form-field.square {
   font-size: 12px;
@@ -70,4 +44,3 @@
 .format-form-field.square select {
   font-size: 10px;
 }
->>>>>>> develop
