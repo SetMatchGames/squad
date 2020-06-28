@@ -109,9 +109,9 @@ async function squadInit () {
       state.squad.loadedFormat = Object.assign(JSON.parse(formatToLoad.data), { pieces })
 
       // Get the X and Y ranges of the board
-      const xRange = findBoardRange(0, state.squad.loadedFormat.startingPosition)
-      const yRange = findBoardRange(1, state.squad.loadedFormat.startingPosition)
-      state.squad.loadedFormat.boardRanges = { x: xRange, y: yRange }
+      const x = findBoardRange(0, state.squad.loadedFormat.startingPosition)
+      const y = findBoardRange(1, state.squad.loadedFormat.startingPosition)
+      state.squad.loadedFormat.boardSize = { x, y }
 
       console.log('Loaded format', state.squad.loadedFormat)
 
