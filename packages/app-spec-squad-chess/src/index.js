@@ -77,10 +77,7 @@ async function squadInit () {
     // get all the game's formats and components
     const formatDefs = await metastore.getGameFormats(settings.gameAddress)
     const componentDefs = await metastore.getGameComponents(settings.gameAddress)
-    for (const key in formatDefs) {
-      formatDefs[key] = formatDefs[key].Format
-    }
-    state.squad.rawFormats = formatDefs
+
 
     const localCatalog = []
     for (const key in formatDefs) {
@@ -94,15 +91,32 @@ async function squadInit () {
 
     // for each format, see if the current user owns the format
     Object.keys(formatDefs).forEach((address) => {
+
+    for (const address in formatDefs) {
+      // take out the extra 'Format' part of the objects
+      formatDefs[address] = formatDefs[address].Format
+      // see if the current user owns the format
       curationMarket.getBalance(address).then((balance) => {
         state.owned[address] = balance.toNumber()
         m.redraw()
       })
-    })
+      // get the market cap
+      curationMarket.getMarketCap(address).then((marketCap) => {
+        state.marketCaps[address] = marketCap
+        m.redraw()
+      })
+    }
+    state.squad.rawFormats = formatDefs
 
-    // take the extra 'Component' part of the objects
-    for (const key in componentDefs) {
-      componentDefs[key] = componentDefs[key].Component
+    // for each component
+    for (const address in componentDefs) {
+      // take out the extra 'Component' part of the objects
+      componentDefs[address] = componentDefs[address].Component
+      // get the market cap
+      curationMarket.getMarketCap(address).then((marketCap) => {
+        state.marketCaps[address] = marketCap
+        m.redraw()
+      })
     }
 
     state.squad.components = componentDefs
