@@ -15,6 +15,10 @@ import { findBoardRange } from './utils.js'
 
 import defs from '../scripts/load_development_defs.js'
 
+// Overwrite any settings with query params
+const urlParams = new URLSearchParams(window.location.search)
+Object.assign(settings, Object.fromEntries(urlParams))
+
 const App = {
   oninit: () => {
     squadInit()
