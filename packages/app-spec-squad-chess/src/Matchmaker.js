@@ -3,7 +3,7 @@
 import m from 'mithril'
 import { matchmaking } from '@squad/sdk'
 import crypto from 'crypto'
-import settings from './settings.json'
+import settings from './settings.js'
 import state from './state.js'
 import { checkWinner } from './Board.js'
 

@@ -4,7 +4,7 @@ import m from 'mithril'
 import squad from '@squad/sdk'
 
 import state from './state.js'
-import settings from './settings.json'
+import settings from './settings.js'
 import { mechanics, admechanics } from './rules.js'
 import graphicsPaths from './graphics-paths.json'
 import { shortHash } from './utils.js'

@@ -4,7 +4,7 @@ import m from 'mithril'
 import squad from '@squad/sdk'
 
 import state from './state.js'
-import settings from './settings.json'
+import settings from './settings.js'
 import { stringToSquare } from './rules.js'
 import { shortHash, findBoardRange } from './utils.js'
 

@@ -1,10 +1,10 @@
-/* global URLSearchParams localStorage */
+/* global localStorage */
 
 import m from 'mithril'
 import squad, { metastore, curationMarket } from '@squad/sdk'
 
 import chess from './rules.js'
-import settings from './settings.json'
+import settings from './settings.js'
 import state from './state.js'
 import { Board } from './Board.js'
 import FormatSelector from './FormatSelector.js'
@@ -14,10 +14,6 @@ import FormatForm from './FormatForm.js'
 import { findBoardRange } from './utils.js'
 
 import defs from '../scripts/load_development_defs.js'
-
-// Overwrite any settings with query params
-const urlParams = new URLSearchParams(window.location.search)
-Object.assign(settings, Object.fromEntries(urlParams))
 
 const App = {
   oninit: () => {
@@ -58,20 +54,14 @@ async function squadInit () {
 
     // load up the default definitions (only relevant with the temporary metastore)
     const defaultDefs = await defs()
-    console.log('default defs', defaultDefs)
 
     // load up the local storage definitions along with the defaults (for now)
     let storedDefs = JSON.parse(localStorage.getItem('localDefinitions'))
     if (!storedDefs) {
       storedDefs = []
     }
-    console.log('Stored Defs', storedDefs)
-    const localDefs = [...defaultDefs, ...storedDefs]
 
-    // submit the default definitions to make sure they have bonds on ethereum
-    localDefs.forEach(async (def) => {
-      console.log('loading local def', def)
-    })
+    const localDefs = [...defaultDefs, ...storedDefs]
 
     // submit the default definitions to make sure they have bonds on ethereum
     localDefs.forEach(async (def) => {
@@ -89,7 +79,7 @@ async function squadInit () {
     for (const key in componentDefs) {
       localCatalog.push(componentDefs[key])
     }
-    console.log('local Catalog', localCatalog)
+    console.log('local Catalog size', localCatalog.length)
     localStorage.setItem('localDefinitions', JSON.stringify(localCatalog))
 
     // for each format, see if the current user owns the format
