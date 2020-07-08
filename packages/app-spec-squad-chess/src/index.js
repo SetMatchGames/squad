@@ -78,7 +78,6 @@ async function squadInit () {
     const formatDefs = await metastore.getGameFormats(settings.gameAddress)
     const componentDefs = await metastore.getGameComponents(settings.gameAddress)
 
-
     const localCatalog = []
     for (const key in formatDefs) {
       localCatalog.push(formatDefs[key])
@@ -90,8 +89,6 @@ async function squadInit () {
     localStorage.setItem('localDefinitions', JSON.stringify(localCatalog))
 
     // for each format, see if the current user owns the format
-    Object.keys(formatDefs).forEach((address) => {
-
     for (const address in formatDefs) {
       // take out the extra 'Format' part of the objects
       formatDefs[address] = formatDefs[address].Format
