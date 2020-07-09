@@ -1,10 +1,10 @@
-/* global URLSearchParams */
+/* global localStorage */
 
 import m from 'mithril'
 import squad, { metastore, curationMarket } from '@squad/sdk'
 
 import chess from './rules.js'
-import settings from './settings.json'
+import settings from './settings.js'
 import state from './state.js'
 import { Board } from './Board.js'
 import FormatSelector from './FormatSelector.js'
@@ -54,10 +54,17 @@ async function squadInit () {
 
     // load up the default definitions (only relevant with the temporary metastore)
     const defaultDefs = await defs()
-    console.log('default defs', defaultDefs)
+
+    // load up the local storage definitions along with the defaults (for now)
+    let storedDefs = JSON.parse(localStorage.getItem('localDefinitions'))
+    if (!storedDefs) {
+      storedDefs = []
+    }
+
+    const localDefs = [...defaultDefs, ...storedDefs]
 
     // submit the default definitions to make sure they have bonds on ethereum
-    defaultDefs.forEach(async (def) => {
+    localDefs.forEach(async (def) => {
       await squad.definition(def, [settings.gameAddress])
     })
 
@@ -65,6 +72,17 @@ async function squadInit () {
     const formatDefs = await metastore.getGameFormats(settings.gameAddress)
     const componentDefs = await metastore.getGameComponents(settings.gameAddress)
 
+    const localCatalog = []
+    for (const key in formatDefs) {
+      localCatalog.push(formatDefs[key])
+    }
+    for (const key in componentDefs) {
+      localCatalog.push(componentDefs[key])
+    }
+    console.log('local Catalog size', localCatalog.length)
+    localStorage.setItem('localDefinitions', JSON.stringify(localCatalog))
+
+    // for each format, see if the current user owns the format
     for (const address in formatDefs) {
       // take out the extra 'Format' part of the objects
       formatDefs[address] = formatDefs[address].Format
