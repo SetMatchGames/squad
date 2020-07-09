@@ -3,7 +3,7 @@ import chess from './rules.js'
 
 import { sendMessage } from './Matchmaker.js'
 import state from './state.js'
-import settings from './settings.json'
+import settings from './settings.js'
 
 const BOARD_CONFIG = settings.boardConfig
 const squareSize = BOARD_CONFIG.squares.size

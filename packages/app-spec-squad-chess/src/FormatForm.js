@@ -1,8 +1,10 @@
+/* global localStorage */
+
 import m from 'mithril'
 import squad from '@squad/sdk'
 
 import state from './state.js'
-import settings from './settings.json'
+import settings from './settings.js'
 import { stringToSquare } from './rules.js'
 import { shortHash, findBoardRange } from './utils.js'
 
@@ -592,6 +594,8 @@ const handleSubmit = (event) => {
       })
     }
   }
+  const localDefs = JSON.parse(localStorage.getItem('localDefinitions'))
+  localStorage.setItem('localDefinitions', JSON.stringify([...localDefs, definition]))
   console.log('Definition being submitted', definition)
   // make sure we get the right value before submitting, if not enough time has already passed
   squad.curationMarket.getBuyPriceFromCurve(0, state.formatForm.initialBuy, state.formatForm.curveAddress).then(res => {

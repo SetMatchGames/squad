@@ -1,8 +1,10 @@
+/* global localStorage */
+
 import m from 'mithril'
 import squad from '@squad/sdk'
 
 import state from './state.js'
-import settings from './settings.json'
+import settings from './settings.js'
 import { mechanics, admechanics } from './rules.js'
 import graphicsPaths from './graphics-paths.json'
 import { shortHash } from './utils.js'
@@ -413,6 +415,10 @@ const handleSubmit = (event) => {
       })
     }
   }
+
+  const localDefs = JSON.parse(localStorage.getItem('localDefinitions'))
+  console.log('local components', localDefs)
+  localStorage.setItem('localDefinitions', JSON.stringify([...localDefs, definition]))
 
   console.log('Submitting definition:', definition)
 
