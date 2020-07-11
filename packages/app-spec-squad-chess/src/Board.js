@@ -3,26 +3,10 @@ import chess from './rules.js'
 
 import { sendMessage } from './Matchmaker.js'
 import state from './state.js'
+import settings from './settings.js'
 
-const BOARD_CONFIG = {
-  squares: {
-    size: 5,
-    lightColor: '#e5b578',
-    darkColor: '#b67028'
-  }
-}
-
+const BOARD_CONFIG = settings.boardConfig
 const squareSize = BOARD_CONFIG.squares.size
-
-/*
- *    Display a message when a match is found X
- *    don't allow moves before a match is found X
- *    give each player in the match a color X
- *    don't allow them to make moves not of their color X
- *    when they make a move, send the new board state to the other player X
- *    when you receive a board state, update your board state X
- * when the game ends, display a message for both players
- */
 
 /* I don't totally understand what this general dragover listener is doing:
  * When I add similar 'ondragover' listeners on each component,
@@ -105,10 +89,14 @@ const BoardPiece = {
   }
 }
 
-function squareStyle (coordinates, squareColor, highlighted) {
+function squareStyle (coordinates, highlighted) {
+  // create the checkerboard color pattern
+  let squareColor = BOARD_CONFIG.squares.lightColor
+  if ((coordinates[0] + coordinates[1]) % 2 === 1) { squareColor = BOARD_CONFIG.squares.darkColor }
+
   const result = {
-    right: (20 + squareSize * coordinates[0]) + 'vw',
-    top: (10 + squareSize * coordinates[1]) + 'vw',
+    right: (squareSize * coordinates[0]) + 'vw',
+    top: (squareSize * coordinates[1]) + 'vw',
     width: squareSize + 'vw',
     height: squareSize + 'vw',
     background: squareColor
@@ -160,9 +148,6 @@ const BoardSquare = {
   view: (vnode) => {
     // convert the string coordinates back to an array
     const coordinates = chess.stringToSquare(vnode.key)
-    // create the checkerboard color pattern
-    let squareColor = BOARD_CONFIG.squares.lightColor
-    if ((coordinates[0] + coordinates[1]) % 2 === 1) { squareColor = BOARD_CONFIG.squares.darkColor }
     // highlight square
     const highlighted = squareInArray(coordinates, state.board.highlightedSquares)
     let squareContent
@@ -186,7 +171,7 @@ const BoardSquare = {
     return m(
       `.square#${vnode.key}`,
       {
-        style: squareStyle(coordinates, squareColor, highlighted),
+        style: squareStyle(coordinates, highlighted),
         ondrop: handleTurn(),
         onclick
       },
@@ -208,8 +193,15 @@ export const Board = {
     if (!state.game.position) {
       return m('#board', 'Load a format!')
     } else {
-      return m(
-        '#board',
+      const playarea = m(
+        '#play-area',
+        // add style here {}, using the board ranges to size and space the board well
+        {
+          style: {
+            width: (state.squad.loadedFormat.boardRanges.x + 1) * squareSize + 'vw',
+            height: (state.squad.loadedFormat.boardRanges.y + 1) * squareSize + 'vw'
+          }
+        },
         // For each square in the position
         Object.keys(state.game.position).map(squareId => {
           // grab what's in the square
@@ -224,8 +216,12 @@ export const Board = {
             BoardSquare,
             { key: squareId, content, graphics }
           )
-        }),
-        m('#match-status', `${state.board.matchStatus} ${state.board.winner}`)
+        })
+      )
+      return m(
+        '#board',
+        m('#match-status', `${state.board.matchStatus} ${state.board.winner}`),
+        playarea
       )
     }
   }

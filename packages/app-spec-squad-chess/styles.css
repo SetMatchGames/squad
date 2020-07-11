@@ -1,9 +1,21 @@
 /* App */
+
 #app {
   display: flex;
   flex-direction: column;
 }
+
 /* Board */
+#board {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+#play-area {
+  position: relative;
+}
+
 .square {
   position: absolute;
   display: flex;
@@ -11,13 +23,24 @@
   align-items: center;
   justify-content: center;
 }
-#match-status {
-  position: absolute;
-  right: 30vw;
-  top: 5vw;
-}
 /* Format Selector */
+
 #format-selector {
   display: flex;
   flex-direction: column;
+}
+
+/* Format Form */
+
+#format-form-position {
+  position: relative;
+  margin: 2vw;
+}
+
+.format-form-field.square {
+  font-size: 12px;
+}
+
+.format-form-field.square select {
+  font-size: 10px;
 }

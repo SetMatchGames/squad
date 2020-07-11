@@ -1,7 +1,9 @@
+/* global clearInterval setInterval setTimeout */
+
 import m from 'mithril'
 import { matchmaking } from '@squad/sdk'
 import crypto from 'crypto'
-import settings from './settings.json'
+import settings from './settings.js'
 import state from './state.js'
 import { checkWinner } from './Board.js'
 
@@ -196,11 +198,6 @@ const Messages = {
   }
 }
 
-export const sendMessage = (message) => {
-  console.log('Sending message:', message)
-  matchmaking.sendMessage(message)
-}
-
 // handlers
 const handleSaveRoom = (event) => {
   event.preventDefault()
@@ -265,9 +262,33 @@ const handleSendAnswer = (event) => {
   m.redraw()
 }
 
+export const sendMessage = (message) => {
+  if (!state.matchmaking.messageNumber) {
+    state.matchmaking.messageNumber = 0
+  }
+  if (!message.number) {
+    state.matchmaking.messageNumber += 1
+    message.number = state.matchmaking.messageNumber
+  }
+  if (message.number < state.matchmaking.messageNumber) {
+    return
+  }
+  console.log('Sending message:', message)
+  matchmaking.sendMessage(message)
+  setTimeout(() => {
+    console.log('resending message number', message.number)
+    sendMessage(message)
+  }, 3000)
+}
+
 const handleReceiveMessage = (event) => {
   if (event.from !== state.matchmaking.id) {
+    if (event.data.number <= state.matchmaking.messageNumber) {
+      console.log('revieved old message number', event.data.number)
+      return
+    }
     console.log('Received message:', event)
+    state.matchmaking.messageNumber = event.data.number
     if (event.data === 'match started') {
       state.matchmaking.connection = event.data
     } else {

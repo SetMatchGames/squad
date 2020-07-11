@@ -1,4 +1,4 @@
-# Squad
+# Squad (README OUT OF DATE!!!)
 
 Squad is an open source project consisting of
 1. a video game store for community-designed games and

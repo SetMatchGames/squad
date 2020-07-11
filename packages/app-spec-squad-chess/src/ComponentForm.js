@@ -1,10 +1,13 @@
+/* global localStorage */
+
 import m from 'mithril'
 import squad from '@squad/sdk'
 
 import state from './state.js'
-import settings from './settings.json'
+import settings from './settings.js'
 import { mechanics, admechanics } from './rules.js'
 import graphicsPaths from './graphics-paths.json'
+import { shortHash } from './utils.js'
 
 const ComponentForm = {
   oninit: () => {
@@ -37,7 +40,10 @@ const ComponentPreloader = {
       '.component-form-field',
       m('label', 'Preload a component:'),
       Object.keys(state.squad.components).map(key => {
-        return m(ComponentButton, { key, name: state.squad.components[key].name })
+        return m(ComponentButton, {
+          key,
+          name: `${state.squad.components[key].name} (${shortHash(key)})`
+        })
       }),
       m(
         'button',
@@ -409,6 +415,10 @@ const handleSubmit = (event) => {
       })
     }
   }
+
+  const localDefs = JSON.parse(localStorage.getItem('localDefinitions'))
+  console.log('local components', localDefs)
+  localStorage.setItem('localDefinitions', JSON.stringify([...localDefs, definition]))
 
   console.log('Submitting definition:', definition)
 
