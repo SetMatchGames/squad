@@ -1,17 +1,25 @@
 # Squad Protocol
 
+## Definitions
+
+The squad protocol defines a structure for metadata-driven games that allows them and the metadata driving them to be 
+
+```
+Game <- Format -> Component
+```
+
 ```
 Player -> Game -> Definition <- Contributor
-  \        ^          ^      ____/
+  \        |          |      ____/
    \       |          |     /
-    ___ Proof   -> AutoBond <- Curator
-        of            |
+    --- Proof of -- AutoBond ---- Curator
         purchase      |
-                   Curve
+                      |
+                    Curve
 ```
 
 * Players play games, buy proof of purchase
-* Games check proof of purchase and follow deffinition licence rules as implimented
+* Games check proof of purchase and follow definition licence rules as implimented
 * Contributors create definitions (Games, Formats, Components)
   * Optionally buy first block of bond tokens
 * Curators buy bond tokens
