@@ -6,11 +6,14 @@ export const shortHash = (str) => {
 
 export const findBoardRange = (variableIndex, startingPosition) => {
   let max = 0
-  let min = 0
+  let min = stringToSquare(Object.keys(startingPosition)[0])[variableIndex]
   Object.keys(startingPosition).forEach(str => {
     const variable = stringToSquare(str)[variableIndex]
     if (variable > max) { max = variable }
     if (variable < min) { min = variable }
   })
-  return max - min
+  return {
+    range: max - min,
+    min
+  }
 }

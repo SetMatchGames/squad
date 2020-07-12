@@ -90,6 +90,12 @@ const BoardPiece = {
 }
 
 function squareStyle (coordinates, highlighted) {
+  // get rid of extra space
+  coordinates = [
+    coordinates[0] - state.squad.loadedFormat.boardSize.x.min,
+    coordinates[1] - state.squad.loadedFormat.boardSize.y.min
+  ]
+
   // create the checkerboard color pattern
   let squareColor = BOARD_CONFIG.squares.lightColor
   if ((coordinates[0] + coordinates[1]) % 2 === 1) { squareColor = BOARD_CONFIG.squares.darkColor }
@@ -195,11 +201,10 @@ export const Board = {
     } else {
       const playarea = m(
         '#play-area',
-        // add style here {}, using the board ranges to size and space the board well
         {
           style: {
-            width: (state.squad.loadedFormat.boardRanges.x + 1) * squareSize + 'vw',
-            height: (state.squad.loadedFormat.boardRanges.y + 1) * squareSize + 'vw'
+            width: (state.squad.loadedFormat.boardSize.x.range + 1) * squareSize + 'vw',
+            height: (state.squad.loadedFormat.boardSize.y.range + 1) * squareSize + 'vw'
           }
         },
         // For each square in the position
