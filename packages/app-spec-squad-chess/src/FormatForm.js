@@ -195,15 +195,15 @@ const StartingPositionSquares = {
     if (squares.length === 0) { return }
 
     // Get the right sizing
-    const xRange = findBoardRange(0, state.formatForm.startingPosition)
-    const yRange = findBoardRange(1, state.formatForm.startingPosition)
+    state.formatForm.boardSize.x = findBoardRange(0, state.formatForm.startingPosition)
+    state.formatForm.boardSize.y = findBoardRange(1, state.formatForm.startingPosition)
 
     return m(
       '#format-form-position',
       {
         style: {
-          width: (xRange + 1) * squareSize + 'px',
-          height: (yRange + 1) * squareSize + 'px'
+          width: (state.formatForm.boardSize.x.range + 1) * squareSize + 'px',
+          height: (state.formatForm.boardSize.y.range + 1) * squareSize + 'px'
         }
       },
       squares.map(square => {
@@ -216,6 +216,12 @@ const StartingPositionSquares = {
 const squareSize = 150
 
 function squareStyle (coordinates, deleted) {
+  // get rid of extra space
+  coordinates = [
+    coordinates[0] - state.formatForm.boardSize.x.min,
+    coordinates[1] - state.formatForm.boardSize.y.min
+  ]
+
   let squareColor = settings.boardConfig.squares.lightColor
   if ((coordinates[0] + coordinates[1]) % 2 === 1) { squareColor = settings.boardConfig.squares.darkColor }
   if (deleted) { squareColor = 'white' }
@@ -499,7 +505,8 @@ function clearForm () {
       whiteOrientation: 2,
       blackOrientation: 0,
       initialBuy: 0,
-      value: 0
+      value: 0,
+      boardSize: {}
     }
   )
 }
