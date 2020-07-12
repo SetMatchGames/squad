@@ -44,10 +44,10 @@ not causing harm.
 
 ## The Development and Governance Process
 
-* General communication and coordination happens in the discord
-  channel <link>
+* General communication and coordination happens in the [discord
+  channel](https://discord.gg/BuCMZ59)
 
-* When needed a planning session is organized in the discord and a
+* We organize planning sessions in the discord to update a
   backlog document specifying work the form of tasks, user stories,
   and so on is assembled into a PR and proposed in a batch. Day to day
   tracking of backlog items are done in GitHub projects but the
