@@ -27,7 +27,7 @@ const ComponentForm = {
       )
     )
     return m(
-      'p#component-form-section',
+      '#component-form.section',
       m('h3', 'New Component'),
       form
     )

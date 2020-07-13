@@ -1,8 +1,29 @@
-/* App */
+/* Global */
+body {
+  background: #EFEEEE;
+}
 
 #app {
   display: flex;
   flex-direction: column;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, "Helvetica Neue", sans-serif;
+  color: #3A3A3A;
+}
+
+a {
+  color: #125E8A;
+  text-decoration: none;
+}
+
+/* Sections */
+.section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 2vw 10vw 2vw 10vw;
+  padding: 2vw;
+  box-shadow: 6px 6px 16px #D1CDC7, -6px -6px 16px #FFFFFF;
+  border-radius: 12px;
 }
 
 /* Board */
@@ -23,15 +44,14 @@
   align-items: center;
   justify-content: center;
 }
-/* Format Selector */
 
+/* Format Selector */
 #format-selector {
   display: flex;
   flex-direction: column;
 }
 
 /* Format Form */
-
 #format-form-position {
   position: relative;
   margin: 2vw;

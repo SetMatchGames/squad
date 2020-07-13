@@ -26,7 +26,7 @@ const FormatForm = {
       )
     )
     return m(
-      'p#format-form-section',
+      '#format-form.section',
       m('h3', 'New Format'),
       form
     )

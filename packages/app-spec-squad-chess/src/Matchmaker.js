@@ -20,7 +20,7 @@ export const Matchmaker = {
   },
   view: () => {
     return m(
-      '#matchmaker',
+      '#matchmaker.section',
       m('h3', 'Matchmaking'),
       m(FindMatchForm),
       m(PeerList),

@@ -197,7 +197,7 @@ export const Board = {
         state.board.matchStatus = 'Match not started.'
     }
     if (!state.game.position) {
-      return m('#board', 'Load a format!')
+      return m('#board.section', 'Load a format!')
     } else {
       const playarea = m(
         '#play-area',
@@ -224,7 +224,7 @@ export const Board = {
         })
       )
       return m(
-        '#board',
+        '#board.section',
         m('#match-status', `${state.board.matchStatus} ${state.board.winner}`),
         playarea
       )

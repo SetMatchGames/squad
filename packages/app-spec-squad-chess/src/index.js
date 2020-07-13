@@ -23,19 +23,41 @@ const App = {
     if (!state.squad.connection) {
       return m(
         '#app',
-        'Connecting to Squad...'
+        m(HeaderFooter, { content: 'Connecting to Squad...', id: 'header' })
       )
     }
     return m(
       '#app',
+      m(HeaderFooter, { content: Title, id: 'header' }),
       m(Board),
       m(FormatSelector),
       m(Matchmaker),
       m(ComponentForm),
-      m(FormatForm)
+      m(FormatForm),
+      m(HeaderFooter, { content: Citation, id: 'footer' })
     )
   }
 }
+
+const HeaderFooter = {
+  view: (vnode) => {
+    return m(
+      `#${vnode.attrs.id}.section`,
+      vnode.attrs.content
+    )
+  }
+}
+
+const Title = m('h1', 'Squad Chess')
+
+const Citation = m(
+  '.citation',
+  'Non-standard chess icons made by ',
+  m('a', { href: 'https://www.flaticon.com/authors/freepik' }, 'Freepik'),
+  ' from ',
+  m('a', { href:  'https://www.flaticon.com/' }, 'www.flaticon.com'),
+  '.'
+)
 
 async function squadInit () {
   console.log('Initializing squad chess with settings:', settings)
