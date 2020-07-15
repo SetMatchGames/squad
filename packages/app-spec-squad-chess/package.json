@@ -15,6 +15,7 @@
   "dependencies": {
     "@squad/sdk": "^1.0.0",
     "mithril": "^2.0.4",
+    "normalize.css": "^8.0.1",
     "peerjs": "^1.2.0"
   },
   "devDependencies": {

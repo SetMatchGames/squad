@@ -225,7 +225,7 @@ export const Board = {
       )
       return m(
         '#board',
-        m('#match-status', `${state.board.matchStatus} ${state.board.winner}`),
+        m('p#match-status', `${state.board.matchStatus} ${state.board.winner}`),
         playarea
       )
     }

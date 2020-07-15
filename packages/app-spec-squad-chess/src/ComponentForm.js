@@ -27,7 +27,7 @@ const ComponentForm = {
       )
     )
     return m(
-      'p#component-form-section',
+      '#component-form',
       m('h3', 'New Component'),
       form
     )
@@ -37,8 +37,7 @@ const ComponentForm = {
 const ComponentPreloader = {
   view: () => {
     return m(
-      '.component-form-field',
-      m('label', 'Preload a component:'),
+      '.component.form-field',
       Object.keys(state.squad.components).map(key => {
         return m(ComponentButton, {
           key,
@@ -67,7 +66,7 @@ const ComponentButton = {
 const DefinitionFields = {
   view: () => {
     return m(
-      '.component-form-field',
+      '.component.definition',
       m(ComponentNameField),
       m(ComponentMechanics),
       m(ComponentKing),
@@ -79,8 +78,8 @@ const DefinitionFields = {
 const ComponentNameField = {
   view: () => {
     return m(
-      '.component-form-field',
-      m('label', 'Enter component name:'),
+      '.component.form-field',
+      'Component name: ',
       m(
         'input[type=text]',
         { value: state.componentForm.name, oninput: handleSaveFactory('name') }
@@ -92,8 +91,8 @@ const ComponentNameField = {
 const ComponentMechanics = {
   view: () => {
     return m(
-      '#component-mechanics',
-      m('label', 'Choose mechanics:'),
+      '.component.form-field',
+      m('p', 'Mechanics: '),
       Object.keys(mechanics).map(mechanic => {
         return m(
           ComponentMechanic,
@@ -115,16 +114,15 @@ const ComponentMechanic = {
     const instances = []
     if (state.componentForm.mechanics[vnode.key]) {
       Object.keys(state.componentForm.mechanics[vnode.key]).forEach(key => {
-        instances.push(m(
-          '.component-form-field',
+        instances.push(
           m(MechanicOffset, { mechanic: vnode.key, key })
-        ))
+        )
       })
     }
     return m(
-      '.component-form-field',
-      m('div', vnode.key),
-      vnode.attrs.description,
+      '.component.mechanic',
+      `"${vnode.key}" – `,
+      m('span.italics', vnode.attrs.description),
       m(
         'button',
         { onclick: handleAddMechanicInstanceFactory(vnode.key) },
@@ -139,19 +137,18 @@ const MechanicOffset = {
   view: (vnode) => {
     const instance = state.componentForm.mechanics[vnode.attrs.mechanic][vnode.key]
     return m(
-      '.mechanic-offset',
-      m('div', 'Enter offset:'),
-      m('label', 'X'),
+      '.component.mechanic-params.indented',
+      m('label', 'X: '),
       m(
         `input[type=number][value=${instance.offset[0]}].offset-input`,
         { oninput: handleMechanicOffsetFactory(vnode.attrs.mechanic, vnode.key, 0) }
       ),
-      m('label', 'Y'),
+      m('label', 'Y: '),
       m(
         `input[type=number][value=${instance.offset[1]}].offset-input`,
         { oninput: handleMechanicOffsetFactory(vnode.attrs.mechanic, vnode.key, 1) }
       ),
-      m('label', 'Number of steps:'),
+      m('label', 'Steps: '),
       m(
         `input[type=number][value=${instance.steps}].steps-input`,
         { oninput: handleMechanicStepsFactory(vnode.attrs.mechanic, vnode.key) }
@@ -170,7 +167,7 @@ const ComponentAdmechanic = {
     let form
     if (state.componentForm.admechanics[vnode.key] !== undefined) {
       form = m(
-        '.component-form-field',
+        '.component.admechanic-params.indented',
         m('label', "Enter params (any of ['default', 'self', 'king']):"),
         m(
           `input[type=text][value="${state.componentForm.admechanics[vnode.key]}"]`,
@@ -179,9 +176,9 @@ const ComponentAdmechanic = {
       )
     }
     return m(
-      '.component-form-field',
-      m('div', vnode.key),
-      vnode.attrs.description,
+      '.component.admechanic',
+      `"${vnode.key}" – `,
+      m('span.italics', vnode.attrs.description),
       m(
         'input[type=checkbox]',
         {
@@ -197,8 +194,8 @@ const ComponentAdmechanic = {
 const ComponentKing = {
   view: () => {
     return m(
-      '.component-form-field',
-      m('label', 'King?'),
+      '.component.form-field',
+      'King: ',
       m(
         'input[type=checkbox]',
         {
@@ -213,8 +210,8 @@ const ComponentKing = {
 const ComponentGraphics = {
   view: () => {
     return m(
-      '.component-form-field',
-      m('label', 'Select graphics:'),
+      '.component.form-field',
+      m('p', 'Graphics: '),
       m(
         '.radio',
         m(GraphicsButtons)
@@ -229,15 +226,15 @@ const GraphicsButtons = {
     for (const piece in graphicsPaths) {
       buttons.push(
         m(
-          'input[type="radio"]',
-          {
-            value: piece,
-            onclick: handleSaveFactory('graphics'),
-            checked: state.componentForm.graphics === piece
-          }
-        ),
-        m(
           'label',
+          m(
+            'input[type="radio"]',
+            {
+              value: piece,
+              onclick: handleSaveFactory('graphics'),
+              checked: state.componentForm.graphics === piece
+            }
+          ),
           m('img', {
             src: graphicsPaths[piece].white,
             height: '25vw',
@@ -258,13 +255,13 @@ const GraphicsButtons = {
 const InitialBuyField = {
   view: () => {
     return m(
-      '.component-form-field',
-      m('label', 'Enter number of tokens to buy:'),
+      '.component.form-field',
+      'Tokens to buy: ',
       m(
         'input[type=number][placeholder=0]',
         { oninput: handleSaveInitialBuy }
       ),
-      m('#value', `Cost: ${state.componentForm.value}`)
+      `(${state.componentForm.value} Wei)`
     )
   }
 }
@@ -272,8 +269,8 @@ const InitialBuyField = {
 const CurveAddressField = {
   view: () => {
     return m(
-      '.component-form-field',
-      m('label', 'Enter curve address:'),
+      '.component.form-field',
+      'Curve address: ',
       m(
         'input[type=number][placeholder=Leave blank!]',
         { oninput: handleSaveFactory('curveAddress') }

@@ -26,7 +26,7 @@ const FormatForm = {
       )
     )
     return m(
-      'p#format-form-section',
+      '#format-form',
       m('h3', 'New Format'),
       form
     )
@@ -36,8 +36,7 @@ const FormatForm = {
 const FormatPreloader = {
   view: () => {
     return m(
-      '.format-form-field',
-      m('label', 'Preload a format:'),
+      '.format.form-field',
       Object.keys(state.squad.rawFormats).map(key => {
         return m(FormatButton, {
           key,
@@ -66,7 +65,7 @@ const FormatButton = {
 const DefinitionFields = {
   view: () => {
     return m(
-      '#format-defition-fields',
+      '.format.defition',
       m(FormatNameField),
       m(FormatComponentsList),
       m(FormatDataFields)
@@ -77,8 +76,8 @@ const DefinitionFields = {
 const FormatNameField = {
   view: () => {
     return m(
-      '.format-form-field',
-      m('label', 'Enter format name:'),
+      '.format.form-field',
+      'Format name: ',
       m(
         'input[type=text]',
         { value: state.formatForm.name, oninput: handleSaveFactory('name') }
@@ -96,19 +95,19 @@ const FormatComponentsList = {
       if (state.formatForm.components.includes(address)) { checked = true }
       componentBoxes = componentBoxes.concat([
         m(
-          `input.format-form-checkbox[type=checkbox][name=${name}][value=${address}]`,
-          { oninput: handleAddOrRemoveComponent, checked }
-        ),
-        m(
           `label[for=${name}]`,
+          m(
+            `input[type=checkbox][name=${name}][value=${address}]`,
+            { oninput: handleAddOrRemoveComponent, checked }
+          ),
           name
         )
       ])
     }
     return m(
-      '.format-form-field',
-      m('label', 'Select components to include:'),
-      componentBoxes
+      '.format.form-field',
+      m('label', 'Components:'),
+      m('.format.components', componentBoxes)
     )
   }
 }
@@ -116,7 +115,7 @@ const FormatComponentsList = {
 const FormatDataFields = {
   view: () => {
     return m(
-      '#format-data-fields',
+      '.format.data',
       m(FormatStartingPosition),
       m(FormatOrientation)
     )
@@ -135,16 +134,22 @@ const FormatStartingPosition = {
 const StartingPositionDimensions = {
   view: () => {
     return m(
-      '.format-form-field',
-      m('label', 'Choose starting position width:'),
+      '.format.form-field',
       m(
-        'input[type=number]',
-        { oninput: handleSaveFactory('startingPositionWidth') }
+        'p',
+        'Starting position width: ',
+        m(
+          'input[type=number]',
+          { oninput: handleSaveFactory('startingPositionWidth') }
+        )
       ),
-      m('label', 'Choose starting position height'),
       m(
-        'input[type=number]',
-        { oninput: handleSaveFactory('startingPositionHeight') }
+        'p',
+        'Starting position height: ',
+        m(
+          'input[type=number]',
+          { oninput: handleSaveFactory('startingPositionHeight') }
+        )
       )
     )
   }
@@ -199,7 +204,7 @@ const StartingPositionSquares = {
     state.formatForm.boardSize.y = findBoardRange(1, state.formatForm.startingPosition)
 
     return m(
-      '#format-form-position',
+      '.format.position',
       {
         style: {
           width: (state.formatForm.boardSize.x.range + 1) * squareSize + 'px',
@@ -238,7 +243,7 @@ function squareStyle (coordinates, deleted) {
 const StartingPositionSquare = {
   view: (vnode) => {
     return m(
-      '.format-form-field.square',
+      '.format.square',
       {
         key: vnode.key,
         style: squareStyle(stringToSquare(vnode.key), state.formatForm.startingPosition[vnode.key].deleted)
@@ -272,12 +277,12 @@ const SelectPiece = {
         selected = ''
       }
       return m(
-        `option.format-form-field[value=${address}][${selected}]`,
+        `option[value=${address}][${selected}]`,
         state.squad.components[address].name
       )
     })
     options.unshift(m(
-      'option.format-form-field[value=null]',
+      'option[value=null]',
       'None'
     ))
     const contentBool = !!state.formatForm.startingPosition[vnode.attrs.square].content
@@ -299,7 +304,7 @@ const SelectPiece = {
         'label',
         'Piece:',
         m(
-          'select.format-form-field',
+          'select',
           { oninput: handleSelectPieceFactory(vnode.attrs.square) },
           options
         )
@@ -340,15 +345,15 @@ const SelectPieceColor = {
         'label',
         'Color:',
         m(
-          'select.format-form-field',
+          'select',
           { oninput: handlePieceColorFactory(vnode.attrs.square) },
           [
             m(
-              `option.format-form-field[value=White][${whiteSelected}]`,
+              `option[value=White][${whiteSelected}]`,
               'White'
             ),
             m(
-              `option.format-form-field[value=Black][${blackSelected}]`,
+              `option[value=Black][${blackSelected}]`,
               'Black'
             )
           ]
@@ -382,19 +387,19 @@ const Promotion = {
         'label',
         'Promotion?',
         m(
-          'select.format-form-field',
+          'select',
           { oninput: handlePiecePromotionFactory(vnode.attrs.square) },
           [
             m(
-              `option.format-form-field[value=None][${noneSelected}]`,
+              `option[value=None][${noneSelected}]`,
               'None'
             ),
             m(
-              `option.format-form-field[value=White][${whiteSelected}]`,
+              `option[value=White][${whiteSelected}]`,
               'White'
             ),
             m(
-              `option.format-form-field[value=Black][${blackSelected}]`,
+              `option[value=Black][${blackSelected}]`,
               'Black'
             )
           ]
@@ -411,15 +416,15 @@ const DeleteSquareSelect = {
         'label',
         'Delete?',
         m(
-          'select.format-form-field',
+          'select',
           { oninput: handleDeleteSquareFactory(vnode.attrs.square) },
           [
             m(
-              'option.format-form-field[value=false]',
+              'option[value=false]',
               'No'
             ),
             m(
-              'option.format-form-field[value=true]',
+              'option[value=true]',
               'Yes'
             )
           ]
@@ -432,16 +437,22 @@ const DeleteSquareSelect = {
 const FormatOrientation = {
   view: () => {
     return m(
-      '.format-form-field',
-      m('label', 'Choose orientation for white (0-3):'),
+      '.format.form-field',
       m(
-        'input[type=number][placeholder=2]',
-        { value: state.formatForm.whiteOrientation, oninput: handleSaveFactory('whiteOrientation') }
+        'p',
+        'Orientation for white (0-3): ',
+        m(
+          'input[type=number][placeholder=2]',
+          { value: state.formatForm.whiteOrientation, oninput: handleSaveFactory('whiteOrientation') }
+        )
       ),
-      m('label', 'Choose orientation for black (0-3):'),
       m(
-        'input[type=number][placeholder=0]',
-        { value: state.formatForm.blackOrientation, oninput: handleSaveFactory('blackOrientation') }
+        'p',
+        'Orientation for black (0-3): ',
+        m(
+          'input[type=number][placeholder=0]',
+          { value: state.formatForm.blackOrientation, oninput: handleSaveFactory('blackOrientation') }
+        )
       )
     )
   }
@@ -450,13 +461,13 @@ const FormatOrientation = {
 const InitialBuyField = {
   view: () => {
     return m(
-      '.format-form-field',
-      m('label', 'Enter number of tokens to buy:'),
+      '.format.form-field',
+      'Tokens to buy: ',
       m(
         'input[type=number][placeholder=0]',
         { oninput: handleSaveInitialBuy }
       ),
-      m('#value', `Cost: ${state.formatForm.value}`)
+      `(${state.formatForm.value} Wei)`
     )
   }
 }
@@ -464,8 +475,8 @@ const InitialBuyField = {
 const CurveAddressField = {
   view: () => {
     return m(
-      '.format-form-field',
-      m('label', 'Enter curve address:'),
+      '.format.form-field',
+      'Curve address: ',
       m(
         'input[type=number][placeholder=Leave blank!]',
         { oninput: handleSaveFactory('curveAddress') }
