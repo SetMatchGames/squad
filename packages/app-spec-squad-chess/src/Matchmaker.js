@@ -20,12 +20,11 @@ export const Matchmaker = {
   },
   view: () => {
     return m(
-      '#matchmaker.section',
+      '#matchmaker',
       m('h3', 'Matchmaking'),
       m(FindMatchForm),
       m(PeerList),
-      m(OfferList),
-      m(Messages)
+      m(OfferList)
     )
   }
 }
@@ -61,10 +60,13 @@ const RoomField = {
       default:
         return m(
           '.room',
-          m('h4', 'Enter room name:'),
           m(
-            'input#room-field[type=text][placeholder=Room name]',
-            { oninput: handleSaveRoom }
+            'p',
+            'Enter room name: ',
+            m(
+              'input#room-field[type=text][placeholder=Room name]',
+              { oninput: handleSaveRoom }
+            )
           )
         )
     }
@@ -150,7 +152,7 @@ const OfferList = {
       }
       case 'offer sent': {
         return m(
-          '#peers',
+          '#offers',
           m('h4', 'Peer List'),
           'Not accepting offers while your offer is pending'
         )
@@ -185,15 +187,6 @@ const Offer = {
           onclick: handleSendAnswer,
           id: vnode.key
         }, 'Accept offer')
-    )
-  }
-}
-
-const Messages = {
-  view: () => {
-    return m(
-      '#messages',
-      m('#messagesReceived', state.matchmaking.messagesReceived)
     )
   }
 }

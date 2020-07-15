@@ -29,11 +29,11 @@ const App = {
     return m(
       '#app',
       m(HeaderFooter, { content: Title, id: 'header' }),
-      m(Board),
-      m(FormatSelector),
-      m(Matchmaker),
-      m(ComponentForm),
-      m(FormatForm),
+      m('.platform', m(Board)),
+      m('.platform', m(FormatSelector)),
+      m('.platform', m(Matchmaker)),
+      m('.platform', m(ComponentForm)),
+      m('.platform', m(FormatForm)),
       m(HeaderFooter, { content: Citation, id: 'footer' })
     )
   }
@@ -42,7 +42,7 @@ const App = {
 const HeaderFooter = {
   view: (vnode) => {
     return m(
-      `#${vnode.attrs.id}.section`,
+      `#${vnode.attrs.id}.platform`,
       vnode.attrs.content
     )
   }
@@ -55,7 +55,7 @@ const Citation = m(
   'Non-standard chess icons made by ',
   m('a', { href: 'https://www.flaticon.com/authors/freepik' }, 'Freepik'),
   ' from ',
-  m('a', { href:  'https://www.flaticon.com/' }, 'www.flaticon.com'),
+  m('a', { href: 'https://www.flaticon.com/' }, 'www.flaticon.com'),
   '.'
 )
 

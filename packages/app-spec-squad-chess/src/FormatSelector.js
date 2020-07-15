@@ -11,7 +11,7 @@ const FormatSelector = {
       return state.marketCaps[b] - state.marketCaps[a]
     })
     return m(
-      '#format-selector.section',
+      '#format-selector',
       m('h3', 'Available Formats'),
       orderedFormats.map(address => {
         const name = `${state.squad.rawFormats[address].name} (${shortHash(address)})`
