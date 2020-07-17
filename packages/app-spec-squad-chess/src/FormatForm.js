@@ -525,7 +525,6 @@ function clearForm () {
 const handleSaveFactory = (dataType) => {
   return (event) => {
     state.formatForm[dataType] = event.target.value
-    console.log(state.formatForm, state.squad.rawFormats)
   }
 }
 

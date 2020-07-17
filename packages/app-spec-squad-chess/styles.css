@@ -55,6 +55,10 @@ button:focus {
   box-shadow: inset 4px 4px 10px #D1CDC7, inset -4px -4px 10px #FFFFFF;
 }
 
+button:disabled {
+  color: rgb(116, 116, 116);
+}
+
 input[type=checkbox] {
   margin: 8px;
   height: 16px;
@@ -73,6 +77,10 @@ input[type=number], input[type=text] {
 input.focus-visible {
   outline: none;
   box-shadow: 5px 5px 12px #D1CDC7, -5px -5px 12px #FFFFFF;
+}
+
+.buy-definition > input, .sell-definition > input {
+  width: 80px;
 }
 
 .italics {

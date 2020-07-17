@@ -1,7 +1,7 @@
 import { stringToSquare } from './rules.js'
 
 export const shortHash = (str) => {
-  return `${str.slice(0, 4)}...${str.slice(-4)}`
+  return `${str.slice(0, 3)}...${str.slice(-3)}`
 }
 
 export const findBoardRange = (variableIndex, startingPosition) => {

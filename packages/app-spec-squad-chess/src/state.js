@@ -8,5 +8,6 @@ export default state = {
   board: {},
   squad: {},
   owned: {},
-  marketCaps: {}
+  marketCaps: {},
+  buyingAndSelling: {}
 }
