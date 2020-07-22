@@ -1,0 +1,8 @@
+baseURL = "http://example.org/"
+languageCode = "en-us"
+title = "My New Hugo Site"
+theme = "squadtheme"
+
+[Params]
+homepageContentTypes = ["posts"]
+gaTrackingID = "todo-update-in-config-toml"

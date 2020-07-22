@@ -1,0 +1,66 @@
+.full {
+    height: 95vmin;
+}
+
+.small {
+    height: 50vmin;
+    width: 60vw;
+    display: inline-block;
+}
+
+header .full h1 {
+    font-family: 'Bungee Shade', cursive;
+    font-size: 11vw;
+    padding-top: 20vmin;
+    line-height: 1;
+}
+
+header .full h2 {
+    font-family: 'Major Mono Display', monospace;
+    font-size: 7.5vw;
+    padding-bottom: 23vmin;
+    line-height: 1;
+}
+
+header .small h1 {
+    text-align: left;
+    font-family: 'Bungee Shade', cursive;
+    font-size: calc(2em + 4vw);
+    line-height: 1;
+    margin-top: 9vmin;
+}
+
+header .small h2 {
+    text-align: left;
+    font-family: 'Major Mono Display', monospace;
+    font-size: calc(.5em + 3vw);
+    line-height: 1;
+}
+
+.left-margin, .content, .right-margin {
+    display: inline-block;
+}
+
+.left-margin, .right-margin {
+    width: 20vw;
+}
+
+.content {
+    width: 60vw;
+}
+
+footer {
+    height: 50vmin;
+    background: black;
+    margin-top: 10vmin;
+}
+
+@media only screen and (max-width: 600px) {
+    .left-margin, .right-margin {
+        width: 5vw;
+    }
+
+    .content {
+        width: 90vw;
+    }
+}

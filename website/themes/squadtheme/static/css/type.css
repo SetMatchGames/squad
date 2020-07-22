@@ -1,0 +1,91 @@
+@import url('https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Bungee&family=Bungee+Hairline&family=Bungee+Inline&family=Bungee+Outline&family=Bungee+Shade&family=Codystar:wght@300;400&family=Major+Mono+Display&family=Monoton&family=Montserrat+Alternates:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Montserrat+Subrayada:wght@400;700&family=Questrial&family=Raleway+Dots&display=swap');
+
+@import url('https://fonts.googleapis.com/css2?family=Inconsolata:wght@200;300;400;500;600;700;800;900&display=swap');
+
+html {
+    font-size: 14pt;
+    font-family: 'Montserrat Alternates', sans-serif;
+}
+@media only screen and (max-width: 600px) {
+    html {
+        font-size: 12pt;
+    }
+}
+.content h1 {
+    font-family: 'Bungee', cursive;
+    font-size: calc(1em + 3vw);
+    line-height: 1;
+    margin-top: 1.6em;
+    margin-bottom: 0.6em;
+}
+
+.home h1 {
+    margin-top: 20vmax;
+}
+
+.content h2 {
+    font-family: 'Bungee', cursive;
+    font-size: calc(1em + 2vw);
+    line-height: 1;
+    margin: 1.6em 0;
+}
+
+.content h3 {
+    font-family: 'Bungee', cursive;
+    font-size: calc(0.8em + 1vw);
+    line-height: 1;
+    margin: 1.6em 0;
+}
+
+.left-margin time {
+    float: right;
+    margin-right: 1em;
+}
+
+p, pre {
+    margin: 1.61rem 0;
+    line-height: 1.61;
+}
+
+p, li, pre {
+    max-width: 60ch;
+    min-width: 30ch;
+}
+
+ul {
+    margin-left: 1em;
+}
+
+ul li {
+    list-style-type: square;
+}
+
+pre {
+    font-family: 'Inconsolata', monospace;
+}
+
+#    font-family: 'Alfa Slab One', cursive;
+#
+#    font-family: 'Bungee', cursive;
+#
+#    font-family: 'Bungee Hairline', cursive;
+#
+#    font-family: 'Bungee Inline', cursive;
+#
+#    font-family: 'Bungee Outline', cursive;
+#
+#    font-family: 'Bungee Shade', cursive;
+#
+#    font-family: 'Codystar', cursive;
+#
+#    font-family: 'Major Mono Display', monospace;
+#
+#    font-family: 'Monoton', cursive;
+#
+#    font-family: 'Montserrat Alternates', sans-serif;
+#
+#    font-family: 'Montserrat Subrayada', sans-serif;
+#
+#    font-family: 'Questrial', sans-serif;
+#
+#    font-family: 'Raleway Dots', cursive;

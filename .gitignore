@@ -9,6 +9,8 @@ dist/
 build/
 bin/
 
+website/public
+
 bundle.json
 metastore.dna.json
 ganache.log

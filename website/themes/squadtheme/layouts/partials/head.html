@@ -1,0 +1,18 @@
+<head>
+  <title>SG {{ .Title }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id={{ .Site.Params.gaTrackingID }}"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    
+    gtag('config', '{{ .Site.Params.gaTrackingID }}');
+  </script>
+
+  <link rel="stylesheet" type="text/css" href="/css/reset.css">
+  <link rel="stylesheet" type="text/css" href="/css/site.css">
+  <link rel="stylesheet" type="text/css" href="/css/type.css">
+  <link rel="stylesheet" type="text/css" href="/css/layout.css">
+</head>
