@@ -16,7 +16,7 @@ inviting their communities in early to join in its development.
 Designers get the tools to launch a game quick, build a community
 driven by a market around it then transition ownership and
 responsibility for future development and maintenance to the community
-when network effects begin to dominate.
+when network effects take hold.
 
 All contributors get tools for earning returns on the success of their
 contributions.

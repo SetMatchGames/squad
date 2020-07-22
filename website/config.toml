@@ -1,4 +1,4 @@
-baseURL = "http://squad.games/"
+baseURL = "http://www.squad.games/"
 languageCode = "en-us"
 title = "Squad Games"
 theme = "squadtheme"
