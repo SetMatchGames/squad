@@ -1,6 +1,6 @@
 baseURL = "http://squad.games/"
 languageCode = "en-us"
-title = "My New Hugo Site"
+title = "Squad Games"
 theme = "squadtheme"
 
 [Params]
