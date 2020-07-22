@@ -1,7 +1,7 @@
 ---
 title: "Squad Chess"
 date: 2020-07-21T21:05:04-03:00
-draft: true
+draft: false
 ---
 
 Squad Chess is the first game built for Squad Games to demonstrate
