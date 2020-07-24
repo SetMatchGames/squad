@@ -1,6 +1,6 @@
 {
   "name": "@squad/metastore",
-  "version": "0.0.3-alpha.0",
+  "version": "0.1.0-alpha.0",
   "description": "Squad Games JavaScript Metastore client",
   "main": "index.js",
   "scripts": {

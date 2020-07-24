@@ -1,6 +1,6 @@
 {
   "name": "@squad/sdk",
-  "version": "0.0.3-alpha.0",
+  "version": "0.1.0-alpha.0",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -9,9 +9,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@squad/curation-client": "^0.0.3-alpha.0",
+    "@squad/curation-client": "^0.1.0-alpha.0",
     "@squad/matchmaking-client": "^0.0.1-alpha.0",
-    "@squad/metastore": "^0.0.3-alpha.0",
+    "@squad/metastore": "^0.1.0-alpha.0",
     "rpc-websockets": "^4.4.0"
   },
   "devDependencies": {
