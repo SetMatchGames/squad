@@ -1,5 +1,6 @@
 {
   "name": "mock-metastore",
+  "private": true,
   "version": "0.0.1",
   "description": "Mock of the squad metastore for alpna release and testing",
   "main": "index.js",
