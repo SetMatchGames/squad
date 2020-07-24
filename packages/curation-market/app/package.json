@@ -1,6 +1,5 @@
 {
   "name": "curation-market",
-  "private": true,
   "version": "0.0.1-alpha.0",
   "description": "",
   "main": "truffle-config.js",

@@ -13,5 +13,6 @@
     "web3": "^1.2.6"
   },
   "author": "Set Match Games <hello@setmatchgames.com>",
-  "license": "Apache-2.0"
+  "license": "Apache-2.0",
+  "gitHead": "713cb90d5715ed5ddca280d05fd579d99afd70c9"
 }

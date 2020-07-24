@@ -17,5 +17,6 @@
   "devDependencies": {
     "jest": "^24.9.0",
     "standard": "^14.3.1"
-  }
+  },
+  "gitHead": "713cb90d5715ed5ddca280d05fd579d99afd70c9"
 }
