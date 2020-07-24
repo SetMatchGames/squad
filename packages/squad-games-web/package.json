@@ -1,8 +1,8 @@
 {
   "name": "squad-games",
-  "version": "0.0.2-alpha.0",
+  "version": "0.0.3-alpha.0",
   "dependencies": {
-    "@squad/sdk": "^0.0.2-alpha.0",
+    "@squad/sdk": "^0.0.3-alpha.0",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-redux": "^7.1.0",
