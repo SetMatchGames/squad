@@ -1,8 +1,8 @@
 /* global require module web3 */
 
 const ethers = require('ethers')
-const AutoBondJSON = require("../../app/build/contracts/AutoBond.json")
 const CurveJSON = require("../../app/build/contracts/Curve.json")
+const AutoBondJSON = require("../../app/build/contracts/AutoBond.json")
 const SimpleLinearCurveJSON = require("../../app/build/contracts/SimpleLinearCurve.json")
 
 const networkIds = {

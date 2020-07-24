@@ -24,7 +24,9 @@ async function runGame (definition) {
   return runner(JSON.parse(definition.Game.data))
 }
 
-// Combined metastore and curation functions
+/*
+ * Combined metastore and curation functions
+ */
 
 // handle submitting a definition and creating a new bond at the same time
 async function newDefinitionWithBond (

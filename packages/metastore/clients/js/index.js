@@ -2,7 +2,7 @@
 
 const WebSocket = require('rpc-websockets').Client
 
-// TODO change 'squad' to 'metastore' here?
+// TODO: change 'squad' to 'metastore' here?
 const squad = {}
 
 function webSocketConnection (uri) {
