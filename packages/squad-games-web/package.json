@@ -1,7 +1,6 @@
 {
   "name": "squad-games",
   "version": "0.0.2-alpha.0",
-  "private": true,
   "dependencies": {
     "@squad/sdk": "^0.0.2-alpha.0",
     "react": "^16.8.6",
