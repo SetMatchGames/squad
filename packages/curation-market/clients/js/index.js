@@ -30,7 +30,8 @@ function init (defaults) {
 
   switch (network) {
     case 'development': {
-      // I think this might not be working right -- maybe instead we should be creating a wallet using one of the ganache keys
+      // I think this might not be working right -- maybe instead we
+      // should be creating a wallet using one of the ganache keys
       provider = new ethers.providers.JsonRpcProvider(devUrl)
       walletOrSigner = provider.getSigner(0)
       const mostRecentDevnet = Object.keys(AutoBondJSON.networks).pop()

@@ -1,4 +1,4 @@
-/* global require */
+/* global require module */
 
 const WebSocket = require('rpc-websockets').Client
 
