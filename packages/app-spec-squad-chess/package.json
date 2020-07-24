@@ -1,7 +1,7 @@
 {
   "name": "app-spec-squad-chess",
   "private": true,
-  "version": "1.0.0",
+  "version": "0.0.1-alpha.0",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -14,7 +14,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@squad/sdk": "^1.0.0",
+    "@squad/sdk": "^0.0.1-alpha.0",
     "mithril": "^2.0.4",
     "normalize.css": "^8.0.1",
     "peerjs": "^1.2.0"
