@@ -18,8 +18,13 @@ header .full h1 {
 header .full h2 {
     font-family: 'Major Mono Display', monospace;
     font-size: 7.5vw;
-    padding-bottom: 23vmin;
+    padding-bottom: 17vmin;
     line-height: 1;
+}
+
+header .full h3 {
+    text-align: center;
+    font-size: 2vw;
 }
 
 header .small h1 {
