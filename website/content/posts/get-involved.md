@@ -1,7 +1,7 @@
 ---
 title: "Get Involved"
 date: 2020-07-21T21:07:36-01:00
-draft: False
+draft: true
 ---
 
 Join the community. Come work on it with us

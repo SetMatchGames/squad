@@ -1,7 +1,7 @@
 +++
 title = "The Squad Protocol"
 date = 2020-07-21T21:04:27-05:00
-draft = false
+draft = true
 +++
 
 We are hard at work writing the full protocol paper but here are the
