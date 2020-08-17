@@ -8,7 +8,7 @@ LocalWords:  videogames devs modders
 There is an incredible opportunity in the gaming industry for
 supporting user generated content (mods) with marketplaces where
 creators can sell their work and users can find it. We see a future in
-which videogame development is massively more diverse and varied than
+which videogame development is far more diverse and varied than
 it is today leading to a dramatically expanded audience as smaller
 communities get market support for their work.
 
