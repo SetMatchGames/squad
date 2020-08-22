@@ -4,25 +4,19 @@ date = 2020-07-21T21:04:27-05:00
 draft = true
 +++
 
-We are hard at work writing the full protocol paper but here are the
-highlights.
+From MOBAs to Minecraft, video game mods have played a huge role in
+building today’s gaming industry. But mod ecosystems are difficult to
+build, and most game developers decide not to include mod systems.
 
-Games built for the Squad protocol give players and modders financial
-stake in their gaming communities by tokenizing their contributions
-and setting up all the needed infrastructure.
+The Squad Games Platform offers a radical new way to build video games
+with mods in mind, to the mutual benefit of game devs, mod-makers, and
+players. With Squad Games, anyone can submit new mods to your game,
+those mods are well curated, and the value created brings in new
+players. Revenues are shared between mod-makers and game developers.
 
-Squad empowers game designers to compete on the basis of speed by
-inviting their communities in early to join in its development.
-Designers get the tools to launch a game quick, build a community
-driven by a market around it then transition ownership and
-responsibility for future development and maintenance to the community
-when network effects take hold.
-
-All contributors get tools for earning returns on the success of their
-contributions.
-
-<!--more-->
-
-Paper coming soon. #SquadGoals
+We’re hard at work building the decentralized protocol and developer
+tools needed for the Squad Games Platform, and we are looking for
+design partners! If you are a game developer interested in building a
+mod-enabled game, please get in touch on the Squad Games Discord.
 
 

@@ -4,16 +4,17 @@ date: 2020-07-21T21:05:04-03:00
 draft: false
 ---
 
-Squad Chess is the first game built for Squad Games to demonstrate
-what's possible.
 
-It's a moddable version of chess allowing the community to create new
-chess pieces and new formats. You could create a king that moves like a
-pawn but takes like a knight. You can make any starting position and
-any board size and shape then submit your new pieces and formats others
-to buy and play.
+Squad Chess is the first game built using the Squad Games Platform,
+meant as a demonstration.
 
-Try it out out at [chess.squad.games](https://chess.squad.games)
-though it's still an early prototype.
+It’s a moddable version of chess that lets users create new chess
+pieces and formats from inside the game, e.g. a king that moves like a
+pawn but takes like a knight. You can make any board size and shape
+with any starting pieces and position, then submit your new format for
+others to buy and play.
+
+You can try out an early prototype release at chess.squad.games.
+
 
 
