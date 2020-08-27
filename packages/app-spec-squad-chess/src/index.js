@@ -20,21 +20,23 @@ const App = {
     squadInit()
   },
   view: () => {
+    let content
     if (!state.squad.connection) {
-      return m(
-        '#app',
-        m(HeaderFooter, { content: 'Connecting to Squad...', id: 'header' })
-      )
+      content = m(HeaderFooter, { content: 'Connecting to Squad...', id: 'header' })
+    } else {
+      content = [
+        m(HeaderFooter, { content: Title, id: 'header' }),
+        m('.platform', m(Board)),
+        m('.platform', m(FormatSelector)),
+        m('.platform', m(ComponentForm)),
+        m('.platform', m(FormatForm)),
+        m(HeaderFooter, { content: Citation, id: 'footer' })
+      ]
+      if (state.squad.loadedFormat) { content.splice(1, 0, m('.platform', m(Matchmaker))) }
     }
     return m(
       '#app',
-      m(HeaderFooter, { content: Title, id: 'header' }),
-      m('.platform', m(Board)),
-      m('.platform', m(FormatSelector)),
-      m('.platform', m(Matchmaker)),
-      m('.platform', m(ComponentForm)),
-      m('.platform', m(FormatForm)),
-      m(HeaderFooter, { content: Citation, id: 'footer' })
+      content
     )
   }
 }
