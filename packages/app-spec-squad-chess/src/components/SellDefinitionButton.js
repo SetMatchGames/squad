@@ -1,11 +1,11 @@
 import m from 'mithril'
 import squad from '@squad/sdk'
-import state from './state.js'
+import state from '../state.js'
 
 const SellDefinitionButton = {
   view: (vnode) => {
-    const bondId = vnode.attrs.bondId
-    const dataType = `sell${bondId}`
+    const address = vnode.attrs.address
+    const dataType = `sell${address}`
     return m(
       'form.sell-definition',
       m(
@@ -17,10 +17,10 @@ const SellDefinitionButton = {
         {
           onclick: (e) => {
             e.preventDefault()
-            squad.curationMarket.getSellPrice(state.buyingAndSelling[dataType], bondId)
+            squad.curationMarket.getSellPrice(state.buyingAndSelling[dataType], address)
               .then((price) => {
                 console.log(price)
-                squad.curationMarket.sell(state.buyingAndSelling[dataType], bondId)
+                squad.curationMarket.sell(state.buyingAndSelling[dataType], address)
               })
           }
         },

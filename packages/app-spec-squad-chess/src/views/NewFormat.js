@@ -3,13 +3,14 @@
 import m from 'mithril'
 import squad from '@squad/sdk'
 
-import state from './state.js'
-import settings from './settings.js'
-import { stringToSquare } from './rules.js'
-import { shortHash, findBoardRange } from './utils.js'
+import state from '../state.js'
+import settings from '../settings.js'
+import { stringToSquare } from '../rules.js'
+import { shortHash, findBoardRange, getMarketInfo } from '../utils.js'
 
 const FormatForm = {
   oninit: () => {
+    getMarketInfo()
     clearForm()
   },
   view: () => {
@@ -26,7 +27,7 @@ const FormatForm = {
       )
     )
     return m(
-      '#format-form',
+      '#format-form.body',
       m('h3', 'New Format'),
       form
     )
@@ -35,20 +36,24 @@ const FormatForm = {
 
 const FormatPreloader = {
   view: () => {
-    return m(
-      '.format.form-field',
-      Object.keys(state.squad.rawFormats).map(key => {
-        return m(FormatButton, {
-          key,
-          name: `${state.squad.rawFormats[key].name} (${shortHash(key)})`
-        })
-      }),
-      m(
-        'button',
-        { onclick: handleClearForm },
-        'Clear'
+    let content = 'Loading...'
+    if (state.squad.rawFormats) {
+      content = m(
+        '.format.form-field',
+        Object.keys(state.squad.rawFormats).map(key => {
+          return m(FormatButton, {
+            key,
+            name: `${state.squad.rawFormats[key].name} (${shortHash(key)})`
+          })
+        }),
+        m(
+          'button',
+          { onclick: handleClearForm },
+          'Clear'
+        )
       )
-    )
+    }
+    return content
   }
 }
 
@@ -88,21 +93,24 @@ const FormatNameField = {
 
 const FormatComponentsList = {
   view: () => {
-    let componentBoxes = []
-    for (const address in state.squad.components) {
-      const name = `${state.squad.components[address].name} (${shortHash(address)})`
-      let checked = false
-      if (state.formatForm.components.includes(address)) { checked = true }
-      componentBoxes = componentBoxes.concat([
-        m(
-          `label[for=${name}]`,
+    let componentBoxes = 'Loading...'
+    if (state.squad.components) {
+      componentBoxes = []
+      for (const address in state.squad.components) {
+        const name = `${state.squad.components[address].name} (${shortHash(address)})`
+        let checked = false
+        if (state.formatForm.components.includes(address)) { checked = true }
+        componentBoxes = componentBoxes.concat([
           m(
-            `input[type=checkbox][name=${name}][value=${address}]`,
-            { oninput: handleAddOrRemoveComponent, checked }
-          ),
-          name
-        )
-      ])
+            `label[for=${name}]`,
+            m(
+              `input[type=checkbox][name=${name}][value=${address}]`,
+              { oninput: handleAddOrRemoveComponent, checked }
+            ),
+            name
+          )
+        ])
+      }
     }
     return m(
       '.format.form-field',

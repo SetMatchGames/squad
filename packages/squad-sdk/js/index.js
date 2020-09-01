@@ -71,6 +71,5 @@ module.exports = {
   metastore,
   curationMarket,
   matchmaking,
-  definition,
-  newDefinitionWithBond
+  definition
 }

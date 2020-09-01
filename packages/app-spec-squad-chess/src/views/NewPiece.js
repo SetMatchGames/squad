@@ -3,14 +3,15 @@
 import m from 'mithril'
 import squad from '@squad/sdk'
 
-import state from './state.js'
-import settings from './settings.js'
-import { mechanics, admechanics } from './rules.js'
-import graphicsPaths from './graphics-paths.json'
-import { shortHash } from './utils.js'
+import state from '../state.js'
+import settings from '../settings.js'
+import { mechanics, admechanics } from '../rules.js'
+import graphicsPaths from '../graphics-paths.json'
+import { shortHash, getMarketInfo } from '../utils.js'
 
 const ComponentForm = {
   oninit: () => {
+    getMarketInfo()
     clearForm()
   },
   view: () => {
@@ -27,7 +28,7 @@ const ComponentForm = {
       )
     )
     return m(
-      '#component-form',
+      '#component-form.body',
       m('h3', 'New Component'),
       form
     )
@@ -36,20 +37,24 @@ const ComponentForm = {
 
 const ComponentPreloader = {
   view: () => {
-    return m(
-      '.component.form-field',
-      Object.keys(state.squad.components).map(key => {
-        return m(ComponentButton, {
-          key,
-          name: `${state.squad.components[key].name} (${shortHash(key)})`
-        })
-      }),
-      m(
-        'button',
-        { onclick: handleClearForm },
-        'Clear'
+    let content = 'Loading...'
+    if (state.squad.components) {
+      content = m(
+        '.component.form-field',
+        Object.keys(state.squad.components).map(key => {
+          return m(ComponentButton, {
+            key,
+            name: `${state.squad.components[key].name} (${shortHash(key)})`
+          })
+        }),
+        m(
+          'button',
+          { onclick: handleClearForm },
+          'Clear'
+        )
       )
-    )
+    }
+    return content
   }
 }
 

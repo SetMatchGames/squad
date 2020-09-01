@@ -1,3 +1,10 @@
+import m from 'mithril'
+import squad, { metastore, curationMarket } from '@squad/sdk'
+
+import defs from '../scripts/load_development_defs.js'
+
+import state from './state.js'
+import settings from './settings.js'
 import { stringToSquare } from './rules.js'
 
 export const shortHash = (str) => {
@@ -15,5 +22,160 @@ export const findBoardRange = (variableIndex, startingPosition) => {
   return {
     range: max - min,
     min
+  }
+}
+
+export const connectSquad = (callback) => {
+  metastore.webSocketConnection(settings.metastoreWs)
+
+  metastore.on('open', async () => {
+    // skip if we've already connected to Squad
+    if (state.squad.connection) {
+      console.log('Skipping on open')
+    } else {
+      // check ethereum connection
+      web3connection()
+
+      // load up the default definitions (only relevant with the temporary metastore)
+      const defaultDefs = await defs()
+
+      // load up the local storage definitions along with the defaults (for now)
+      let storedDefs = JSON.parse(localStorage.getItem('localDefinitions'))
+      if (!storedDefs) {
+        storedDefs = []
+      }
+
+      // make sure all stored defs and defaults are on Ethereum
+      const localDefs = [...defaultDefs, ...storedDefs]
+      await multiDefinition(localDefs)
+
+      // get all the game's formats and components
+      const formatDefs = await metastore.getGameFormats(settings.gameAddress)
+      const componentDefs = await metastore.getGameComponents(settings.gameAddress)
+
+      // restore everything in local storage
+      refreshLocalStorage(formatDefs, componentDefs)
+
+      // for each format
+      for (const address in formatDefs) {
+        // take out the extra 'Format' part of the object
+        formatDefs[address] = formatDefs[address].Format
+      }
+      state.squad.rawFormats = formatDefs
+
+      // for each component
+      for (const address in componentDefs) {
+        // take out the extra 'Component' part of the object
+        componentDefs[address] = componentDefs[address].Component
+      }
+      state.squad.components = componentDefs
+
+      state.squad.connection = 'connected'
+      console.log('Squad Connection:', state.squad.connection)
+    }
+
+    if (callback) { await callback() }
+
+    m.redraw()
+  })
+}
+
+function web3connection () {
+  // TODO this is where we might ask users to create a connection if there isn't one
+  if (!curationMarket.init()[0]) {
+    console.error('No ethereum connection')
+  }
+}
+
+async function multiDefinition (defs) {
+  // submit the default definitions to make sure they have bonds on ethereum
+  defs.forEach(async (def) => {
+    await squad.definition(def, [settings.gameAddress])
+  })
+}
+
+function refreshLocalStorage(formatDefs, componentDefs) {
+  const localCatalog = []
+  for (const key in formatDefs) {
+    localCatalog.push(formatDefs[key])
+  }
+  for (const key in componentDefs) {
+    localCatalog.push(componentDefs[key])
+  }
+  console.log('local Catalog size', localCatalog.length)
+  localStorage.setItem('localDefinitions', JSON.stringify(localCatalog))
+}
+
+export const getMarketInfo = () => {
+  connectSquad(async () => {
+    // for each format
+    for (const address in state.squad.rawFormats) {
+      // see if the current user owns the format
+      await getOwned(address)
+      // get the market cap
+      await getMarketCap(address)
+    }
+
+    // for each component
+    for (const address in state.squad.components) {
+      // get the market cap
+      await getMarketCap(address)
+    }
+  })  
+}
+
+async function getOwned (address) {
+  const balance = await curationMarket.getBalance(address)
+  state.owned[address] = balance
+  m.redraw()
+}
+
+async function getMarketCap (address) {
+  const marketCap = await curationMarket.getMarketCap(address)
+  state.marketCaps[address] = marketCap
+  m.redraw()
+}
+
+export const loadFormat = (address) => {
+  connectSquad(async () => {
+    // get the format
+    const formatToLoad = state.squad.rawFormats[address]
+
+    // load the format
+    if (formatToLoad) {
+      await getOwned(address)
+      if (!state.owned[address]) {
+        m.route.set('/formats')
+        console.log('Must purchase rights to use a format before using. Current tokens owned:', state.owned[address])
+        // TODO Notification asking them to buy the format
+      } else {
+        const components = await metastore.getDefinitions(formatToLoad.components)
+        const pieces = {}
+        for (const address in components) {
+          pieces[address] = JSON.parse(components[address].Component.data)
+        }
+        state.squad.loadedFormat = Object.assign(JSON.parse(formatToLoad.data), { 
+          pieces, 
+          address,
+          name: formatToLoad.name 
+        })
+
+        // Get the X and Y ranges of the board
+        const x = findBoardRange(0, state.squad.loadedFormat.startingPosition)
+        const y = findBoardRange(1, state.squad.loadedFormat.startingPosition)
+        state.squad.loadedFormat.boardSize = { x, y }
+      }
+      console.log('Loaded format', state.squad.loadedFormat)
+      m.redraw()
+    }
+  })
+}
+
+export function checkWinner () {
+  if (state.game.legalTurns.length === 0) {
+    let winner = 'White'
+    if (state.game.turnNumber % 2 === 0) { winner = 'Black' }
+    state.board.winner = `${winner} wins!`
+    console.log(state.board.winner)
   }
 }

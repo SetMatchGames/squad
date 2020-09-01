@@ -9,5 +9,7 @@ export default state = {
   squad: {},
   owned: {},
   marketCaps: {},
+  formatSelector: {},
+  markets: {},
   buyingAndSelling: {}
 }

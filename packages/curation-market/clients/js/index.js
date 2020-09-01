@@ -23,7 +23,7 @@ let defaults
 
 function init (defaults) {
   if (initialized) {
-    return
+    return [initialized, walletOrSigner]
   }
 
   console.log('Initializing...')
@@ -55,7 +55,11 @@ function init (defaults) {
     }
   }
 
-  initialized = true
+  if (walletOrSigner) {
+    initialized = true
+    return [initialized, walletOrSigner]
+  }
+  return [initialized, walletOrSigner]
 }
 
 class BondAlreadyExists extends Error {
@@ -72,7 +76,9 @@ async function newBond (
   addressOfCurve,
 ) {
   init()
-  if (!addressOfCurve) { addressOfCurve = simpleLinearCurveAddress }
+  if (!addressOfCurve || addressOfCurve === '0x0000000000000000000000000000000000000000') { 
+    addressOfCurve = simpleLinearCurveAddress 
+  }
   const bondHash = ethers.utils.id(bondId)
   const fullOptions = Object.assign({}, defaults, options)
   const curve = await autoBond.getCurve(bondHash)
@@ -98,7 +104,7 @@ async function getBalance (bondId, holderAddress) {
   await window.ethereum.enable()
   holderAddress = holderAddress ? holderAddress : await walletOrSigner.getAddress()
   const bondHash = ethers.utils.id(bondId)
-  return await autoBond.getBalance(bondHash, holderAddress)
+  return (await autoBond.getBalance(bondHash, holderAddress)).toNumber()
 }
 
 async function buy (units, bondId, options = {}) {
@@ -149,8 +155,11 @@ async function getMarketCap (bondId) {
   const bondHash = ethers.utils.id(bondId)
   const bond = await autoBond.bonds(bondHash)
   const curveAddress = bond.curve
+  if (curveAddress == '0x0000000000000000000000000000000000000000') { 
+    console.error(`Market for ${bondId} has no curve address set`)
+  }
   const supply = bond.supply
-  return (await getBuyPriceFromCurve(0, supply, curveAddress)).toString()
+  return (await getBuyPriceFromCurve(0, supply, curveAddress)).toNumber()
 }
 
 module.exports = {
