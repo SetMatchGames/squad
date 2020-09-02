@@ -14,7 +14,7 @@ const FormatStore = {
   view: () => {
     if (!state.squad.rawFormats) { 
       return m(
-        '#format-store',
+        '#format-store.body',
         'Loading formats...'
       )
     }
@@ -26,7 +26,7 @@ const FormatStore = {
       m('h3', 'Choose a Format to Play'),
       m(Labels),
       orderedFormats.map((address, index) => {
-        let order = 'body'
+        let order = 'middle'
         if (index === 0) { order = 'head' }
         if (index === orderedFormats.length - 1) {
           order = 'foot'

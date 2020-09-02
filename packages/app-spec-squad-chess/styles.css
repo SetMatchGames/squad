@@ -1,6 +1,7 @@
 /* Global */
 body {
   background: #fff6e8;
+  margin: 0;
 }
 
 #app {
@@ -22,6 +23,10 @@ body {
   flex-direction: row;
   position: relative;
   padding: 14px 0 14px 0;
+}
+
+.body {
+  margin: 5vw;
 }
 
 a {
@@ -131,12 +136,13 @@ input.focus-visible {
 /* Nav Menu */
 #header h1 {
   position: absolute;
+  top: -15px;
 }
 
 #nav-menu {
   position: absolute;
   right: 0;
-  top: -7px;
+  top: 0;
 }
 
 #menu-symbol {
@@ -179,6 +185,46 @@ input.focus-visible {
 
 #menu-links a:hover {
   color: #db8a0d;
+}
+
+/* Connect Modal */
+#connect-modal {
+  position: absolute;
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.25);
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+#connect-modal .card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 300px;
+  height: 300px;
+  padding: 20px;
+  border-radius: 12px;
+  background-color: #fff6e8;
+}
+
+#connect-modal h4 {
+  text-align: center;
+  padding: 0 20px 20px 20px;
+}
+
+#connect-modal img {
+  width: 120px;
+  padding: 10px;
+  box-shadow: #fffcf7 1px 1px 0px inset;
+  border: 1px solid #ebddc3;
+  border-image: initial;
+  border-radius: 12px;
+  flex: 1 1 0%;
 }
 
 /* Board */

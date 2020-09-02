@@ -10,6 +10,7 @@ import NewFormat from './views/NewFormat.js'
 import NewPiece from './views/NewPiece.js'
 
 import NavMenu from './components/NavMenu.js'
+import ConnectModal from './components/ConnectModal.js'
 
 const LandingPage = {
   view: () => {
@@ -64,6 +65,7 @@ function layout(body) {
     render: (vnode) => {
       return m(
         '#app',
+        m(ConnectModal),
         m(Header),
         m(body, vnode.attrs),
         m(Footer)

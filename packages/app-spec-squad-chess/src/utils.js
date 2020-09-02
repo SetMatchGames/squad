@@ -81,10 +81,12 @@ export const connectSquad = (callback) => {
 }
 
 function web3connection () {
-  // TODO this is where we might ask users to create a connection if there isn't one
-  if (!curationMarket.init()[0]) {
-    console.error('No ethereum connection')
-  }
+  if (!curationMarket.init()[0] || curationMarket.init()[1].provider.provider.chainId !== '0x3') {
+    console.log('No connection to Ropsten Ethereum testnet.')
+    const connectModal = document.getElementById('connect-modal')
+    connectModal.style.display = 'flex'
+    m.redraw()
+  } 
 }
 
 async function multiDefinition (defs) {

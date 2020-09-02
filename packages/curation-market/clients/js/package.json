@@ -9,8 +9,7 @@
   "dependencies": {
     "@truffle/contract": "^4.1.13",
     "ethers": "^4.0.46",
-    "jest": "^25.2.3",
-    "web3": "^1.2.6"
+    "jest": "^25.2.3"
   },
   "author": "Set Match Games <hello@setmatchgames.com>",
   "license": "Apache-2.0"
