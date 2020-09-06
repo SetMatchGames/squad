@@ -28,7 +28,7 @@ const FormatForm = {
     )
     return m(
       '#format-form.body',
-      m('h3', 'New Format'),
+      m('h2', 'New Format'),
       form
     )
   }

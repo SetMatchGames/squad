@@ -141,43 +141,59 @@ async function getMarketCap (address) {
 export const loadFormat = (address) => {
   connectSquad(async () => {
     // get the format
-    const formatToLoad = state.squad.rawFormats[address]
+    const rawFormat = state.squad.rawFormats[address]
 
     // load the format
-    if (formatToLoad) {
+    if (rawFormat) {
       await getOwned(address)
       if (!state.owned[address]) {
         m.route.set('/formats')
         console.log('Must purchase rights to use a format before using. Current tokens owned:', state.owned[address])
         // TODO Notification asking them to buy the format
       } else {
-        const components = await metastore.getDefinitions(formatToLoad.components)
-        const pieces = {}
-        for (const address in components) {
-          pieces[address] = JSON.parse(components[address].Component.data)
-        }
-        state.squad.loadedFormat = Object.assign(JSON.parse(formatToLoad.data), { 
-          pieces, 
-          address,
-          name: formatToLoad.name 
-        })
-
-        // Get the X and Y ranges of the board
-        const x = findBoardRange(0, state.squad.loadedFormat.startingPosition)
-        const y = findBoardRange(1, state.squad.loadedFormat.startingPosition)
-        state.squad.loadedFormat.boardSize = { x, y }
+        state.squad.loadedFormat = getFullFormat(rawFormat, address)
+        console.log('Loaded format:', state.squad.loadedFormat)
       }
-      console.log('Loaded format', state.squad.loadedFormat)
       m.redraw()
     }
   })
 }
 
-export function checkWinner () {
+export const previewFormat = (address) => {
+  const rawFormat = state.squad.rawFormats[address]
+  state.markets.previewedFormat = getFullFormat(rawFormat, address)
+  console.log('Previewing format:', state.markets.previewedFormat)
+}
+
+function getFullFormat(rawFormat, address) {
+  // get the pieces
+  const pieces = {}
+  rawFormat.components.forEach(address => {
+    const piece = state.squad.components[address]
+    pieces[address] = Object.assign({},
+      { name: piece.name },
+      JSON.parse(piece.data)
+    )
+  })
+  const fullFormat = Object.assign(JSON.parse(rawFormat.data), { 
+    pieces, 
+    address,
+    name: rawFormat.name
+  })
+
+  // Get the X and Y ranges of the board
+  const x = findBoardRange(0, fullFormat.startingPosition)
+  const y = findBoardRange(1, fullFormat.startingPosition)
+  fullFormat.boardSize = { x, y }
+
+  return fullFormat
+}
+
+export const checkWinner = () => {
   if (state.game.legalTurns.length === 0) {
     let winner = 'White'
     if (state.game.turnNumber % 2 === 0) { winner = 'Black' }
-    state.board.winner = `${winner} wins!`
-    console.log(state.board.winner)
+    state.board.matchStatus = `${winner} wins!`
+    console.log(state.board.matchStatus)
   }
 }

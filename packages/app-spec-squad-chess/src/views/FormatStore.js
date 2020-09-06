@@ -2,14 +2,15 @@
 
 import m from 'mithril'
 import state from '../state.js'
+import Board from '../components/Board.js'
 import BuyDefinitionButton from '../components/BuyDefinitionButton.js'
 import SellDefinitionButton from '../components/SellDefinitionButton.js'
-import { shortHash, getMarketInfo } from '../utils.js'
+import { shortHash, getMarketInfo, previewFormat } from '../utils.js'
 
 const FormatStore = {
   oninit: () => {
     getMarketInfo()
-    state.markets.visible = []
+    state.markets.previewedFormats = {}
   },
   view: () => {
     if (!state.squad.rawFormats) { 
@@ -23,7 +24,7 @@ const FormatStore = {
     })
     return m(
       '#format-store.body',
-      m('h3', 'Choose a Format to Play'),
+      m('h2', 'Choose a Format to Play'),
       m(Labels),
       orderedFormats.map((address, index) => {
         let order = 'middle'
@@ -43,9 +44,9 @@ const Labels = {
       '.format-card.labels.row',
       m('.score.offset', 'Market Score'),
       m('.name.offset', 'Name'),
-      m('.ID.offset', 'ID'),
       m('.loader'),
-      m('.market-toggle')
+      m('.market-toggle'),
+      m('.details-toggle')
     )
   }
 }
@@ -57,13 +58,52 @@ const FormatCard = {
       `.format-card.column.${vnode.attrs.order}`,
       m(
         '.info.row',
-        m('.score.offset', state.marketCaps[vnode.key]),
+        m('.score.offset', shortenScore(state.marketCaps[vnode.key])),
         m('.name.offset', name),
-        m('.ID.offset', shortHash(vnode.key)),
-        m(Loader, { address: vnode.key }),
-        m(MarketToggle, { address: vnode.key })
+        m(
+          '.button-section', 
+          m(Loader, { address: vnode.key }),
+          m(DetailsToggle, { address: vnode.key })
+        )
       ),
-      m(Market, { address: vnode.key })
+      m(Details, { address: vnode.key })
+    )
+  }
+}
+
+const DetailsToggle = {
+  view: (vnode) => {
+    const address = vnode.attrs.address
+    let content = 'Details'
+    if (state.markets.previewedFormats[address]) {
+      content = 'Hide'
+    }
+    return m(
+      'form.details-toggle',
+      m(
+        'button',
+        { onclick: handleToggleDetailsFactory(address) },
+        content
+      )
+    )
+  }
+}
+
+const Details = {
+  view: (vnode) => {
+    const address = vnode.attrs.address
+    if (!state.markets.previewedFormat || 
+    state.markets.previewedFormat.address !== address) {
+      return
+    }
+    const num = state.owned[address]
+    return m(
+      '.details',
+      m('.ID', shortHash(address)),
+      `(Owned: ${num})`,
+      m(BuyDefinitionButton, { address }), 
+      m(SellDefinitionButton, { address }),
+      m(Board, { format: state.markets.previewedFormat })
     )
   }
 }
@@ -86,37 +126,15 @@ const Loader = {
   }
 }
 
-const Market = {
-  view: (vnode) => {
-    const address = vnode.attrs.address
-    if (!state.markets.visible.includes(address)) {
-      return
+const handleToggleDetailsFactory = (address) => {
+  return (e) => {
+    e.preventDefault()
+    if (state.markets.previewedFormat && 
+    state.markets.previewedFormat.address === address) {
+      state.markets.previewedFormat = null
+    } else {
+      previewFormat(address)
     }
-    const num = state.owned[address]
-    return m(
-      '.market',
-      `(Owned: ${num})`,
-      m(BuyDefinitionButton, { address }), 
-      m(SellDefinitionButton, { address })
-    )
-  }
-}
-
-const MarketToggle = {
-  view: (vnode) => {
-    const address = vnode.attrs.address
-    let content = "Buy / Sell"
-    if (state.markets.visible.includes(address)) {
-      content = "Hide"
-    }
-    return m(
-      'form.market-toggle',
-      m(
-      'button',
-      { onclick: handleToggleMarketFactory(address) },
-      content
-      )
-    )
   }
 }
 
@@ -127,18 +145,33 @@ const handleLinkFactory = (address) => {
   }
 }
 
-const handleToggleMarketFactory = (address) => {
-  return (e) => {
-    e.preventDefault()
-    if (state.markets.visible.includes(address)) {
-      console.log('making invisible', address)
-      const index = state.markets.visible.indexOf(address)
-      state.markets.visible.splice(index, 1)
-    } else {
-      console.log('making visible', address)
-      state.markets.visible.push(address)
+function shortenScore(score) {
+  if (!score) { return }
+  let result = String(score)
+  if (result.length > 7) {
+    let count = 0
+    let length = result.length
+    while (length > 3 && count < 5) {
+      result = result.slice(0, -3)
+      count += 1
+      length -= 3
     }
+    let suffix = "K"
+    switch (count) {
+      case 2:
+        suffix = "M"
+        break
+      case 3:
+        suffix = "B"
+        break
+      case 4:
+        suffix = "t"
+        break
+      default:
+    }
+    result += suffix
   }
+  return result
 }
 
 export default FormatStore

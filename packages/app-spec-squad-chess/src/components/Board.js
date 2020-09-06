@@ -8,83 +8,69 @@ import { checkWinner } from '../utils.js'
 
 const BOARD_CONFIG = settings.boardConfig
 
+// TODO: figure out the common denominator for the boards in format previews, the new format form, and playing a match
 const Board = {
-  oninit: resetBoardState,
-  view: () => {
-    switch (state.matchmaking.connection) {
-      case 'match started':
-        state.board.matchStatus = 'Match started!'
-        break
-      default:
-        state.board.matchStatus = 'Match not started.'
-    }
-    if (!state.game.position) {
-      return m('div', 'Load a format!')
-    } else {
-      const xRange = state.squad.loadedFormat.boardSize.x.range + 1
-      const yRange = state.squad.loadedFormat.boardSize.y.range + 1
-      let max = xRange
-      if (xRange < yRange) { max = yRange }
-      const width = 100 * xRange / max + '%'
-      const height = 100 * yRange / max + '%'
-      const playarea = m(
-        '#play-area',
-        {
-          style: {
-            width,
-            height
-          }
-        },
-        // For each square in the position
-        Object.keys(state.game.position).map(squareId => {
-          // grab what's in the square
-          const content = state.game.position[squareId].content
-          // if there is a piece, grab links to piece images
-          let graphics
-          if (content) {
-            graphics = state.squad.loadedFormat.pieces[content.pieceId].graphics
-          }
-          // add the square to the board
-          return m(
-            BoardSquare,
-            { key: squareId, content, graphics }
-          )
-        })
-      )
-      return m(
-        '#board.body',
-        m('p#match-status', `${state.board.matchStatus} ${state.board.winner}`),
-        playarea
-      )
-    }
+  oninit: (vnode) => { 
+    resetBoardState(vnode)
+  },
+  view: (vnode) => {
+    const xRange = vnode.attrs.format.boardSize.x.range + 1
+    const yRange = vnode.attrs.format.boardSize.y.range + 1
+    let max = xRange
+    if (xRange < yRange) { max = yRange }
+    const width = 100 * xRange / max + '%'
+    const height = 100 * yRange / max + '%'
+    const board = m(
+      '.board-squares',
+      {
+        style: {
+          width,
+          height
+        }
+      },
+      // For each square in the position
+      Object.keys(state.game.position).map(squareId => {
+        // grab what's in the square
+        const content = state.game.position[squareId].content
+        // if there is a piece, grab links to piece images
+        let graphics
+        if (content) {
+          console.log(vnode.attrs.format, content.pieceId)
+          graphics = vnode.attrs.format.pieces[content.pieceId].graphics
+        }
+        // add the square to the board
+        return m(
+          BoardSquare,
+          { key: squareId, content, graphics, format: vnode.attrs.format }
+        )
+      })
+    )
+    return m(
+      '.board',
+      board
+    )
   }
 }
 
 // initialize or reset the 'board' part of the state
-function resetBoardState () {
+function resetBoardState (vnode) {
   document.addEventListener('dragover', (e) => {
     e.preventDefault()
   }, false)
 
   // set initial game state
-  if (!state.squad.loadedFormat) {
-    m.route.set('/formats')
-    console.log('Load a format before playing. Current format:', state.squad.loadedFormat)
-    // TODO Notification asking them to load a format
-  } else if (state.matchmaking.connection !== 'match started') {
-    m.route.set('/matchmaking/:formatAddress', { formatAddress })
-  }
-  // TODO reject if no match has started?
-  state.game = chess.createGame(state.squad.loadedFormat)
+  state.game = chess.createGame(vnode.attrs.format)
 
   // set match state
-  state.board = {
-    from: [],
-    highlightedSquares: [],
-    deselectable: [],
-    matchStatus: 'not started',
-    winner: ''
-  }
+  state.board = Object.assign(
+    {
+      from: [],
+      highlightedSquares: [],
+      deselectable: [],
+      matchStatus: 'Match not started'
+    },
+    state.board
+  )
 }
 
 function queueDeselect () {
@@ -141,7 +127,7 @@ const BoardSquare = {
     return m(
       `.square#${vnode.key}`,
       {
-        style: squareStyle(coordinates, highlighted),
+        style: squareStyle(coordinates, highlighted, vnode.attrs.format),
         ondrop: handleTurn(),
         onclick
       },
@@ -150,11 +136,11 @@ const BoardSquare = {
   }
 }
 
-function squareStyle (coordinates, highlighted) {
+function squareStyle (coordinates, highlighted, format) {
   // get rid of extra space
   coordinates = [
-    coordinates[0] - state.squad.loadedFormat.boardSize.x.min,
-    coordinates[1] - state.squad.loadedFormat.boardSize.y.min
+    coordinates[0] - format.boardSize.x.min,
+    coordinates[1] - format.boardSize.y.min
   ]
 
   // create the checkerboard color pattern
@@ -162,8 +148,8 @@ function squareStyle (coordinates, highlighted) {
   if ((coordinates[0] + coordinates[1]) % 2 === 1) { squareColor = BOARD_CONFIG.squares.darkColor }
 
   // spacing and size
-  const xRange = state.squad.loadedFormat.boardSize.x.range + 1
-  const yRange = state.squad.loadedFormat.boardSize.y.range + 1
+  const xRange = format.boardSize.x.range + 1
+  const yRange = format.boardSize.y.range + 1
   const result = {
     right: 100 * coordinates[0] / xRange + '%',
     top: 100 * coordinates[1] / yRange + '%',
@@ -190,12 +176,15 @@ const BoardPiece = {
     }
     const coordinates = chess.stringToSquare(vnode.key)
     const highlighted = squareInArray(coordinates, state.board.highlightedSquares)
-    const player = state.game.position[vnode.key].content.player
+    // TODO: let the user be both players unless in a match
+    // configure this by: preview: moveable, both players; match: moveable, one player; form: moveable, both players, 
+    const pieceOwner = state.game.position[vnode.key].content.player
     // if a match hasn't started, don't add events
     if (state.matchmaking.connection !== 'match started') {
       /* do nothing */
-    // if it isn't our turn and its not highlighted, don't add events
-    } else if ((player !== state.matchmaking.player) && !highlighted) {
+    // if it isn't our piece and its not highlighted, don't add events
+    } else if ((pieceOwner !== state.matchmaking.player) && !highlighted) {
+      /* do nothing */
     // if highlighted, click to attempt turn
     } else if (highlighted) {
       attrs.onclick = handleTurn()
@@ -205,8 +194,8 @@ const BoardPiece = {
     // if the selected piece, let another mousedown queue deselect
     } else if (squareInArray(coordinates, [state.board.from])) {
       attrs.onmousedown = queueDeselect()
-    // if not highlighted or selected, select the piece
-    } else if (player === state.game.turnNumber % 2) {
+    // if not highlighted or selected and it's our turn, select the piece
+    } else if (pieceOwner === state.game.turnNumber % 2) {
       attrs.onmousedown = handleSelectPiece()
     }
     return m('img#' + vnode.key, attrs)

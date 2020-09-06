@@ -27,7 +27,7 @@ const Matchmaking = {
     }
     return m(
       '#matchmaking.body',
-      m('h3', `Matchmaking for ${name}`),
+      m('h2', `Matchmaking for ${name}`),
       m(FindMatchForm),
       m(PeerList),
       m(OfferList)

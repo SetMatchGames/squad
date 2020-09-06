@@ -5,12 +5,13 @@ import m from 'mithril'
 import Home from './views/Home.js'
 import FormatStore from './views/FormatStore.js'
 import Matchmaking from './views/Matchmaking.js'
-import Board from './views/Board.js'
+import Play from './views/Play.js'
 import NewFormat from './views/NewFormat.js'
 import NewPiece from './views/NewPiece.js'
 
 import NavMenu from './components/NavMenu.js'
 import ConnectModal from './components/ConnectModal.js'
+import state from './state.js';
 
 const LandingPage = {
   view: () => {
@@ -63,8 +64,15 @@ const Citation = {
 function layout(body) {
   return {
     render: (vnode) => {
+      let onclick
+      if (state.menu === 'visible') {
+        onclick = () => {
+          state.menu = 'hidden'
+        }
+      }
       return m(
         '#app',
+        { onclick },
         m(ConnectModal),
         m(Header),
         m(body, vnode.attrs),
@@ -78,7 +86,7 @@ m.route(document.body, "/", {
   "/": { render: () => { return m(LandingPage) } },
   "/formats": layout(FormatStore),
   "/matchmaking/:formatAddress": layout(Matchmaking),
-  "/play": layout(Board),
+  "/play": layout(Play),
   "/new-piece": layout(NewPiece),
   "/new-format": layout(NewFormat)
 })

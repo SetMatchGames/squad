@@ -1,6 +1,11 @@
 import m from 'mithril'
 
+import state from '../state.js'
+
 const NavMenu = {
+  oninit: () => {
+    state.menu = 'hidden'
+  },
   view: () => {
     return m(
       '#nav-menu.outline',
@@ -14,7 +19,7 @@ const MenuSymbol = {
   view: () => {
     return m(
       'button#menu-symbol',
-      { onclick: handleToggleLinks },
+      { onclick: handleToggleMenu },
       m('.stripe', '—'),
       m('.stripe', '—'),
       m('.stripe', '—')
@@ -24,34 +29,35 @@ const MenuSymbol = {
 
 const MenuLinks = {
   view: () => {
+    let display = 'none'
+    if (state.menu === 'visible') { display = 'flex' }
     return m(
       '#menu-links',
-      { style: { display: 'none' } },
+      { style: { display } },
       m('a', { onclick: handleLinkFactory('/formats') }, 'Play'),
       m('a', { onclick: handleLinkFactory('/new-piece') }, 'New Piece' ),
       m('a', { onclick: handleLinkFactory('/new-format') }, 'New Format'),
-      // m('a', { onclick: handleLinkFactory('/markets') }, 'Explore Markets' )
+      // TODO m('a', { onclick: handleLinkFactory('/markets') }, 'Explore Markets' )
     )
   }
 }
 
-const handleToggleLinks = () => {
-  toggleLinks()
+const handleToggleMenu = () => {
+  toggleMenu()
 }
 
 const handleLinkFactory = (route) => {
   return () => {
     m.route.set(route)
-    toggleLinks()
+    toggleMenu()
   }
 }
 
-function toggleLinks() {
-  const links = document.getElementById('menu-links')
-  if (links.style.display === 'none') {
-    links.style.display = 'flex'
+function toggleMenu() {
+  if (state.menu === 'hidden') {
+    state.menu = 'visible'
   } else {
-    links.style.display = 'none'
+    state.menu = 'hidden'
   }
 }
 

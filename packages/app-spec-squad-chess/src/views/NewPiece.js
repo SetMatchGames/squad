@@ -29,7 +29,7 @@ const ComponentForm = {
     )
     return m(
       '#component-form.body',
-      m('h3', 'New Component'),
+      m('h2', 'New Component'),
       form
     )
   }
