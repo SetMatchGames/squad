@@ -65,11 +65,11 @@ function layout(body) {
   return {
     render: (vnode) => {
       let onclick
-      if (state.menu === 'visible') {
-        onclick = () => {
-          state.menu = 'hidden'
-        }
-      }
+      let visibleMenu = false
+      Object.keys(state.menus).forEach(menu => {
+        if (state.menus[menu] === 'visible') { visibleMenu = true }
+      })
+      if (visibleMenu) { onclick = hideMenus }
       return m(
         '#app',
         { onclick },
@@ -80,6 +80,14 @@ function layout(body) {
       )
     }
   }
+}
+
+const hideMenus = () => {
+  Object.keys(state.menus).forEach(menu => {
+    if (state.menus[menu] === 'visible') {
+      state.menus[menu] = 'hidden'
+    }
+  })
 }
 
 m.route(document.body, "/", {

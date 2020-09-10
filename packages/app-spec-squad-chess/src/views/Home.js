@@ -15,7 +15,7 @@ const Blurb = {
   view: () => {
     return m(
       '.blurb',
-      'Play and create new variations of chess.'
+      'Play and create new variations of chess. Get paid for your creations.'
     )
   }
 }

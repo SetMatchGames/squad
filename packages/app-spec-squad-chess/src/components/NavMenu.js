@@ -4,7 +4,7 @@ import state from '../state.js'
 
 const NavMenu = {
   oninit: () => {
-    state.menu = 'hidden'
+    state.menus.nav = 'hidden'
   },
   view: () => {
     return m(
@@ -30,7 +30,7 @@ const MenuSymbol = {
 const MenuLinks = {
   view: () => {
     let display = 'none'
-    if (state.menu === 'visible') { display = 'flex' }
+    if (state.menus.nav === 'visible') { display = 'flex' }
     return m(
       '#menu-links',
       { style: { display } },
@@ -54,10 +54,10 @@ const handleLinkFactory = (route) => {
 }
 
 function toggleMenu() {
-  if (state.menu === 'hidden') {
-    state.menu = 'visible'
+  if (state.menus.nav === 'hidden') {
+    state.menus.nav = 'visible'
   } else {
-    state.menu = 'hidden'
+    state.menus.nav = 'hidden'
   }
 }
 

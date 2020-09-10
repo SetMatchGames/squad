@@ -34,7 +34,7 @@ export const connectSquad = (callback) => {
       console.log('Skipping on open')
     } else {
       // check ethereum connection
-      web3connection()
+      await web3connection()
 
       // load up the default definitions (only relevant with the temporary metastore)
       const defaultDefs = await defs()
@@ -80,13 +80,20 @@ export const connectSquad = (callback) => {
   })
 }
 
-function web3connection () {
-  if (!curationMarket.init()[0] || curationMarket.init()[1].provider.provider.chainId !== '0x3') {
-    console.log('No connection to Ropsten Ethereum testnet.')
-    const connectModal = document.getElementById('connect-modal')
-    connectModal.style.display = 'flex'
-    m.redraw()
-  } 
+async function web3connection () {
+  const connection = curationMarket.init()
+  let address
+  try {
+    address = await connection.getAddress()
+  } catch(e) {
+    address = e
+  }
+  if (typeof address !== 'string' || (await connection.provider.getNetwork()).chainId !== 3) {
+    state.connectModal = true
+  }  else {
+    state.connectModal = false
+  }
+  m.redraw()
 }
 
 async function multiDefinition (defs) {

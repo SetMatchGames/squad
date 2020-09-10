@@ -75,7 +75,8 @@ const DetailsToggle = {
   view: (vnode) => {
     const address = vnode.attrs.address
     let content = 'Details'
-    if (state.markets.previewedFormats[address]) {
+    if (state.markets.previewedFormat &&
+    state.markets.previewedFormat.address === address) {
       content = 'Hide'
     }
     return m(
@@ -96,14 +97,15 @@ const Details = {
     state.markets.previewedFormat.address !== address) {
       return
     }
+    const description = state.markets.previewedFormat.description || ''
     const num = state.owned[address]
     return m(
       '.details',
-      m('.ID', shortHash(address)),
-      `(Owned: ${num})`,
-      m(BuyDefinitionButton, { address }), 
-      m(SellDefinitionButton, { address }),
-      m(Board, { format: state.markets.previewedFormat })
+      m('.board-row.row', m(Board, { format: state.markets.previewedFormat })),
+      m('.row', m('label', 'Description: '), m('.data', description)),
+      m('.row', m('label', 'ID: '), m('.data', shortHash(address))),
+      m('.row', m('label', 'Tokens owned: '), m('.data',  num)),
+      m('.row', m('.buttons', m(BuyDefinitionButton, { address }), m(SellDefinitionButton, { address })))
     )
   }
 }
@@ -146,7 +148,7 @@ const handleLinkFactory = (address) => {
 }
 
 function shortenScore(score) {
-  if (!score) { return }
+  if (!(score + 1)) { return }
   let result = String(score)
   if (result.length > 7) {
     let count = 0

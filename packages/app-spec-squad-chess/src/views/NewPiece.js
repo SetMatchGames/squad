@@ -9,40 +9,50 @@ import { mechanics, admechanics } from '../rules.js'
 import graphicsPaths from '../graphics-paths.json'
 import { shortHash, getMarketInfo } from '../utils.js'
 
-const ComponentForm = {
+const PieceForm = {
   oninit: () => {
     getMarketInfo()
     clearForm()
   },
   view: () => {
     const form = m(
-      'form#component-form',
-      m(ComponentPreloader),
+      'form#piece-form',
+      m(Explanation),
+      m(PiecePreloader),
       m(DefinitionFields),
-      m(InitialBuyField),
-      m(CurveAddressField),
+      m(MarketFields),
       m(
-        'button',
+        'button.submit',
         { onclick: handleSubmit },
         'Submit new definition'
       )
     )
     return m(
-      '#component-form.body',
-      m('h2', 'New Component'),
+      '#piece-form.body',
+      m('h2', 'New Piece'),
       form
     )
   }
 }
 
-const ComponentPreloader = {
+const Explanation = {
+  view: () => {
+    return m(
+      'p',
+      'Create a new piece that can be added to formats.'
+    )
+  }
+}
+
+const PiecePreloader = {
   view: () => {
     let content = 'Loading...'
     if (state.squad.components) {
       content = m(
-        '.component.form-field',
+        '.piece.form-field',
+        m('h3', 'Load an existing piece'),
         Object.keys(state.squad.components).map(key => {
-          return m(ComponentButton, {
+          return m(PieceButton, {
             key,
             name: `${state.squad.components[key].name} (${shortHash(key)})`
           })
@@ -58,11 +68,11 @@ const ComponentPreloader = {
   }
 }
 
-const ComponentButton = {
+const PieceButton = {
   view: (vnode) => {
     return m(
       'button',
-      { value: vnode.key, onclick: handleLoadComponent },
+      { value: vnode.key, onclick: handleLoadPiece },
       vnode.attrs.name
     )
   }
@@ -71,20 +81,30 @@ const ComponentButton = {
 const DefinitionFields = {
   view: () => {
     return m(
-      '.component.definition',
-      m(ComponentNameField),
-      m(ComponentMechanics),
-      m(ComponentKing),
-      m(ComponentGraphics)
+      '.piece.definition',
+      m(PieceBasicsFields),
+      m(PieceMechanics),
+      m(PieceGraphics)
     )
   }
 }
 
-const ComponentNameField = {
+const PieceBasicsFields = {
   view: () => {
     return m(
-      '.component.form-field',
-      'Component name: ',
+      '.piece.form-field',
+      m('h3', 'Basics'),
+      m(PieceNameField),
+      m(PieceDescriptionField)
+    )
+  }
+}
+
+const PieceNameField = {
+  view: () => {
+    return m(
+      '.piece',
+      'Name: ',
       m(
         'input[type=text]',
         { value: state.componentForm.name, oninput: handleSaveFactory('name') }
@@ -93,28 +113,43 @@ const ComponentNameField = {
   }
 }
 
-const ComponentMechanics = {
+const PieceDescriptionField = {
   view: () => {
     return m(
-      '.component.form-field',
-      m('p', 'Mechanics: '),
+      '.piece',
+      'Description: ',
+      m(
+        'input[type=text]',
+        { value: state.componentForm.description, oninput: handleSaveFactory('description') }
+      )
+    )
+  }
+}
+
+const PieceMechanics = {
+  view: () => {
+    return m(
+      '.piece.form-field',
+      m('h3', 'Mechanics '),
+      m('p', 'Choose the rules for your piece. Each instance is a possible action your piece can take.'),
       Object.keys(mechanics).map(mechanic => {
         return m(
-          ComponentMechanic,
+          PieceMechanic,
           { key: mechanic, description: mechanics[mechanic] }
         )
       }),
       Object.keys(admechanics).map(admechanic => {
         return m(
-          ComponentAdmechanic,
+          PieceAdmechanic,
           { key: admechanic, description: admechanics[admechanic] }
         )
-      })
+      }),
+      m(PieceKing)
     )
   }
 }
 
-const ComponentMechanic = {
+const PieceMechanic = {
   view: (vnode) => {
     const instances = []
     if (state.componentForm.mechanics[vnode.key]) {
@@ -125,8 +160,8 @@ const ComponentMechanic = {
       })
     }
     return m(
-      '.component.mechanic',
-      `"${vnode.key}" – `,
+      '.piece.mechanic',
+      `${vnode.key} – `,
       m('span.italics', vnode.attrs.description),
       m(
         'button',
@@ -142,7 +177,7 @@ const MechanicOffset = {
   view: (vnode) => {
     const instance = state.componentForm.mechanics[vnode.attrs.mechanic][vnode.key]
     return m(
-      '.component.mechanic-params.indented',
+      '.piece.mechanic-params.indented',
       m('label', 'X: '),
       m(
         `input[type=number][value=${instance.offset[0]}].offset-input`,
@@ -167,12 +202,12 @@ const MechanicOffset = {
   }
 }
 
-const ComponentAdmechanic = {
+const PieceAdmechanic = {
   view: (vnode) => {
     let form
     if (state.componentForm.admechanics[vnode.key] !== undefined) {
       form = m(
-        '.component.admechanic-params.indented',
+        '.piece.admechanic-params.indented',
         m('label', "Enter params (any of ['default', 'self', 'king']):"),
         m(
           `input[type=text][value="${state.componentForm.admechanics[vnode.key]}"]`,
@@ -181,8 +216,8 @@ const ComponentAdmechanic = {
       )
     }
     return m(
-      '.component.admechanic',
-      `"${vnode.key}" – `,
+      '.piece.admechanic',
+      `${vnode.key} – `,
       m('span.italics', vnode.attrs.description),
       m(
         'input[type=checkbox]',
@@ -196,11 +231,12 @@ const ComponentAdmechanic = {
   }
 }
 
-const ComponentKing = {
+const PieceKing = {
   view: () => {
     return m(
-      '.component.form-field',
-      'King: ',
+      '.piece',
+      'king – ',
+      m('span.italics', "If a player captures all their opponent's kings, they win."),
       m(
         'input[type=checkbox]',
         {
@@ -212,11 +248,11 @@ const ComponentKing = {
   }
 }
 
-const ComponentGraphics = {
+const PieceGraphics = {
   view: () => {
     return m(
-      '.component.form-field',
-      m('p', 'Graphics: '),
+      '.piece.form-field',
+      m('h3', 'Graphics'),
       m(
         '.radio',
         m(GraphicsButtons)
@@ -257,43 +293,41 @@ const GraphicsButtons = {
   }
 }
 
+const MarketFields = {
+  view: () => {
+    return m(
+      '.piece.form-field',
+      m('h3', 'Tokens and Licensing'),
+      m(InitialBuyField)
+    )
+  }
+}
+
 const InitialBuyField = {
   view: () => {
     return m(
-      '.component.form-field',
+      '.piece',
       'Tokens to buy: ',
       m(
         'input[type=number][placeholder=0]',
         { oninput: handleSaveInitialBuy }
       ),
-      `(${state.componentForm.value} Wei)`
-    )
-  }
-}
-
-const CurveAddressField = {
-  view: () => {
-    return m(
-      '.component.form-field',
-      'Curve address: ',
-      m(
-        'input[type=number][placeholder=Leave blank!]',
-        { oninput: handleSaveFactory('curveAddress') }
-      )
+      `Cost: ${state.componentForm.value} Wei`
     )
   }
 }
 
 // handlers
-const handleLoadComponent = (event) => {
+const handleLoadPiece = (event) => {
   event.preventDefault()
-  const component = state.squad.components[event.target.value]
-  const data = JSON.parse(component.data)
+  const piece = state.squad.components[event.target.value]
+  const data = JSON.parse(piece.data)
 
   const graphics = data.graphics.local.white.split('/').pop().slice(1)
 
   state.componentForm = Object.assign(state.componentForm, {
-    name: component.name,
+    name: piece.name,
+    description: data.description,
     mechanics: data.mechanics || {},
     admechanics: data.admechanics || {},
     king: data.king,
@@ -310,6 +344,8 @@ function clearForm () {
   state.componentForm = Object.assign(
     {},
     {
+      name: '',
+      description: '',
       mechanics: {},
       admechanics: {},
       graphics: '',
@@ -384,7 +420,7 @@ const handleToggleKing = () => {
 
 const handleSaveInitialBuy = (event) => {
   state.componentForm.initialBuy = event.target.value
-  squad.curationMarket.getBuyPriceFromCurve(0, state.componentForm.initialBuy, state.componentForm.curveAddress).then(res => {
+  squad.curationMarket.getBuyPriceFromCurve(0, state.componentForm.initialBuy).then(res => {
     state.componentForm.value = res
     m.redraw()
   })
@@ -392,6 +428,7 @@ const handleSaveInitialBuy = (event) => {
 
 const handleSubmit = (event) => {
   event.preventDefault()
+  const description = state.componentForm.description
   const whiteGraphicPath = graphicsPaths[state.componentForm.graphics].white
   const blackGraphicPath = graphicsPaths[state.componentForm.graphics].black
   const mechanics = {}
@@ -405,6 +442,7 @@ const handleSubmit = (event) => {
     Component: {
       name: state.componentForm.name,
       data: JSON.stringify({
+        description,
         mechanics,
         admechanics: state.componentForm.admechanics,
         king: state.componentForm.king,
@@ -425,16 +463,15 @@ const handleSubmit = (event) => {
   console.log('Submitting definition:', definition)
 
   // make sure we get the right value before submitting, if not enough time has already passed
-  squad.curationMarket.getBuyPriceFromCurve(0, state.componentForm.initialBuy, state.componentForm.curveAddress).then(res => {
+  squad.curationMarket.getBuyPriceFromCurve(0, state.componentForm.initialBuy).then(res => {
     const value = res
     squad.definition(
       definition,
       [settings.gameAddress],
       state.componentForm.initialBuy,
-      { value },
-      state.componentForm.curveAddress
+      { value }
     )
   })
 }
 
-export default ComponentForm
+export default PieceForm

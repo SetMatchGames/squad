@@ -3,6 +3,9 @@ import squad from '@squad/sdk'
 import state from '../state.js'
 
 const SellDefinitionButton = {
+  oninit: (vnode) => {
+    state.buyingAndSelling[`sellPrice${vnode.attrs.address}`] = 0
+  },
   view: (vnode) => {
     const address = vnode.attrs.address
     const dataType = `sell${address}`
@@ -10,29 +13,34 @@ const SellDefinitionButton = {
       'form.sell-definition',
       m(
         'input[type=number]',
-        { value: state.buyingAndSelling[dataType], oninput: handleSaveFactory(dataType) }
+        { value: state.buyingAndSelling[dataType], oninput: handleSaveSellInfo(address, dataType) }
       ),
       m(
         'button',
         {
           onclick: (e) => {
             e.preventDefault()
-            squad.curationMarket.getSellPrice(state.buyingAndSelling[dataType], address)
-              .then((price) => {
-                console.log(price)
-                squad.curationMarket.sell(state.buyingAndSelling[dataType], address)
-              })
+            squad.curationMarket.sell(state.buyingAndSelling[dataType], address)
           }
         },
-        'Sell'
+        'Sell Tokens'
+      ),
+      m(
+        '.price',
+        'Return: ' + state.buyingAndSelling[`sellPrice${address}`] + ' Wei'
       )
     )
   }
 }
 
-const handleSaveFactory = (dataType) => {
+const handleSaveSellInfo = (address, dataType) => {
   return (event) => {
     state.buyingAndSelling[dataType] = event.target.value
+    squad.curationMarket.getSellPrice(state.buyingAndSelling[dataType], address)
+      .then((price) => {
+        state.buyingAndSelling[`sellPrice${address}`] = price
+        m.redraw()
+      })
   }
 }
 

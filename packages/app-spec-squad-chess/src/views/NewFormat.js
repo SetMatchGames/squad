@@ -16,12 +16,12 @@ const FormatForm = {
   view: () => {
     const form = m(
       'form#format-form',
+      m(Explanation),
       m(FormatPreloader),
       m(DefinitionFields),
-      m(InitialBuyField),
-      m(CurveAddressField),
+      m(MarketFields),
       m(
-        'button',
+        'button.submit',
         { onclick: handleSubmit },
         'Submit new definition'
       )
@@ -34,12 +34,23 @@ const FormatForm = {
   }
 }
 
+const Explanation = {
+  view: () => {
+    return m(
+      'p',
+      'Create a new format and set the price players must pay to play it. \
+      {TODO}% of the payments will go to the makers of Squad Chess as a network tax.'
+    )
+  }
+}
+
 const FormatPreloader = {
   view: () => {
     let content = 'Loading...'
     if (state.squad.rawFormats) {
       content = m(
         '.format.form-field',
+        m('h3', 'Load an existing format'),
         Object.keys(state.squad.rawFormats).map(key => {
           return m(FormatButton, {
             key,
@@ -71,9 +82,20 @@ const DefinitionFields = {
   view: () => {
     return m(
       '.format.defition',
-      m(FormatNameField),
+      m(FormatBasicsFields),
       m(FormatComponentsList),
       m(FormatDataFields)
+    )
+  }
+}
+
+const FormatBasicsFields = {
+  view: () => {
+    return m(
+      '.format.form-field',
+      m('h3', 'Basics'),
+      m(FormatNameField),
+      m(FormatDescriptionField)
     )
   }
 }
@@ -81,11 +103,24 @@ const DefinitionFields = {
 const FormatNameField = {
   view: () => {
     return m(
-      '.format.form-field',
-      'Format name: ',
+      '.format',
+      'Name: ',
       m(
         'input[type=text]',
         { value: state.formatForm.name, oninput: handleSaveFactory('name') }
+      )
+    )
+  }
+}
+
+const FormatDescriptionField = {
+  view: () => {
+    return m(
+      '.format',
+      'Description: ',
+      m(
+        'input[type=text]',
+        { value: state.formatForm.description, oninput: handleSaveFactory('description') }
       )
     )
   }
@@ -98,6 +133,12 @@ const FormatComponentsList = {
       componentBoxes = []
       for (const address in state.squad.components) {
         const name = `${state.squad.components[address].name} (${shortHash(address)})`
+        let description = JSON.parse(state.squad.components[address].data).description
+        if (description) {
+          description = ' – ' + description
+        } else {
+          description = ''
+        }
         let checked = false
         if (state.formatForm.components.includes(address)) { checked = true }
         componentBoxes = componentBoxes.concat([
@@ -107,14 +148,15 @@ const FormatComponentsList = {
               `input[type=checkbox][name=${name}][value=${address}]`,
               { oninput: handleAddOrRemoveComponent, checked }
             ),
-            name
+            name,
+            m('span.italics', description)
           )
         ])
       }
     }
     return m(
       '.format.form-field',
-      m('label', 'Components:'),
+      m('h3', 'Pieces'),
       m('.format.components', componentBoxes)
     )
   }
@@ -123,7 +165,8 @@ const FormatComponentsList = {
 const FormatDataFields = {
   view: () => {
     return m(
-      '.format.data',
+      '.format.form-field',
+      m('h3', 'Board'),
       m(FormatStartingPosition),
       m(FormatOrientation)
     )
@@ -142,7 +185,7 @@ const FormatStartingPosition = {
 const StartingPositionDimensions = {
   view: () => {
     return m(
-      '.format.form-field',
+      '.format',
       m(
         'p',
         'Starting position width: ',
@@ -328,11 +371,11 @@ const PieceImage = {
     const attrs = {
       src: vnode.attrs.imgLink,
       style: {
-        width: 10 * settings.boardConfig.squares.size + 'px',
-        height: 10 * settings.boardConfig.squares.size + 'px'
+        width: '80px',
+        height: '80px'
       }
     }
-    return m('img#' + vnode.key, attrs)
+    return m('img', attrs)
   }
 }
 
@@ -445,23 +488,69 @@ const DeleteSquareSelect = {
 const FormatOrientation = {
   view: () => {
     return m(
-      '.format.form-field',
+      '.format.orientation',
       m(
         'p',
-        'Orientation for white (0-3): ',
-        m(
-          'input[type=number][placeholder=2]',
-          { value: state.formatForm.whiteOrientation, oninput: handleSaveFactory('whiteOrientation') }
-        )
+        m('label', 'Direction for white pieces: '),
+        m(OrientationSelector, { player: 'whiteOrientation' })
       ),
       m(
         'p',
-        'Orientation for black (0-3): ',
-        m(
-          'input[type=number][placeholder=0]',
-          { value: state.formatForm.blackOrientation, oninput: handleSaveFactory('blackOrientation') }
-        )
+        m('label', 'Direction for black pieces: '),
+        m(OrientationSelector, { player: 'blackOrientation' })
       )
+    )
+  }
+}
+
+const OrientationSelector = {
+  view: (vnode) => {
+    const options = {
+      0: 'Top to bottom',
+      2: 'Bottom to top',
+      3: 'Right to left',
+      1: 'Left to right'
+    }
+    const currentSelection = options[Number(state.formatForm[vnode.attrs.player])]
+    delete options[state.formatForm[vnode.attrs.player]]
+    return m(
+      `.select.${state.menus[vnode.attrs.player]}`,
+      m(
+        'a.selected', 
+        { onclick: handleToggleOrientationOptions(vnode.attrs.player) }, 
+        currentSelection
+      ),
+      m(OrientationOptions, { options, player: vnode.attrs.player })
+    )
+  }
+}
+
+const OrientationOptions = {
+  view: (vnode) => {
+    let display = 'none'
+    if (state.menus[vnode.attrs.player] === 'visible') { display = 'flex' }
+    return m(
+      '.options',
+      Object.keys(vnode.attrs.options).map(key => {
+        return m(
+          `a.option#${key}`,
+          { 
+            onclick: handleSaveOrientation(vnode.attrs.player),
+            style: { display }
+          },
+          vnode.attrs.options[key]
+        )
+      })
+    )
+  }
+}
+
+const MarketFields = {
+  view: () => {
+    return m(
+      '.format.form-field',
+      m('h3', 'Tokens and Licensing'),
+      m(InitialBuyField)
     )
   }
 }
@@ -469,26 +558,13 @@ const FormatOrientation = {
 const InitialBuyField = {
   view: () => {
     return m(
-      '.format.form-field',
+      '.format',
       'Tokens to buy: ',
       m(
         'input[type=number][placeholder=0]',
         { oninput: handleSaveInitialBuy }
       ),
-      `(${state.formatForm.value} Wei)`
-    )
-  }
-}
-
-const CurveAddressField = {
-  view: () => {
-    return m(
-      '.format.form-field',
-      'Curve address: ',
-      m(
-        'input[type=number][placeholder=Leave blank!]',
-        { oninput: handleSaveFactory('curveAddress') }
-      )
+      `Cost: ${state.formatForm.value} Wei`
     )
   }
 }
@@ -504,6 +580,7 @@ const handleLoadFormat = (event) => {
     whiteOrientation: data.orientation.white,
     blackOrientation: data.orientation.black,
     name: format.name,
+    description: data.description,
     components: [...format.components]
   })
 
@@ -519,10 +596,13 @@ function clearForm () {
   state.formatForm = Object.assign(
     {},
     {
+      name: '',
+      description: '',
       components: [],
       startingPosition: {},
       whiteOrientation: 2,
       blackOrientation: 0,
+      orientationOptions: {},
       initialBuy: 0,
       value: 0,
       boardSize: {}
@@ -588,9 +668,31 @@ const handlePiecePromotionFactory = (squareId) => {
   }
 }
 
+
+const handleSaveOrientation = (player) => {
+  return (event) => {
+    state.formatForm[player] = event.target.id
+    toggleOrientationsOptions(player)
+  }
+}
+
+const handleToggleOrientationOptions = (player) => {
+  return () => {
+    toggleOrientationsOptions(player)
+  }
+}
+
+function toggleOrientationsOptions(player) {
+  if (state.menus[player] !== 'visible') {
+    state.menus[player] = 'visible'
+  } else {
+    state.menus[player] = 'hidden'
+  }
+}
+
 const handleSaveInitialBuy = (event) => {
   state.formatForm.initialBuy = event.target.value
-  squad.curationMarket.getBuyPriceFromCurve(0, state.formatForm.initialBuy, state.formatForm.curveAddress).then(res => {
+  squad.curationMarket.getBuyPriceFromCurve(0, state.formatForm.initialBuy).then(res => {
     state.formatForm.value = res
     m.redraw()
   })
@@ -598,6 +700,7 @@ const handleSaveInitialBuy = (event) => {
 
 const handleSubmit = (event) => {
   event.preventDefault()
+  const description = state.formatForm.description
   const startingPosition = cleanStartingPosition(state.formatForm.startingPosition)
   const orientation = {}
   orientation.white = state.formatForm.whiteOrientation
@@ -607,6 +710,7 @@ const handleSubmit = (event) => {
       name: state.formatForm.name,
       components: state.formatForm.components,
       data: JSON.stringify({
+        description,
         startingPosition,
         orientation
       })
@@ -616,14 +720,13 @@ const handleSubmit = (event) => {
   localStorage.setItem('localDefinitions', JSON.stringify([...localDefs, definition]))
   console.log('Definition being submitted', definition)
   // make sure we get the right value before submitting, if not enough time has already passed
-  squad.curationMarket.getBuyPriceFromCurve(0, state.formatForm.initialBuy, state.formatForm.curveAddress).then(res => {
+  squad.curationMarket.getBuyPriceFromCurve(0, state.formatForm.initialBuy).then(res => {
     const value = res
     squad.definition(
       definition,
       [settings.gameAddress],
       state.formatForm.initialBuy,
-      { value },
-      state.formatForm.curveAddress
+      { value }
     )
   })
 }

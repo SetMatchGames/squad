@@ -35,7 +35,6 @@ const Board = {
         // if there is a piece, grab links to piece images
         let graphics
         if (content) {
-          console.log(vnode.attrs.format, content.pieceId)
           graphics = vnode.attrs.format.pieces[content.pieceId].graphics
         }
         // add the square to the board
@@ -82,7 +81,13 @@ function queueDeselect () {
 }
 
 function handleDeselectPiece () {
-  return resetBoardState
+  return () => {
+    state.board = Object.assign({}, state.board, {
+      deselectable: [],
+      highlightedSquares: [],
+      from: []
+    })
+  }
 }
 
 function handleSelectPiece () {

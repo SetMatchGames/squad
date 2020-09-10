@@ -1,7 +1,8 @@
 let state // eslint-disable-line no-unused-vars
 
 export default state = {
-  menu: '',
+  menus: {},
+  connectModal: false,
   formatForm: {},
   componentForm: {},
   matchmaking: {},

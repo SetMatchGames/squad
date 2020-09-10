@@ -25,7 +25,6 @@ function init (defaults) {
   if (initialized) {
     return [initialized, walletOrSigner]
   }
-
   console.log('Initializing...')
 
   switch (network) {
@@ -55,11 +54,12 @@ function init (defaults) {
     }
   }
 
-  if (walletOrSigner) {
-    initialized = true
-    return [initialized, walletOrSigner]
-  }
-  return [initialized, walletOrSigner]
+  walletOrSigner.getAddress()
+    .then(() => {
+      initialized = true
+    })
+
+  return walletOrSigner
 }
 
 class BondAlreadyExists extends Error {
@@ -159,7 +159,8 @@ async function getMarketCap (bondId) {
     console.error(`Market for ${bondId} has no curve address set`)
   }
   const supply = bond.supply
-  return (await getBuyPriceFromCurve(0, supply, curveAddress)).toNumber()
+  const cap = await getBuyPriceFromCurve(0, supply, curveAddress)
+  return cap.toNumber()
 }
 
 module.exports = {
