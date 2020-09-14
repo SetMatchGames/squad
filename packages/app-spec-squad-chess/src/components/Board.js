@@ -59,17 +59,19 @@ function resetBoardState (vnode) {
 
   // set initial game state
   state.game = chess.createGame(vnode.attrs.format)
+  console.log(vnode.attrs.matchStatus)
 
-  // set match state
+  // set board state
   state.board = Object.assign(
+    state.board,
     {
       from: [],
       highlightedSquares: [],
       deselectable: [],
-      matchStatus: 'Match not started'
-    },
-    state.board
+      matchStatus: vnode.attrs.matchStatus
+    }
   )
+  console.log(state.board)
 }
 
 function queueDeselect () {
@@ -185,7 +187,7 @@ const BoardPiece = {
     // configure this by: preview: moveable, both players; match: moveable, one player; form: moveable, both players, 
     const pieceOwner = state.game.position[vnode.key].content.player
     // if a match hasn't started, don't add events
-    if (state.matchmaking.connection !== 'match started') {
+    if (state.board.matchStatus !== 'match started') {
       /* do nothing */
     // if it isn't our piece and its not highlighted, don't add events
     } else if ((pieceOwner !== state.matchmaking.player) && !highlighted) {

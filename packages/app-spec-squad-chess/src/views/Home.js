@@ -5,8 +5,7 @@ const Home = {
     return m(
       '#home.body',
       m(Blurb),
-      m(PlayButton),
-      m(CreationButtons),
+      m(Buttons)
     )
   }
 }
@@ -20,12 +19,22 @@ const Blurb = {
   }
 }
 
+const Buttons = {
+  view: () => {
+    return m(
+      '.buttons',
+      m(PlayButton),
+      m(CreationButtons)
+    )
+  }
+}
+
 const PlayButton = {
   view: () => {
     return m(
-      'button',
+      'button#play',
       { onclick: () => { m.route.set('/formats') } },
-      'Play'
+      m('h2', 'Play')
     )
   }
 }
@@ -37,12 +46,12 @@ const CreationButtons = {
       m(
         'button',
         { onclick: () => { m.route.set('/new-piece') } },
-        'New Chess Piece'
+        m('h4', 'New Chess Piece')
       ),
       m(
         'button',
         { onclick: () => { m.route.set('/new-format') } },
-        'New Chess Format'
+        m('h4', 'New Chess Format')
       )
     )
   }

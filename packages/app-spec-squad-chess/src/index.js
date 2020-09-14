@@ -11,6 +11,8 @@ import NewPiece from './views/NewPiece.js'
 
 import NavMenu from './components/NavMenu.js'
 import ConnectModal from './components/ConnectModal.js'
+import AlertList from './components/AlertList.js'
+
 import state from './state.js';
 
 const LandingPage = {
@@ -35,7 +37,14 @@ const Header = {
 
 const Title = {
   view: () => {
-    return m('h1', '🦑 Squad Chess')
+    return m(
+      'h1', 
+      m(
+        'a', 
+        { href: '/' },
+        '🦑 Squad Chess'
+      )
+    )
   }
 }
 
@@ -74,6 +83,7 @@ function layout(body) {
         '#app',
         { onclick },
         m(ConnectModal),
+        m(AlertList),
         m(Header),
         m(body, vnode.attrs),
         m(Footer)

@@ -5,6 +5,7 @@ body {
 }
 
 #app {
+  position: relative;
   display: flex;
   flex-direction: column;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, "Helvetica Neue", sans-serif;
@@ -37,6 +38,11 @@ a {
   cursor: pointer;
 }
 
+h1 a {
+  color: #705b3b;
+  padding-top: 12%;
+}
+
 p {
   margin-top: 0px;
   margin-bottom: 8px;
@@ -49,6 +55,11 @@ img {
 h1, h2, h3, h4, h5, h6 {
   display: flex;
   flex-direction: row;
+}
+
+#app h1 {
+  justify-content: center;
+  padding: 0 16px 0 16px;
 }
 
 .body h2 {
@@ -124,6 +135,10 @@ input.focus-visible {
 
 .italics {
   font-style: italic;
+}
+
+.bold {
+  font-weight: bold;
 }
 
 .row {
@@ -253,16 +268,69 @@ input.focus-visible {
   flex: 1 1 0%;
 }
 
+/* Alerts */
+#alert-list {
+  position: fixed;
+  z-index: 1;
+  bottom: 40px;
+  left: 40px;
+  width: 400px;
+  display: flex;
+  flex-direction: column;
+}
+
+.alert {
+  display: flex;
+  flex-direction: row;
+  padding: 12px;
+  margin: 8px;
+  border: 1px solid #ebddc3;
+  border-radius: 8px;
+  background-color: #fffcf7;
+  box-shadow: -4px -4px 12px 0 #ebddc3;
+  opacity: 1;
+  transition: opacity 3s;
+}
+
+.alert div {
+  margin-left: 8px;
+}
+
 /* Home Page */
-#app h1 {
+#home {
+  margin-top: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#home .buttons {
+  margin-top: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
 }
 
-#home {
+#home button {
+  margin: 24px;
+}
+
+#home button h2, #home button h4 {
+  margin: 0;
+}
+
+.creation-buttons {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  width: 100%;
   justify-content: center;
-  align-items: center;
+}
+
+@media screen and (max-width: 600px) {
+  .creation-buttons {
+    flex-direction: column;
+  }
 }
 
 /* Board */
@@ -271,8 +339,9 @@ input.focus-visible {
   flex-direction: column;
   align-items: center;
   position: relative;
-  width: 50vw;
-  height: 50vw;
+  width: 45vw;
+  height: 45vw;
+  margin: 16px;
 }
 
 .board-squares {
@@ -301,10 +370,18 @@ input.focus-visible {
   }
 }
 
+/* Play */
+#play {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 /* Format Store */
 #format-selector {
   display: flex;
   flex-direction: column;
+  justify-content: space-around;
 }
 
 .format-card {
@@ -515,13 +592,20 @@ button.submit {
 .format.orientation .select {
   position: absolute;
   left: 192px;
-  color: #ff7b00;
   background-color: #fff6e8;
   font-size: 16px;
   margin: 8px;
   padding: 10px;
   box-shadow: #ebddc3 6px 6px 12px, #fffcf7 -12px -12px 16px -2px;
   border-radius: 6px;
+}
+
+.format.orientation .select .selected {
+  color: #705b3b;
+}
+
+.format.orientation .select .selected:hover {
+  color: #ff7b00;
 }
 
 @media screen and (max-width: 600px) {
@@ -551,4 +635,41 @@ button.submit {
 
 .format.orientation .select .options a:hover {
   color: #ff7b00;
+}
+
+/* Piece Form */
+.piece.mechanic {
+  margin: 40px 0 0 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.piece.mechanic button.add-instance {
+  margin-top: 16px;
+}
+
+.piece.mechanic-params {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 8px 0 8px 0;
+  border-bottom: 1px solid #ebddc3;
+}
+
+.piece.mechanic-params .instances {
+  display: flex;
+  flex-direction: row;
+}
+
+@media screen and (max-width: 1100px) {
+  .piece.mechanic-params .instances {
+    flex-direction: column;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .piece.mechanic-params {
+    flex-direction: column;
+  }
 }

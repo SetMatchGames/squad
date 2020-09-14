@@ -101,11 +101,17 @@ const Details = {
     const num = state.owned[address]
     return m(
       '.details',
-      m('.board-row.row', m(Board, { format: state.markets.previewedFormat })),
+      m('.board-row.row', m(Board, { 
+        format: state.markets.previewedFormat, 
+        matchStatus: 'no match' 
+      })),
       m('.row', m('label', 'Description: '), m('.data', description)),
       m('.row', m('label', 'ID: '), m('.data', shortHash(address))),
       m('.row', m('label', 'Tokens owned: '), m('.data',  num)),
-      m('.row', m('.buttons', m(BuyDefinitionButton, { address }), m(SellDefinitionButton, { address })))
+      m('.row', m('.buttons', 
+        m(BuyDefinitionButton, { address }), 
+        m(SellDefinitionButton, { address })
+      ))
     )
   }
 }

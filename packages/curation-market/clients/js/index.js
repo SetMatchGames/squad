@@ -72,8 +72,9 @@ class BondAlreadyExists extends Error {
 async function newBond (
   bondId,
   initialBuyNumber,
+  callback,
   options = {},
-  addressOfCurve,
+  addressOfCurve
 ) {
   init()
   if (!addressOfCurve || addressOfCurve === '0x0000000000000000000000000000000000000000') { 
@@ -83,20 +84,20 @@ async function newBond (
   const fullOptions = Object.assign({}, defaults, options)
   const curve = await autoBond.getCurve(bondHash)
   if (curve === '0x0000000000000000000000000000000000000000') {
-    return await autoBond.newBond(
+    const tx = await autoBond.newBond(
       addressOfCurve,
       bondHash,
       initialBuyNumber,
       fullOptions
     )
+    return handleConfirmationCallback(tx.hash, callback)
   }
-  throw new BondAlreadyExists(`Bond ${bondId} already exists.`)
 }
 
 async function getSupply (bondId) {
   init()
   const bondHash = ethers.utils.id(bondId)
-  return await autoBond.getSupply(bondHash)
+  return Number(await autoBond.getSupply(bondHash))
 }
 
 async function getBalance (bondId, holderAddress) {
@@ -107,33 +108,34 @@ async function getBalance (bondId, holderAddress) {
   return (await autoBond.getBalance(bondHash, holderAddress)).toNumber()
 }
 
-async function buy (units, bondId, options = {}) {
+async function buy (units, bondId, callback, options = {}) {
   init()
   const bondHash = ethers.utils.id(bondId)
   const fullOptions = Object.assign({}, defaults, options)
-  return await autoBond.buy(
+  const tx = await autoBond.buy(
     units,
     bondHash,
     fullOptions
   )
+  return handleConfirmationCallback(tx.hash, callback)
 }
 
-async function sell (units, bondId, options = {}) {
+async function sell (units, bondId, callback, options = {}) {
   init()
   const bondHash = ethers.utils.id(bondId)
   const fullOptions = Object.assign({}, defaults, options)
-  return await autoBond.sell(
+  const tx = await autoBond.sell(
     units,
     bondHash,
     fullOptions
   )
+  return handleConfirmationCallback(tx.hash, callback)
 }
 
 async function getBuyPrice (units, bondId) {
   init()
   const bondHash = ethers.utils.id(bondId)
-  console.log("getting buy price", units, bondHash)
-  return await autoBond.getBuyPrice(units, bondHash)
+  return Number(await autoBond.getBuyPrice(units, bondHash))
 }
 
 async function getBuyPriceFromCurve (supply, units, curveAddress) {
@@ -161,6 +163,14 @@ async function getMarketCap (bondId) {
   const supply = bond.supply
   const cap = await getBuyPriceFromCurve(0, supply, curveAddress)
   return cap.toNumber()
+}
+
+function handleConfirmationCallback (txHash, callback) {
+  return provider.waitForTransaction(txHash).then(async (receipt) => {
+    if (typeof callback === 'function') {
+      await callback(receipt)
+    }
+  })
 }
 
 module.exports = {

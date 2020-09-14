@@ -161,10 +161,14 @@ const PieceMechanic = {
     }
     return m(
       '.piece.mechanic',
-      `${vnode.key} – `,
-      m('span.italics', vnode.attrs.description),
       m(
-        'button',
+        '.description',
+        m('span.bold', vnode.key),
+        m('span.italics', ` – ${vnode.attrs.description}`)
+
+      ),
+      m(
+        'button.add-instance',
         { onclick: handleAddMechanicInstanceFactory(vnode.key) },
         'Add instance'
       ),
@@ -178,20 +182,32 @@ const MechanicOffset = {
     const instance = state.componentForm.mechanics[vnode.attrs.mechanic][vnode.key]
     return m(
       '.piece.mechanic-params.indented',
-      m('label', 'X: '),
       m(
-        `input[type=number][value=${instance.offset[0]}].offset-input`,
-        { oninput: handleMechanicOffsetFactory(vnode.attrs.mechanic, vnode.key, 0) }
-      ),
-      m('label', 'Y: '),
-      m(
-        `input[type=number][value=${instance.offset[1]}].offset-input`,
-        { oninput: handleMechanicOffsetFactory(vnode.attrs.mechanic, vnode.key, 1) }
-      ),
-      m('label', 'Steps: '),
-      m(
-        `input[type=number][value=${instance.steps}].steps-input`,
-        { oninput: handleMechanicStepsFactory(vnode.attrs.mechanic, vnode.key) }
+        '.instances',
+        m(
+          '.field',
+          m('label', 'X: '),
+          m(
+            `input[type=number][value=${instance.offset[0]}].offset-input`,
+            { oninput: handleMechanicOffsetFactory(vnode.attrs.mechanic, vnode.key, 0) }
+          )
+        ),
+        m(
+          '.field',
+          m('label', 'Y: '),
+          m(
+            `input[type=number][value=${instance.offset[1]}].offset-input`,
+            { oninput: handleMechanicOffsetFactory(vnode.attrs.mechanic, vnode.key, 1) }
+          )
+        ),
+        m(
+          '.field',
+          m('label', 'Steps: '),
+          m(
+            `input[type=number][value=${instance.steps}].steps-input`,
+            { oninput: handleMechanicStepsFactory(vnode.attrs.mechanic, vnode.key) }
+          )
+        )
       ),
       m(
         'button',
@@ -208,7 +224,7 @@ const PieceAdmechanic = {
     if (state.componentForm.admechanics[vnode.key] !== undefined) {
       form = m(
         '.piece.admechanic-params.indented',
-        m('label', "Enter params (any of ['default', 'self', 'king']):"),
+        m('label', "Params (any of ['default', 'self', 'king']):"),
         m(
           `input[type=text][value="${state.componentForm.admechanics[vnode.key]}"]`,
           { oninput: handleAdmechanicParamsFactory(vnode.key) }
@@ -216,9 +232,13 @@ const PieceAdmechanic = {
       )
     }
     return m(
-      '.piece.admechanic',
-      `${vnode.key} – `,
-      m('span.italics', vnode.attrs.description),
+      '.piece.mechanic',
+      m(
+        '.description',
+        m('span.bold', vnode.key),
+        m('span.italics', ` – ${vnode.attrs.description}`)
+
+      ),
       m(
         'input[type=checkbox]',
         {
@@ -234,9 +254,13 @@ const PieceAdmechanic = {
 const PieceKing = {
   view: () => {
     return m(
-      '.piece',
-      'king – ',
-      m('span.italics', "If a player captures all their opponent's kings, they win."),
+      '.piece.mechanic',
+      m(
+        '.description',
+        m('span.bold', 'king'),
+        m('span.italics', " – If a player captures all their opponent's kings, they win.")
+
+      ),
       m(
         'input[type=checkbox]',
         {
