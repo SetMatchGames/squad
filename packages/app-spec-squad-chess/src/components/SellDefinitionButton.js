@@ -1,6 +1,8 @@
 import m from 'mithril'
 import squad from '@squad/sdk'
+
 import state from '../state.js'
+import { sellWithAlerts } from '../utils.js'
 
 const SellDefinitionButton = {
   oninit: (vnode) => {
@@ -20,7 +22,7 @@ const SellDefinitionButton = {
         {
           onclick: (e) => {
             e.preventDefault()
-            squad.curationMarket.sell(state.buyingAndSelling[dataType], address)
+            sellWithAlerts(state.buyingAndSelling[dataType], address)
           }
         },
         'Sell Tokens'

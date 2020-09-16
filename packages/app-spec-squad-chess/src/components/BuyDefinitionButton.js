@@ -1,5 +1,7 @@
 import m from 'mithril'
 import squad from '@squad/sdk'
+
+import { buyWithAlerts } from '../utils.js'
 import state from '../state.js'
 
 const BuyDefinitionButton = {
@@ -22,7 +24,7 @@ const BuyDefinitionButton = {
             e.preventDefault()
             squad.curationMarket.getBuyPrice(state.buyingAndSelling[dataType], address)
               .then((price) => {
-                squad.curationMarket.buy(state.buyingAndSelling[dataType], address, { value: price })
+                buyWithAlerts(state.buyingAndSelling[dataType], address, { value: price })
               })
           }
         },

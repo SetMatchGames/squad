@@ -6,7 +6,7 @@ import squad from '@squad/sdk'
 import state from '../state.js'
 import settings from '../settings.js'
 import { stringToSquare } from '../rules.js'
-import { shortHash, findBoardRange, getMarketInfo } from '../utils.js'
+import { shortHash, findBoardRange, getMarketInfo, definitionWithAlerts } from '../utils.js'
 
 const FormatForm = {
   oninit: () => {
@@ -188,7 +188,7 @@ const StartingPositionDimensions = {
       '.format',
       m(
         'p',
-        'Starting position width: ',
+        'Width: ',
         m(
           'input[type=number]',
           { oninput: handleSaveFactory('startingPositionWidth') }
@@ -196,7 +196,7 @@ const StartingPositionDimensions = {
       ),
       m(
         'p',
-        'Starting position height: ',
+        'Height: ',
         m(
           'input[type=number]',
           { oninput: handleSaveFactory('startingPositionHeight') }
@@ -722,7 +722,7 @@ const handleSubmit = (event) => {
   // make sure we get the right value before submitting, if not enough time has already passed
   squad.curationMarket.getBuyPriceFromCurve(0, state.formatForm.initialBuy).then(res => {
     const value = res
-    squad.definition(
+    definitionWithAlerts(
       definition,
       [settings.gameAddress],
       state.formatForm.initialBuy,

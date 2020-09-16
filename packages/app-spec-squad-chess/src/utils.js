@@ -99,7 +99,7 @@ async function web3connection () {
 async function multiDefinition (defs) {
   // submit the default definitions to make sure they have bonds on ethereum
   defs.forEach(async (def) => {
-    await squad.definition(def, [settings.gameAddress])
+    await squad.definition(def, [settings.gameAddress], 0)
   })
 }
 
@@ -203,4 +203,45 @@ export const checkWinner = () => {
     state.board.matchStatus = `${winner} wins!`
     console.log(state.board.matchStatus)
   }
+}
+
+export const buyWithAlerts = async (units, bondId, options) => {
+  await squad.curationMarket.buy(
+    units, 
+    bondId,
+    handleAlert('Submitted', 'buy order submitted'),
+    handleAlert('Confirmed', 'buy order confirmed'),
+    options
+  )
+}
+
+export const sellWithAlerts = async (units, bondId) => {
+  await squad.curationMarket.sell(
+    units, 
+    bondId,
+    handleAlert('Submitted', 'sell order submitted'),
+    handleAlert('Confirmed', 'sell order confirmed')
+  )
+}
+
+export const definitionWithAlerts = async (definition, games, initialBuyUnits, options) => {
+  await squad.definition(
+    definition, 
+    games, 
+    initialBuyUnits, 
+    handleAlert('Submitted', 'contribution submitted'),
+    handleAlert('Confirmed', 'contribution confirmed'),
+    options
+  )
+}
+
+const handleAlert = (type, text) => {
+  return () => { alert(type, text) }
+}
+
+const alert = (type, text) => {
+  console.log('Creating alert', type, text)
+  const alert = { type, text }
+  state.alerts.push(alert)
+  m.redraw()
 }

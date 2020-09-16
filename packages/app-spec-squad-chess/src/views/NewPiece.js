@@ -7,7 +7,7 @@ import state from '../state.js'
 import settings from '../settings.js'
 import { mechanics, admechanics } from '../rules.js'
 import graphicsPaths from '../graphics-paths.json'
-import { shortHash, getMarketInfo } from '../utils.js'
+import { shortHash, getMarketInfo, definitionWithAlerts } from '../utils.js'
 
 const PieceForm = {
   oninit: () => {
@@ -489,7 +489,7 @@ const handleSubmit = (event) => {
   // make sure we get the right value before submitting, if not enough time has already passed
   squad.curationMarket.getBuyPriceFromCurve(0, state.componentForm.initialBuy).then(res => {
     const value = res
-    squad.definition(
+    definitionWithAlerts(
       definition,
       [settings.gameAddress],
       state.componentForm.initialBuy,

@@ -72,7 +72,8 @@ class BondAlreadyExists extends Error {
 async function newBond (
   bondId,
   initialBuyNumber,
-  callback,
+  submissionCb,
+  confirmationCb,
   options = {},
   addressOfCurve
 ) {
@@ -90,7 +91,8 @@ async function newBond (
       initialBuyNumber,
       fullOptions
     )
-    return handleConfirmationCallback(tx.hash, callback)
+    submissionCb(tx)
+    return handleConfirmationCallback(tx.hash, confirmationCb)
   }
 }
 
@@ -108,7 +110,7 @@ async function getBalance (bondId, holderAddress) {
   return (await autoBond.getBalance(bondHash, holderAddress)).toNumber()
 }
 
-async function buy (units, bondId, callback, options = {}) {
+async function buy (units, bondId, submissionCb, confirmationCb, options = {}) {
   init()
   const bondHash = ethers.utils.id(bondId)
   const fullOptions = Object.assign({}, defaults, options)
@@ -117,10 +119,11 @@ async function buy (units, bondId, callback, options = {}) {
     bondHash,
     fullOptions
   )
-  return handleConfirmationCallback(tx.hash, callback)
+  submissionCb(tx)
+  return handleConfirmationCallback(tx.hash, confirmationCb)
 }
 
-async function sell (units, bondId, callback, options = {}) {
+async function sell (units, bondId, submissionCb, confirmationCb, options = {}) {
   init()
   const bondHash = ethers.utils.id(bondId)
   const fullOptions = Object.assign({}, defaults, options)
@@ -129,7 +132,8 @@ async function sell (units, bondId, callback, options = {}) {
     bondHash,
     fullOptions
   )
-  return handleConfirmationCallback(tx.hash, callback)
+  submissionCb(tx)
+  return handleConfirmationCallback(tx.hash, confirmationCb)
 }
 
 async function getBuyPrice (units, bondId) {
@@ -166,10 +170,8 @@ async function getMarketCap (bondId) {
 }
 
 function handleConfirmationCallback (txHash, callback) {
-  return provider.waitForTransaction(txHash).then(async (receipt) => {
-    if (typeof callback === 'function') {
-      await callback(receipt)
-    }
+  return provider.waitForTransaction(txHash).then((receipt) => {
+    callback(receipt)
   })
 }
 
