@@ -103,6 +103,7 @@ const Details = {
       '.details',
       m('.board-row.row', m(Board, { 
         format: state.markets.previewedFormat, 
+        position: state.markets.previewedFormat.startingPosition,
         matchStatus: 'no match' 
       })),
       m('.row', m('label', 'Description: '), m('.data', description)),

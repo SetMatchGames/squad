@@ -172,7 +172,7 @@ export const previewFormat = (address) => {
   console.log('Previewing format:', state.markets.previewedFormat)
 }
 
-function getFullFormat(rawFormat, address) {
+export const getFullFormat = (rawFormat, address) => {
   // get the pieces
   const pieces = {}
   rawFormat.components.forEach(address => {

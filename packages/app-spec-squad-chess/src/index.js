@@ -18,7 +18,7 @@ import state from './state.js';
 const LandingPage = {
   view: () => {
     return m(
-      '#app',
+      '#app.landing',
       m(Title),
       m(Home)
     )

@@ -8,12 +8,14 @@ import { checkWinner } from '../utils.js'
 
 const BOARD_CONFIG = settings.boardConfig
 
-// TODO: figure out the common denominator for the boards in format previews, the new format form, and playing a match
 const Board = {
-  oninit: (vnode) => { 
+  oninit: (vnode) => {
     resetBoardState(vnode)
   },
   view: (vnode) => {
+    let position = state.game.position
+    if (vnode.attrs.position) { position = vnode.attrs.position }
+
     const xRange = vnode.attrs.format.boardSize.x.range + 1
     const yRange = vnode.attrs.format.boardSize.y.range + 1
     let max = xRange
@@ -29,9 +31,9 @@ const Board = {
         }
       },
       // For each square in the position
-      Object.keys(state.game.position).map(squareId => {
+      Object.keys(position).map(squareId => {
         // grab what's in the square
-        const content = state.game.position[squareId].content
+        const content = position[squareId].content
         // if there is a piece, grab links to piece images
         let graphics
         if (content) {
@@ -40,7 +42,13 @@ const Board = {
         // add the square to the board
         return m(
           BoardSquare,
-          { key: squareId, content, graphics, format: vnode.attrs.format }
+          { 
+            key: squareId, 
+            content, 
+            graphics, 
+            format: vnode.attrs.format,
+            position: position
+          }
         )
       })
     )
@@ -59,7 +67,7 @@ function resetBoardState (vnode) {
 
   // set initial game state
   state.game = chess.createGame(vnode.attrs.format)
-  console.log(vnode.attrs.matchStatus)
+  console.log('match status', vnode.attrs.matchStatus)
 
   // set board state
   state.board = Object.assign(
@@ -71,7 +79,6 @@ function resetBoardState (vnode) {
       matchStatus: vnode.attrs.matchStatus
     }
   )
-  console.log(state.board)
 }
 
 function queueDeselect () {
@@ -125,7 +132,11 @@ const BoardSquare = {
       if (vnode.attrs.graphics.local) {
         imgLink = `./img/${vnode.attrs.graphics.local[pieceColor]}`
       } // else if (vnode.graphics.remote)...
-      squareContent = m(BoardPiece, { imgLink, key: vnode.key })
+      squareContent = m(BoardPiece, { 
+        imgLink, 
+        key: vnode.key, 
+        position: vnode.attrs.position 
+      })
     } else {
       // if the square is empty and highlighted, add an onclick for handling a turn
       if (highlighted) { onclick = handleTurn() }
@@ -185,7 +196,7 @@ const BoardPiece = {
     const highlighted = squareInArray(coordinates, state.board.highlightedSquares)
     // TODO: let the user be both players unless in a match
     // configure this by: preview: moveable, both players; match: moveable, one player; form: moveable, both players, 
-    const pieceOwner = state.game.position[vnode.key].content.player
+    const pieceOwner = vnode.attrs.position[vnode.key].content.player
     // if a match hasn't started, don't add events
     if (state.board.matchStatus !== 'match started') {
       /* do nothing */

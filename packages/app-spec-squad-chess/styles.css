@@ -40,7 +40,6 @@ a {
 
 h1 a {
   color: #705b3b;
-  padding-top: 12%;
 }
 
 p {
@@ -150,6 +149,11 @@ input.focus-visible {
   display: flex;
   flex-direction: column;
   height: 100%;
+}
+
+/* Landing page */
+.landing h1 a {
+  padding-top: 12%;
 }
 
 /* Nav Menu */
@@ -634,6 +638,29 @@ button.submit {
 
 .format.orientation .select .options a:hover {
   color: #ff7b00;
+}
+
+/* Format Form */
+.square-menu {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  padding: 8px 0 8px 0;
+}
+
+.square-menu label {
+  padding-right: 16px;
+}
+
+.square-menu .fields {
+  display: flex;
+  flex-direction: row;
+}
+
+@media screen and (max-width: 900px) {
+  .square-menu .fields {
+    flex-direction: column;
+  }
 }
 
 /* Piece Form */

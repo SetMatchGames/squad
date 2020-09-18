@@ -3,10 +3,16 @@
 import m from 'mithril'
 import squad from '@squad/sdk'
 
+import Board from '../components/Board.js'
 import state from '../state.js'
 import settings from '../settings.js'
 import { stringToSquare } from '../rules.js'
-import { shortHash, findBoardRange, getMarketInfo, definitionWithAlerts } from '../utils.js'
+import { 
+  shortHash, 
+  getMarketInfo, 
+  getFullFormat,
+  definitionWithAlerts 
+} from '../utils.js'
 
 const FormatForm = {
   oninit: () => {
@@ -81,7 +87,7 @@ const FormatButton = {
 const DefinitionFields = {
   view: () => {
     return m(
-      '.format.defition',
+      '.format.definition',
       m(FormatBasicsFields),
       m(FormatComponentsList),
       m(FormatDataFields)
@@ -175,10 +181,31 @@ const FormatDataFields = {
 
 const FormatStartingPosition = {
   view: () => {
+    updatePosition()
+    let board
+    if (Object.keys(state.formatForm.startingPosition).length) {
+      const format = getFullFormat(cleanDefinition().Format, null)
+      board = m(Board, { 
+        format,
+        position: format.startingPosition,
+        matchStatus: 'not connected'
+      })
+    }
     return [
       m(StartingPositionDimensions),
-      m(StartingPositionSquares)
+      board,
+      m(SquareMenu, { id: state.menus.formatFormSquare })
     ]
+  },
+  onupdate: () => {
+    const squares = document.getElementsByClassName('square')
+    Object.keys(squares).forEach(key => {
+      const id = squares[key].id
+      if (!state.formatForm.startingPosition[id].onclick) {
+        squares[key].addEventListener('click', handleSquareMenuFactory(id), true)
+        state.formatForm.startingPosition[id].onclick = true
+      }
+    })
   }
 }
 
@@ -206,102 +233,18 @@ const StartingPositionDimensions = {
   }
 }
 
-const StartingPositionSquares = {
-  view: () => {
-    const oldSquares = Object.keys(state.formatForm.startingPosition)
-    const newSquares = []
-    for (let w = 0; w < state.formatForm.startingPositionWidth; w++) {
-      for (let h = 0; h < state.formatForm.startingPositionHeight; h++) {
-        const square = `${w},${h}`
-        newSquares.push(square)
-      }
-    }
-    const oldNotShared = [...oldSquares]
-    const newNotShared = [...newSquares]
-    newSquares.forEach(square => {
-      if (oldSquares.includes(square)) {
-        oldNotShared.splice(oldNotShared.indexOf(square), 1)
-        newNotShared.splice(newNotShared.indexOf(square), 1)
-      }
-    })
-    oldNotShared.forEach(square => {
-      // for keys only in old keys, delete the key and value
-      delete state.formatForm.startingPosition[square]
-    })
-    // if we've preloaded a format, add that back in
-    if (state.formatForm.loadedStartingPosition) {
-      state.formatForm.startingPosition = Object.assign(
-        state.formatForm.startingPosition,
-        state.formatForm.loadedStartingPosition
-      )
-    }
-    newNotShared.forEach(square => {
-      // for keys only in new keys, add default values
-      state.formatForm.startingPosition[square] = { content: null, deleted: false }
-    })
-    // Order squares properly
-    const squares = Object.keys(state.formatForm.startingPosition).sort((a, b) => {
-      a = stringToSquare(a)
-      b = stringToSquare(b)
-      if (a[1] !== b[1]) { return a[1] - b[1] }
-      return a[0] - b[0]
-    })
-
-    // if no board is being rendered, return nothing
-    if (squares.length === 0) { return }
-
-    // Get the right sizing
-    state.formatForm.boardSize.x = findBoardRange(0, state.formatForm.startingPosition)
-    state.formatForm.boardSize.y = findBoardRange(1, state.formatForm.startingPosition)
-
-    return m(
-      '.format.position',
-      {
-        style: {
-          width: (state.formatForm.boardSize.x.range + 1) * squareSize + 'px',
-          height: (state.formatForm.boardSize.y.range + 1) * squareSize + 'px'
-        }
-      },
-      squares.map(square => {
-        return m(StartingPositionSquare, { key: square })
-      })
-    )
-  }
-}
-
-const squareSize = 150
-
-function squareStyle (coordinates, deleted) {
-  // get rid of extra space
-  coordinates = [
-    coordinates[0] - state.formatForm.boardSize.x.min,
-    coordinates[1] - state.formatForm.boardSize.y.min
-  ]
-
-  let squareColor = settings.boardConfig.squares.lightColor
-  if ((coordinates[0] + coordinates[1]) % 2 === 1) { squareColor = settings.boardConfig.squares.darkColor }
-  if (deleted) { squareColor = 'white' }
-
-  return {
-    right: (squareSize * coordinates[0]) + 'px',
-    top: (squareSize * coordinates[1]) + 'px',
-    width: squareSize + 'px',
-    height: squareSize + 'px',
-    background: squareColor
-  }
-}
-
-const StartingPositionSquare = {
+const SquareMenu = {
   view: (vnode) => {
+    if (!vnode.attrs.id) { return }
     return m(
-      '.format.square',
-      {
-        key: vnode.key,
-        style: squareStyle(stringToSquare(vnode.key), state.formatForm.startingPosition[vnode.key].deleted)
-      },
-      m(SelectPiece, { square: vnode.key }),
-      m(Promotion, { square: vnode.key }),
-      m(DeleteSquareSelect, { square: vnode.key })
+      `.square-menu#${vnode.attrs.id}`,
+      m('label', 'Square Information:'),
+      m(
+        '.fields',
+        m(SelectPiece, { square: vnode.attrs.id }),
+        m(Promotion, { square: vnode.attrs.id }),
+        m(DeleteSquareSelect, { square: vnode.attrs.id })
+      )
     )
   }
 }
@@ -337,23 +280,17 @@ const SelectPiece = {
       'None'
     ))
     const contentBool = !!state.formatForm.startingPosition[vnode.attrs.square].content
-    let imgLink
     if (contentBool) {
       const pieceId = state.formatForm.startingPosition[vnode.attrs.square].content.pieceId
       const graphics = JSON.parse(state.squad.components[pieceId].data).graphics
       const player = state.formatForm.startingPosition[vnode.attrs.square].content.player
       let pieceColor = 'white'
       if (player === 1) { pieceColor = 'black' }
-      // prioritize local images
-      if (graphics.local) {
-        imgLink = `./img/${graphics.local[pieceColor]}`
-      } // else if (graphics.remote)...
     }
     return [
-      m(PieceImage, { imgLink, contentBool }),
       m(
         'label',
-        'Piece:',
+        'Piece: ',
         m(
           'select',
           { oninput: handleSelectPieceFactory(vnode.attrs.square) },
@@ -362,20 +299,6 @@ const SelectPiece = {
       ),
       m(SelectPieceColor, { contentBool, square: vnode.attrs.square })
     ]
-  }
-}
-
-const PieceImage = {
-  view: (vnode) => {
-    if (!vnode.attrs.contentBool) { return }
-    const attrs = {
-      src: vnode.attrs.imgLink,
-      style: {
-        width: '80px',
-        height: '80px'
-      }
-    }
-    return m('img', attrs)
   }
 }
 
@@ -394,7 +317,7 @@ const SelectPieceColor = {
     return [
       m(
         'label',
-        'Color:',
+        'Color: ',
         m(
           'select',
           { oninput: handlePieceColorFactory(vnode.attrs.square) },
@@ -436,7 +359,7 @@ const Promotion = {
     return [
       m(
         'label',
-        'Promotion?',
+        'Promotion: ',
         m(
           'select',
           { oninput: handlePiecePromotionFactory(vnode.attrs.square) },
@@ -465,7 +388,7 @@ const DeleteSquareSelect = {
     return [
       m(
         'label',
-        'Delete?',
+        'Delete? ',
         m(
           'select',
           { oninput: handleDeleteSquareFactory(vnode.attrs.square) },
@@ -626,6 +549,15 @@ const handleAddOrRemoveComponent = (event) => {
   }
 }
 
+const handleSquareMenuFactory = (squareId) => {
+  return (event) => {
+    state.menus.formatFormSquare = squareId
+    state.board.highlightedSquares = [ stringToSquare(squareId) ]
+    m.redraw()
+    console.log(state.menus.formatFormSquare, state.board.highlightedSquares)
+  }
+}
+
 const handleDeleteSquareFactory = (squareId) => {
   return (event) => {
     let bool = false
@@ -700,22 +632,7 @@ const handleSaveInitialBuy = (event) => {
 
 const handleSubmit = (event) => {
   event.preventDefault()
-  const description = state.formatForm.description
-  const startingPosition = cleanStartingPosition(state.formatForm.startingPosition)
-  const orientation = {}
-  orientation.white = state.formatForm.whiteOrientation
-  orientation.black = state.formatForm.blackOrientation
-  const definition = {
-    Format: {
-      name: state.formatForm.name,
-      components: state.formatForm.components,
-      data: JSON.stringify({
-        description,
-        startingPosition,
-        orientation
-      })
-    }
-  }
+  const definition = cleanDefinition()
   const localDefs = JSON.parse(localStorage.getItem('localDefinitions'))
   localStorage.setItem('localDefinitions', JSON.stringify([...localDefs, definition]))
   console.log('Definition being submitted', definition)
@@ -731,6 +648,27 @@ const handleSubmit = (event) => {
   })
 }
 
+// helpers
+
+function cleanDefinition () {
+  const description = state.formatForm.description
+  const startingPosition = cleanStartingPosition(state.formatForm.startingPosition)
+  const orientation = {}
+  orientation.white = state.formatForm.whiteOrientation
+  orientation.black = state.formatForm.blackOrientation
+  return {
+    Format: {
+      name: state.formatForm.name,
+      components: state.formatForm.components,
+      data: JSON.stringify({
+        description,
+        startingPosition,
+        orientation
+      })
+    }
+  }
+}
+
 function cleanStartingPosition (sp) {
   const cleanPosition = {}
   for (const square in sp) {
@@ -740,6 +678,40 @@ function cleanStartingPosition (sp) {
     }
   }
   return cleanPosition
+}
+
+function updatePosition () {
+  const oldSquares = Object.keys(state.formatForm.startingPosition)
+  const newSquares = []
+  for (let w = 0; w < state.formatForm.startingPositionWidth; w++) {
+    for (let h = 0; h < state.formatForm.startingPositionHeight; h++) {
+      const square = `${w},${h}`
+      newSquares.push(square)
+    }
+  }
+  const oldNotShared = [...oldSquares]
+  const newNotShared = [...newSquares]
+  newSquares.forEach(square => {
+    if (oldSquares.includes(square)) {
+      oldNotShared.splice(oldNotShared.indexOf(square), 1)
+      newNotShared.splice(newNotShared.indexOf(square), 1)
+    }
+  })
+  oldNotShared.forEach(square => {
+    // for keys only in old keys, delete the key and value
+    delete state.formatForm.startingPosition[square]
+  })
+  // if we've preloaded a format, add that back in
+  if (state.formatForm.loadedStartingPosition) {
+    state.formatForm.startingPosition = Object.assign(
+      state.formatForm.startingPosition,
+      state.formatForm.loadedStartingPosition
+    )
+  }
+  newNotShared.forEach(square => {
+    // for keys only in new keys, add default values
+    state.formatForm.startingPosition[square] = { content: null, deleted: false }
+  })
 }
 
 export default FormatForm

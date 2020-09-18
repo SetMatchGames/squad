@@ -15,7 +15,10 @@ const Play = {
     return m(
       '#play.body',
       m('p#match-status', `${state.board.matchStatus}`),
-      m(Board, { format: state.squad.loadedFormat, matchStatus: state.matchmaking.connection }),
+      m(Board, { 
+        format: state.squad.loadedFormat,
+        matchStatus: state.matchmaking.connection 
+      }),
       m(PlayAgainButton)
     )
   }
