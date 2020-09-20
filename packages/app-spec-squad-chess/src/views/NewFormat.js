@@ -8,11 +8,11 @@ import Option from '../components/Option.js'
 import state from '../state.js'
 import settings from '../settings.js'
 import { stringToSquare } from '../rules.js'
-import { 
-  shortHash, 
-  getMarketInfo, 
+import {
+  shortHash,
+  getMarketInfo,
   getFullFormat,
-  definitionWithAlerts 
+  definitionWithAlerts
 } from '../utils.js'
 
 const FormatForm = {
@@ -45,8 +45,7 @@ const Explanation = {
   view: () => {
     return m(
       'p',
-      'Create a new format and set the price players must pay to play it. \
-      {TODO}% of the payments will go to the makers of Squad Chess as a network tax.'
+      'Create a new format and set the price players must pay to play it. {TODO}% of the payments will go to the makers of Squad Chess as a network tax.'
     )
   }
 }
@@ -186,7 +185,7 @@ const FormatStartingPosition = {
       if (event.target.classList[0] === 'square') {
         const id = event.target.id
         state.menus.formatFormSquare = id
-        state.board.highlightedSquares = [ stringToSquare(id) ]
+        state.board.highlightedSquares = [stringToSquare(id)]
         m.redraw()
       }
     })
@@ -196,7 +195,7 @@ const FormatStartingPosition = {
     let board
     if (Object.keys(state.formatForm.startingPosition).length) {
       const format = getFullFormat(cleanDefinition().Format, null)
-      board = m(Board, { 
+      board = m(Board, {
         format,
         position: format.startingPosition,
         matchStatus: 'not connected'
@@ -304,7 +303,7 @@ const PieceColorOption = {
     return m(
       'label',
       'Piece Color: ',
-      m(Option, { 
+      m(Option, {
         id,
         options: {
           0: 'White',
@@ -322,7 +321,7 @@ const PromotionOption = {
     if (state.formatForm.startingPosition[vnode.attrs.square].deleted === true) {
       return
     }
-    
+
     const id = `promotion${vnode.attrs.square}`
     const options = {
       None: 'None',
@@ -397,7 +396,7 @@ const FormatOrientation = {
       m(
         'p',
         m('label', 'Direction for white pieces: '),
-        m(Option, { 
+        m(Option, {
           id: 'whiteOrientation',
           options: {
             0: 'Top to bottom',
@@ -412,7 +411,7 @@ const FormatOrientation = {
       m(
         'p',
         m('label', 'Direction for black pieces: '),
-        m(Option, { 
+        m(Option, {
           id: 'blackOrientation',
           options: {
             0: 'Top to bottom',

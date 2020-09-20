@@ -35,8 +35,8 @@ const MenuLinks = {
       '#menu-links',
       { style: { display } },
       m('a', { onclick: handleLinkFactory('/formats') }, 'Play'),
-      m('a', { onclick: handleLinkFactory('/new-piece') }, 'New Piece' ),
-      m('a', { onclick: handleLinkFactory('/new-format') }, 'New Format'),
+      m('a', { onclick: handleLinkFactory('/new-piece') }, 'New Piece'),
+      m('a', { onclick: handleLinkFactory('/new-format') }, 'New Format')
       // TODO m('a', { onclick: handleLinkFactory('/markets') }, 'Explore Markets' )
     )
   }
@@ -53,7 +53,7 @@ const handleLinkFactory = (route) => {
   }
 }
 
-function toggleMenu() {
+function toggleMenu () {
   if (state.menus.nav === 'hidden') {
     state.menus.nav = 'visible'
   } else {

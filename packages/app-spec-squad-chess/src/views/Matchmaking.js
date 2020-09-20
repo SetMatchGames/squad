@@ -1,4 +1,4 @@
-/* global clearInterval setInterval setTimeout */
+/* global clearInterval setInterval */
 
 import m from 'mithril'
 import { matchmaking } from '@squad/sdk'

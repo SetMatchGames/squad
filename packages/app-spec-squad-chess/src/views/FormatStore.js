@@ -1,5 +1,3 @@
-/* global URL, location */
-
 import m from 'mithril'
 import state from '../state.js'
 import Board from '../components/Board.js'
@@ -13,7 +11,7 @@ const FormatStore = {
     state.markets.previewedFormats = {}
   },
   view: () => {
-    if (!state.squad.rawFormats) { 
+    if (!state.squad.rawFormats) {
       return m(
         '#format-store.body',
         'Loading formats...'
@@ -61,7 +59,7 @@ const FormatCard = {
         m('.score.offset', shortenScore(state.marketCaps[vnode.key])),
         m('.name.offset', name),
         m(
-          '.button-section', 
+          '.button-section',
           m(Loader, { address: vnode.key }),
           m(DetailsToggle, { address: vnode.key })
         )
@@ -93,7 +91,7 @@ const DetailsToggle = {
 const Details = {
   view: (vnode) => {
     const address = vnode.attrs.address
-    if (!state.markets.previewedFormat || 
+    if (!state.markets.previewedFormat ||
     state.markets.previewedFormat.address !== address) {
       return
     }
@@ -101,16 +99,16 @@ const Details = {
     const num = state.owned[address]
     return m(
       '.details',
-      m('.board-row.row', m(Board, { 
-        format: state.markets.previewedFormat, 
+      m('.board-row.row', m(Board, {
+        format: state.markets.previewedFormat,
         position: state.markets.previewedFormat.startingPosition,
-        matchStatus: 'no match' 
+        matchStatus: 'no match'
       })),
       m('.row', m('label', 'Description: '), m('.data', description)),
       m('.row', m('label', 'ID: '), m('.data', shortHash(address))),
-      m('.row', m('label', 'Tokens owned: '), m('.data',  num)),
-      m('.row', m('.buttons', 
-        m(BuyDefinitionButton, { address }), 
+      m('.row', m('label', 'Tokens owned: '), m('.data', num)),
+      m('.row', m('.buttons',
+        m(BuyDefinitionButton, { address }),
         m(SellDefinitionButton, { address })
       ))
     )
@@ -138,7 +136,7 @@ const Loader = {
 const handleToggleDetailsFactory = (address) => {
   return (e) => {
     e.preventDefault()
-    if (state.markets.previewedFormat && 
+    if (state.markets.previewedFormat &&
     state.markets.previewedFormat.address === address) {
       state.markets.previewedFormat = null
     } else {
@@ -154,7 +152,7 @@ const handleLinkFactory = (address) => {
   }
 }
 
-function shortenScore(score) {
+function shortenScore (score) {
   if (!(score + 1)) { return }
   let result = String(score)
   if (result.length > 7) {
@@ -165,16 +163,16 @@ function shortenScore(score) {
       count += 1
       length -= 3
     }
-    let suffix = "K"
+    let suffix = 'K'
     switch (count) {
       case 2:
-        suffix = "M"
+        suffix = 'M'
         break
       case 3:
-        suffix = "B"
+        suffix = 'B'
         break
       case 4:
-        suffix = "t"
+        suffix = 't'
         break
       default:
     }

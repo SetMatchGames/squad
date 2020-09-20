@@ -12,7 +12,7 @@ const ConnectModal = {
         m('h4', "Connect to Ethereum's Ropsten testnet and reload."),
         m(
           'a',
-          { href: 'https://metamask.io'},
+          { href: 'https://metamask.io' },
           m('img', { src: '/img/metamask-fox.svg' })
         )
       )

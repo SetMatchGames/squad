@@ -1,3 +1,5 @@
+/* global localStorage */
+
 import m from 'mithril'
 import squad, { metastore, curationMarket } from '@squad/sdk'
 
@@ -85,12 +87,12 @@ async function web3connection () {
   let address
   try {
     address = await connection.getAddress()
-  } catch(e) {
+  } catch (e) {
     address = e
   }
   if (typeof address !== 'string' || (await connection.provider.getNetwork()).chainId !== 3) {
     state.connectModal = true
-  }  else {
+  } else {
     state.connectModal = false
   }
   m.redraw()
@@ -103,7 +105,7 @@ async function multiDefinition (defs) {
   })
 }
 
-function refreshLocalStorage(formatDefs, componentDefs) {
+function refreshLocalStorage (formatDefs, componentDefs) {
   const localCatalog = []
   for (const key in formatDefs) {
     localCatalog.push(formatDefs[key])
@@ -130,7 +132,7 @@ export const getMarketInfo = () => {
       // get the market cap
       await getMarketCap(address)
     }
-  })  
+  })
 }
 
 async function getOwned (address) {
@@ -182,8 +184,8 @@ export const getFullFormat = (rawFormat, address) => {
       JSON.parse(piece.data)
     )
   })
-  const fullFormat = Object.assign(JSON.parse(rawFormat.data), { 
-    pieces, 
+  const fullFormat = Object.assign(JSON.parse(rawFormat.data), {
+    pieces,
     address,
     name: rawFormat.name
   })
@@ -207,7 +209,7 @@ export const checkWinner = () => {
 
 export const buyWithAlerts = async (units, bondId, options) => {
   await squad.curationMarket.buy(
-    units, 
+    units,
     bondId,
     handleAlert('Submitted', 'buy order submitted'),
     handleAlert('Confirmed', 'buy order confirmed'),
@@ -217,7 +219,7 @@ export const buyWithAlerts = async (units, bondId, options) => {
 
 export const sellWithAlerts = async (units, bondId) => {
   await squad.curationMarket.sell(
-    units, 
+    units,
     bondId,
     handleAlert('Submitted', 'sell order submitted'),
     handleAlert('Confirmed', 'sell order confirmed')
@@ -226,9 +228,9 @@ export const sellWithAlerts = async (units, bondId) => {
 
 export const definitionWithAlerts = async (definition, games, initialBuyUnits, options) => {
   await squad.definition(
-    definition, 
-    games, 
-    initialBuyUnits, 
+    definition,
+    games,
+    initialBuyUnits,
     handleAlert('Submitted', 'contribution submitted'),
     handleAlert('Confirmed', 'contribution confirmed'),
     options

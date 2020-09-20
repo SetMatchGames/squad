@@ -43,10 +43,10 @@ const Board = {
         // add the square to the board
         return m(
           BoardSquare,
-          { 
-            key: squareId, 
-            content, 
-            graphics, 
+          {
+            key: squareId,
+            content,
+            graphics,
             format: vnode.attrs.format,
             position: position
           }
@@ -128,17 +128,17 @@ const BoardSquare = {
       // get the link to the piece graphic
       let imgLink
       let pieceColor = 'white'
-      if (vnode.attrs.content.player === 1) { 
-        pieceColor = 'black' 
+      if (vnode.attrs.content.player === 1) {
+        pieceColor = 'black'
       }
       // prioritize local images
       if (vnode.attrs.graphics.local) {
         imgLink = `./img/${vnode.attrs.graphics.local[pieceColor]}`
       } // else if (vnode.graphics.remote)...
-      squareContent = m(BoardPiece, { 
-        imgLink, 
-        key: vnode.key, 
-        position: vnode.attrs.position 
+      squareContent = m(BoardPiece, {
+        imgLink,
+        key: vnode.key,
+        position: vnode.attrs.position
       })
     } else {
       // if the square is empty and highlighted, add an onclick for handling a turn
@@ -198,7 +198,7 @@ const BoardPiece = {
     const coordinates = chess.stringToSquare(vnode.key)
     const highlighted = squareInArray(coordinates, state.board.highlightedSquares)
     // TODO: let the user be both players unless in a match
-    // configure this by: preview: moveable, both players; match: moveable, one player; form: moveable, both players, 
+    // configure this by: preview: moveable, both players; match: moveable, one player; form: moveable, both players,
     const pieceOwner = vnode.attrs.position[vnode.key].content.player
     // if a match hasn't started, don't add events
     if (state.board.matchStatus !== 'match started') {

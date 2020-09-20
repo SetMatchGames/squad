@@ -1,5 +1,3 @@
-/* global localStorage */
-
 import m from 'mithril'
 
 import Home from './views/Home.js'
@@ -13,7 +11,7 @@ import NavMenu from './components/NavMenu.js'
 import ConnectModal from './components/ConnectModal.js'
 import AlertList from './components/AlertList.js'
 
-import state from './state.js';
+import state from './state.js'
 
 const LandingPage = {
   view: () => {
@@ -38,9 +36,9 @@ const Header = {
 const Title = {
   view: () => {
     return m(
-      'h1', 
+      'h1',
       m(
-        'a', 
+        'a',
         { href: '/' },
         '🦑 Squad Chess'
       )
@@ -70,7 +68,7 @@ const Citation = {
   }
 }
 
-function layout(body) {
+function layout (body) {
   return {
     render: (vnode) => {
       let onclick
@@ -100,11 +98,11 @@ const hideMenus = () => {
   })
 }
 
-m.route(document.body, "/", {
-  "/": { render: () => { return m(LandingPage) } },
-  "/formats": layout(FormatStore),
-  "/matchmaking/:formatAddress": layout(Matchmaking),
-  "/play": layout(Play),
-  "/new-piece": layout(NewPiece),
-  "/new-format": layout(NewFormat)
+m.route(document.body, '/', {
+  '/': { render: () => { return m(LandingPage) } },
+  '/formats': layout(FormatStore),
+  '/matchmaking/:formatAddress': layout(Matchmaking),
+  '/play': layout(Play),
+  '/new-piece': layout(NewPiece),
+  '/new-format': layout(NewFormat)
 })

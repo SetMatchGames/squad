@@ -38,11 +38,11 @@ async function newDefinitionWithBond (
 ) {
   const bondId = await metastore.createDefinition(definition, games)
   await curationMarket.newBond(
-    bondId, 
-    initialBuyUnits, 
-    submissionCb, 
-    confirmationCb, 
-    opts, 
+    bondId,
+    initialBuyUnits,
+    submissionCb,
+    confirmationCb,
+    opts,
     addressOfCurve
   )
   return bondId
@@ -54,7 +54,7 @@ async function definition (
   definition,
   games = [],
   initialBuyUnits = 0,
-  submissionCb, 
+  submissionCb,
   confirmationCb,
   opts = {},
   addressOfCurve
@@ -64,7 +64,7 @@ async function definition (
       definition,
       games,
       initialBuyUnits,
-      submissionCb, 
+      submissionCb,
       confirmationCb,
       opts,
       addressOfCurve

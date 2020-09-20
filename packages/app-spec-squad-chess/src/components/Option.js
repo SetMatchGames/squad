@@ -12,7 +12,7 @@ const Option = {
     return m(
       `.select.${state.menus[id]}`,
       m(
-        'a.selected', 
+        'a.selected',
         { onclick: handleToggleOptions(id) },
         currentSelection
       ),
@@ -30,7 +30,7 @@ const Options = {
       Object.keys(vnode.attrs.options).map(i => {
         return m(
           `a.option#${i}`,
-          { 
+          {
             onclick: handleSaveOption(vnode.attrs.id, vnode.attrs.callback),
             style: { display }
           },
@@ -54,7 +54,7 @@ const handleToggleOptions = (id) => {
   }
 }
 
-function toggleOptions(id) {
+function toggleOptions (id) {
   if (state.menus[id] !== 'visible') {
     state.menus[id] = 'visible'
   } else {
