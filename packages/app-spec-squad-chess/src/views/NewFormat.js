@@ -4,6 +4,7 @@ import m from 'mithril'
 import squad from '@squad/sdk'
 
 import Board from '../components/Board.js'
+import Option from '../components/Option.js'
 import state from '../state.js'
 import settings from '../settings.js'
 import { stringToSquare } from '../rules.js'
@@ -180,6 +181,16 @@ const FormatDataFields = {
 }
 
 const FormatStartingPosition = {
+  oninit: () => {
+    document.body.addEventListener('click', (event) => {
+      if (event.target.classList[0] === 'square') {
+        const id = event.target.id
+        state.menus.formatFormSquare = id
+        state.board.highlightedSquares = [ stringToSquare(id) ]
+        m.redraw()
+      }
+    })
+  },
   view: () => {
     updatePosition()
     let board
@@ -196,16 +207,6 @@ const FormatStartingPosition = {
       board,
       m(SquareMenu, { id: state.menus.formatFormSquare })
     ]
-  },
-  onupdate: () => {
-    const squares = document.getElementsByClassName('square')
-    Object.keys(squares).forEach(key => {
-      const id = squares[key].id
-      if (!state.formatForm.startingPosition[id].onclick) {
-        squares[key].addEventListener('click', handleSquareMenuFactory(id), true)
-        state.formatForm.startingPosition[id].onclick = true
-      }
-    })
   }
 }
 
@@ -238,232 +239,191 @@ const SquareMenu = {
     if (!vnode.attrs.id) { return }
     return m(
       `.square-menu#${vnode.attrs.id}`,
-      m('label', 'Square Information:'),
-      m(
-        '.fields',
-        m(SelectPiece, { square: vnode.attrs.id }),
-        m(Promotion, { square: vnode.attrs.id }),
-        m(DeleteSquareSelect, { square: vnode.attrs.id })
-      )
+      m(PieceOption, { square: vnode.attrs.id }),
+      m(PieceColorOption, { square: vnode.attrs.id }),
+      m(PromotionOption, { square: vnode.attrs.id }),
+      m(DeleteOption, { square: vnode.attrs.id })
     )
   }
 }
 
-const SelectPiece = {
+const PieceOption = {
   view: (vnode) => {
     if (state.formatForm.startingPosition[vnode.attrs.square].deleted === true) {
       return
     }
-    let selected = ''
-    let selection
-    if (state.formatForm.startingPosition[vnode.attrs.square].content) {
-      selection = state.formatForm.startingPosition[vnode.attrs.square].content.pieceId
-    }
-    const components = [...state.formatForm.components]
-    // if the selected piece is no longer in the selected piece list, still include it
-    if (selection && !components.includes(selection)) {
-      components.push(selection)
-    }
-    const options = components.map(address => {
-      if (selection === address) {
-        selected = 'selected'
-      } else {
-        selected = ''
-      }
-      return m(
-        `option[value=${address}][${selected}]`,
-        state.squad.components[address].name
-      )
+
+    const id = `piece${vnode.attrs.square}`
+    const options = { None: 'None' }
+    state.formatForm.components.forEach(address => {
+      options[address] = state.squad.components[address].name
     })
-    options.unshift(m(
-      'option[value=null]',
-      'None'
-    ))
-    const contentBool = !!state.formatForm.startingPosition[vnode.attrs.square].content
-    if (contentBool) {
-      const pieceId = state.formatForm.startingPosition[vnode.attrs.square].content.pieceId
-      const graphics = JSON.parse(state.squad.components[pieceId].data).graphics
-      const player = state.formatForm.startingPosition[vnode.attrs.square].content.player
-      let pieceColor = 'white'
-      if (player === 1) { pieceColor = 'black' }
+    let currentSelection = 'None'
+    if (state.formatForm.startingPosition[vnode.attrs.square].content) {
+      currentSelection = state.formatForm.startingPosition[vnode.attrs.square].content.pieceId
     }
-    return [
-      m(
-        'label',
-        'Piece: ',
-        m(
-          'select',
-          { oninput: handleSelectPieceFactory(vnode.attrs.square) },
-          options
-        )
-      ),
-      m(SelectPieceColor, { contentBool, square: vnode.attrs.square })
-    ]
+    const callback = (value) => {
+      if (state.formatForm.startingPosition[vnode.attrs.square].content) {
+        state.formatForm.startingPosition[vnode.attrs.square].content.pieceId = value
+      } else {
+        state.formatForm.startingPosition[vnode.attrs.square].content = { pieceId: value, player: 0 }
+      }
+    }
+
+    return m(
+      'label',
+      'Piece: ',
+      m(Option, {
+        id,
+        options,
+        currentSelection,
+        callback
+      })
+    )
   }
 }
 
-const SelectPieceColor = {
-  view: (vnode) => {
-    if (!vnode.attrs.contentBool) { return }
-    if (!state.formatForm.startingPosition[vnode.attrs.square].content.player) {
-      state.formatForm.startingPosition[vnode.attrs.square].content.player = 0
-    }
-    let whiteSelected = 'selected'
-    let blackSelected = ''
-    if (state.formatForm.startingPosition[vnode.attrs.square].content.player === 1) {
-      whiteSelected = ''
-      blackSelected = 'selected'
-    }
-    return [
-      m(
-        'label',
-        'Color: ',
-        m(
-          'select',
-          { oninput: handlePieceColorFactory(vnode.attrs.square) },
-          [
-            m(
-              `option[value=White][${whiteSelected}]`,
-              'White'
-            ),
-            m(
-              `option[value=Black][${blackSelected}]`,
-              'Black'
-            )
-          ]
-        )
-      )
-    ]
-  }
-}
-
-const Promotion = {
+const PieceColorOption = {
   view: (vnode) => {
     if (state.formatForm.startingPosition[vnode.attrs.square].deleted === true) {
       return
     }
-    let noneSelected = 'selected'
-    let whiteSelected = ''
-    let blackSelected = ''
-    switch (state.formatForm.startingPosition[vnode.attrs.square].promotion) {
-      case 0:
-        whiteSelected = 'selected'
-        noneSelected = ''
-        break
-      case 1:
-        blackSelected = 'selected'
-        noneSelected = ''
-        break
-      default:
+    if (!state.formatForm.startingPosition[vnode.attrs.square].content) {
+      return
     }
-    return [
-      m(
-        'label',
-        'Promotion: ',
-        m(
-          'select',
-          { oninput: handlePiecePromotionFactory(vnode.attrs.square) },
-          [
-            m(
-              `option[value=None][${noneSelected}]`,
-              'None'
-            ),
-            m(
-              `option[value=White][${whiteSelected}]`,
-              'White'
-            ),
-            m(
-              `option[value=Black][${blackSelected}]`,
-              'Black'
-            )
-          ]
-        )
-      )
-    ]
+
+    const id = `pieceColor${vnode.attrs.square}`
+    let currentSelection = 0
+    if (state.formatForm.startingPosition[vnode.attrs.square].content) {
+      currentSelection = state.formatForm.startingPosition[vnode.attrs.square].content.player
+    }
+    const callback = (value) => {
+      state.formatForm.startingPosition[vnode.attrs.square].content.player = Number(value)
+    }
+
+    return m(
+      'label',
+      'Piece Color: ',
+      m(Option, { 
+        id,
+        options: {
+          0: 'White',
+          1: 'Black'
+        },
+        currentSelection,
+        callback
+      })
+    )
   }
 }
 
-const DeleteSquareSelect = {
+const PromotionOption = {
   view: (vnode) => {
-    return [
-      m(
-        'label',
-        'Delete? ',
-        m(
-          'select',
-          { oninput: handleDeleteSquareFactory(vnode.attrs.square) },
-          [
-            m(
-              'option[value=false]',
-              'No'
-            ),
-            m(
-              'option[value=true]',
-              'Yes'
-            )
-          ]
-        )
-      )
-    ]
+    if (state.formatForm.startingPosition[vnode.attrs.square].deleted === true) {
+      return
+    }
+    
+    const id = `promotion${vnode.attrs.square}`
+    const options = {
+      None: 'None',
+      0: 'White',
+      1: 'Black'
+    }
+    let currentSelection = 'None'
+    if (state.formatForm.startingPosition[vnode.attrs.square].promotion === 0 ||
+      state.formatForm.startingPosition[vnode.attrs.square].promotion === 1) {
+      currentSelection = state.formatForm.startingPosition[vnode.attrs.square].promotion
+    }
+    const callback = (value) => {
+      state.formatForm.startingPosition[vnode.attrs.square].promotion = Number(value)
+    }
+
+    return m(
+      'label',
+      'Promotion: ',
+      m(Option, {
+        id,
+        options,
+        currentSelection,
+        callback
+      })
+    )
+  }
+}
+
+const DeleteOption = {
+  view: (vnode) => {
+    const id = `delete${vnode.attrs.square}`
+    const options = {
+      false: 'No',
+      true: 'Yes'
+    }
+    let currentSelection = 'false'
+    if (state.formatForm.startingPosition[vnode.attrs.square].deleted) {
+      currentSelection = 'true'
+    }
+    const callback = (value) => {
+      if (value === 'true') {
+        state.formatForm.startingPosition[vnode.attrs.square].deleted = true
+      } else {
+        state.formatForm.startingPosition[vnode.attrs.square].deleted = false
+      }
+    }
+
+    return m(
+      'label',
+      'Deleted?',
+      m(Option, {
+        id,
+        options,
+        currentSelection,
+        callback
+      })
+    )
   }
 }
 
 const FormatOrientation = {
   view: () => {
+    const whiteSelection = state.formatForm.orientation.white
+    const blackSelection = state.formatForm.orientation.black
+    const callbackFactory = (color) => {
+      return (value) => {
+        state.formatForm.orientation[color] = Number(value)
+      }
+    }
     return m(
       '.format.orientation',
       m(
         'p',
         m('label', 'Direction for white pieces: '),
-        m(OrientationSelector, { player: 'whiteOrientation' })
+        m(Option, { 
+          id: 'whiteOrientation',
+          options: {
+            0: 'Top to bottom',
+            2: 'Bottom to top',
+            3: 'Right to left',
+            1: 'Left to right'
+          },
+          currentSelection: whiteSelection,
+          callback: callbackFactory('white')
+        })
       ),
       m(
         'p',
         m('label', 'Direction for black pieces: '),
-        m(OrientationSelector, { player: 'blackOrientation' })
-      )
-    )
-  }
-}
-
-const OrientationSelector = {
-  view: (vnode) => {
-    const options = {
-      0: 'Top to bottom',
-      2: 'Bottom to top',
-      3: 'Right to left',
-      1: 'Left to right'
-    }
-    const currentSelection = options[Number(state.formatForm[vnode.attrs.player])]
-    delete options[state.formatForm[vnode.attrs.player]]
-    return m(
-      `.select.${state.menus[vnode.attrs.player]}`,
-      m(
-        'a.selected', 
-        { onclick: handleToggleOrientationOptions(vnode.attrs.player) }, 
-        currentSelection
-      ),
-      m(OrientationOptions, { options, player: vnode.attrs.player })
-    )
-  }
-}
-
-const OrientationOptions = {
-  view: (vnode) => {
-    let display = 'none'
-    if (state.menus[vnode.attrs.player] === 'visible') { display = 'flex' }
-    return m(
-      '.options',
-      Object.keys(vnode.attrs.options).map(key => {
-        return m(
-          `a.option#${key}`,
-          { 
-            onclick: handleSaveOrientation(vnode.attrs.player),
-            style: { display }
+        m(Option, { 
+          id: 'blackOrientation',
+          options: {
+            0: 'Top to bottom',
+            2: 'Bottom to top',
+            3: 'Right to left',
+            1: 'Left to right'
           },
-          vnode.attrs.options[key]
-        )
-      })
+          currentSelection: blackSelection,
+          callback: callbackFactory('black')
+        })
+      )
     )
   }
 }
@@ -497,11 +457,12 @@ const handleLoadFormat = (event) => {
   event.preventDefault()
   const format = state.squad.rawFormats[event.target.value]
   const data = JSON.parse(format.data)
-
   state.formatForm = Object.assign(state.formatForm, {
     startingPosition: data.startingPosition,
-    whiteOrientation: data.orientation.white,
-    blackOrientation: data.orientation.black,
+    orientation: Object.assign(
+      { white: 2, black: 0 },
+      data.orientation
+    ),
     name: format.name,
     description: data.description,
     components: [...format.components]
@@ -523,9 +484,10 @@ function clearForm () {
       description: '',
       components: [],
       startingPosition: {},
-      whiteOrientation: 2,
-      blackOrientation: 0,
-      orientationOptions: {},
+      orientation: {
+        white: 2,
+        black: 0
+      },
       initialBuy: 0,
       value: 0,
       boardSize: {}
@@ -536,6 +498,7 @@ function clearForm () {
 const handleSaveFactory = (dataType) => {
   return (event) => {
     state.formatForm[dataType] = event.target.value
+    console.log(state.formatForm)
   }
 }
 
@@ -546,79 +509,6 @@ const handleAddOrRemoveComponent = (event) => {
     state.formatForm.components.splice(index, 1)
   } else {
     state.formatForm.components.push(address)
-  }
-}
-
-const handleSquareMenuFactory = (squareId) => {
-  return (event) => {
-    state.menus.formatFormSquare = squareId
-    state.board.highlightedSquares = [ stringToSquare(squareId) ]
-    m.redraw()
-    console.log(state.menus.formatFormSquare, state.board.highlightedSquares)
-  }
-}
-
-const handleDeleteSquareFactory = (squareId) => {
-  return (event) => {
-    let bool = false
-    if (event.target.value === 'true') { bool = true }
-    state.formatForm.startingPosition[squareId].deleted = bool
-  }
-}
-
-const handleSelectPieceFactory = (squareId) => {
-  return (event) => {
-    const pieceId = event.target.value
-    if (pieceId === 'null') {
-      state.formatForm.startingPosition[squareId].content = null
-    } else {
-      state.formatForm.startingPosition[squareId].content = {}
-      state.formatForm.startingPosition[squareId].content.pieceId = pieceId
-    }
-  }
-}
-
-const handlePieceColorFactory = (squareId) => {
-  return (event) => {
-    const color = event.target.value
-    if (color === 'White') {
-      state.formatForm.startingPosition[squareId].content.player = 0
-    } else if (color === 'Black') {
-      state.formatForm.startingPosition[squareId].content.player = 1
-    }
-  }
-}
-
-const handlePiecePromotionFactory = (squareId) => {
-  return (event) => {
-    const promotion = event.target.value
-    if (promotion === 'White') {
-      state.formatForm.startingPosition[squareId].promotion = 0
-    } else if (promotion === 'Black') {
-      state.formatForm.startingPosition[squareId].promotion = 1
-    }
-  }
-}
-
-
-const handleSaveOrientation = (player) => {
-  return (event) => {
-    state.formatForm[player] = event.target.id
-    toggleOrientationsOptions(player)
-  }
-}
-
-const handleToggleOrientationOptions = (player) => {
-  return () => {
-    toggleOrientationsOptions(player)
-  }
-}
-
-function toggleOrientationsOptions(player) {
-  if (state.menus[player] !== 'visible') {
-    state.menus[player] = 'visible'
-  } else {
-    state.menus[player] = 'hidden'
   }
 }
 
@@ -653,9 +543,7 @@ const handleSubmit = (event) => {
 function cleanDefinition () {
   const description = state.formatForm.description
   const startingPosition = cleanStartingPosition(state.formatForm.startingPosition)
-  const orientation = {}
-  orientation.white = state.formatForm.whiteOrientation
-  orientation.black = state.formatForm.blackOrientation
+  const orientation = state.formatForm.orientation
   return {
     Format: {
       name: state.formatForm.name,

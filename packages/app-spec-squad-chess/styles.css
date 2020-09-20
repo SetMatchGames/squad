@@ -578,23 +578,26 @@ button.submit {
   font-size: 10px;
 }
 
-.format.orientation p {
+.orientation p {
   display: flex;
   flex-direction: row;
   position: relative;
   height: 56px;
 }
 
-.format.orientation label {
+.orientation label {
   display: flex;
   flex-direction: column;
   justify-content: center;
   width: 192px;
 }
 
-.format.orientation .select {
+.orientation .select {
   position: absolute;
   left: 192px;
+}
+
+.orientation .select, .square-menu .select {
   background-color: #fff6e8;
   font-size: 16px;
   margin: 8px;
@@ -603,63 +606,80 @@ button.submit {
   border-radius: 6px;
 }
 
-.format.orientation .select .selected {
+.orientation .select .selected, .square-menu .select .selected{
   color: #705b3b;
 }
 
-.format.orientation .select .selected:hover {
+.orientation .select .selected:hover, .square-menu .select .selected:hover {
   color: #ff7b00;
 }
 
 @media screen and (max-width: 600px) {
-  .format.orientation p {
+  .orientation p {
     flex-direction: column;
-    height: 12vh;
+    height: 16vh;
   }
 
-  .format.orientation .select {
+  .orientation .select {
     left: 0;
-    top: 3.5vh;
+    top: 4vh;
   }
 }
 
-.format.orientation .select.visible {
+.orientation .select.visible, .square-menu .select.visible {
   z-index: 1;
 }
 
-.format.orientation .select .options {
+.orientation .select .options, .square-menu .select .options {
   padding-top: 0;
 }
 
-.format.orientation .select .options a {
+.orientation .select .options a, .square-menu .select .options a {
   margin-top: 10px;
   color: #705b3b;
 }
 
-.format.orientation .select .options a:hover {
+.orientation .select .options a:hover, .square-menu .select .options a:hover {
   color: #ff7b00;
 }
 
-/* Format Form */
 .square-menu {
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
   padding: 8px 0 8px 0;
+  height: 80px;
 }
 
 .square-menu label {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
   padding-right: 16px;
+  width: 120px;
+  position: relative;
 }
 
-.square-menu .fields {
-  display: flex;
-  flex-direction: row;
+.square-menu .select {
+  position: absolute;
+  margin-top: 32px; 
 }
 
 @media screen and (max-width: 900px) {
-  .square-menu .fields {
+  .square-menu {
     flex-direction: column;
+    height: 256px;
+    padding: 0;
+  }
+
+  .square-menu label {
+    flex-direction: row;
+    height: 56px;
+    margin-bottom: 8px;
+  }
+
+  .square-menu .select {
+    margin: 0 0 0 96px;
   }
 }
 

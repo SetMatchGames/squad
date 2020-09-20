@@ -37,6 +37,7 @@ const Board = {
         // if there is a piece, grab links to piece images
         let graphics
         if (content) {
+          // console.log(vnode.attrs.format.pieces, content, squareId)
           graphics = vnode.attrs.format.pieces[content.pieceId].graphics
         }
         // add the square to the board
@@ -127,7 +128,9 @@ const BoardSquare = {
       // get the link to the piece graphic
       let imgLink
       let pieceColor = 'white'
-      if (vnode.attrs.content.player === 1) { pieceColor = 'black' }
+      if (vnode.attrs.content.player === 1) { 
+        pieceColor = 'black' 
+      }
       // prioritize local images
       if (vnode.attrs.graphics.local) {
         imgLink = `./img/${vnode.attrs.graphics.local[pieceColor]}`
@@ -216,7 +219,7 @@ const BoardPiece = {
     } else if (pieceOwner === state.game.turnNumber % 2) {
       attrs.onmousedown = handleSelectPiece()
     }
-    return m('img#' + vnode.key, attrs)
+    return m('img.square#' + vnode.key, attrs)
   }
 }
 
