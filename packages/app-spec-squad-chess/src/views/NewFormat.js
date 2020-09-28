@@ -181,14 +181,8 @@ const FormatDataFields = {
 
 const FormatStartingPosition = {
   oninit: () => {
-    document.body.addEventListener('click', (event) => {
-      if (event.target.classList[0] === 'square') {
-        const id = event.target.id
-        state.menus.formatFormSquare = id
-        state.board.highlightedSquares = [stringToSquare(id)]
-        m.redraw()
-      }
-    })
+    console.log('on init')
+    document.body.addEventListener('click', handleRenderSquareMenu)
   },
   view: () => {
     updatePosition()
@@ -203,9 +197,22 @@ const FormatStartingPosition = {
     }
     return [
       m(StartingPositionDimensions),
-      board,
-      m(SquareMenu, { id: state.menus.formatFormSquare })
+      m(SquareMenu, { id: state.menus.formatFormSquare }),
+      board
     ]
+  },
+  onremove: () => {
+    console.log('on remove')
+    document.body.removeEventListener('click', handleRenderSquareMenu)
+  }
+}
+
+const handleRenderSquareMenu = (event) => {
+  if (event.target.classList[0] === 'square') {
+    const id = event.target.id
+    state.menus.formatFormSquare = id
+    state.board.highlightedSquares = [stringToSquare(id)]
+    m.redraw()
   }
 }
 
