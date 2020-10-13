@@ -506,23 +506,15 @@ input.focus-visible {
   padding-left: 8px;
 }
 
-.buy-definition > input, .sell-definition > input {
+.buy-license > input, .buy-definition > input, .sell-definition > input {
   width: 80px;
 }
 
-.details .buy-definition {
+.details .buy-license, .details .buy-definition, .details .sell-definition {
   display: flex;
   flex-direction: row;
   align-items: center;
   padding-bottom: 0;
-  padding-left: 8px;
-}
-
-.details .sell-definition {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  padding-top: 0;
   padding-left: 8px;
 }
 

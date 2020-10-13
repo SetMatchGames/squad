@@ -3,6 +3,7 @@ import state from '../state.js'
 import Board from '../components/Board.js'
 import BuyDefinitionButton from '../components/BuyDefinitionButton.js'
 import SellDefinitionButton from '../components/SellDefinitionButton.js'
+import BuyLicenseButton from '../components/BuyLicenseButton.js'
 import { shortHash, getMarketInfo, previewFormat } from '../utils.js'
 
 const FormatStore = {
@@ -109,7 +110,8 @@ const Details = {
       m('.row', m('label', 'Tokens owned: '), m('.data', num)),
       m('.row', m('.buttons',
         m(BuyDefinitionButton, { address }),
-        m(SellDefinitionButton, { address })
+        m(SellDefinitionButton, { address }),
+        m(BuyLicenseButton, { address })
       ))
     )
   }
