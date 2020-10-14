@@ -82,7 +82,27 @@ export const connectSquad = (callback) => {
   })
 }
 
+let tested = false
+async function testCurationMarket() {
+  if(tested) {
+    return
+  }
+  tested = true
+  console.log("TESTING CURATION MARKET")
+  console.log("network fee rate", await curationMarket.networkFeeRate())
+  console.log(
+    await curationMarket.newContribution(
+      Date.now().toString(),
+      200,
+      10,
+      console.log,
+      console.log,
+    )
+  )
+}
+
 async function web3connection () {
+  await testCurationMarket()
   const connection = curationMarket.init()
   let address
   try {

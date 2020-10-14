@@ -4,6 +4,10 @@ const ethers = require('ethers')
 const AutoBondJSON = require("../../app/build/contracts/AutoBond.json")
 const CurveJSON = require("../../app/build/contracts/Curve.json")
 const SimpleLinearCurveJSON = require("../../app/build/contracts/SimpleLinearCurve.json")
+const SquadControllerJSON = require("./artifacts/SquadController.json")
+const TokenClaimCheckJSON = require("./artifacts/TokenClaimCheck.json")
+const squadControllerAddress = '0x19Ce2C83f2F4Da92ECbEd17606f4c51f04942f76'
+const tokenClaimCheckAddress = '0x3e671040ffb4BbB9d93395f64b944901580Ba8A4'
 
 const networkIds = {
   'ropsten': 3
@@ -20,6 +24,9 @@ let curve
 let autoBondAddress
 let simpleLinearCurveAddress
 let defaults
+
+let squadController
+let tokenClaimCheck
 
 function init (defaults) {
   if (initialized) {
@@ -48,9 +55,16 @@ function init (defaults) {
   autoBond = new ethers.Contract(autoBondAddress, AutoBondJSON.abi, walletOrSigner)
   curve = new ethers.Contract(simpleLinearCurveAddress, CurveJSON.abi, walletOrSigner)
 
+  squadController = new ethers.Contract(
+    squadControllerAddress, SquadControllerJSON.abi, walletOrSigner
+  )
+  tokenClaimCheck = new ethers.Contract(
+    tokenClaimCheckAddress, TokenClaimCheckJSON.abi, walletOrSigner
+  )
+
   if (defaults === undefined) {
     defaults = {
-      gas: 900000
+      gas: 9000000
     }
   }
 
@@ -69,6 +83,41 @@ class BondAlreadyExists extends Error {
   }
 }
 
+async function networkFeeRate () {
+  init()
+  return await squadController.networkFeeRate()
+}
+
+async function newContribution (
+  contributionId,
+  feeRate,
+  purchasePrice,
+  submissionCb,
+  confirmationCb,
+  options
+) {
+  init()
+  const walletAddress = await walletOrSigner.getAddress()
+  const fullOptions = Object.assign({}, defaults, options, {gasLimit: 4712357})
+  const name = `Squad Chess ${contributionId}`
+  const symbol = `sc${contributionId.substring(0, 3).toUpperCase()}`
+  const metadata = JSON.stringify({game: "Squad Chess", experiment: true})
+  console.log(ethers)
+  const tx = await squadController.newContribution(
+    ethers.utils.formatBytes32String(contributionId),
+    walletAddress,
+    feeRate,
+    purchasePrice,
+    name,
+    symbol,
+    metadata,
+    fullOptions
+  )
+  console.log(tx)
+  submissionCb(tx)
+  return handleConfirmationCallback(tx.hash, confirmationCb)
+}
+
 async function newBond (
   bondId,
   initialBuyNumber,
@@ -79,7 +128,7 @@ async function newBond (
 ) {
   init()
   if (!addressOfCurve || addressOfCurve === '0x0000000000000000000000000000000000000000') { 
-    addressOfCurve = simpleLinearCurveAddress 
+    addressOfCurve = simpleLinearCurveAddress
   }
   const bondHash = ethers.utils.id(bondId)
   const fullOptions = Object.assign({}, defaults, options)
@@ -186,5 +235,8 @@ module.exports = {
   getMarketCap,
   buy,
   sell,
-  BondAlreadyExists
+  BondAlreadyExists,
+
+  newContribution,
+  networkFeeRate
 }
