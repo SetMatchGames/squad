@@ -227,6 +227,10 @@ export const checkWinner = () => {
   }
 }
 
+export const buyLicenseWithAlerts = async (amount, bondId) => {
+  console.log('Mock buy license', amount, bondId)
+}
+
 export const buyWithAlerts = async (units, bondId, options) => {
   await squad.curationMarket.buy(
     units,
