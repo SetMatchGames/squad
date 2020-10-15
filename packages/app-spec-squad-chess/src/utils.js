@@ -112,10 +112,10 @@ async function test() {
 
   const ethers = curationMarket.getEthers()
   const signerAddress = await curationMarket.walletAddress()
-  const contributionId = Date.now().toString()
+  const contributionId = "abc123" // Date.now().toString()
   const feeRate = 200
   const purchasePrice = ethers.utils.parseEther("0.5")
-
+/*
   done = false
   testLog("newContribution", contributionId, feeRate, purchasePrice)
   await curationMarket.newContribution(contributionId, feeRate, purchasePrice, testLog, finish)
@@ -133,6 +133,16 @@ async function test() {
   testLog("holdsLicenseFor", contributionId, signerAddress)
   testLog(await curationMarket.holdsLicenseFor(contributionId, signerAddress))
   testLog()
+*/
+  done = false
+  const validLicenses = await curationMarket.getValidLicenses(signerAddress)
+  testLog(validLicenses, contributionId)
+  const licenseId = validLicenses[contributionId][0].licenseId
+  testLog("redeemAndSell", licenseId, 0)
+  await curationMarket.redeemAndSell(licenseId, 0, testLog, testLog, testLog, finish)
+  testLog()
+  wait()
+
 }
 
 async function web3connection () {

@@ -201,19 +201,68 @@ async function getSupply (bondId) {
   return Number(await autoBond.getSupply(bondHash))
 }
 
-// replaces getBalance
-async function holdsLicenseFor(contributionId, holderAddress) {
+async function getLicenseInfo(licenseId) {
+  const bytes32Id = await squadController.validLicenses(licenseId)
+  const contributionId = ethers.utils.parseBytes32String(bytes32Id)
+  if (bytes32Id === '') {
+    return false
+  }
+  const [beneficiary, feeRate, purchasePrice] = await squadController.contributions(bytes32Id)
+  const contribution = {beneficiary, feeRate, purchasePrice}
+  if (contribution.beneficiary === ethers.constants.AddressZero) {
+    return false
+  }
+  const [token, amount] = await tokenClaimCheck.claims(licenseId)
+  const claim = {token, amount}
+  if (claim.token === ethers.constants.AddressZero) {
+    return false
+  }
+  return { licenseId, contributionId, contribution, claim }
+}
+
+/**
+ * getValidLicenses returns all valid licenses held by `holderAddress`
+ *
+ * {
+ *   licenseId: licenseInfo,
+ *   contributionId: [licenseInfo]
+ * }
+ */
+async function getValidLicenses(holderAddress) {
   init()
   const licenseBalance = parseInt((await tokenClaimCheck.balanceOf(holderAddress)).toString(), 10)
+  console.log("TEST licenseBalance", licenseBalance)
   const licenseIds = await Promise.all(
     [...Array(licenseBalance).keys()].map(async (i) => {
       return await tokenClaimCheck.tokenOfOwnerByIndex(holderAddress, i)
     })
   )
-  for (let i=0; i<licenseIds.length; i++) {
+  console.log("TEST licenseIds", licenseIds)
+  const validLicenses = {}
+  await Promise.all(licenseIds.map(async (licenseId) => {
+    const licenseInfo = await getLicenseInfo(licenseId)
+    console.log("TEST licenseInfo for", licenseId, licenseInfo)
+    if(!licenseInfo) {
+      // NFT is not a valid squad license
+      return
+    }
+    validLicenses[licenseId] = licenseInfo
+    validLicenses[licenseInfo.contributionId] = [
+      licenseInfo, ...(validLicenses[licenseInfo.contributionId] || [])
+    ]
+    console.log("TEST Valid Licenses", validLicenses)
+  }))
+  return validLicenses
+}
+
+// replaces getBalance
+async function holdsLicenseFor(contributionId, holderAddress) {
+  init()
+  const validLicenses = (await getValidLicenses(holderAddress))[contributionId] || []
+  for (let i=0; i<validLicenses.length; i++) {
     const holdsLicense = await squadController.holdsLicense(
       ethers.utils.formatBytes32String(contributionId),
-      licenseIds[i],
+      validLicenses[i],
       holderAddress
     )
     if(holdsLicense) {
@@ -307,7 +356,7 @@ async function sellTokens(
 }
 
 // replaces sell
-async function redeemAndSellAll(
+async function redeemAndSell(
   licenseId,
   minPrice,
   redeemSubmissionCb,
@@ -317,7 +366,9 @@ async function redeemAndSellAll(
 ) {
   init()
   const claim = await tokenClaimCheck.claims(licenseId)
-  const contributionId = await squadController.validLicenses(licenseId)
+  const contributionId = ethers.utils.parseBytes32String(
+    await squadController.validLicenses(licenseId)
+  )
   await redeemLicense(
     licenseId,
     redeemSubmissionCb,
@@ -441,9 +492,10 @@ module.exports = {
   buyLicense,
   redeemLicense,
   sellTokens,
-  redeemAndSellAll,
+  redeemAndSell,
   priceOf,
   sellPriceFor,
   marketSize,
-  getEthers
+  getEthers,
+  getValidLicenses
 }
