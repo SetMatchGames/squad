@@ -115,7 +115,7 @@ async function test() {
   const contributionId = "abc123" // Date.now().toString()
   const feeRate = 200
   const purchasePrice = ethers.utils.parseEther("0.5")
-/*
+  /*
   done = false
   testLog("newContribution", contributionId, feeRate, purchasePrice)
   await curationMarket.newContribution(contributionId, feeRate, purchasePrice, testLog, finish)
@@ -126,23 +126,44 @@ async function test() {
   await curationMarket.buyLicense(contributionId, testLog, finish)
   testLog()
   wait()
+  */
+  done = false
+  const supply = await curationMarket.totalSupplyOf(contributionId)
+  const amount = curationMarket.linearCurveAmount(supply, purchasePrice.mul(10))
+  testLog("buyLicense with extra amount", contributionId, amount)
+  await curationMarket.buyLicense(contributionId, testLog, finish, amount)
+  testLog()
+  wait()
 
   testLog("totalSupplyOf", contributionId)
   testLog((await curationMarket.totalSupplyOf(contributionId)).toString())
   testLog()
+
   testLog("holdsLicenseFor", contributionId, signerAddress)
   testLog(await curationMarket.holdsLicenseFor(contributionId, signerAddress))
   testLog()
-*/
+
   done = false
   const validLicenses = await curationMarket.getValidLicenses(signerAddress)
   testLog(validLicenses, contributionId)
   const licenseId = validLicenses[contributionId][0].licenseId
   testLog("redeemAndSell", licenseId, 0)
+  const claimAmount = await validLicenses[licenseId].claim.amount
+  testLog("claimAmount     ", claimAmount.toString())
+  testLog("licenseSellPrice", (await curationMarket.licenseSellPrice(licenseId)).toString())
+  testLog("SellPriceFor    ", (await curationMarket.sellPriceFor(contributionId, claimAmount)).toString())
   await curationMarket.redeemAndSell(licenseId, 0, testLog, testLog, testLog, finish)
   testLog()
   wait()
 
+  testLog(await curationMarket.getValidLicenses(signerAddress))
+  // marketSize
+  testLog("MarketSize          ", (await curationMarket.marketSize(contributionId)).toString())
+  testLog("MarketSize of XYa123", (await curationMarket.marketSize("XYa123")).toString())
+
+  // purchasePriceOf
+  testLog("PurchasePriceOf       ", (await curationMarket.purchasePriceOf(contributionId)).toString())
+  testLog("PurchasePriceOf XYa123", (await curationMarket.purchasePriceOf("XYa123")).toString())
 }
 
 async function web3connection () {
