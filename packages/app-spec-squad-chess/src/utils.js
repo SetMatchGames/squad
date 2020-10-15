@@ -1,4 +1,4 @@
-/* global localStorage */
+/* global URL setTimeout localStorage */
 
 import m from 'mithril'
 import squad, { metastore, curationMarket } from '@squad/sdk'
@@ -37,6 +37,8 @@ export const connectSquad = (callback) => {
     } else {
       // check ethereum connection
       await web3connection()
+
+      test()
 
       // load up the default definitions (only relevant with the temporary metastore)
       const defaultDefs = await defs()
@@ -83,26 +85,57 @@ export const connectSquad = (callback) => {
 }
 
 let tested = false
-async function testCurationMarket() {
-  if(tested) {
+async function test() {
+  const params = (new URL(document.location)).searchParams;
+  console.log("TEST", params.get("test"))
+  if(tested || params.get("test") !== "on") {
     return
   }
   tested = true
-  console.log("TESTING CURATION MARKET")
-  console.log("network fee rate", await curationMarket.networkFeeRate())
-  console.log(
-    await curationMarket.newContribution(
-      Date.now().toString(),
-      200,
-      10,
-      console.log,
-      console.log,
-    )
-  )
+
+  function testLog(...args) {
+    console.log("TEST", ...args)
+  }
+
+  let done = false
+  function finish(...args) {
+    testLog("Finish", ...args)
+    done = true
+  }
+
+  async function wait() {
+    while (!done) {
+      await new Promise(resolve => setTimeout(resolve, 100))
+    }
+    done = true
+  }
+
+  const ethers = curationMarket.getEthers()
+  const signerAddress = await curationMarket.walletAddress()
+  const contributionId = Date.now().toString()
+  const feeRate = 200
+  const purchasePrice = ethers.utils.parseEther("0.5")
+
+  done = false
+  testLog("newContribution", contributionId, feeRate, purchasePrice)
+  await curationMarket.newContribution(contributionId, feeRate, purchasePrice, testLog, finish)
+  wait()
+
+  done = false
+  testLog("buyLicense", contributionId)
+  await curationMarket.buyLicense(contributionId, testLog, finish)
+  testLog()
+  wait()
+
+  testLog("totalSupplyOf", contributionId)
+  testLog((await curationMarket.totalSupplyOf(contributionId)).toString())
+  testLog()
+  testLog("holdsLicenseFor", contributionId, signerAddress)
+  testLog(await curationMarket.holdsLicenseFor(contributionId, signerAddress))
+  testLog()
 }
 
 async function web3connection () {
-  await testCurationMarket()
   const connection = curationMarket.init()
   let address
   try {
