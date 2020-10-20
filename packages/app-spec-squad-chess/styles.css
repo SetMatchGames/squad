@@ -532,6 +532,55 @@ input.focus-visible {
   height: 30vw;
 }
 
+/* License Cards */
+.licenses {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.license-card {
+  width: 400px;
+  margin: 8px;
+  padding: 12px 12px 8px 12px;
+  border: 1px solid #ebddc3;
+  box-shadow: #ffffff -1px -1px 0px inset;
+  border-radius: 12px;
+  background-color: #fffcf7;
+  color: #b19161;
+}
+
+.license-card .row {
+  padding: 4px 0 4px 0;
+}
+
+.license-card .left {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.license-card .row.left {
+  padding-bottom: 16px;
+}
+
+.license-card .center {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.license-card .right {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+}
+
 /* Forms */
 .form-field {
   border-bottom: 1px solid #ebddc3;

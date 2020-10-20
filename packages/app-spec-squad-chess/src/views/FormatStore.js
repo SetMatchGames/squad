@@ -1,10 +1,9 @@
 import m from 'mithril'
+import { curationMarket } from '@squad/sdk'
 import state from '../state.js'
 import Board from '../components/Board.js'
-import BuyDefinitionButton from '../components/BuyDefinitionButton.js'
-import SellDefinitionButton from '../components/SellDefinitionButton.js'
-import BuyLicenseButton from '../components/BuyLicenseButton.js'
-import { shortHash, getMarketInfo, previewFormat } from '../utils.js'
+import Licenses from '../components/Licenses.js'
+import { shortHash, getMarketInfo, previewFormat, sellTokensWithAlerts } from '../utils.js'
 
 const FormatStore = {
   oninit: () => {
@@ -97,7 +96,7 @@ const Details = {
       return
     }
     const description = state.markets.previewedFormat.description || ''
-    const num = state.owned[address]
+    // sellTokensWithAlerts(curationMarket.id(address), '2', '0')
     return m(
       '.details',
       m('.board-row.row', m(Board, {
@@ -107,12 +106,7 @@ const Details = {
       })),
       m('.row', m('label', 'Description: '), m('.data', description)),
       m('.row', m('label', 'ID: '), m('.data', shortHash(address))),
-      m('.row', m('label', 'Tokens owned: '), m('.data', num)),
-      m('.row', m('.buttons',
-        m(BuyDefinitionButton, { address }),
-        m(SellDefinitionButton, { address }),
-        m(BuyLicenseButton, { address })
-      ))
+      m(Licenses, { address })
     )
   }
 }
@@ -121,7 +115,7 @@ const Loader = {
   view: (vnode) => {
     const address = vnode.attrs.address
     let owned = false
-    if (state.owned[address] > 0) {
+    if (state.licenses[curationMarket.id(address)]) {
       owned = true
     }
     return m(

@@ -9,26 +9,30 @@ let licensePrice = 10
 const BuyLicenseButton = {
   oninit: (vnode) => {
     console.log('Get license price for', vnode.attrs.address)
-    state.buyingAndSelling[`buyLicense${vnode.attrs.address}`] = licensePrice
+    const purchasePrice = state.squad.rawFormats[vnode.attrs.address].purchasePrice
+    state.buyingAndSelling[`buyLicense${vnode.attrs.address}`] = purchasePrice
   },
   view: (vnode) => {
     const address = vnode.attrs.address
+    const purchasePrice = state.buyingAndSelling[`buyLicense${vnode.attrs.address}`]
     const dataType = `buyLicense${address}`
     return m(
       'form.buy-license',
+      /*
       m(
         'input[type=number]',
         { value: state.buyingAndSelling[dataType], oninput: handleSaveBuyInfo(dataType) }
       ),
+      */
       m(
         'button',
         {
           onclick: (e) => {
             e.preventDefault()
-            buyLicenseWithAlerts(state.buyingAndSelling[dataType], address)
+            buyLicenseWithAlerts(address)
           }
         },
-        'Buy License'
+        `Buy License for ${purchasePrice} MT`
       )
     )
   }

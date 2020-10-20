@@ -51,7 +51,8 @@ export const connectSquad = (callback) => {
 
       // make sure all stored defs and defaults are on Ethereum
       const localDefs = [...defaultDefs, ...storedDefs]
-      await multiDefinition(localDefs)
+      console.log('local defs', localDefs)
+      // await multiDefinition(localDefs)
 
       // get all the game's formats and components
       const formatDefs = await metastore.getGameFormats(settings.gameAddress)
@@ -185,7 +186,7 @@ async function web3connection () {
 async function multiDefinition (defs) {
   // submit the default definitions to make sure they have bonds on ethereum
   defs.forEach(async (def) => {
-    await squad.definition(def, [settings.gameAddress], 0)
+    await squad.definition(def, [settings.gameAddress], 100, 10)
   })
 }
 
@@ -203,32 +204,42 @@ function refreshLocalStorage (formatDefs, componentDefs) {
 
 export const getMarketInfo = () => {
   connectSquad(async () => {
+    // get the users licenses
+    state.licenses = await squad.curationMarket.getValidLicenses()
     // for each format
     for (const address in state.squad.rawFormats) {
       // see if the current user owns the format
-      await getOwned(address)
+      // await getOwned(address)
       // get the market cap
       await getMarketCap(address)
+      // get the purchasePrice
+      await getPurchasePrice(address)
+      m.redraw()
     }
-
     // for each component
     for (const address in state.squad.components) {
       // get the market cap
       await getMarketCap(address)
+      m.redraw()
     }
   })
 }
 
+/*
 async function getOwned (address) {
   const balance = await curationMarket.getBalance(address)
   state.owned[address] = balance
-  m.redraw()
 }
+*/
 
 async function getMarketCap (address) {
   const marketCap = await curationMarket.getMarketCap(address)
   state.marketCaps[address] = marketCap
-  m.redraw()
+}
+
+async function getPurchasePrice (address) {
+  const purchasePrice = await curationMarket.purchasePriceOf(address)
+  state.squad.rawFormats[address].purchasePrice = purchasePrice
 }
 
 export const loadFormat = (address) => {
@@ -238,8 +249,8 @@ export const loadFormat = (address) => {
 
     // load the format
     if (rawFormat) {
-      await getOwned(address)
-      if (!state.owned[address]) {
+      await getMarketInfo()
+      if (!state.licenses[curationMarket.id(address)]) {
         m.route.set('/formats')
         console.log('Must purchase rights to use a format before using. Current tokens owned:', state.owned[address])
         // TODO Notification asking them to buy the format
@@ -291,8 +302,36 @@ export const checkWinner = () => {
   }
 }
 
-export const buyLicenseWithAlerts = async (amount, bondId) => {
-  console.log('Mock buy license', amount, bondId)
+export const buyLicenseWithAlerts = async (bondId, amount) => {
+  await curationMarket.buyLicense(
+    bondId,
+    handleAlert('Submitted', 'buy order submitted'),
+    handleAlert('Confirmed', 'buy order confirmed'),
+    amount
+  )
+}
+
+export const sellLicenseWithAlerts = async (licenseId, minPrice) => {
+  console.log('sell license inputs', licenseId, minPrice)
+  await curationMarket.redeemAndSell(
+    licenseId,
+    minPrice,
+    handleAlert('Submitted', 'redeem order submitted'),
+    handleAlert('Confirmed', 'redeem order confirmed'),
+    handleAlert('Submitted', 'sell order submitted'),
+    handleAlert('Confirmed', 'sell order confirmed')
+  )
+}
+
+export const sellTokensWithAlerts = async (contributionId, amount, minPrice) => {
+  console.log('sell token inputs', contributionId, amount, minPrice)
+  await curationMarket.sellTokens(
+    contributionId,
+    amount,
+    minPrice,
+    handleAlert('Submitted', 'sell order submitted'),
+    handleAlert('Confirmed', 'sell order confirmed')
+  )
 }
 
 export const buyWithAlerts = async (units, bondId, options) => {
@@ -333,5 +372,5 @@ const alert = (type, text) => {
   console.log('Creating alert', type, text)
   const alert = { type, text }
   state.alerts.push(alert)
-  m.redraw()
+  getMarketInfo()
 }
