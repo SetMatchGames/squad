@@ -67,8 +67,11 @@ function resetBoardState (vnode) {
   }, false)
 
   // set initial game state
-  state.game = chess.createGame(vnode.attrs.format)
-  console.log('match status', vnode.attrs.matchStatus)
+  try {
+    state.game = chess.createGame(vnode.attrs.format)
+  } catch (e) {
+    console.error(e)
+  }
 
   // set board state
   state.board = Object.assign(

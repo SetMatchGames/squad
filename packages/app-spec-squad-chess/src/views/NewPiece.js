@@ -20,7 +20,7 @@ const PieceForm = {
       m(Explanation),
       m(PiecePreloader),
       m(DefinitionFields),
-      m(MarketFields),
+      // m(LicenseFields),
       m(
         'button.submit',
         { onclick: handleSubmit },
@@ -224,7 +224,7 @@ const PieceAdmechanic = {
     if (state.componentForm.admechanics[vnode.key] !== undefined) {
       form = m(
         '.piece.admechanic-params.indented',
-        m('label', "Params (any of ['default', 'self', 'king']):"),
+        m('label', "Params (comma separated list of any/all of default, self, king):"),
         m(
           `input[type=text][value="${state.componentForm.admechanics[vnode.key]}"]`,
           { oninput: handleAdmechanicParamsFactory(vnode.key) }
@@ -316,17 +316,64 @@ const GraphicsButtons = {
     return buttons
   }
 }
-
-const MarketFields = {
+/*
+const LicenseFields = {
   view: () => {
     return m(
       '.piece.form-field',
-      m('h3', 'Tokens and Licensing'),
-      m(InitialBuyField)
+      m('h3', 'License Settings'),
+      m('p', 'Choose the price and the percentage fee you will receive on all purchases of this contribution.'),
+      m(PurchasePriceField),
+      // m(BeneficiaryField),
+      m(FeeField)
     )
   }
 }
 
+const PurchasePriceField = {
+  view: () => {
+    return m(
+      '.piece',
+      'Purchase price (MT): ',
+      m(
+        'input[type=number][placeholder=0]',
+        { oninput: handleSaveFactory('purchasePrice') }
+      )
+    )
+  }
+}
+
+
+const BeneficiaryField = {
+  view: () => {
+    return m(
+      '.piece',
+      'Beneficiary address: ',
+      m(
+        `input[type=text][value=${state.address}]`,
+        { oninput: handleSaveFactory('beneficiary') }
+      )
+    )
+  }
+}
+
+
+const FeeField = {
+  view: () => {
+    return m(
+      '.piece',
+      'Beneficiary fee: ',
+      m(
+        'input[type=number][placeholder=0]',
+        { oninput: handleSaveFactory('beneficiaryFee') }
+      ),
+      '%'
+    )
+  }
+}
+*/
+
+/*
 const InitialBuyField = {
   view: () => {
     return m(
@@ -340,6 +387,7 @@ const InitialBuyField = {
     )
   }
 }
+*/
 
 // handlers
 const handleLoadPiece = (event) => {
@@ -423,7 +471,7 @@ const handleToggleAdmechanicFactory = (admechanic) => {
     if (state.componentForm.admechanics[admechanic]) {
       delete state.componentForm.admechanics[admechanic]
     } else {
-      state.componentForm.admechanics[admechanic] = "['default']"
+      state.componentForm.admechanics[admechanic] = "default"
     }
   }
 }
@@ -431,6 +479,7 @@ const handleToggleAdmechanicFactory = (admechanic) => {
 const handleAdmechanicParamsFactory = (admechanic) => {
   return (event) => {
     state.componentForm.admechanics[admechanic] = event.target.value
+    console.log(state.componentForm.admechanics)
   }
 }
 
@@ -441,7 +490,7 @@ const handleToggleKing = () => {
     state.componentForm.king = true
   }
 }
-
+/*
 const handleSaveInitialBuy = (event) => {
   state.componentForm.initialBuy = event.target.value
   squad.curationMarket.getBuyPriceFromCurve(0, state.componentForm.initialBuy).then(res => {
@@ -449,7 +498,7 @@ const handleSaveInitialBuy = (event) => {
     m.redraw()
   })
 }
-
+*/
 const handleSubmit = (event) => {
   event.preventDefault()
   const description = state.componentForm.description
@@ -462,6 +511,9 @@ const handleSubmit = (event) => {
       mechanics[mechanic].push(state.componentForm.mechanics[mechanic][key])
     }
   }
+  Object.keys(state.componentForm.admechanics).forEach(am => {
+    state.componentForm.admechanics[am] = state.componentForm.admechanics[am].split(',')
+  })
   const definition = {
     Component: {
       name: state.componentForm.name,
@@ -487,15 +539,15 @@ const handleSubmit = (event) => {
   console.log('Submitting definition:', definition)
 
   // make sure we get the right value before submitting, if not enough time has already passed
-  squad.curationMarket.getBuyPriceFromCurve(0, state.componentForm.initialBuy).then(res => {
-    const value = res
+  // squad.curationMarket.getBuyPriceFromCurve(0, state.componentForm.initialBuy).then(res => {
+  //   const value = res
     definitionWithAlerts(
       definition,
       [settings.gameAddress],
-      state.componentForm.initialBuy,
-      { value }
+      0, // fee
+      0 // purchase price
     )
-  })
+  // })
 }
 
 export default PieceForm

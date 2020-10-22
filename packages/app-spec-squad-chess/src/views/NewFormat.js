@@ -26,7 +26,7 @@ const FormatForm = {
       m(Explanation),
       m(FormatPreloader),
       m(DefinitionFields),
-      m(MarketFields),
+      m(LicenseFields),
       m(
         'button.submit',
         { onclick: handleSubmit },
@@ -181,7 +181,6 @@ const FormatDataFields = {
 
 const FormatStartingPosition = {
   oninit: () => {
-    console.log('on init')
     document.body.addEventListener('click', handleRenderSquareMenu)
   },
   view: () => {
@@ -202,7 +201,6 @@ const FormatStartingPosition = {
     ]
   },
   onremove: () => {
-    console.log('on remove')
     document.body.removeEventListener('click', handleRenderSquareMenu)
   }
 }
@@ -270,7 +268,11 @@ const PieceOption = {
     }
     const callback = (value) => {
       if (state.formatForm.startingPosition[vnode.attrs.square].content) {
-        state.formatForm.startingPosition[vnode.attrs.square].content.pieceId = value
+        if (value === 'None') {
+          state.formatForm.startingPosition[vnode.attrs.square].content = null
+        } else {
+          state.formatForm.startingPosition[vnode.attrs.square].content.pieceId = value
+        }
       } else {
         state.formatForm.startingPosition[vnode.attrs.square].content = { pieceId: value, player: 0 }
       }
@@ -434,16 +436,62 @@ const FormatOrientation = {
   }
 }
 
-const MarketFields = {
+const LicenseFields = {
   view: () => {
     return m(
       '.format.form-field',
-      m('h3', 'Tokens and Licensing'),
-      m(InitialBuyField)
+      m('h3', 'License Settings'),
+      m('p', 'Choose the price and the percentage fee you will receive on all purchases of this contribution.'),
+      m(PurchasePriceField),
+      // m(BeneficiaryField),
+      m(FeeField)
     )
   }
 }
 
+const PurchasePriceField = {
+  view: () => {
+    return m(
+      '.format',
+      'Purchase price (MT): ',
+      m(
+        'input[type=number][placeholder=0]',
+        { oninput: handleSaveFactory('purchasePrice') }
+      )
+    )
+  }
+}
+
+/*
+const BeneficiaryField = {
+  view: () => {
+    return m(
+      '.format',
+      'Beneficiary address: ',
+      m(
+        `input[type=text][value=${state.address}]`,
+        { oninput: handleSaveFactory('beneficiary') }
+      )
+    )
+  }
+}
+*/
+
+const FeeField = {
+  view: () => {
+    return m(
+      '.format',
+      'Beneficiary fee: ',
+      m(
+        'input[type=number][placeholder=0]',
+        { oninput: handleSaveFactory('beneficiaryFee') }
+      ),
+      '%'
+    )
+  }
+}
+
+/*
 const InitialBuyField = {
   view: () => {
     return m(
@@ -453,10 +501,11 @@ const InitialBuyField = {
         'input[type=number][placeholder=0]',
         { oninput: handleSaveInitialBuy }
       ),
-      `Cost: ${state.formatForm.value} Wei`
+      `Cost: ${state.componentForm.value} Wei`
     )
   }
 }
+*/
 
 // handlers
 const handleLoadFormat = (event) => {
@@ -517,7 +566,7 @@ const handleAddOrRemoveComponent = (event) => {
     state.formatForm.components.push(address)
   }
 }
-
+/*
 const handleSaveInitialBuy = (event) => {
   state.formatForm.initialBuy = event.target.value
   squad.curationMarket.getBuyPriceFromCurve(0, state.formatForm.initialBuy).then(res => {
@@ -525,23 +574,26 @@ const handleSaveInitialBuy = (event) => {
     m.redraw()
   })
 }
-
+*/
 const handleSubmit = (event) => {
   event.preventDefault()
   const definition = cleanDefinition()
   const localDefs = JSON.parse(localStorage.getItem('localDefinitions'))
   localStorage.setItem('localDefinitions', JSON.stringify([...localDefs, definition]))
-  console.log('Definition being submitted', definition)
+  // convert  percent to basis points
+  const feeRate = parseInt(state.formatForm.beneficiaryFee * 100)
+  console.log(
+    'Definition being submitted', 
+    definition,
+    state.formatForm
+  )
   // make sure we get the right value before submitting, if not enough time has already passed
-  squad.curationMarket.getBuyPriceFromCurve(0, state.formatForm.initialBuy).then(res => {
-    const value = res
-    definitionWithAlerts(
-      definition,
-      [settings.gameAddress],
-      state.formatForm.initialBuy,
-      { value }
-    )
-  })
+  definitionWithAlerts(
+    definition,
+    [settings.gameAddress],
+    feeRate,
+    parseInt(state.formatForm.purchasePrice)
+  )
 }
 
 // helpers

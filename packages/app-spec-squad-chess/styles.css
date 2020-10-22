@@ -760,3 +760,25 @@ button.submit {
     flex-direction: column;
   }
 }
+
+/* Withdraw */
+.withdraw {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.withdraw .card {
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  width: 400px;
+  box-shadow: #fffcf7 1px 1px 0px inset;
+  border: 1px solid #ebddc3;
+  border-image: initial;
+  border-radius: 12px;
+}
+
+.withdraw .card p {
+  margin-bottom: 12px;
+}

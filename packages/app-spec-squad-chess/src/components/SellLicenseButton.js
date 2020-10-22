@@ -7,7 +7,6 @@ let licensePrice = 10
 
 const SellLicenseButton = {
   oninit: (vnode) => {
-    console.log('Get license price for', vnode.attrs.address)
     state.buyingAndSelling[`sellLicense${vnode.attrs.address}`] = licensePrice
   },
   view: (vnode) => {

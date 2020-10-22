@@ -151,6 +151,7 @@ const handleLinkFactory = (address) => {
 function shortenScore (score) {
   if (!(score + 1)) { return }
   let result = String(score)
+  result = result.split('.')[0]
   if (result.length > 7) {
     let count = 0
     let length = result.length

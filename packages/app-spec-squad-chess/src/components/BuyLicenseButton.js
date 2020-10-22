@@ -8,7 +8,6 @@ let licensePrice = 10
 
 const BuyLicenseButton = {
   oninit: (vnode) => {
-    console.log('Get license price for', vnode.attrs.address)
     const purchasePrice = state.squad.rawFormats[vnode.attrs.address].purchasePrice
     state.buyingAndSelling[`buyLicense${vnode.attrs.address}`] = purchasePrice
   },
@@ -37,7 +36,7 @@ const BuyLicenseButton = {
     )
   }
 }
-
+/*
 const handleSaveBuyInfo = (dataType) => {
   return (event) => {
     if (event.target.value >= licensePrice) {
@@ -45,5 +44,5 @@ const handleSaveBuyInfo = (dataType) => {
     }
   }
 }
-
+*/
 export default BuyLicenseButton

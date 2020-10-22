@@ -2,6 +2,7 @@ let state // eslint-disable-line no-unused-vars
 
 export default state = {
   menus: {},
+  address: '',
   options: {},
   connectModal: false,
   formatForm: {},
@@ -15,5 +16,6 @@ export default state = {
   formatSelector: {},
   markets: {},
   buyingAndSelling: {},
+  withdrawAmount: '-',
   alerts: []
 }

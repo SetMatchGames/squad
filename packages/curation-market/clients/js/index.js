@@ -6,6 +6,7 @@ const CurveJSON = require("../../app/build/contracts/Curve.json")
 const SimpleLinearCurveJSON = require("../../app/build/contracts/SimpleLinearCurve.json")
 const SquadControllerJSON = require("./artifacts/SquadController.json")
 const TokenClaimCheckJSON = require("./artifacts/TokenClaimCheck.json")
+const AccountingJSON = require("./artifacts/Accounting.json")
 const LinearCurveJSON = require("./artifacts/LinearCurve.json")
 const BondingCurveFactoryJSON = require("./artifacts/BondingCurveFactory.json")
 const ERC20JSON = require("./artifacts/ERC20.json")
@@ -14,6 +15,7 @@ const tokenClaimCheckAddress = '0x917C936370a345E3EC97B134E095F30697524B9d'
 const linearCurveAddress = '0x682e04D70c12e2D4eEeFF82e03e0E0c6EFC97eaf'
 const bondingCurveFactoryAddress = '0x3F3191211352f7b5562D4960f505eF8be77f3b38'
 const reserveTokenAddress = '0x7B16Ef4F69e0858e19294F2c2D9A8530E0a74EBc'
+const accountingAddress = '0x294A2dc8A476dA309Fd6c8C4CB67Dd0cAF769c13'
 
 const networkIds = {
   'ropsten': 3
@@ -67,6 +69,7 @@ let squadController
 let tokenClaimCheck
 let bondingCurveFactory
 let reserveToken
+let accounting
 
 function init (defaults) {
   if (initialized) {
@@ -103,6 +106,8 @@ function init (defaults) {
     tokenClaimCheckAddress, TokenClaimCheckJSON.abi, walletOrSigner
   )
   reserveToken = new ethers.Contract(reserveTokenAddress, ERC20JSON.abi, walletOrSigner)
+  accounting = new ethers.Contract(accountingAddress, AccountingJSON.abi, walletOrSigner)
+  
 
   if (defaults === undefined) {
     defaults = {
@@ -213,10 +218,8 @@ async function getLicenseInfo(licenseId) {
   }
   const [token, amount] = await tokenClaimCheck.claims(licenseId)
   const claim = {token, amount}
-  console.log('CLAIMS', token, ethers.utils.formatEther(amount), Number(await sellPriceFor(bytes32Id, amount)))
-  const sellStrings = (await sellPriceFor(bytes32Id, amount)).split('.')
+  const sellStrings = (await licenseSellPrice(licenseId, feeRate)).split('.')
   sellAmount = `${sellStrings[0]}.${sellStrings[1].slice(0, 2)}`
-  console.log('sellAmount', sellAmount)
   // sell amount is not correct! it should always be 10.0 right after buying
   if (token === ethers.constants.AddressZero) {
     return false
@@ -353,7 +356,6 @@ async function sellTokens (
   init()
   const amountUnits = ethers.utils.parseUnits(amount)
   const minPriceUnits = ethers.utils.parseUnits(minPrice)
-  console.log('sell token internal inputs', contributionId, amountUnits, minPriceUnits)
   const tx = await squadController.sellTokens(
     contributionId,
     amountUnits,
@@ -374,16 +376,7 @@ async function redeemAndSell(
 ) {
   init()
   const claim = await tokenClaimCheck.claims(licenseId)
-  console.log('claim from sell', claim, Number(claim.amount))
-  console.log('valid license', await squadController.validLicenses(licenseId))
   const contributionId = await squadController.validLicenses(licenseId)
-  console.log('MIN PRICE number', Number(minPrice))
-  console.log('Sell inputs', 
-    contributionId,
-    ethers.utils.formatEther(claim.amount),
-    minPrice,
-    String(minPrice),
-    await sellPriceFor(contributionId, claim.amount))
   await redeemLicense(
     licenseId,
     redeemSubmissionCb,
@@ -420,6 +413,12 @@ async function purchasePriceOf(contributionId) {
   )
 }
 
+async function feeOf(contributionId) {
+  init()
+  const bytes32Id = ethers.utils.id(contributionId)
+  return (await squadController.contributions(bytes32Id)).feeRate
+}
+
 async function priceOf(contributionId, amount) {
   init()
   const bytes32Id = ethers.utils.id(contributionId)
@@ -450,20 +449,16 @@ async function getBuyPriceFromCurve (supply, units, curveAddress) {
 async function sellPriceFor(contributionId, amount) {
   init()
   const supply = await squadController.totalSupplyOf(contributionId)
-  console.log(amount, supply, ethers.utils.formatEther(amount), ethers.utils.formatEther(supply))
-  console.log(
-    'Sell price for',
-    await linearCurvePrice(supply.sub(amount), amount)
-  )
   return await linearCurvePrice(supply.sub(amount), amount)
 }
 
-async function licenseSellPrice(licenseId) {
+async function licenseSellPrice(licenseId, feeRate) {
   init()
   const claim = await tokenClaimCheck.claims(licenseId)
   const bytes32Id = await squadController.validLicenses(licenseId)
-  const contributionId = ethers.utils.parseBytes32String(bytes32Id)
-  return await sellPriceFor(contributionId, claim.amount)
+  const amount = claim.amount.sub(claim.amount.mul(feeRate).div(10000))
+  // const contributionId = ethers.utils.parseBytes32String(bytes32Id)
+  return await sellPriceFor(bytes32Id, amount)
 }
 
 async function getSellPrice (units, bondId) {
@@ -507,6 +502,20 @@ function getEthers() {
   return ethers
 }
 
+async function withdrawAmount () {
+  init()
+  const raw = ethers.utils.formatEther(await accounting.accounts(await walletAddress()))
+  console.log('withdraw raw', raw)
+  return parseFloat(Number(raw)).toPrecision(4)
+}
+
+async function withdraw (submissionCb, confirmationCb) {
+  init()
+  const tx = await squadController.withdraw(await walletAddress())
+  submissionCb(tx)
+  return handleConfirmationCallback(tx.hash, confirmationCb)
+}
+
 module.exports = {
   init,
   newBond,
@@ -537,5 +546,8 @@ module.exports = {
   getValidLicenses,
   linearCurveAmount,
   purchasePriceOf,
-  licenseSellPrice
+  feeOf,
+  licenseSellPrice,
+  withdrawAmount,
+  withdraw
 }

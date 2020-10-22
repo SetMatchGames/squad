@@ -36,7 +36,8 @@ const MenuLinks = {
       { style: { display } },
       m('a', { onclick: handleLinkFactory('/formats') }, 'Play'),
       m('a', { onclick: handleLinkFactory('/new-piece') }, 'New Piece'),
-      m('a', { onclick: handleLinkFactory('/new-format') }, 'New Format')
+      m('a', { onclick: handleLinkFactory('/new-format') }, 'New Format'),
+      m('a', { onclick: handleLinkFactory('/withdraw') }, 'Withdraw')
       // TODO m('a', { onclick: handleLinkFactory('/markets') }, 'Explore Markets' )
     )
   }

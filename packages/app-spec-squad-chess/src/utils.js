@@ -172,6 +172,7 @@ async function web3connection () {
   let address
   try {
     address = await connection.getAddress()
+    state.address = address
   } catch (e) {
     address = e
   }
@@ -204,6 +205,8 @@ function refreshLocalStorage (formatDefs, componentDefs) {
 
 export const getMarketInfo = () => {
   connectSquad(async () => {
+    // get the logged in user's available withdraw amount
+    state.withdrawAmount = await squad.curationMarket.withdrawAmount()
     // get the users licenses
     state.licenses = await squad.curationMarket.getValidLicenses()
     // for each format
@@ -214,6 +217,7 @@ export const getMarketInfo = () => {
       await getMarketCap(address)
       // get the purchasePrice
       await getPurchasePrice(address)
+      await getBeneficiaryFee(address)
       m.redraw()
     }
     // for each component
@@ -233,13 +237,18 @@ async function getOwned (address) {
 */
 
 async function getMarketCap (address) {
-  const marketCap = await curationMarket.getMarketCap(address)
+  const marketCap = await curationMarket.marketSize(address)
   state.marketCaps[address] = marketCap
 }
 
 async function getPurchasePrice (address) {
   const purchasePrice = await curationMarket.purchasePriceOf(address)
   state.squad.rawFormats[address].purchasePrice = purchasePrice
+}
+
+async function getBeneficiaryFee (address) {
+  const fee = await curationMarket.feeOf(address)
+  state.squad.rawFormats[address].fee = Number(fee) / 100
 }
 
 export const loadFormat = (address) => {
@@ -312,7 +321,6 @@ export const buyLicenseWithAlerts = async (bondId, amount) => {
 }
 
 export const sellLicenseWithAlerts = async (licenseId, minPrice) => {
-  console.log('sell license inputs', licenseId, minPrice)
   await curationMarket.redeemAndSell(
     licenseId,
     minPrice,
@@ -324,7 +332,6 @@ export const sellLicenseWithAlerts = async (licenseId, minPrice) => {
 }
 
 export const sellTokensWithAlerts = async (contributionId, amount, minPrice) => {
-  console.log('sell token inputs', contributionId, amount, minPrice)
   await curationMarket.sellTokens(
     contributionId,
     amount,
@@ -353,14 +360,28 @@ export const sellWithAlerts = async (units, bondId) => {
   )
 }
 
-export const definitionWithAlerts = async (definition, games, initialBuyUnits, options) => {
+export const definitionWithAlerts = async (
+  definition, 
+  games, 
+  feeRate,
+  purchasePrice, 
+  options
+) => {
   await squad.definition(
     definition,
     games,
-    initialBuyUnits,
+    feeRate,
+    purchasePrice,
     handleAlert('Submitted', 'contribution submitted'),
     handleAlert('Confirmed', 'contribution confirmed'),
     options
+  )
+}
+
+export const withdrawWithAlerts = async () => {
+  await curationMarket.withdraw(
+    handleAlert('Submitted', 'withdraw request submitted'),
+    handleAlert('Confirmed', 'withdraw confirmed')
   )
 }
 

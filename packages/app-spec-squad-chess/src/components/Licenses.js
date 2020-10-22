@@ -20,7 +20,8 @@ const Licenses = {
       m(
         '.licenses.column',
         licenses,
-        m(BuyLicenseButton, { address: vnode.attrs.address })
+        m(BuyLicenseButton, { address: vnode.attrs.address }),
+        `Beneficiary fee: ${state.squad.rawFormats[vnode.attrs.address].fee}%`
       )
     ]
   }

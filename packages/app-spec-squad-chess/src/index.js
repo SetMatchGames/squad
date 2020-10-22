@@ -6,6 +6,7 @@ import Matchmaking from './views/Matchmaking.js'
 import Play from './views/Play.js'
 import NewFormat from './views/NewFormat.js'
 import NewPiece from './views/NewPiece.js'
+import Withdraw from './views/Withdraw.js'
 
 import NavMenu from './components/NavMenu.js'
 import ConnectModal from './components/ConnectModal.js'
@@ -104,5 +105,6 @@ m.route(document.body, '/', {
   '/matchmaking/:formatAddress': layout(Matchmaking),
   '/play': layout(Play),
   '/new-piece': layout(NewPiece),
-  '/new-format': layout(NewFormat)
+  '/new-format': layout(NewFormat),
+  '/withdraw': layout(Withdraw)
 })
