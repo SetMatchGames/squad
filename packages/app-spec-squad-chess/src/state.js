@@ -1,6 +1,10 @@
 let state // eslint-disable-line no-unused-vars
 
 export default state = {
+  menus: {},
+  address: '',
+  options: {},
+  connectModal: false,
   formatForm: {},
   componentForm: {},
   matchmaking: {},
@@ -9,5 +13,9 @@ export default state = {
   squad: {},
   owned: {},
   marketCaps: {},
-  buyingAndSelling: {}
+  formatSelector: {},
+  markets: {},
+  buyingAndSelling: {},
+  withdrawAmount: '-',
+  alerts: []
 }

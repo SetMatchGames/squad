@@ -1,6 +1,7 @@
 squad-games-web = packages/squad-games-web
 app-spec-roshambo = packages/app-spec-roshambo
 curation-market = packages/curation-market/app
+curation-market-js = packages/curation-market/clients/js
 metastore-js = packages/metastore/clients/js
 metastore = packages/metastore/app
 mock-metastore = packages/metastore/mock
@@ -79,6 +80,10 @@ app-spec-roshambo-tests:
 .PHONY: curation-market-tests
 curation-market-tests: build/development-curation-market
 	cd $(curation-market) && npm run test
+
+.PHONY: curation-market-js-tests
+curation-market-js-tests: build/development-curation-market
+	cd $(curation-market-js) && npm run test
 
 .PHONY: matchmaking-js-tests
 matchmaking-js-tests: build/matchmaking

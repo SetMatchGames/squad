@@ -1,14 +1,16 @@
-/* global clearInterval setInterval setTimeout */
+/* global clearInterval setInterval */
 
 import m from 'mithril'
 import { matchmaking } from '@squad/sdk'
 import crypto from 'crypto'
-import settings from './settings.js'
-import state from './state.js'
-import { checkWinner } from './Board.js'
+import settings from '../settings.js'
+import state from '../state.js'
+import { loadFormat, checkWinner } from '../utils.js'
 
-export const Matchmaker = {
-  oninit: () => {
+const Matchmaking = {
+  oninit: (vnode) => {
+    loadFormat(vnode.attrs.formatAddress)
+
     state.matchmaking.id = crypto.randomBytes(16).toString('hex')
     console.log(`Our matchmaking Id: ${state.matchmaking.id}`)
 
@@ -19,9 +21,13 @@ export const Matchmaker = {
     state.matchmaking.connection = 'not connected'
   },
   view: () => {
+    let name = '[ format loading... ]'
+    if (state.squad.loadedFormat) {
+      name = state.squad.loadedFormat.name
+    }
     return m(
-      '#matchmaker',
-      m('h3', 'Matchmaking'),
+      '#matchmaking.body',
+      m('h2', `Matchmaking for ${name}`),
       m(FindMatchForm),
       m(PeerList),
       m(OfferList)
@@ -194,7 +200,7 @@ const Offer = {
 // handlers
 const handleSaveRoom = (event) => {
   event.preventDefault()
-  state.matchmaking.room = `${event.target.value}-${state.squad.loadedFormatKey}`
+  state.matchmaking.room = `${event.target.value}-${state.squad.loadedFormat.address}`
 }
 
 const handleConnect = (event) => {
@@ -252,26 +258,7 @@ const handleSendAnswer = (event) => {
 
   state.matchmaking.connection = 'match started'
   clearInterval(state.matchmaking.rollCallInterval)
-  m.redraw()
-}
-
-export const sendMessage = (message) => {
-  if (!state.matchmaking.messageNumber) {
-    state.matchmaking.messageNumber = 0
-  }
-  if (!message.number) {
-    state.matchmaking.messageNumber += 1
-    message.number = state.matchmaking.messageNumber
-  }
-  if (message.number < state.matchmaking.messageNumber) {
-    return
-  }
-  console.log('Sending message:', message)
-  matchmaking.sendMessage(message)
-  setTimeout(() => {
-    console.log('resending message number', message.number)
-    sendMessage(message)
-  }, 3000)
+  m.route.set('/play')
 }
 
 const handleReceiveMessage = (event) => {
@@ -284,6 +271,7 @@ const handleReceiveMessage = (event) => {
     state.matchmaking.messageNumber = event.data.number
     if (event.data === 'match started') {
       state.matchmaking.connection = event.data
+      m.route.set('/play')
     } else {
       state.game = event.data
       checkWinner()
@@ -291,3 +279,5 @@ const handleReceiveMessage = (event) => {
     m.redraw()
   }
 }
+
+export default Matchmaking

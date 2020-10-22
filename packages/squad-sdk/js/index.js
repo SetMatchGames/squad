@@ -30,12 +30,21 @@ async function runGame (definition) {
 async function newDefinitionWithBond (
   definition,
   games,
-  initialBuyUnits = 0,
-  opts = {},
-  addressOfCurve
+  feeRate,
+  purchasePrice,
+  submissionCb,
+  confirmationCb,
+  opts = {}
 ) {
   const bondId = await metastore.createDefinition(definition, games)
-  await curationMarket.newBond(bondId, initialBuyUnits, opts, addressOfCurve)
+  await curationMarket.newContribution(
+    bondId,
+    feeRate,
+    purchasePrice,
+    submissionCb,
+    confirmationCb,
+    opts
+  )
   return bondId
 }
 
@@ -44,17 +53,21 @@ async function newDefinitionWithBond (
 async function definition (
   definition,
   games = [],
-  initialBuyUnits = 0,
-  opts = {},
-  addressOfCurve
+  feeRate,
+  purchasePrice,
+  submissionCb,
+  confirmationCb,
+  opts = {}
 ) {
   try {
     return await newDefinitionWithBond(
       definition,
       games,
-      initialBuyUnits,
-      opts,
-      addressOfCurve
+      feeRate,
+      purchasePrice,
+      submissionCb,
+      confirmationCb,
+      opts
     )
   } catch (e) {
     if (e instanceof curationMarket.BondAlreadyExists) {
@@ -71,6 +84,5 @@ module.exports = {
   metastore,
   curationMarket,
   matchmaking,
-  definition,
-  newDefinitionWithBond
+  definition
 }
