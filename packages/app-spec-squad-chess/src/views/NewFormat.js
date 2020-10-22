@@ -1,7 +1,6 @@
 /* global localStorage */
 
 import m from 'mithril'
-import squad from '@squad/sdk'
 
 import Board from '../components/Board.js'
 import Option from '../components/Option.js'
@@ -583,7 +582,7 @@ const handleSubmit = (event) => {
   // convert  percent to basis points
   const feeRate = parseInt(state.formatForm.beneficiaryFee * 100)
   console.log(
-    'Definition being submitted', 
+    'Definition being submitted',
     definition,
     state.formatForm
   )

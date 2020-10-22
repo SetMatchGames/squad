@@ -1,10 +1,7 @@
 import m from 'mithril'
-import squad from '@squad/sdk'
 
 import { buyLicenseWithAlerts } from '../utils.js'
 import state from '../state.js'
-
-let licensePrice = 10
 
 const BuyLicenseButton = {
   oninit: (vnode) => {
@@ -14,7 +11,6 @@ const BuyLicenseButton = {
   view: (vnode) => {
     const address = vnode.attrs.address
     const purchasePrice = state.buyingAndSelling[`buyLicense${vnode.attrs.address}`]
-    const dataType = `buyLicense${address}`
     return m(
       'form.buy-license',
       /*

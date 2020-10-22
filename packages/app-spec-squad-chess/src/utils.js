@@ -86,25 +86,25 @@ export const connectSquad = (callback) => {
 }
 
 let tested = false
-async function test() {
-  const params = (new URL(document.location)).searchParams;
-  console.log("TEST", params.get("test"))
-  if(tested || params.get("test") !== "on") {
+async function test () {
+  const params = (new URL(document.location)).searchParams
+  console.log('TEST', params.get('test'))
+  if (tested || params.get('test') !== 'on') {
     return
   }
   tested = true
 
-  function testLog(...args) {
-    console.log("TEST", ...args)
+  function testLog (...args) {
+    console.log('TEST', ...args)
   }
 
   let done = false
-  function finish(...args) {
-    testLog("Finish", ...args)
+  function finish (...args) {
+    testLog('Finish', ...args)
     done = true
   }
 
-  async function wait() {
+  async function wait () {
     while (!done) {
       await new Promise(resolve => setTimeout(resolve, 100))
     }
@@ -113,9 +113,9 @@ async function test() {
 
   const ethers = curationMarket.getEthers()
   const signerAddress = await curationMarket.walletAddress()
-  const contributionId = "abc123" // Date.now().toString()
+  const contributionId = 'abc123' // Date.now().toString()
   const feeRate = 200
-  const purchasePrice = ethers.utils.parseEther("0.5")
+  const purchasePrice = ethers.utils.parseEther('0.5')
   /*
   done = false
   testLog("newContribution", contributionId, feeRate, purchasePrice)
@@ -131,16 +131,16 @@ async function test() {
   done = false
   const supply = await curationMarket.totalSupplyOf(contributionId)
   const amount = curationMarket.linearCurveAmount(supply, purchasePrice.mul(10))
-  testLog("buyLicense with extra amount", contributionId, amount)
+  testLog('buyLicense with extra amount', contributionId, amount)
   await curationMarket.buyLicense(contributionId, testLog, finish, amount)
   testLog()
   wait()
 
-  testLog("totalSupplyOf", contributionId)
+  testLog('totalSupplyOf', contributionId)
   testLog((await curationMarket.totalSupplyOf(contributionId)).toString())
   testLog()
 
-  testLog("holdsLicenseFor", contributionId, signerAddress)
+  testLog('holdsLicenseFor', contributionId, signerAddress)
   testLog(await curationMarket.holdsLicenseFor(contributionId, signerAddress))
   testLog()
 
@@ -148,23 +148,23 @@ async function test() {
   const validLicenses = await curationMarket.getValidLicenses(signerAddress)
   testLog(validLicenses, contributionId)
   const licenseId = validLicenses[contributionId][0].licenseId
-  testLog("redeemAndSell", licenseId, 0)
+  testLog('redeemAndSell', licenseId, 0)
   const claimAmount = await validLicenses[licenseId].claim.amount
-  testLog("claimAmount     ", claimAmount.toString())
-  testLog("licenseSellPrice", (await curationMarket.licenseSellPrice(licenseId)).toString())
-  testLog("SellPriceFor    ", (await curationMarket.sellPriceFor(contributionId, claimAmount)).toString())
+  testLog('claimAmount     ', claimAmount.toString())
+  testLog('licenseSellPrice', (await curationMarket.licenseSellPrice(licenseId)).toString())
+  testLog('SellPriceFor    ', (await curationMarket.sellPriceFor(contributionId, claimAmount)).toString())
   await curationMarket.redeemAndSell(licenseId, 0, testLog, testLog, testLog, finish)
   testLog()
   wait()
 
   testLog(await curationMarket.getValidLicenses(signerAddress))
   // marketSize
-  testLog("MarketSize          ", (await curationMarket.marketSize(contributionId)).toString())
-  testLog("MarketSize of XYa123", (await curationMarket.marketSize("XYa123")).toString())
+  testLog('MarketSize          ', (await curationMarket.marketSize(contributionId)).toString())
+  testLog('MarketSize of XYa123', (await curationMarket.marketSize('XYa123')).toString())
 
   // purchasePriceOf
-  testLog("PurchasePriceOf       ", (await curationMarket.purchasePriceOf(contributionId)).toString())
-  testLog("PurchasePriceOf XYa123", (await curationMarket.purchasePriceOf("XYa123")).toString())
+  testLog('PurchasePriceOf       ', (await curationMarket.purchasePriceOf(contributionId)).toString())
+  testLog('PurchasePriceOf XYa123', (await curationMarket.purchasePriceOf('XYa123')).toString())
 }
 
 async function web3connection () {
@@ -361,10 +361,10 @@ export const sellWithAlerts = async (units, bondId) => {
 }
 
 export const definitionWithAlerts = async (
-  definition, 
-  games, 
+  definition,
+  games,
   feeRate,
-  purchasePrice, 
+  purchasePrice,
   options
 ) => {
   await squad.definition(

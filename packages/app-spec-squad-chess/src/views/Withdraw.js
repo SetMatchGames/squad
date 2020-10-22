@@ -1,7 +1,7 @@
 import m from 'mithril'
 
 import state from '../state.js'
-import { getMarketInfo, withdrawWithAlerts } from '../utils.js';
+import { getMarketInfo, withdrawWithAlerts } from '../utils.js'
 
 const Withdraw = {
   oninit: () => {

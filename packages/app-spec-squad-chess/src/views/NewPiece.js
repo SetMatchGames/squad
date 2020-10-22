@@ -1,7 +1,6 @@
 /* global localStorage */
 
 import m from 'mithril'
-import squad from '@squad/sdk'
 
 import state from '../state.js'
 import settings from '../settings.js'
@@ -224,7 +223,7 @@ const PieceAdmechanic = {
     if (state.componentForm.admechanics[vnode.key] !== undefined) {
       form = m(
         '.piece.admechanic-params.indented',
-        m('label', "Params (comma separated list of any/all of default, self, king):"),
+        m('label', 'Params (comma separated list of any/all of default, self, king):'),
         m(
           `input[type=text][value="${state.componentForm.admechanics[vnode.key]}"]`,
           { oninput: handleAdmechanicParamsFactory(vnode.key) }
@@ -343,7 +342,6 @@ const PurchasePriceField = {
   }
 }
 
-
 const BeneficiaryField = {
   view: () => {
     return m(
@@ -356,7 +354,6 @@ const BeneficiaryField = {
     )
   }
 }
-
 
 const FeeField = {
   view: () => {
@@ -471,7 +468,7 @@ const handleToggleAdmechanicFactory = (admechanic) => {
     if (state.componentForm.admechanics[admechanic]) {
       delete state.componentForm.admechanics[admechanic]
     } else {
-      state.componentForm.admechanics[admechanic] = "default"
+      state.componentForm.admechanics[admechanic] = 'default'
     }
   }
 }
@@ -541,12 +538,12 @@ const handleSubmit = (event) => {
   // make sure we get the right value before submitting, if not enough time has already passed
   // squad.curationMarket.getBuyPriceFromCurve(0, state.componentForm.initialBuy).then(res => {
   //   const value = res
-    definitionWithAlerts(
-      definition,
-      [settings.gameAddress],
-      0, // fee
-      0 // purchase price
-    )
+  definitionWithAlerts(
+    definition,
+    [settings.gameAddress],
+    0, // fee
+    0 // purchase price
+  )
   // })
 }
 
