@@ -73,7 +73,7 @@ let accounting
 
 function init (defaults) {
   if (initialized) {
-    return [initialized, walletOrSigner]
+    return walletOrSigner
   }
   console.log('Initializing...')
 
