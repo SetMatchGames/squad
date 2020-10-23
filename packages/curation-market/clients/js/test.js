@@ -3,15 +3,6 @@
 const curation = require("./index.js")
 
 const curationMarket = require('./index.js')
-const ethers = require('ethers')
-
-function assert(statement, error) {
-  if (statement === true) {
-    return
-  } else {
-    throw error
-  }
-}
 
 async function main() {
   console.log("TESTING CURATION API...")
@@ -63,13 +54,21 @@ test("Tests run", async () => {
   expect(true).toBe(true)
 })
 
-test("create a new bond with 100 initial buys", async () => {
+test("create a new bond and buy 100", async () => {
   const bondId = Date.now().toString()
 
-  await curationMarket.newBond(bondId, 0)
-  console.log('buy price', await curationMarket.getBuyPrice(100, bondId))
+  await curationMarket.newBond(bondId, 0, async (receipt) => {
+    const supply = await curationMarket.getSupply(bondId)
+    expect(supply).toEqual(0)
+    /*
+    await curationMarket.buy(100, bondId, async (receipt) => {
+      const supply = await curationMarket.getSupply(bondId)
+      expect(supply).toEqual(100)
+    })
+    */
+  })
 
-  const supply = await curationMarket.getSupply(bondId)
-  expect(supply).toEqual(ethers.utils.bigNumberify(0))
+  // const supply = await curationMarket.getSupply(bondId)
+  // expect(supply).toEqual(ethers.utils.bigNumberify(0))
 })
 

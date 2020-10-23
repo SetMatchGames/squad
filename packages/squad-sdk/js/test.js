@@ -14,7 +14,7 @@ test('Tests run', () => {
   expect(true).toBe(true)
 })
 
-test('newDefinitionWithBond', async () => {
+test('definition', async () => {
   const component = {
     Component: {
       name: 'Rock',
@@ -31,10 +31,12 @@ test('newDefinitionWithBond', async () => {
   const initialBuyUnits = 10
   const value = 55
 
-  await squad.newDefinitionWithBond(
+  await squad.definition(
     component,
     [gameAddress],
     initialBuyUnits,
+    null,
+    null,
     { value },
     curveAddress
   )
@@ -46,6 +48,8 @@ test('newDefinitionWithBond', async () => {
   expect(curation.newBond).toBeCalledWith(
     'mockBondId',
     initialBuyUnits,
+    null,
+    null,
     { value },
     curveAddress
   )

@@ -1,63 +1,77 @@
 /* global localStorage */
 
 import m from 'mithril'
-import squad from '@squad/sdk'
 
-import state from './state.js'
-import settings from './settings.js'
-import { mechanics, admechanics } from './rules.js'
-import graphicsPaths from './graphics-paths.json'
-import { shortHash } from './utils.js'
+import state from '../state.js'
+import settings from '../settings.js'
+import { mechanics, admechanics } from '../rules.js'
+import graphicsPaths from '../graphics-paths.json'
+import { shortHash, getMarketInfo, definitionWithAlerts } from '../utils.js'
 
-const ComponentForm = {
+const PieceForm = {
   oninit: () => {
+    getMarketInfo()
     clearForm()
   },
   view: () => {
     const form = m(
-      'form#component-form',
-      m(ComponentPreloader),
+      'form#piece-form',
+      m(Explanation),
+      m(PiecePreloader),
       m(DefinitionFields),
-      m(InitialBuyField),
-      m(CurveAddressField),
+      // m(LicenseFields),
       m(
-        'button',
+        'button.submit',
         { onclick: handleSubmit },
         'Submit new definition'
       )
     )
     return m(
-      '#component-form',
-      m('h3', 'New Component'),
+      '#piece-form.body',
+      m('h2', 'New Piece'),
       form
     )
   }
 }
 
-const ComponentPreloader = {
+const Explanation = {
   view: () => {
     return m(
-      '.component.form-field',
-      Object.keys(state.squad.components).map(key => {
-        return m(ComponentButton, {
-          key,
-          name: `${state.squad.components[key].name} (${shortHash(key)})`
-        })
-      }),
-      m(
-        'button',
-        { onclick: handleClearForm },
-        'Clear'
-      )
+      'p',
+      'Create a new piece that can be added to formats.'
     )
   }
 }
 
-const ComponentButton = {
+const PiecePreloader = {
+  view: () => {
+    let content = 'Loading...'
+    if (state.squad.components) {
+      content = m(
+        '.piece.form-field',
+        m('h3', 'Load an existing piece'),
+        Object.keys(state.squad.components).map(key => {
+          return m(PieceButton, {
+            key,
+            name: `${state.squad.components[key].name} (${shortHash(key)})`
+          })
+        }),
+        m(
+          'button',
+          { onclick: handleClearForm },
+          'Clear'
+        )
+      )
+    }
+    return content
+  }
+}
+
+const PieceButton = {
   view: (vnode) => {
     return m(
       'button',
-      { value: vnode.key, onclick: handleLoadComponent },
+      { value: vnode.key, onclick: handleLoadPiece },
       vnode.attrs.name
     )
   }
@@ -66,20 +80,30 @@ const ComponentButton = {
 const DefinitionFields = {
   view: () => {
     return m(
-      '.component.definition',
-      m(ComponentNameField),
-      m(ComponentMechanics),
-      m(ComponentKing),
-      m(ComponentGraphics)
+      '.piece.definition',
+      m(PieceBasicsFields),
+      m(PieceMechanics),
+      m(PieceGraphics)
     )
   }
 }
 
-const ComponentNameField = {
+const PieceBasicsFields = {
   view: () => {
     return m(
-      '.component.form-field',
-      'Component name: ',
+      '.piece.form-field',
+      m('h3', 'Basics'),
+      m(PieceNameField),
+      m(PieceDescriptionField)
+    )
+  }
+}
+
+const PieceNameField = {
+  view: () => {
+    return m(
+      '.piece',
+      'Name: ',
       m(
         'input[type=text]',
         { value: state.componentForm.name, oninput: handleSaveFactory('name') }
@@ -88,28 +112,43 @@ const ComponentNameField = {
   }
 }
 
-const ComponentMechanics = {
+const PieceDescriptionField = {
   view: () => {
     return m(
-      '.component.form-field',
-      m('p', 'Mechanics: '),
+      '.piece',
+      'Description: ',
+      m(
+        'input[type=text]',
+        { value: state.componentForm.description, oninput: handleSaveFactory('description') }
+      )
+    )
+  }
+}
+
+const PieceMechanics = {
+  view: () => {
+    return m(
+      '.piece.form-field',
+      m('h3', 'Mechanics '),
+      m('p', 'Choose the rules for your piece. Each instance is a possible action your piece can take.'),
       Object.keys(mechanics).map(mechanic => {
         return m(
-          ComponentMechanic,
+          PieceMechanic,
           { key: mechanic, description: mechanics[mechanic] }
         )
       }),
       Object.keys(admechanics).map(admechanic => {
         return m(
-          ComponentAdmechanic,
+          PieceAdmechanic,
           { key: admechanic, description: admechanics[admechanic] }
         )
-      })
+      }),
+      m(PieceKing)
     )
   }
 }
 
-const ComponentMechanic = {
+const PieceMechanic = {
   view: (vnode) => {
     const instances = []
     if (state.componentForm.mechanics[vnode.key]) {
@@ -120,11 +159,15 @@ const ComponentMechanic = {
       })
     }
     return m(
-      '.component.mechanic',
-      `"${vnode.key}" – `,
-      m('span.italics', vnode.attrs.description),
+      '.piece.mechanic',
       m(
-        'button',
+        '.description',
+        m('span.bold', vnode.key),
+        m('span.italics', ` – ${vnode.attrs.description}`)
+
+      ),
+      m(
+        'button.add-instance',
         { onclick: handleAddMechanicInstanceFactory(vnode.key) },
         'Add instance'
       ),
@@ -137,21 +180,33 @@ const MechanicOffset = {
   view: (vnode) => {
     const instance = state.componentForm.mechanics[vnode.attrs.mechanic][vnode.key]
     return m(
-      '.component.mechanic-params.indented',
-      m('label', 'X: '),
+      '.piece.mechanic-params.indented',
       m(
-        `input[type=number][value=${instance.offset[0]}].offset-input`,
-        { oninput: handleMechanicOffsetFactory(vnode.attrs.mechanic, vnode.key, 0) }
-      ),
-      m('label', 'Y: '),
-      m(
-        `input[type=number][value=${instance.offset[1]}].offset-input`,
-        { oninput: handleMechanicOffsetFactory(vnode.attrs.mechanic, vnode.key, 1) }
-      ),
-      m('label', 'Steps: '),
-      m(
-        `input[type=number][value=${instance.steps}].steps-input`,
-        { oninput: handleMechanicStepsFactory(vnode.attrs.mechanic, vnode.key) }
+        '.instances',
+        m(
+          '.field',
+          m('label', 'X: '),
+          m(
+            `input[type=number][value=${instance.offset[0]}].offset-input`,
+            { oninput: handleMechanicOffsetFactory(vnode.attrs.mechanic, vnode.key, 0) }
+          )
+        ),
+        m(
+          '.field',
+          m('label', 'Y: '),
+          m(
+            `input[type=number][value=${instance.offset[1]}].offset-input`,
+            { oninput: handleMechanicOffsetFactory(vnode.attrs.mechanic, vnode.key, 1) }
+          )
+        ),
+        m(
+          '.field',
+          m('label', 'Steps: '),
+          m(
+            `input[type=number][value=${instance.steps}].steps-input`,
+            { oninput: handleMechanicStepsFactory(vnode.attrs.mechanic, vnode.key) }
+          )
+        )
       ),
       m(
         'button',
@@ -162,13 +217,13 @@ const MechanicOffset = {
   }
 }
 
-const ComponentAdmechanic = {
+const PieceAdmechanic = {
   view: (vnode) => {
     let form
     if (state.componentForm.admechanics[vnode.key] !== undefined) {
       form = m(
-        '.component.admechanic-params.indented',
-        m('label', "Enter params (any of ['default', 'self', 'king']):"),
+        '.piece.admechanic-params.indented',
+        m('label', 'Params (comma separated list of any/all of default, self, king):'),
         m(
           `input[type=text][value="${state.componentForm.admechanics[vnode.key]}"]`,
           { oninput: handleAdmechanicParamsFactory(vnode.key) }
@@ -176,9 +231,13 @@ const ComponentAdmechanic = {
       )
     }
     return m(
-      '.component.admechanic',
-      `"${vnode.key}" – `,
-      m('span.italics', vnode.attrs.description),
+      '.piece.mechanic',
+      m(
+        '.description',
+        m('span.bold', vnode.key),
+        m('span.italics', ` – ${vnode.attrs.description}`)
+
+      ),
       m(
         'input[type=checkbox]',
         {
@@ -191,11 +250,16 @@ const ComponentAdmechanic = {
   }
 }
 
-const ComponentKing = {
+const PieceKing = {
   view: () => {
     return m(
-      '.component.form-field',
-      'King: ',
+      '.piece.mechanic',
+      m(
+        '.description',
+        m('span.bold', 'king'),
+        m('span.italics', " – If a player captures all their opponent's kings, they win.")
+
+      ),
       m(
         'input[type=checkbox]',
         {
@@ -207,11 +271,11 @@ const ComponentKing = {
   }
 }
 
-const ComponentGraphics = {
+const PieceGraphics = {
   view: () => {
     return m(
-      '.component.form-field',
-      m('p', 'Graphics: '),
+      '.piece.form-field',
+      m('h3', 'Graphics'),
       m(
         '.radio',
         m(GraphicsButtons)
@@ -251,44 +315,88 @@ const GraphicsButtons = {
     return buttons
   }
 }
-
-const InitialBuyField = {
+/*
+const LicenseFields = {
   view: () => {
     return m(
-      '.component.form-field',
-      'Tokens to buy: ',
-      m(
-        'input[type=number][placeholder=0]',
-        { oninput: handleSaveInitialBuy }
-      ),
-      `(${state.componentForm.value} Wei)`
+      '.piece.form-field',
+      m('h3', 'License Settings'),
+      m('p', 'Choose the price and the percentage fee you will receive on all purchases of this contribution.'),
+      m(PurchasePriceField),
+      // m(BeneficiaryField),
+      m(FeeField)
     )
   }
 }
 
-const CurveAddressField = {
+const PurchasePriceField = {
   view: () => {
     return m(
-      '.component.form-field',
-      'Curve address: ',
+      '.piece',
+      'Purchase price (MT): ',
       m(
-        'input[type=number][placeholder=Leave blank!]',
-        { oninput: handleSaveFactory('curveAddress') }
+        'input[type=number][placeholder=0]',
+        { oninput: handleSaveFactory('purchasePrice') }
       )
     )
   }
 }
 
+const BeneficiaryField = {
+  view: () => {
+    return m(
+      '.piece',
+      'Beneficiary address: ',
+      m(
+        `input[type=text][value=${state.address}]`,
+        { oninput: handleSaveFactory('beneficiary') }
+      )
+    )
+  }
+}
+
+const FeeField = {
+  view: () => {
+    return m(
+      '.piece',
+      'Beneficiary fee: ',
+      m(
+        'input[type=number][placeholder=0]',
+        { oninput: handleSaveFactory('beneficiaryFee') }
+      ),
+      '%'
+    )
+  }
+}
+*/
+
+/*
+const InitialBuyField = {
+  view: () => {
+    return m(
+      '.piece',
+      'Tokens to buy: ',
+      m(
+        'input[type=number][placeholder=0]',
+        { oninput: handleSaveInitialBuy }
+      ),
+      `Cost: ${state.componentForm.value} Wei`
+    )
+  }
+}
+*/
+
 // handlers
-const handleLoadComponent = (event) => {
+const handleLoadPiece = (event) => {
   event.preventDefault()
-  const component = state.squad.components[event.target.value]
-  const data = JSON.parse(component.data)
+  const piece = state.squad.components[event.target.value]
+  const data = JSON.parse(piece.data)
 
   const graphics = data.graphics.local.white.split('/').pop().slice(1)
 
   state.componentForm = Object.assign(state.componentForm, {
-    name: component.name,
+    name: piece.name,
+    description: data.description,
     mechanics: data.mechanics || {},
     admechanics: data.admechanics || {},
     king: data.king,
@@ -305,6 +413,8 @@ function clearForm () {
   state.componentForm = Object.assign(
     {},
     {
+      name: '',
+      description: '',
       mechanics: {},
       admechanics: {},
       graphics: '',
@@ -358,7 +468,7 @@ const handleToggleAdmechanicFactory = (admechanic) => {
     if (state.componentForm.admechanics[admechanic]) {
       delete state.componentForm.admechanics[admechanic]
     } else {
-      state.componentForm.admechanics[admechanic] = "['default']"
+      state.componentForm.admechanics[admechanic] = 'default'
     }
   }
 }
@@ -366,6 +476,7 @@ const handleToggleAdmechanicFactory = (admechanic) => {
 const handleAdmechanicParamsFactory = (admechanic) => {
   return (event) => {
     state.componentForm.admechanics[admechanic] = event.target.value
+    console.log(state.componentForm.admechanics)
   }
 }
 
@@ -376,17 +487,18 @@ const handleToggleKing = () => {
     state.componentForm.king = true
   }
 }
-
+/*
 const handleSaveInitialBuy = (event) => {
   state.componentForm.initialBuy = event.target.value
-  squad.curationMarket.getBuyPriceFromCurve(0, state.componentForm.initialBuy, state.componentForm.curveAddress).then(res => {
+  squad.curationMarket.getBuyPriceFromCurve(0, state.componentForm.initialBuy).then(res => {
     state.componentForm.value = res
     m.redraw()
   })
 }
-
+*/
 const handleSubmit = (event) => {
   event.preventDefault()
+  const description = state.componentForm.description
   const whiteGraphicPath = graphicsPaths[state.componentForm.graphics].white
   const blackGraphicPath = graphicsPaths[state.componentForm.graphics].black
   const mechanics = {}
@@ -396,10 +508,14 @@ const handleSubmit = (event) => {
       mechanics[mechanic].push(state.componentForm.mechanics[mechanic][key])
     }
   }
+  Object.keys(state.componentForm.admechanics).forEach(am => {
+    state.componentForm.admechanics[am] = state.componentForm.admechanics[am].split(',')
+  })
   const definition = {
     Component: {
       name: state.componentForm.name,
       data: JSON.stringify({
+        description,
         mechanics,
         admechanics: state.componentForm.admechanics,
         king: state.componentForm.king,
@@ -420,16 +536,15 @@ const handleSubmit = (event) => {
   console.log('Submitting definition:', definition)
 
   // make sure we get the right value before submitting, if not enough time has already passed
-  squad.curationMarket.getBuyPriceFromCurve(0, state.componentForm.initialBuy, state.componentForm.curveAddress).then(res => {
-    const value = res
-    squad.definition(
-      definition,
-      [settings.gameAddress],
-      state.componentForm.initialBuy,
-      { value },
-      state.componentForm.curveAddress
-    )
-  })
+  // squad.curationMarket.getBuyPriceFromCurve(0, state.componentForm.initialBuy).then(res => {
+  //   const value = res
+  definitionWithAlerts(
+    definition,
+    [settings.gameAddress],
+    0, // fee
+    0 // purchase price
+  )
+  // })
 }
 
-export default ComponentForm
+export default PieceForm
