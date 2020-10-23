@@ -161,7 +161,13 @@ input.focus-visible {
   position: absolute;
   right: 60px;
   top: 9px;
-  
+}
+
+@media screen and (max-width: 600px) {
+  #header button.connect {
+    left: 60px;
+    top: 85px;
+  }
 }
 
 /* Nav Menu */

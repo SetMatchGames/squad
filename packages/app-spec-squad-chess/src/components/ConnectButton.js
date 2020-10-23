@@ -36,7 +36,6 @@ const ConnectButton = {
 
 const connectHandler = (event) => {
   event.preventDefault()
-  state.squad.connection = 'connecting'
   try {
     ethereum.request({ method: 'eth_requestAccounts' })
     .then(accounts => {
@@ -45,8 +44,10 @@ const connectHandler = (event) => {
       console.log('Squad Connection:', state.squad.connection)
       location.reload()
     })
+    state.squad.connection = 'connecting'
   } catch(e) {
     console.error('Connection error', e)
+    state.squad.connection = 'not connected'
   }
 }
 
