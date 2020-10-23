@@ -9,6 +9,7 @@ import NewPiece from './views/NewPiece.js'
 import Withdraw from './views/Withdraw.js'
 
 import NavMenu from './components/NavMenu.js'
+import ConnectButton from './components/ConnectButton.js'
 import ConnectModal from './components/ConnectModal.js'
 import AlertList from './components/AlertList.js'
 
@@ -29,7 +30,8 @@ const Header = {
     return m(
       '#header',
       m(Title),
-      m(NavMenu)
+      m(NavMenu),
+      m(ConnectButton)
     )
   }
 }

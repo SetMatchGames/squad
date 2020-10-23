@@ -156,6 +156,20 @@ input.focus-visible {
   padding-top: 12%;
 }
 
+/* Connect Button */
+#header button.connect {
+  position: absolute;
+  right: 60px;
+  top: 9px;
+}
+
+@media screen and (max-width: 600px) {
+  #header button.connect {
+    left: 60px;
+    top: 85px;
+  }
+}
+
 /* Nav Menu */
 #header h1 {
   position: absolute;
@@ -259,7 +273,6 @@ input.focus-visible {
 
 #connect-modal h4 {
   text-align: center;
-  padding: 0 20px 20px 20px;
 }
 
 #connect-modal img {

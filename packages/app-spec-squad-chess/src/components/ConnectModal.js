@@ -1,6 +1,7 @@
 import m from 'mithril'
 
 import state from '../state.js'
+import ConnectButton from  './ConnectButton.js'
 
 const ConnectModal = {
   view: () => {
@@ -9,12 +10,9 @@ const ConnectModal = {
       '#connect-modal',
       m(
         '.card',
-        m('h4', "Connect to Ethereum's Ropsten testnet and reload."),
-        m(
-          'a',
-          { href: '/' },
-          m('img', { src: '/img/metamask-fox.svg' })
-        )
+        m('h4', "Connect to Ethereum's Ropsten testnet."),
+        m('img', { src: '/img/metamask-fox.svg' }),
+        m(ConnectButton)
       )
     )
   }
