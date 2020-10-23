@@ -211,20 +211,31 @@ export const getMarketInfo = () => {
     state.licenses = await squad.curationMarket.getValidLicenses()
     // for each format
     for (const address in state.squad.rawFormats) {
-      // see if the current user owns the format
-      // await getOwned(address)
-      // get the market cap
-      await getMarketCap(address)
-      // get the purchasePrice
-      await getPurchasePrice(address)
-      await getBeneficiaryFee(address)
-      m.redraw()
+      try {
+        // see if the current user owns the format
+        // await getOwned(address)
+        // get the market cap
+        await getMarketCap(address)
+        // get the purchasePrice
+        await getPurchasePrice(address)
+        await getBeneficiaryFee(address)
+        m.redraw()
+      } catch (e) {
+        console.error('Invalid contribution', state.squad.components[address], e)
+        delete state.squad.rawFormats[address]
+        // remove invalid contributions
+      }
     }
     // for each component
     for (const address in state.squad.components) {
-      // get the market cap
-      await getMarketCap(address)
-      m.redraw()
+      try {
+        // get the market cap
+        await getMarketCap(address)
+        m.redraw()
+      } catch (e) {
+        console.error('Invalid contribution', state.squad.components[address], e)
+        delete state.squad.components[address]
+      }
     }
   })
 }
