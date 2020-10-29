@@ -45,6 +45,7 @@ export const connectSquad = (callback) => {
 
       // load up the local storage definitions along with the defaults (for now)
       let storedDefs = JSON.parse(localStorage.getItem('localDefinitions'))
+      console.log('stored defs', storedDefs)
       if (!storedDefs) {
         storedDefs = []
       }
@@ -175,12 +176,13 @@ async function web3connection () {
   } catch (e) {
     address = e
   }
-  console.log(connection, connection.provider)
+  console.log(connection, connection.provider, (await connection.provider.getNetwork()).chainId)
   let one = (typeof address === 'string')
   let two
   try {
-    (await connection.provider.getNetwork()).chainId === 3
-    two = true
+    if ((await connection.provider.getNetwork()).chainId === 3) {
+      two = true
+    }
   } catch (e) {
     console.error('Two error', e)
     two = false
