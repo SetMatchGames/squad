@@ -105,12 +105,12 @@ build/development-curation-market: build/devnet build/bootstrap
 	touch build/development-curation-market
 
 build/metastore: build/bootstrap
-ifeq ($(MOCK_METASTORE), true)
+# ifeq ($(MOCK_METASTORE), true)
 	cd $(mock-metastore) && { npm run start & echo $$! > PID; }
 	mv $(mock-metastore)/PID build/metastore
-else
-	$(metastore-shell) 'hc package && hc run --logging'
-endif
+# else
+# 	$(metastore-shell) 'hc package && hc run --logging'
+# endif
 
 build/devnet:
 	mkdir -p build
