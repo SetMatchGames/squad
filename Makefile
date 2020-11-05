@@ -27,6 +27,9 @@ squad-chess: build/matchmaking build/metastore
 	cd $(squad-chess) && npx http-server -c-1
 	cd $(squad-chess) && echo "open localhost:8080 in your browser"
 
+.PHONY: squad-chess-dev
+squad-chess-dev: build/matchmaking build/metastore 
+
 .PHONY: squad-chess-alpha-server
 squad-chess-alpha-server: build/metastore
 	cd $(squad-chess) && node scripts/load_defs.js

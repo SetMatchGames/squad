@@ -180,7 +180,11 @@ async function web3connection () {
   let one = (typeof address === 'string')
   let two
   try {
-    if ((await connection.provider.getNetwork()).chainId === 3) {
+    const network = await connection.provider.getNetwork()
+    if (network.chainId === 3) {
+      two = true
+    } else {
+      console.error('Wrong network', network)
       two = true
     }
   } catch (e) {
@@ -235,7 +239,7 @@ export const getMarketInfo = () => {
         await getBeneficiaryFee(address)
         m.redraw()
       } catch (e) {
-        console.error('Invalid contribution', state.squad.components[address], e)
+        console.error('Invalid contribution', address, state.squad.components[address], e)
         delete state.squad.rawFormats[address]
         // remove invalid contributions
       }

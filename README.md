@@ -49,3 +49,8 @@ contributors to Squad as of October, 2019, are:
  We also stream development at
  [twitch.tv/setmatchgames](https://www.twitch.tv/setmatchgames)!
  Streams generally happen every Saturday from 11:30 AM - 2:30 PM EST.
+
+## Dev environment instructions
+`npx hardhat node` in SquadGames/Squad
+`TREASURY_ADDRESS=[hardhat address 1] USER_ADDRESS=[hardhat address 2] npx hardhat run scripts/deploy-squad` in SquadGames/Squad, 2nd tab
+`make squad-chess`

@@ -2,9 +2,11 @@
 
 const ethers = require('ethers')
 
+/*
 const AutoBondJSON = require("../../app/build/contracts/AutoBond.json")
 const CurveJSON = require("../../app/build/contracts/Curve.json")
 const SimpleLinearCurveJSON = require("../../app/build/contracts/SimpleLinearCurve.json")
+*/
 const SquadControllerJSON = require("./artifacts/SquadController.json")
 const TokenClaimCheckJSON = require("./artifacts/TokenClaimCheck.json")
 const AccountingJSON = require("./artifacts/Accounting.json")
@@ -12,16 +14,29 @@ const LinearCurveJSON = require("./artifacts/LinearCurve.json")
 const BondingCurveFactoryJSON = require("./artifacts/BondingCurveFactory.json")
 const ERC20JSON = require("./artifacts/ERC20.json")
 
+/* Ropsten addresses */
+/*
 const squadControllerAddress = '0x998c16377Bf29759C573Aae62ea23bDADba936d3'
 const tokenClaimCheckAddress = '0x917C936370a345E3EC97B134E095F30697524B9d'
 const linearCurveAddress = '0x682e04D70c12e2D4eEeFF82e03e0E0c6EFC97eaf'
 const bondingCurveFactoryAddress = '0x3F3191211352f7b5562D4960f505eF8be77f3b38'
 const reserveTokenAddress = '0x7B16Ef4F69e0858e19294F2c2D9A8530E0a74EBc'
 const accountingAddress = '0x294A2dc8A476dA309Fd6c8C4CB67Dd0cAF769c13'
+*/
 
+/* localhost addresses, to be swapped out */
+const squadControllerAddress = '0x5FC8d32690cc91D4c39d9d3abcBD16989F875707'
+const tokenClaimCheckAddress = '0x5FbDB2315678afecb367f032d93F642f64180aa3'
+const linearCurveAddress = '0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512'
+const bondingCurveFactoryAddress = '0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9'
+const reserveTokenAddress = '0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0'
+const accountingAddress = '0x61c36a8d610163660E21a8b7359e1Cac0C9133e1'
+
+/*
 const networkIds = {
   'ropsten': 3
 }
+*/
 
 function bnsqrt (a, precision) {
   precision = precision <= 0 ? 1 : precision
@@ -61,10 +76,10 @@ const devUrl = 'http://localhost:8545'
 let initialized = false
 let provider
 let walletOrSigner
-let autoBond
-let curve, linearCurve // linear curve is the new practical curve
-let autoBondAddress
-let simpleLinearCurveAddress
+// let autoBond
+let /* curve, */ linearCurve // linear curve is the new practical curve
+// let autoBondAddress
+// let simpleLinearCurveAddress
 let defaults
 
 let squadController
@@ -78,27 +93,34 @@ function init (defaults) {
     return walletOrSigner
   }
   console.log('Initializing...')
-
+  
   switch (network) {
     case 'development': {
       // I think this might not be working right -- maybe instead we should be creating a wallet using one of the ganache keys
       provider = new ethers.providers.JsonRpcProvider(devUrl)
       walletOrSigner = provider.getSigner(0)
+      /*
       const mostRecentDevnet = Object.keys(AutoBondJSON.networks).pop()
       autoBondAddress = AutoBondJSON.networks[mostRecentDevnet].address
       simpleLinearCurveAddress = SimpleLinearCurveJSON.networks[mostRecentDevnet].address
+      */
       break
     }
     default: {
       console.log('Trying to make provider...')
       provider = new ethers.providers.Web3Provider(web3.currentProvider)
       walletOrSigner = provider.getSigner()
+      /*
       autoBondAddress = AutoBondJSON.networks[networkIds[network]].address
       simpleLinearCurveAddress = SimpleLinearCurveJSON.networks[networkIds[network]].address
+      */
     }
   }
+  /*
   autoBond = new ethers.Contract(autoBondAddress, AutoBondJSON.abi, walletOrSigner)
   curve = new ethers.Contract(simpleLinearCurveAddress, CurveJSON.abi, walletOrSigner)
+  */
+  
   linearCurve = new ethers.Contract(linearCurveAddress, LinearCurveJSON.abi, walletOrSigner)
   bondingCurveFactory = new ethers.Contract(bondingCurveFactoryAddress, BondingCurveFactoryJSON.abi, walletOrSigner)
   squadController = new ethers.Contract(
