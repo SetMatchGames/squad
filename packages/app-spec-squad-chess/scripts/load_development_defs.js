@@ -5,6 +5,7 @@ const { createDefinition } = require('@squad/sdk').metastore
 process.on('unhandledRejection', r => console.log(r))
 
 async function main () {
+  /*
   const squadChess = {
     Game: {
       name: 'Squad Chess',
@@ -16,6 +17,8 @@ async function main () {
   }
 
   const squadChessAddress = await createDefinition(squadChess)
+  */
+  const squadChessAddress = '0x8c875b7990077c166479df9ee2aafff7cc7bf82c54741ff47d169a56f18fe5d5'
 
   const squadChessComponents = [{
     Component: {
@@ -206,7 +209,9 @@ async function main () {
   const componentAddresses = {}
 
   const promises = squadChessComponents.map(async (definition) => {
+    console.log('trying definition', definition)
     const address = await createDefinition(definition, [squadChessAddress])
+    console.log('address loaded', address)
     componentAddresses[definition.Component.name] = address
     console.log('creating definition', definition, address)
   })
@@ -262,9 +267,9 @@ async function main () {
     }
   }
 
-  await createDefinition(ExhibitionChess, [squadChess])
+  await createDefinition(ExhibitionChess, [squadChessAddress])
 
-  return [...squadChessComponents, squadChess, chessFormat, chessRBKNRNBQFormat, ExhibitionChess]
+  return [...squadChessComponents, /* squadChess ,*/ chessFormat, chessRBKNRNBQFormat, ExhibitionChess]
 }
 
 module.exports = main

@@ -1,5 +1,4 @@
 import m from 'mithril'
-import { curationMarket } from '@squad/sdk'
 import state from '../state.js'
 import Board from '../components/Board.js'
 import Licenses from '../components/Licenses.js'
@@ -17,6 +16,7 @@ const FormatStore = {
         'Loading formats...'
       )
     }
+    console.log('raw formats', state.squad.rawFormats)
     const orderedFormats = Object.keys(state.squad.rawFormats).sort((a, b) => {
       return state.marketCaps[b] - state.marketCaps[a]
     })
@@ -96,7 +96,7 @@ const Details = {
       return
     }
     const description = state.markets.previewedFormat.description || ''
-    // sellTokensWithAlerts(curationMarket.id(address), '2', '0')
+    // sellTokensWithAlerts(address), '2', '0')
     return m(
       '.details',
       m('.board-row.row', m(Board, {
@@ -115,7 +115,7 @@ const Loader = {
   view: (vnode) => {
     const address = vnode.attrs.address
     let owned = false
-    if (state.licenses[curationMarket.id(address)]) {
+    if (state.licenses[address]) {
       owned = true
     }
     return m(

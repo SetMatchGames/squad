@@ -37,6 +37,7 @@ async function newDefinitionWithBond (
   opts = {}
 ) {
   const bondId = await metastore.createDefinition(definition, games)
+  console.log('bondId', bondId)
   await curationMarket.newContribution(
     bondId,
     feeRate,

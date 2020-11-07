@@ -51,12 +51,13 @@ export const connectSquad = (callback) => {
       }
 
       // make sure all stored defs and defaults are on Ethereum
-      const localDefs = [...defaultDefs, ...storedDefs]
+      const localDefs = [...defaultDefs, /*...storedDefs*/]
       console.log('local defs', localDefs)
-      // await multiDefinition(localDefs)
+      await multiDefinition(localDefs)
 
       // get all the game's formats and components
       const formatDefs = await metastore.getGameFormats(settings.gameAddress)
+      console.log('format defs', formatDefs)
       const componentDefs = await metastore.getGameComponents(settings.gameAddress)
 
       // restore everything in local storage
@@ -68,6 +69,7 @@ export const connectSquad = (callback) => {
         formatDefs[address] = formatDefs[address].Format
       }
       state.squad.rawFormats = formatDefs
+      console.log('raw formats 1', state.squad.rawFormats)
 
       // for each component
       for (const address in componentDefs) {
@@ -239,7 +241,7 @@ export const getMarketInfo = () => {
         await getBeneficiaryFee(address)
         m.redraw()
       } catch (e) {
-        console.error('Invalid contribution', address, state.squad.components[address], e)
+        console.error('Invalid contribution', address, state.squad.rawFormats[address], e)
         delete state.squad.rawFormats[address]
         // remove invalid contributions
       }
@@ -268,16 +270,19 @@ async function getOwned (address) {
 async function getMarketCap (address) {
   const marketCap = await curationMarket.marketSize(address)
   state.marketCaps[address] = marketCap
+  console.log('Market cap', address, marketCap)
 }
 
 async function getPurchasePrice (address) {
   const purchasePrice = await curationMarket.purchasePriceOf(address)
   state.squad.rawFormats[address].purchasePrice = purchasePrice
+  console.log('Purchase price', address, purchasePrice)
 }
 
 async function getBeneficiaryFee (address) {
   const fee = await curationMarket.feeOf(address)
   state.squad.rawFormats[address].fee = Number(fee) / 100
+  console.log('Fee', address, Number(fee) / 100)
 }
 
 export const loadFormat = (address) => {

@@ -175,8 +175,12 @@ async function newContribution (
   const symbol = `sc${contributionId.substring(0, 3).toUpperCase()}`
   purchasePrice = ethers.utils.parseEther(`${purchasePrice}`)
   const metadata = JSON.stringify({game: "Squad Chess", experiment: true})
+  console.log('raw', contributionId)
+  if (await squadController.exists(contributionId)) {
+    throw new BondAlreadyExists('Contribution ID already exists')
+  }
   const tx = await squadController.newContribution(
-    ethers.utils.id(contributionId),
+    contributionId,
     walletAddress,
     feeRate,
     purchasePrice,
@@ -219,8 +223,8 @@ async function newBond (
 // replaces getSupply
 async function totalSupplyOf(contributionId) /* returns BigNumber */ {
   init()
-  const bytes32Id = ethers.utils.id(contributionId)
-  return await squadController.totalSupplyOf(bytes32Id)
+  console.log('total supply of', contributionId)
+  return await squadController.totalSupplyOf(contributionId)
 }
 /*
 async function getSupply (bondId) {
@@ -230,25 +234,28 @@ async function getSupply (bondId) {
 }
 */
 async function getLicenseInfo(licenseId) {
-  const bytes32Id = await squadController.validLicenses(licenseId)
-  // const contributionId = ethers.utils.parseBytes32String(bytes32Id)
-  if (bytes32Id === '') {
+  const contributionId = await squadController.validLicenses(licenseId)
+  console.log('valid licenses', contributionId)
+  if (contributionId === '') {
     return false
   }
-  const [beneficiary, feeRate, purchasePrice] = await squadController.contributions(bytes32Id)
+  const [beneficiary, feeRate, purchasePrice] = await squadController.contributions(contributionId)
+  console.log('contribution', [beneficiary, feeRate, purchasePrice])
   const contribution = {beneficiary, feeRate, purchasePrice}
   if (contribution.beneficiary === ethers.constants.AddressZero) {
     return false
   }
   const [token, amount] = await tokenClaimCheck.claims(licenseId)
+  console.log('claim check', [token, amount])
   const claim = {token, amount}
   const sellStrings = (await licenseSellPrice(licenseId, feeRate)).split('.')
   sellAmount = `${sellStrings[0]}.${sellStrings[1].slice(0, 2)}`
+  console.log('sell amount', sellAmount)
   // sell amount is not correct! it should always be 10.0 right after buying
   if (token === ethers.constants.AddressZero) {
     return false
   }
-  return { licenseId, contributionId: bytes32Id, contribution, claim, sellAmount }
+  return { licenseId, contributionId, contribution, claim, sellAmount }
 }
 
 /**
@@ -259,23 +266,23 @@ async function getLicenseInfo(licenseId) {
  *   contributionId: [licenseInfo]
  * }
  */
-// Rough way to convert metastore addresses to contribution IDs (we don't want this to require a conversion like this)
-function id (metastoreAddress) {
-  return ethers.utils.id(metastoreAddress)
-}
 
 async function getValidLicenses(holderAddress) {
   init()
   if (!holderAddress) { holderAddress = await walletOrSigner.getAddress() }
+  console.log('holder address', holderAddress)
   const licenseBalance = parseInt((await tokenClaimCheck.balanceOf(holderAddress)).toString(), 10)
+  console.log('license balance', licenseBalance)
   const licenseIds = await Promise.all(
     [...Array(licenseBalance).keys()].map(async (i) => {
       return await tokenClaimCheck.tokenOfOwnerByIndex(holderAddress, i)
     })
   )
+  console.log('license Ids', licenseIds)
   const validLicenses = {}
   await Promise.all(licenseIds.map(async (licenseId) => {
     const licenseInfo = await getLicenseInfo(licenseId)
+    console.log('license info', licenseInfo)
     if(!licenseInfo) {
       // NFT is not a valid squad license
       return
@@ -294,7 +301,7 @@ async function holdsLicenseFor(contributionId, holderAddress) {
   const validLicenses = (await getValidLicenses(holderAddress))[contributionId] || []
   for (let i=0; i<validLicenses.length; i++) {
     const holdsLicense = await squadController.holdsLicense(
-      ethers.utils.id(contributionId),
+      contributionId,
       validLicenses[i].licenseId,
       holderAddress
     )
@@ -322,9 +329,8 @@ async function buyLicense(
   maxPriceBP = 100 // number of basis points max should be above price shown
 ) {
   init()
-  const bytes32Id = ethers.utils.id(contributionId)
   const purchasePrice = (
-    await squadController.contributions(bytes32Id)
+    await squadController.contributions(contributionId)
   ).purchasePrice
   let buyPrice = purchasePrice
   const supply = await totalSupplyOf(contributionId)
@@ -341,7 +347,7 @@ async function buyLicense(
   const approveTx = await reserveToken.approve(bondingCurveFactoryAddress, maxPrice)
   await provider.waitForTransaction(approveTx.hash)
   const tx = await squadController.buyLicense(
-    bytes32Id,
+    contributionId,
     amount,
     maxPrice,
     {gasLimit: 4000000}
@@ -431,23 +437,20 @@ async function sell (units, bondId, submissionCb, confirmationCb, options = {}) 
 // replaces getBuyPrice
 async function purchasePriceOf(contributionId) {
   init()
-  const bytes32Id = ethers.utils.id(contributionId)
   return ethers.utils.formatEther(
-    (await squadController.contributions(bytes32Id)).purchasePrice
+    (await squadController.contributions(contributionId)).purchasePrice
   )
 }
 
 async function feeOf(contributionId) {
   init()
-  const bytes32Id = ethers.utils.id(contributionId)
-  return (await squadController.contributions(bytes32Id)).feeRate
+  return (await squadController.contributions(contributionId)).feeRate
 }
 
 async function priceOf(contributionId, amount) {
   init()
-  const bytes32Id = ethers.utils.id(contributionId)
-  const supply = await squadController.totalSupplyOf(bytes32Id)
-  return await squadController.priceOf(bytes32Id, supply, amount)
+  const supply = await squadController.totalSupplyOf(contributionId)
+  return await squadController.priceOf(contributionId, supply, amount)
 }
 /*
 async function getBuyPrice (units, bondId) {
@@ -479,10 +482,9 @@ async function sellPriceFor(contributionId, amount) {
 async function licenseSellPrice(licenseId, feeRate) {
   init()
   const claim = await tokenClaimCheck.claims(licenseId)
-  const bytes32Id = await squadController.validLicenses(licenseId)
+  const contributionId = await squadController.validLicenses(licenseId)
   const amount = claim.amount.sub(claim.amount.mul(feeRate).div(10000))
-  // const contributionId = ethers.utils.parseBytes32String(bytes32Id)
-  return await sellPriceFor(bytes32Id, amount)
+  return await sellPriceFor(contributionId, amount)
 }
 /*
 async function getSellPrice (units, bondId) {
@@ -494,7 +496,8 @@ async function getSellPrice (units, bondId) {
 // replaces getMarketCap
 async function marketSize(contributionId) {
   init()
-  const supply = totalSupplyOf(contributionId)
+  const supply = await totalSupplyOf(contributionId)
+  console.log('Supply', supply)
   return linearCurvePrice(0, supply)
 }
 /*
@@ -552,9 +555,8 @@ module.exports = {
   getMarketCap,
   buy,
   sell,
-  BondAlreadyExists,
   */
-  id,
+  BondAlreadyExists,
   walletAddress,
   newContribution,
   networkFeeRate,
