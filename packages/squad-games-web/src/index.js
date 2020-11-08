@@ -11,10 +11,10 @@ import { connectToSquad } from './squad/actions'
 import {
   fetchCatalog,
   switchDefinitionForm,
-  shareDefinitions,
+  shareDefinitions
 } from './definitions/actions'
 
-export default function startApp(elem) {
+export default function startApp (elem) {
   ReactDOM.render(
     <Provider store={store}>
       <App />
@@ -25,10 +25,10 @@ export default function startApp(elem) {
   store.dispatch(connectToSquad(
     'ws://localhost:8888', // TODO make this configurable
     (connection, dispatch) => {
-      dispatch(fetchCatalog("Game", "Game Catalog"))
-      dispatch(fetchCatalog("Component", "Component Catalog"))
-      dispatch(fetchCatalog("Format", "Format Catalog"))
-      dispatch(switchDefinitionForm("Game", "Game Catalog"))
+      dispatch(fetchCatalog('Game', 'Game Catalog'))
+      dispatch(fetchCatalog('Component', 'Component Catalog'))
+      dispatch(fetchCatalog('Format', 'Format Catalog'))
+      dispatch(switchDefinitionForm('Game', 'Game Catalog'))
       shareDefinitions()
     },
     (error, dispatch) => {

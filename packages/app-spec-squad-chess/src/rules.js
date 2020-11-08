@@ -151,6 +151,7 @@ const generateTurns = (position, turnNumber) => {
     if (position[square].content.player !== turnNumber % 2) { continue }
     // get the piece
     const piece = FORMAT.pieces[position[square].content.pieceId]
+    console.log(piece, FORMAT.pieces, position[square].content.pieceId)
     // if the piece has the 'king' property, mark king as true
     if (piece.king) { king = true }
     // for each of the piece's mechanics

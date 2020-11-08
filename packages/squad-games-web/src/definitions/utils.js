@@ -1,7 +1,7 @@
-export function mapState(state, ownProps) {
+export function mapState (state, ownProps) {
   return ownProps.mapState(state)
 }
 
-export function catalogKey(name, definitionType) {
+export function catalogKey (name, definitionType) {
   return `${name}-${definitionType}`
 }

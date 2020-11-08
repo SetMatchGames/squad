@@ -2,39 +2,39 @@ const { curation, metastore, definition } = require('@squad/sdk')
 
 const games = [{
   Game: {
-    name: "App Spec",
-    type_: "web-game-v0",
+    name: 'App Spec',
+    type_: 'web-game-v0',
     data: JSON.stringify({
-      url: "http://localhost:3001"
+      url: 'http://localhost:3001'
     })
   }
 }]
 
 const components = [{
   Component: {
-    name: "Rock",
-    type_: "Roshambo",
+    name: 'Rock',
+    type_: 'Roshambo',
     data: JSON.stringify({
-      winsAgainst: ["Scissors"],
-      losesAgainst: ["Paper"]
+      winsAgainst: ['Scissors'],
+      losesAgainst: ['Paper']
     })
   }
 }, {
   Component: {
-    name: "Paper",
-    type_: "Roshambo",
+    name: 'Paper',
+    type_: 'Roshambo',
     data: JSON.stringify({
-      winsAgainst: ["Rock"],
-      losesAgainst: ["Scissors"]
+      winsAgainst: ['Rock'],
+      losesAgainst: ['Scissors']
     })
   }
 }, {
   Component: {
-    name: "Scissors",
-    type_: "Roshambo",
+    name: 'Scissors',
+    type_: 'Roshambo',
     data: JSON.stringify({
-      winsAgainst: ["Paper"],
-      losesAgainst: ["Rock"]
+      winsAgainst: ['Paper'],
+      losesAgainst: ['Rock']
     })
   }
 }]
@@ -46,50 +46,47 @@ let done = false
 metastore.on('open', async () => {
   await curation.init()
   started = true
-  console.log("Connected to metastore")
+  console.log('Connected to metastore')
   const gameAddrs = await Promise.all(games.map(async d => {
     return definition(d)
   })).catch(console.error)
-  console.log("created games", gameAddrs)
+  console.log('created games', gameAddrs)
   const componentAddrs = await Promise.all(components.map(async d => {
     return definition(d)
   })).catch(console.error)
-  console.log("created components", componentAddrs)
+  console.log('created components', componentAddrs)
 
   const standard = {
     Format: {
-      name: "Standard",
+      name: 'Standard',
       components: componentAddrs
     }
   }
   const standardAddr = await definition(standard).catch(console.error)
-  console.log("created standard format", standardAddr)
+  console.log('created standard format', standardAddr)
   done = true
 })
 
 let waitedForMetastore = false
 let waitedForDefs = false
-function waitUntilDone() {
+function waitUntilDone () {
   console.log(`waited: meta ${waitedForMetastore}, defs ${waitedForDefs}`)
   console.log(`started: ${started}, done ${done}`)
   if (done) {
-    console.log("Done waiting for dev defs")
+    console.log('Done waiting for dev defs')
     process.exit(0) // I guess... probably not worth figuring out why its needed
     return
   } else if (!done && !started && !waitedForMetastore) {
-    console.log(`Waiting a sec for metastore to come up`)
+    console.log('Waiting a sec for metastore to come up')
     handle = setTimeout(waitUntilDone, 5000)
     waitedForMetastore = true
-    return
   } else if (!done && started && !waitedForDefs) {
-    console.log("Started: waiting for dev definitions")
+    console.log('Started: waiting for dev definitions')
     handle = setTimeout(waitUntilDone, 5000)
     waitedForDefs = true
-    return
   } else {
-    throw new Error("waited too long for metastore/defs")
+    throw new Error('waited too long for metastore/defs')
   }
 }
 
 waitUntilDone()
-

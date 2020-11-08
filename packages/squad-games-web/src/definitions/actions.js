@@ -3,29 +3,28 @@
  * There are catalogs for each of the definition types (Game, Format, Component)
  */
 
-import { curationMarket, newDefinitionWithBond, metastore } from "@squad/sdk"
-import store from "../store"
+import { curationMarket, newDefinitionWithBond, metastore } from '@squad/sdk'
+import store from '../store'
 
-export const CREATE_DEFINITION = "CREATE_DEFINITION"
-export const CREATE_DEFINITION_SUCCESS = "CREATE_DEFINITION_SUCCESS"
-export const CREATE_DEFINITION_FAILURE = "CREATE_DEFINITION_FAILURE"
-export const REQUEST_CATALOG = "REQUEST_CATALOG"
-export const RECEIVE_CATALOG = "RECEIVE_CATALOG"
-export const CATALOG_FAILURE = "CATALOG_FAILURE"
-export const SWITCH_DEFINITION_FORM = "SWITCH_DEFINITION_FORM"
+export const CREATE_DEFINITION = 'CREATE_DEFINITION'
+export const CREATE_DEFINITION_SUCCESS = 'CREATE_DEFINITION_SUCCESS'
+export const CREATE_DEFINITION_FAILURE = 'CREATE_DEFINITION_FAILURE'
+export const REQUEST_CATALOG = 'REQUEST_CATALOG'
+export const RECEIVE_CATALOG = 'RECEIVE_CATALOG'
+export const CATALOG_FAILURE = 'CATALOG_FAILURE'
+export const SWITCH_DEFINITION_FORM = 'SWITCH_DEFINITION_FORM'
 
-
-export function shareDefinitions() {
+export function shareDefinitions () {
   const node = metastore.networking.createNode('squad.games')
   metastore.networking.shareDefinitions(
     node,
-    "squad.games/metastore/topic",
-    ["Format", "Game", "Component"],
+    'squad.games/metastore/topic',
+    ['Format', 'Game', 'Component'],
     submitDefinition
   )
 }
 
-export function submitDefinition(definition) {
+export function submitDefinition (definition) {
   return (dispatch) => {
     dispatch(createDefinition(definition))
     newDefinitionWithBond(definition).then(
@@ -35,9 +34,9 @@ export function submitDefinition(definition) {
   }
 }
 
-export function createDefinition(definition) {
-  let definitionType = Object.keys(definition)[0]
-  let catalogName = `${definitionType} Catalog`
+export function createDefinition (definition) {
+  const definitionType = Object.keys(definition)[0]
+  const catalogName = `${definitionType} Catalog`
   return {
     type: CREATE_DEFINITION,
     definition,
@@ -46,9 +45,9 @@ export function createDefinition(definition) {
   }
 }
 
-export function createDefinitionSuccess(definition, address) {
-  let definitionType = Object.keys(definition)[0]
-  let catalogName = `${definitionType} Catalog`
+export function createDefinitionSuccess (definition, address) {
+  const definitionType = Object.keys(definition)[0]
+  const catalogName = `${definitionType} Catalog`
   return {
     type: CREATE_DEFINITION_SUCCESS,
     definition,
@@ -58,9 +57,9 @@ export function createDefinitionSuccess(definition, address) {
   }
 }
 
-export function createDefinitionFailure(definition, error) {
-  let definitionType = Object.keys(definition)[0]
-  let catalogName = `${definitionType} Catalog`
+export function createDefinitionFailure (definition, error) {
+  const definitionType = Object.keys(definition)[0]
+  const catalogName = `${definitionType} Catalog`
   return {
     type: CREATE_DEFINITION_FAILURE,
     error,
@@ -70,47 +69,47 @@ export function createDefinitionFailure(definition, error) {
   }
 }
 
-export function fetchCatalog(definitionType, name) {
+export function fetchCatalog (definitionType, name) {
   return (dispatch) => {
     dispatch(requestCatalog(definitionType, name))
     catalogWithKeys(definitionType, name).then(withKeys => {
-      if (definitionType === "Format") {
+      if (definitionType === 'Format') {
         withFormatComponentNames(withKeys).then(withKeysAndNames => {
           dispatch(receiveCatalog(definitionType, name, withKeysAndNames))
         })
-        .catch(error => {
-          dispatch(catalogFailure(definitionType, name, error))
-        })
+          .catch(error => {
+            dispatch(catalogFailure(definitionType, name, error))
+          })
       } else {
         dispatch(receiveCatalog(definitionType, name, withKeys))
       }
     })
-     .catch(error => {
-      dispatch(catalogFailure(definitionType, name, error))
-    })
+      .catch(error => {
+        dispatch(catalogFailure(definitionType, name, error))
+      })
   }
 }
 
-export function requestCatalog(definitionType, name) {
-  return {type: REQUEST_CATALOG, definitionType, name}
+export function requestCatalog (definitionType, name) {
+  return { type: REQUEST_CATALOG, definitionType, name }
 }
 
-export function receiveCatalog(definitionType, name, definitions) {
-  return {type: RECEIVE_CATALOG, definitionType, name, definitions}
+export function receiveCatalog (definitionType, name, definitions) {
+  return { type: RECEIVE_CATALOG, definitionType, name, definitions }
 }
 
-export function catalogFailure(definitionType, name, error) {
-  return {type: CATALOG_FAILURE, definitionType, name, error}
+export function catalogFailure (definitionType, name, error) {
+  return { type: CATALOG_FAILURE, definitionType, name, error }
 }
 
-export function switchDefinitionForm(definitionType, name) {
-  return {type: SWITCH_DEFINITION_FORM, definitionType, name}
+export function switchDefinitionForm (definitionType, name) {
+  return { type: SWITCH_DEFINITION_FORM, definitionType, name }
 }
 
-async function getComponents(addresses) {
-  let definitions = []
-  for (let i in addresses) {
-    let definition = {
+async function getComponents (addresses) {
+  const definitions = []
+  for (const i in addresses) {
+    const definition = {
       definition: await metastore.getDefinition(addresses[i]),
       key: addresses[i]
     }
@@ -119,15 +118,15 @@ async function getComponents(addresses) {
   return definitions
 }
 
-async function withFormatComponentNames(formatArray) {
+async function withFormatComponentNames (formatArray) {
   let compAddrs = []
   formatArray.forEach(item => {
     compAddrs = compAddrs.concat(item.definition.Format.components)
   })
-  let components = await getComponents(compAddrs)
+  const components = await getComponents(compAddrs)
   let index = 0
   formatArray.forEach((item, n) => {
-    let newComps = {}
+    const newComps = {}
     item.definition.Format.components.forEach(address => {
       newComps[address] = components[index].definition.Component.name
       index += 1
@@ -137,13 +136,13 @@ async function withFormatComponentNames(formatArray) {
   return formatArray
 }
 
-async function catalogWithKeys(definitionType, name) {
-  let definitions = await metastore.getDefinitionsFromCatalog(definitionType, name)
-  let addresses = await metastore.getCatalogAddresses(definitionType, name)
-  let withKeys = addresses.map(address => {
-    let entry = {}
-    entry["definition"] = definitions[addresses.indexOf(address)]
-    entry["key"] = address
+async function catalogWithKeys (definitionType, name) {
+  const definitions = await metastore.getDefinitionsFromCatalog(definitionType, name)
+  const addresses = await metastore.getCatalogAddresses(definitionType, name)
+  const withKeys = addresses.map(address => {
+    const entry = {}
+    entry.definition = definitions[addresses.indexOf(address)]
+    entry.key = address
     return entry
   })
   return withKeys

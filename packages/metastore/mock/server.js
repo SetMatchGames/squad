@@ -11,7 +11,7 @@ const http = require('http')
 const DEF_TYPES = ['Game', 'Component', 'Format']
 
 function conf (name, defaultValue) {
-  var value = process.env[name]
+  let value = process.env[name]
   if (value === undefined) {
     value = defaultValue
   }
@@ -63,7 +63,7 @@ const addToCatalog = (catalogName, address) => {
 
 const createDefinition = ({ definition, games = [] }) => {
   const address = writeDefinition(definition)
-  var typeIdentified = false
+  let typeIdentified = false
   for (const i in DEF_TYPES) {
     const type_ = DEF_TYPES[i]
     // for each type of definition we have catalogs for

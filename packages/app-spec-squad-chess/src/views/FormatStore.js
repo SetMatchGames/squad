@@ -2,7 +2,7 @@ import m from 'mithril'
 import state from '../state.js'
 import Board from '../components/Board.js'
 import Licenses from '../components/Licenses.js'
-import { shortHash, getMarketInfo, previewFormat, sellTokensWithAlerts } from '../utils.js'
+import { shortHash, getMarketInfo, previewFormat } from '../utils.js'
 
 const FormatStore = {
   oninit: () => {
@@ -96,7 +96,6 @@ const Details = {
       return
     }
     const description = state.markets.previewedFormat.description || ''
-    // sellTokensWithAlerts(address), '2', '0')
     return m(
       '.details',
       m('.board-row.row', m(Board, {

@@ -32,7 +32,7 @@ async function call (zome, method, inputs) {
 }
 
 async function createDefinition (definition, games = []) {
-  return '0x'+ await call('definitions', 'create_definition', { definition, games })
+  return '0x' + await call('definitions', 'create_definition', { definition, games })
 }
 
 async function getDefinitions (addresses) {
@@ -64,7 +64,7 @@ async function getAllDefinitionsOfType (catalogType) {
     { catalog_type: catalogType }
   )
   const definitions = {}
-  for(d in rawDefinitions) {
+  for (d in rawDefinitions) {
     definitions[`0x${d}`] = rawDefinitions[d]
   }
   return definitions
@@ -77,18 +77,20 @@ async function getDefinitionsFromCatalog (catalogType, catalogName) {
     { catalog_type: catalogType, catalog_name: catalogName }
   )
   const definitions = {}
-  for(d in rawDefinitions) {
+  for (d in rawDefinitions) {
     definitions[`0x${d}`] = rawDefinitions[d]
   }
   return definitions
 }
 
 async function getGameDefinitions (gameAddress, defType) {
-  gameAddress = gameAddress.slice(2)
+  // gameAddress = gameAddress.slice(2)
+  console.log(gameAddress)
   return getDefinitionsFromCatalog(defType, `${gameAddress} ${defType} Catalog`)
 }
 
 async function getGameFormats (gameAddress) {
+  console.log(gameAddress)
   return getGameDefinitions(gameAddress, 'Format')
 }
 

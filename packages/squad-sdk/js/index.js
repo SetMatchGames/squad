@@ -37,7 +37,7 @@ async function newDefinitionWithBond (
   opts = {}
 ) {
   const bondId = await metastore.createDefinition(definition, games)
-  console.log('bondId', bondId)
+  console.log('trying to submit id', bondId)
   await curationMarket.newContribution(
     bondId,
     feeRate,
@@ -61,6 +61,7 @@ async function definition (
   opts = {}
 ) {
   try {
+    console.log('submitting', definition, games)
     return await newDefinitionWithBond(
       definition,
       games,
@@ -72,6 +73,7 @@ async function definition (
     )
   } catch (e) {
     if (e instanceof curationMarket.BondAlreadyExists) {
+      console.log('bond already exists', definition, games)
       return metastore.createDefinition(definition, games)
     } else {
       throw e

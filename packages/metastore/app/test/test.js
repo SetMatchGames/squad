@@ -1,1 +1,1 @@
-console.log("Not Implemented")
+console.log('Not Implemented')

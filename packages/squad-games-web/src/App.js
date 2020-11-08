@@ -6,7 +6,7 @@ import { connect } from 'react-redux'
 import DefintionForm from './definitions/DefinitionForm'
 import Catalog from './definitions/Catalog'
 
-function App(props) {
+function App (props) {
   const catalogs = Object.keys(props.catalogs).map(
     (catalogKey) => {
       return (
@@ -19,10 +19,10 @@ function App(props) {
   )
   return (
     <div>
-      <div className="App-header">
+      <div className='App-header'>
         SQUAD
       </div>
-      <div className="App-body">
+      <div className='App-body'>
         <DefintionForm mapState={s => s.definitionForm} />
         {catalogs}
       </div>

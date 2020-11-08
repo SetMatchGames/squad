@@ -1,5 +1,4 @@
 import m from 'mithril'
-import { curationMarket } from '@squad/sdk'
 import { shortHash } from '../utils.js'
 
 import state from '../state.js'
@@ -8,7 +7,7 @@ import SellLicenseButton from './SellLicenseButton.js'
 
 const Licenses = {
   view: (vnode) => {
-    const id = curationMarket.id(vnode.attrs.address)
+    const id = vnode.attrs.address
     let licenses
     if (state.licenses[id]) {
       licenses = state.licenses[id].map(license => {

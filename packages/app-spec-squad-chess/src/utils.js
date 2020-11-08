@@ -1,4 +1,4 @@
-/* global URL setTimeout localStorage */
+/* global localStorage ethereum */
 
 import m from 'mithril'
 import squad, { metastore, curationMarket } from '@squad/sdk'
@@ -38,7 +38,7 @@ export const connectSquad = (callback) => {
       // check ethereum connection
       await web3connection()
 
-      test()
+      // test()
 
       // load up the default definitions (only relevant with the temporary metastore)
       const defaultDefs = await defs()
@@ -51,13 +51,13 @@ export const connectSquad = (callback) => {
       }
 
       // make sure all stored defs and defaults are on Ethereum
-      const localDefs = [...defaultDefs, /*...storedDefs*/]
+      const localDefs = [...defaultDefs]
       console.log('local defs', localDefs)
       await multiDefinition(localDefs)
 
       // get all the game's formats and components
       const formatDefs = await metastore.getGameFormats(settings.gameAddress)
-      console.log('format defs', formatDefs)
+      console.log('format defs', formatDefs, settings.gameAddress)
       const componentDefs = await metastore.getGameComponents(settings.gameAddress)
 
       // restore everything in local storage
@@ -88,6 +88,7 @@ export const connectSquad = (callback) => {
   })
 }
 
+/*
 let tested = false
 async function test () {
   const params = (new URL(document.location)).searchParams
@@ -130,7 +131,7 @@ async function test () {
   await curationMarket.buyLicense(contributionId, testLog, finish)
   testLog()
   wait()
-  */
+
   done = false
   const supply = await curationMarket.totalSupplyOf(contributionId)
   const amount = curationMarket.linearCurveAmount(supply, purchasePrice.mul(10))
@@ -169,7 +170,7 @@ async function test () {
   testLog('PurchasePriceOf       ', (await curationMarket.purchasePriceOf(contributionId)).toString())
   testLog('PurchasePriceOf XYa123', (await curationMarket.purchasePriceOf('XYa123')).toString())
 }
-
+*/
 async function web3connection () {
   const connection = curationMarket.init()
   let address
@@ -179,7 +180,7 @@ async function web3connection () {
     address = e
   }
   console.log(connection, connection.provider, (await connection.provider.getNetwork()).chainId)
-  let one = (typeof address === 'string')
+  const one = (typeof address === 'string')
   let two
   try {
     const network = await connection.provider.getNetwork()
@@ -193,7 +194,7 @@ async function web3connection () {
     console.error('Two error', e)
     two = false
   }
-  let three = !!ethereum.selectedAddress
+  const three = !!ethereum.selectedAddress
   console.log(one, two, three)
   if (one && two && three) {
     state.connectModal = false
@@ -206,9 +207,9 @@ async function web3connection () {
 
 async function multiDefinition (defs) {
   // submit the default definitions to make sure they have bonds on ethereum
-  defs.forEach(async (def) => {
-    await squad.definition(def, [settings.gameAddress], 100, 10)
-  })
+  await Promise.all(defs.map(async (def) => {
+    return squad.definition(def, [settings.gameAddress], 100, 10)
+  }))
 }
 
 function refreshLocalStorage (formatDefs, componentDefs) {
@@ -292,8 +293,10 @@ export const loadFormat = (address) => {
 
     // load the format
     if (rawFormat) {
-      await getMarketInfo()
-      if (!state.licenses[curationMarket.id(address)]) {
+      console.log('raw format found')
+      // get the users licenses
+      state.licenses = await squad.curationMarket.getValidLicenses()
+      if (!state.licenses[address]) {
         m.route.set('/formats')
         console.log('Must purchase rights to use a format before using. Current tokens owned:', state.owned[address])
         // TODO Notification asking them to buy the format

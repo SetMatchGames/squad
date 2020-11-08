@@ -23,10 +23,9 @@ state = {
 
 */
 
-const composeEnhansers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+const composeEnhansers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
 
 export default createStore(
-  combineReducers({squad, catalogs, definitionForm}),
+  combineReducers({ squad, catalogs, definitionForm }),
   composeEnhansers(applyMiddleware(thunk))
 )
-
