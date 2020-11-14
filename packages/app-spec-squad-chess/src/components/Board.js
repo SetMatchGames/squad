@@ -40,6 +40,8 @@ const Board = {
           // console.log(vnode.attrs.format.pieces, content, squareId)
           graphics = vnode.attrs.format.pieces[content.pieceId].graphics
         }
+        // if the square has been deleted
+        const deleted = position[squareId].deleted
         // add the square to the board
         return m(
           BoardSquare,
@@ -48,7 +50,8 @@ const Board = {
             content,
             graphics,
             format: vnode.attrs.format,
-            position: position
+            position: position,
+            deleted
           }
         )
       })
@@ -127,7 +130,7 @@ const BoardSquare = {
     let squareContent
     let onclick
     // if the square holds a piece, set the properties
-    if (vnode.attrs.content) {
+    if (vnode.attrs.content && !vnode.attrs.deleted) {
       // get the link to the piece graphic
       let imgLink
       let pieceColor = 'white'
@@ -151,7 +154,7 @@ const BoardSquare = {
     return m(
       `.square#${vnode.key}`,
       {
-        style: squareStyle(coordinates, highlighted, vnode.attrs.format),
+        style: squareStyle(coordinates, highlighted, vnode.attrs.format, vnode.attrs.deleted),
         ondrop: handleTurn(),
         onclick
       },
@@ -160,7 +163,7 @@ const BoardSquare = {
   }
 }
 
-function squareStyle (coordinates, highlighted, format) {
+function squareStyle (coordinates, highlighted, format, deleted) {
   // get rid of extra space
   coordinates = [
     coordinates[0] - format.boardSize.x.min,
@@ -170,6 +173,7 @@ function squareStyle (coordinates, highlighted, format) {
   // create the checkerboard color pattern
   let squareColor = BOARD_CONFIG.squares.lightColor
   if ((coordinates[0] + coordinates[1]) % 2 === 1) { squareColor = BOARD_CONFIG.squares.darkColor }
+  if (deleted) { squareColor = '' }
 
   // spacing and size
   const xRange = format.boardSize.x.range + 1

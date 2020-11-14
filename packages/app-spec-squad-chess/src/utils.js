@@ -51,7 +51,7 @@ export const connectSquad = (callback) => {
       }
 
       // make sure all stored defs and defaults are on Ethereum
-      const localDefs = [...defaultDefs]
+      const localDefs = [...defaultDefs, ...storedDefs]
       console.log('local defs', localDefs)
       await multiDefinition(localDefs)
 

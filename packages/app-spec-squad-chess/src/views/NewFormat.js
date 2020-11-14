@@ -186,7 +186,7 @@ const FormatStartingPosition = {
     updatePosition()
     let board
     if (Object.keys(state.formatForm.startingPosition).length) {
-      const format = getFullFormat(cleanDefinition().Format, null)
+      const format = getFullFormat(cleanDefinition({ deletedSquares: true }).Format, null)
       board = m(Board, {
         format,
         position: format.startingPosition,
@@ -576,7 +576,7 @@ const handleSaveInitialBuy = (event) => {
 */
 const handleSubmit = (event) => {
   event.preventDefault()
-  const definition = cleanDefinition()
+  const definition = cleanDefinition({ deletedSquares: false })
   const localDefs = JSON.parse(localStorage.getItem('localDefinitions'))
   localStorage.setItem('localDefinitions', JSON.stringify([...localDefs, definition]))
   // convert  percent to basis points
@@ -597,9 +597,13 @@ const handleSubmit = (event) => {
 
 // helpers
 
-function cleanDefinition () {
+function cleanDefinition ({ deletedSquares }) {
   const description = state.formatForm.description
-  const startingPosition = cleanStartingPosition(state.formatForm.startingPosition)
+  let startingPosition = state.formatForm.startingPosition
+  if (!deletedSquares) {
+    startingPosition = cleanStartingPosition(startingPosition)
+  }
+
   const orientation = state.formatForm.orientation
   return {
     Format: {

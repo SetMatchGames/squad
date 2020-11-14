@@ -1,72 +1,113 @@
-/* global require process test expect */
-
-const curation = require('./index.js')
+/* global test expect beforeEach */
+// NOTE: if running these tests multiple times without restarting the local network,
+// the tests will take longer each time, leading them to eventually fail.
 
 const curationMarket = require('./index.js')
+const crypto = require('crypto')
 
-async function main () {
-  console.log('TESTING CURATION API...')
+const feeRate = 1000
+const purchasePrice = 10
+let purchases = 0
+const expectedSP = purchasePrice - purchasePrice * feeRate / 10000
+let contributionId
 
-  // new random bond id, so this test can be run more than once in a session
-  const bondId = Date.now().toString()
-  console.log('bondId', bondId)
-
-  // create new bond
-  await curation.newBond(process.env.SIMPLE_CURVE_ADDR, bondId, 0)
-  console.log('new bond created')
-  const supply = await curation.getSupply(bondId)
-  console.log('supply of new bond:', supply)
-
-  /*
-  // buying successfully
-  let units = 1e8
-  console.log("units to buy", units)
-  let buyPrice1 = await curation.getBuyPrice(units, bondId)
-  console.log("wei to buy units:", buyPrice1)
-  await curation.buy(units, bondId, {value: buyPrice1})
-  console.log("attempted to buy units")
-  let newSupply = await curation.getSupply(bondId)
-  console.log("new supply of bond:", newSupply)
-  assert(
-    (parseInt(newSupply) === parseInt(supply+units)),
-    "New supply did not equal old supply plus number to buy."
+beforeEach(async () => {
+  const def = { date: Date.now() }
+  contributionId = '0x' + crypto.createHash('sha256').update(JSON.stringify(def)).digest('hex')
+  await curationMarket.newContribution(
+    contributionId,
+    feeRate,
+    purchasePrice,
+    () => {},
+    () => {}
   )
+  await curationMarket.buyLicense(
+    contributionId,
+    () => {},
+    () => {}
+  )
+  purchases += 1
+})
 
-  // new random bond id, so this test can be run more than once in a session
-  const bondId2 = Date.now().toString()
-  console.log("bondId", bondId2)
-
-  // create new bond
-  await curation.newBond(process.env.SIMPLE_CURVE_ADDR, bondId2, units, {value: buyPrice1})
-  console.log("second new bond created")
-  let supply2 = await curation.getSupply(bondId2)
-  console.log("supply of second bond:", supply2)
-
-  // check unsuccessful buys
-
-  // check refund
-  */
-}
-
-test('Tests run', async () => {
-  console.warn("Old tests don't pass, FIX THEM")
+test('tests run', () => {
   expect(true).toBe(true)
 })
 
-test('create a new bond and buy 100', async () => {
-  const bondId = Date.now().toString()
+test('correctly predict contribution sell price', async () => {
+  const licenses = await curationMarket.getValidLicenses()
+  const returnedSP = Number(licenses[contributionId][0].sellAmount)
+  expect(returnedSP).toBe(expectedSP)
+})
 
-  await curationMarket.newBond(bondId, 0, async (receipt) => {
-    const supply = await curationMarket.getSupply(bondId)
-    expect(supply).toEqual(0)
-    /*
-    await curationMarket.buy(100, bondId, async (receipt) => {
-      const supply = await curationMarket.getSupply(bondId)
-      expect(supply).toEqual(100)
-    })
-    */
-  })
+test('contribution sells for expected amount', async () => {
+  const initBalance = Number(await curationMarket.reserveBalanceOf())
+  const licenses = await curationMarket.getValidLicenses()
+  const licenseId = licenses[contributionId][0].licenseId
+  const returnedSP = Number(licenses[contributionId][0].sellAmount)
+  const expectedBalance = initBalance + returnedSP
+  await curationMarket.redeemAndSell(
+    licenseId,
+    expectedSP,
+    () => {},
+    () => {},
+    () => {},
+    () => {}
+  )
+  const newBalance = Number(await curationMarket.reserveBalanceOf())
+  expect(newBalance).toEqual(expectedBalance)
+})
 
-  // const supply = await curationMarket.getSupply(bondId)
-  // expect(supply).toEqual(ethers.utils.bigNumberify(0))
+test('finds held licenses for contribution', async () => {
+  const bool = await curationMarket.holdsLicenseFor(contributionId)
+  expect(bool).toBe(true)
+})
+
+test('finds lack of licenses for contribution', async () => {
+  const def = { date: Date.now() }
+  const newContributionId = '0x' + crypto.createHash('sha256').update(JSON.stringify(def)).digest('hex')
+  await curationMarket.newContribution(
+    newContributionId,
+    feeRate,
+    purchasePrice,
+    () => {},
+    () => {}
+  )
+  const bool = await curationMarket.holdsLicenseFor(newContributionId)
+  expect(bool).toBe(false)
+})
+
+test('finds correct market size', async () => {
+  const expectedMarketSize = purchasePrice
+  const marketSize = Number(await curationMarket.marketSize(contributionId))
+  expect(marketSize).toBe(expectedMarketSize)
+})
+
+test('finds correct purchase price', async () => {
+  const foundPP = Number(await curationMarket.purchasePriceOf(contributionId))
+  expect(foundPP).toBe(purchasePrice)
+})
+
+test('finds correct fee rate', async () => {
+  const foundFeeRate = Number(await curationMarket.feeOf(contributionId))
+  expect(foundFeeRate).toBe(feeRate)
+})
+
+// Will only work on first test run after starting local network
+test('finds correct withdraw amount', async () => {
+  const expectedWA = purchases * purchasePrice * feeRate / 10000
+  const returnedWA = Number(await curationMarket.withdrawAmount())
+  expect(returnedWA).toBe(expectedWA)
+})
+
+// Will only work on first test run after starting local network
+test('withdraws correct amount', async () => {
+  const initBalance = Number(await curationMarket.reserveBalanceOf())
+  const expectedWA = purchases * purchasePrice * feeRate / 10000
+  const expectedBalance = initBalance + expectedWA
+  await curationMarket.withdraw(
+    () => {},
+    () => {}
+  )
+  const newBalance = Number(await curationMarket.reserveBalanceOf())
+  expect(newBalance).toBe(expectedBalance)
 })
