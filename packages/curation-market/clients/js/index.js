@@ -2,6 +2,8 @@
 
 const ethers = require('ethers')
 
+const graphQueries = require('./graphQueries.js')
+
 const SquadControllerJSON = require('./artifacts/SquadController.json')
 const TokenClaimCheckJSON = require('./artifacts/TokenClaimCheck.json')
 const AccountingJSON = require('./artifacts/Accounting.json')

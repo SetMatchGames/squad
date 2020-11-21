@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "@truffle/contract": "^4.1.13",
+    "axios": "^0.21.0",
     "ethers": "^4.0.46",
     "jest": "^25.2.3"
   },
