@@ -11,8 +11,8 @@ const Matchmaking = {
   oninit: (vnode) => {
     loadFormat(vnode.attrs.formatAddress)
 
-    state.matchmaking.id = crypto.randomBytes(16).toString('hex')
-    console.log(`Our matchmaking Id: ${state.matchmaking.id}`)
+    state.matchmaking.id = (state.squad.account || crypto.randomBytes(16).toString('hex')).toLowerCase()
+    console.log(`Our matchmaking ID: ${state.matchmaking.id}`)
 
     state.matchmaking.room = ''
     state.matchmaking.peers = []
@@ -273,11 +273,17 @@ const handleReceiveMessage = (event) => {
       state.matchmaking.connection = event.data
       m.route.set('/play')
     } else {
+      // find difs here in order to highlight last move?
+      console.log('new game state', state.game, event.data)
       state.game = event.data
       checkWinner()
     }
     m.redraw()
   }
+}
+
+function gameStateDifs (ob1, ob2) {
+  const difs = {}
 }
 
 export default Matchmaking

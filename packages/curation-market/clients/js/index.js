@@ -2,13 +2,11 @@
 
 const ethers = require('ethers')
 
-const graphQueries = require('./graphQueries.js')
-
 const SquadControllerJSON = require('./artifacts/SquadController.json')
 const TokenClaimCheckJSON = require('./artifacts/TokenClaimCheck.json')
 const AccountingJSON = require('./artifacts/Accounting.json')
 const LinearCurveJSON = require('./artifacts/LinearCurve.json')
-// const BondingCurveFactoryJSON = require('./artifacts/BondingCurveFactory.json')
+const BondingCurveFactoryJSON = require('./artifacts/BondingCurveFactory.json')
 const ERC20JSON = require('./artifacts/ERC20.json')
 
 /* Ropsten addresses */
@@ -78,7 +76,7 @@ let defaults
 
 let squadController
 let tokenClaimCheck
-// let bondingCurveFactory
+ let bondingCurveFactory
 let reserveToken
 let accounting
 
@@ -102,7 +100,7 @@ function init (defaults) {
   }
 
   linearCurve = new ethers.Contract(linearCurveAddress, LinearCurveJSON.abi, walletOrSigner)
-  // bondingCurveFactory = new ethers.Contract(bondingCurveFactoryAddress, BondingCurveFactoryJSON.abi, walletOrSigner)
+  bondingCurveFactory = new ethers.Contract(bondingCurveFactoryAddress, BondingCurveFactoryJSON.abi, walletOrSigner)
   squadController = new ethers.Contract(
     squadControllerAddress, SquadControllerJSON.abi, walletOrSigner
   )
@@ -142,6 +140,7 @@ async function newContribution (
   contributionId,
   feeRate,
   purchasePrice,
+  metadata,
   submissionCb,
   confirmationCb,
   options
@@ -152,9 +151,11 @@ async function newContribution (
   const name = `Squad Chess ${contributionId}`
   const symbol = `sc${contributionId.substring(0, 3).toUpperCase()}`
   purchasePrice = ethers.utils.parseEther(`${purchasePrice}`)
-  const metadata = JSON.stringify({ game: 'Squad Chess', experiment: true })
+  metadata = JSON.stringify(metadata)
   if (await squadController.exists(contributionId)) {
-    throw new BondAlreadyExists('Contribution ID already exists')
+    // throw new BondAlreadyExists('Contribution ID already exists')
+    console.error('BondAlreadyExists: Contribution ID already exists')
+    return
   }
   const tx = await squadController.newContribution(
     contributionId,
@@ -322,6 +323,7 @@ async function redeemAndSell (
     redeemSubmissionCb,
     redeemConfirmationCb
   )
+  console.log('sell pricing', await sellPriceFor(contributionId, claim.amount, 100))
   await sellTokens(
     contributionId,
     ethers.utils.formatEther(claim.amount),
@@ -346,15 +348,16 @@ async function feeOf (contributionId) {
 async function priceOf (contributionId, amount) {
   init()
   const supply = await squadController.totalSupplyOf(contributionId)
+  console.log('real supply:', supply.toString())
   return await squadController.priceOf(contributionId, supply, amount)
 }
 
-async function linearCurvePrice (supply, amount) {
+async function linearCurvePrice (supply /* big num */, amount /* big num */) {
   init()
   return ethers.utils.formatEther(await linearCurve.price(supply, amount))
 }
 
-async function sellPriceFor (contributionId, amount, feeRate) {
+async function sellPriceFor (contributionId, amount /* big num */, feeRate) {
   init()
   const supply = await squadController.totalSupplyOf(contributionId)
   let price = await linearCurvePrice(supply.sub(amount), amount)
@@ -431,6 +434,7 @@ module.exports = {
   getEthers,
   getValidLicenses,
   linearCurveAmount,
+  linearCurvePrice,
   purchasePriceOf,
   feeOf,
   licenseSellPrice,

@@ -1,9 +1,9 @@
 /* global localStorage ethereum */
 
 import m from 'mithril'
-import squad, { metastore, curationMarket } from '@squad/sdk'
+import squad, { curationMarket } from '@squad/sdk'
 
-import defs from '../scripts/load_development_defs.js'
+// import defs from '../scripts/load_development_defs.js'
 
 import state from './state.js'
 import settings from './settings.js'
@@ -27,65 +27,144 @@ export const findBoardRange = (variableIndex, startingPosition) => {
   }
 }
 
-export const connectSquad = (callback) => {
-  metastore.webSocketConnection(settings.metastoreWs)
+// functions required
+// web3connect(contributions())
+// web3connect(licenses())
 
-  metastore.on('open', async () => {
-    // skip if we've already connected to Squad
-    if (state.squad.account === 'connected') {
-      console.log('Skipping on open')
-    } else {
-      // check ethereum connection
-      await web3connection()
+export const handleLoadContributions = () => {
+  console.log('connect', state.squad.account)
+  if (state.squad.account) {
+    loadContributions()
+      .then(res => {
+        console.log('loaded contributions')
+      })
+      .catch(err => {
+        console.error(err)
+      })
+  } else {
+    web3connection()
+      .then(async () => {
+        await loadContributions()
+      })
+      .catch(err => {
+        console.error(err)
+      })
+  }
+}
 
-      // test()
-
-      // load up the default definitions (only relevant with the temporary metastore)
-      const defaultDefs = await defs()
-
-      // load up the local storage definitions along with the defaults (for now)
-      let storedDefs = JSON.parse(localStorage.getItem('localDefinitions'))
-      console.log('stored defs', storedDefs)
-      if (!storedDefs) {
-        storedDefs = []
+const loadContributions = async () => {
+  state.squad.rawFormats = {}
+  state.squad.orderedFormats = await squad.getFormats()
+  state.squad.orderedFormats.forEach(f => {
+    state.squad.rawFormats[f.id] = Object.assign({},
+      f.definition.Format,
+      { 
+        fee: f.feeRate,
+        purchasePrice: f.purchasePrice
       }
-
-      // make sure all stored defs and defaults are on Ethereum
-      const localDefs = [...defaultDefs, ...storedDefs]
-      console.log('local defs', localDefs)
-      await multiDefinition(localDefs)
-
-      // get all the game's formats and components
-      const formatDefs = await metastore.getGameFormats(settings.gameAddress)
-      console.log('format defs', formatDefs, settings.gameAddress)
-      const componentDefs = await metastore.getGameComponents(settings.gameAddress)
-
-      // restore everything in local storage
-      refreshLocalStorage(formatDefs, componentDefs)
-
-      // for each format
-      for (const address in formatDefs) {
-        // take out the extra 'Format' part of the object
-        formatDefs[address] = formatDefs[address].Format
-      }
-      state.squad.rawFormats = formatDefs
-      console.log('raw formats 1', state.squad.rawFormats)
-
-      // for each component
-      for (const address in componentDefs) {
-        // take out the extra 'Component' part of the object
-        componentDefs[address] = componentDefs[address].Component
-      }
-      state.squad.components = componentDefs
-
-      // state.squad.connection = 'connected'
-      // console.log('Squad Connection:', state.squad.connection)
-    }
-
-    if (callback) { await callback() }
-
-    m.redraw()
+    )
   })
+
+  state.squad.components = {}
+  state.squad.orderedComponents = await squad.getComponents()
+  state.squad.orderedComponents.forEach(c => {
+    state.squad.components[c.id] = Object.assign({},
+      c.definition.Component,
+      { 
+        fee: c.feeRate,
+        purchasePrice: c.purchasePrice
+      }
+    )
+  })
+
+  m.redraw()
+}
+
+export const handleLoadLicenses = () => {
+  if (state.squad.account) {
+    loadLicenses()
+      .then(res => {
+        console.log('loaded licenses')
+      })
+      .catch(err => {
+        console.error(err)
+      })
+  } else {
+    web3connection()
+      .then(async () => {
+        await loadLicenses()
+      })
+      .catch(err => {
+        console.error(err)
+      })
+  }
+}
+
+const loadLicenses = async () => {
+  state.licenses = await squad.getLicenses(state.squad.address)
+  m.redraw()
+}
+
+export const refreshSquad = (callback) => {
+
+  // skip if we've already connected to Squad
+  if (state.squad.account === 'connected') {
+    console.log('Skipping on open')
+  } else {
+    // check ethereum connection
+    web3connection()
+      .then(r => {
+        // test()
+
+        // load up the default definitions (only relevant with the temporary metastore)
+        // const defaultDefs = await defs()
+
+        // load up the local storage definitions along with the defaults (for now)
+        let storedDefs = JSON.parse(localStorage.getItem('localDefinitions'))
+        console.log('stored defs', storedDefs)
+        if (!storedDefs) {
+          storedDefs = []
+        }
+
+        // make sure all stored defs and defaults are on Ethereum
+        const localDefs = [/*...defaultDefs,*/ ...storedDefs]
+        console.log('local defs', localDefs)
+        // multiDefinition(localDefs)
+
+        state.squad.rawFormats = {}
+        squad.getFormats()
+          .then(formats => {
+            console.log('got formats', formats)
+            state.squad.orderedFormats = formats
+            state.squad.orderedFormats.forEach(f => {
+              state.squad.rawFormats[f.id] = f.definition.Format
+            })
+            m.redraw()
+          })
+          .catch(e => {
+            console.error('getFormats error:', e)
+          })
+
+        state.squad.components = {}
+        squad.getComponents()
+          .then(components => {
+            console.log('got compoentns', components)
+            state.squad.orderedComponents = components
+            state.squad.orderedComponents.forEach(c => {
+              state.squad.components[c.id] = c.definition.Component
+            })
+            m.redraw()
+          })
+          .catch(e => {
+            console.error('getComponents error:', e)
+          })
+
+        if (typeof callback === 'function') { callback() }
+      })
+      .catch(e => {
+        console.error('Web3 connection error:', e)
+      })
+  }
 }
 
 /*
@@ -176,6 +255,7 @@ async function web3connection () {
   let address
   try {
     address = await connection.getAddress()
+    state.squad.account = address
   } catch (e) {
     address = e
   }
@@ -198,6 +278,7 @@ async function web3connection () {
   console.log(one, two, three)
   if (one && two && three) {
     state.connectModal = false
+    state.squad.connection = 'connected'
   } else {
     state.connectModal = true
     state.squad.connection = 'not connected'
@@ -225,7 +306,7 @@ function refreshLocalStorage (formatDefs, componentDefs) {
 }
 
 export const getMarketInfo = () => {
-  connectSquad(async () => {
+  refreshSquad(async () => {
     // get the logged in user's available withdraw amount
     state.withdrawAmount = await squad.curationMarket.withdrawAmount()
     // get the users licenses
@@ -286,27 +367,35 @@ async function getBeneficiaryFee (address) {
   console.log('Fee', address, Number(fee) / 100)
 }
 
-export const loadFormat = (address) => {
-  connectSquad(async () => {
-    // get the format
-    const rawFormat = state.squad.rawFormats[address]
-
-    // load the format
-    if (rawFormat) {
-      console.log('raw format found')
-      // get the users licenses
-      state.licenses = await squad.curationMarket.getValidLicenses()
-      if (!state.licenses[address]) {
-        m.route.set('/formats')
-        console.log('Must purchase rights to use a format before using. Current tokens owned:', state.owned[address])
-        // TODO Notification asking them to buy the format
-      } else {
-        state.squad.loadedFormat = getFullFormat(rawFormat, address)
-        console.log('Loaded format:', state.squad.loadedFormat)
-      }
-      m.redraw()
+export const loadFormat = async (address) => {
+  // check if we've already connected to web3
+  if (!state.squad.account) {
+    await web3connection()
+  }
+  // check if we've already loaded this address
+  if (!state.squad.rawFormats || !state.squad.rawFormats[address]) {
+    // if not, load contributions
+    await loadContributions()
+  }
+  // check if we've already loaded a license for this address and account
+  if (!state.licenses || !state.licenses[address]) {
+    // if not, load licenses
+    await loadLicenses()
+  }
+  // then, load the format
+  const rawFormat = state.squad.rawFormats[address]
+  if (rawFormat) {
+    console.log('raw format found and loading')
+    if (!state.licenses[address]) {
+      m.route.set('/formats')
+      console.log('Must purchase rights to use a format before using. Current tokens owned:', state.owned[address])
+      // TODO Notification asking them to buy the format
+    } else {
+      state.squad.loadedFormat = getFullFormat(rawFormat, address)
+      console.log('Loaded format:', state.squad.loadedFormat)
     }
-  })
+    m.redraw()
+  }
 }
 
 export const previewFormat = (address) => {
@@ -430,5 +519,8 @@ const alert = (type, text) => {
   console.log('Creating alert', type, text)
   const alert = { type, text }
   state.alerts.push(alert)
-  getMarketInfo()
+  console.log('current alerts', state.alerts)
+  handleLoadContributions()
+  handleLoadLicenses()
+  // getMarketInfo()
 }

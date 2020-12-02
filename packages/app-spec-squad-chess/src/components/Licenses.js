@@ -31,11 +31,11 @@ const LicenseCard = {
     const name = state.squad.rawFormats[vnode.attrs.address].name
     return m(
       '.license-card.column',
-      m('.row.left', `License ${vnode.attrs.license.licenseId.toString()}`),
+      m('.row.left', `License ${vnode.attrs.license.id}`),
       m('.row.center', m(
         '.column',
         m('div', name),
-        m('div', `ID: ${shortHash(vnode.attrs.license.contributionId)}`)
+        m('div', `ID: ${shortHash(vnode.attrs.license.contribution.id)}`)
       )),
       m(
         '.row.right',

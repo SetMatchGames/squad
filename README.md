@@ -52,14 +52,20 @@ contributors to Squad as of October, 2019, are:
 
 ## Dev environment instructions
 `npx hardhat node` in SquadGames/Squad
+- (get info on the graph-compatible hardhat fork here)
 `TREASURY_ADDRESS=0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266 USER_ADDRESS=0x70997970c51812dc3a010c7d01b50e0d17dc79c8 npm run deploy-local` in SquadGames/Squad, 2nd tab
 `make squad-chess`
 
 ### Using local subgraph
 Run dev env as above.
 
-In graph-node, make sure docker/data is deleted.
-
 Make sure `network` in subgraph manifest is `mainnet`.
 
 Run `docker-compose up`
+
+In the subgraph, run
+`yarn codegen`
+`graph create --node http://localhost:8020/ squadgames/subgraph`
+`yarn deploy-local`
+
+To fully shut down, run `docker-compose down` and delete docker/data.

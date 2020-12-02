@@ -1,9 +1,10 @@
 /* global module require URL */
+const crypto = require('crypto')
 
 const curationMarket = require('@squad/curation-client')
-const metastore = require('@squad/metastore')
 const matchmaking = require('@squad/matchmaking-client')
 const squadConfig = require('./squad-config.json')
+const graphQueries = require('./graphQueries.js')
 
 const runners = {
   'web-game-v0': async (gameData) => {
@@ -24,33 +25,6 @@ async function runGame (definition) {
   return runner(JSON.parse(definition.Game.data))
 }
 
-// Combined metastore and curation functions
-
-// handle submitting a definition and creating a new bond at the same time
-async function newDefinitionWithBond (
-  definition,
-  games,
-  feeRate,
-  purchasePrice,
-  submissionCb,
-  confirmationCb,
-  opts = {}
-) {
-  const bondId = await metastore.createDefinition(definition, games)
-  console.log('trying to submit id', bondId)
-  await curationMarket.newContribution(
-    bondId,
-    feeRate,
-    purchasePrice,
-    submissionCb,
-    confirmationCb,
-    opts
-  )
-  return bondId
-}
-
-// definition is an "idenpotentish" way to call newDefinitionWithBond
-// it will check to see if the definition exists before creating it
 async function definition (
   definition,
   games = [],
@@ -60,32 +34,76 @@ async function definition (
   confirmationCb,
   opts = {}
 ) {
-  try {
-    console.log('submitting', definition, games)
-    return await newDefinitionWithBond(
-      definition,
-      games,
-      feeRate,
-      purchasePrice,
-      submissionCb,
-      confirmationCb,
-      opts
-    )
-  } catch (e) {
-    if (e instanceof curationMarket.BondAlreadyExists) {
-      console.log('bond already exists', definition, games)
-      return metastore.createDefinition(definition, games)
-    } else {
-      throw e
+  const bondId = '0x'+crypto.createHash('sha256').update(JSON.stringify(definition)).digest('hex')
+  await curationMarket.newContribution(
+    bondId,
+    feeRate,
+    purchasePrice,
+    definition,
+    submissionCb,
+    confirmationCb,
+    opts
+  )
+}
+
+async function getFormats () {
+  return await getContributions('Format')
+}
+
+async function getComponents () {
+  return await getContributions('Component')
+}
+
+async function getContributions(type) {
+  const ethers = curationMarket.getEthers()
+  const contributions = await graphQueries.contributions()
+  const results = []
+  contributions.forEach(c => {
+    c.definition = JSON.parse(c.definition)
+    c.feeRate = c.feeRate / 100
+    c.purchasePrice = ethers.utils.formatEther(c.purchasePrice)
+    c.supply = ethers.utils.formatEther(c.supply)
+    if (c.definition[type]) {
+      results.push(c)
     }
-  }
+  })
+  console.log('found contributions', type, results)
+  return results
+}
+
+async function getLicenses(address) {
+  if (!address) { address = await curationMarket.walletAddress() }
+  const licenses = await graphQueries.licensesOf(address)
+  const dict = {}
+  const promises = licenses.map(l => {
+    return (async () => {
+      if(!dict[l.contribution.id]) { dict[l.contribution.id] = [] }
+      l.sellAmount = await sellAmount(l.amount, l.contribution.supply, l.contribution.feeRate)
+      dict[l.contribution.id].push(l)
+    })()
+  })
+  await Promise.all(promises)
+  return dict
+}
+
+async function sellAmount (amount, supply, feeRate) {
+  const ethers = curationMarket.getEthers()
+  amount = ethers.utils.bigNumberify(amount)
+  supply = ethers.utils.bigNumberify(supply)
+  let price = await curationMarket.linearCurvePrice(supply.sub(amount), amount)
+  price = ethers.utils.parseEther(price)
+  const fee = price.mul(feeRate).div(10000)
+  price = price.sub(fee)
+  return ethers.utils.formatEther(price)
 }
 
 module.exports = {
   runGame,
   registerRunner,
-  metastore,
   curationMarket,
   matchmaking,
-  definition
+  definition,
+  getFormats,
+  getComponents,
+  getLicenses
 }

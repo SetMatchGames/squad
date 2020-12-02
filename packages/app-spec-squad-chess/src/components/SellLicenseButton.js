@@ -17,10 +17,11 @@ const SellLicenseButton = {
         {
           onclick: (e) => {
             e.preventDefault()
-            sellLicenseWithAlerts(vnode.attrs.license.licenseId, vnode.attrs.license.sellAmount)
+            console.log('trying to sell', vnode.attrs.license.id, vnode.attrs.license.sellAmount)
+            sellLicenseWithAlerts(vnode.attrs.license.id, vnode.attrs.license.sellAmount)
           }
         },
-        `Sell (${vnode.attrs.license.sellAmount} MT)`
+        `Sell (${Number.parseFloat(vnode.attrs.license.sellAmount).toPrecision(4)} MT)`
       )
     )
   }

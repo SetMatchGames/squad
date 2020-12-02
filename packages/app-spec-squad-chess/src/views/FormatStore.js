@@ -2,35 +2,38 @@ import m from 'mithril'
 import state from '../state.js'
 import Board from '../components/Board.js'
 import Licenses from '../components/Licenses.js'
-import { shortHash, getMarketInfo, previewFormat } from '../utils.js'
+import { 
+  shortHash, 
+  handleLoadContributions, 
+  handleLoadLicenses, 
+  previewFormat 
+} from '../utils.js'
 
 const FormatStore = {
   oninit: () => {
-    getMarketInfo()
+    handleLoadContributions()
+    handleLoadLicenses()
     state.markets.previewedFormats = {}
   },
   view: () => {
-    if (!state.squad.rawFormats) {
+    if (!state.squad.orderedFormats) {
       return m(
         '#format-store.body',
         'Loading formats...'
       )
     }
-    console.log('raw formats', state.squad.rawFormats)
-    const orderedFormats = Object.keys(state.squad.rawFormats).sort((a, b) => {
-      return state.marketCaps[b] - state.marketCaps[a]
-    })
     return m(
       '#format-store.body',
       m('h2', 'Choose a Format to Play'),
       m(Labels),
-      orderedFormats.map((address, index) => {
+      state.squad.orderedFormats.map((format, index) => {
         let order = 'middle'
         if (index === 0) { order = 'head' }
-        if (index === orderedFormats.length - 1) {
+        if (index === state.squad.orderedFormats.length - 1) {
           order = 'foot'
         }
-        return m(FormatCard, { key: address, order })
+        const score = shortenScore(format.supply)
+        return m(FormatCard, { key: format.id, order, score })
       })
     )
   }
@@ -51,12 +54,13 @@ const Labels = {
 
 const FormatCard = {
   view: (vnode) => {
+    if (!state.squad.rawFormats[vnode.key]) { return }
     const name = state.squad.rawFormats[vnode.key].name
     return m(
       `.format-card.column.${vnode.attrs.order}`,
       m(
         '.info.row',
-        m('.score.offset', shortenScore(state.marketCaps[vnode.key])),
+        m('.score.offset', vnode.attrs.score),
         m('.name.offset', name),
         m(
           '.button-section',

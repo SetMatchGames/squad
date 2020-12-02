@@ -23,11 +23,15 @@ axios.post(url, { query })
 async function licensesOf (address) {
   let licenses
   const query = `{
-    licenses(where: { owner: ${address} }) {
+    licenses(where: { owner: "${address}" }) {
       id
       owner
       amount
-      contribution
+      contribution {
+        id
+        supply
+        feeRate
+      }
     }
   }`
   try {
@@ -38,18 +42,19 @@ async function licensesOf (address) {
   return licenses
 }
 
-async function contributionsBySupply () {
+async function contributions () {
   let contributions
   const query = `{
     contributions(
+      first: 1000
       orderBy: supply, 
       orderDirection: desc
     ) {
       id
-      name
       beneficiary
       feeRate
       purchasePrice
+      definition
       supply
     }
   }`
@@ -61,19 +66,7 @@ async function contributionsBySupply () {
   return contributions
 }
 
-contributionsBySupply()
-  .then(res => {
-    console.log('contributionsBySupply', res)
-  })
-  .catch(err => {
-    console.error('contributionsBySupply error', err)
-  })
-
-/* 
-contributions
-licenses
-
-licenses by owner
-
-contributions by supply
-*/ 
+module.exports = {
+  contributions,
+  licensesOf
+}
