@@ -88,6 +88,8 @@ function resetBoardState (vnode) {
       matchStatus: vnode.attrs.matchStatus
     }
   )
+
+  clearTimeout(matchmaking.messageTimeout)
 }
 
 function queueDeselect () {
@@ -129,7 +131,6 @@ const BoardSquare = {
     const coordinates = chess.stringToSquare(vnode.key)
     // highlight square
     const highlighted = squareInArray(coordinates, state.board.highlightedSquares)
-    console.log('checking last move', state.game)
     const lastMove = squareInArray(coordinates, state.game.lastTurn)
     let squareContent
     let onclick
@@ -278,14 +279,13 @@ function sendMessage (message) {
   }
   console.log('Sending message:', message)
   matchmaking.sendMessage(message)
-  setTimeout(() => {
+  matchmaking.messageTimeout = setTimeout(() => {
     console.log('resending message number', message.number)
     sendMessage(message)
   }, 3000)
 }
 
 function squareInArray (square, array) {
-  console.log('array', array)
   let result = false
   if (array.length === 0) { return result }
   array.forEach(s => {

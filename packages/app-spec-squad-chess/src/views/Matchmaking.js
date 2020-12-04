@@ -19,6 +19,7 @@ const Matchmaking = {
     state.matchmaking.offers = {}
     state.matchmaking.player = 0
     state.matchmaking.connection = 'not connected'
+    state.matchmaking.messageNumber = 0
   },
   view: () => {
     let name = '[ format loading... ]'
@@ -244,6 +245,8 @@ const handleSendOffer = (event) => {
   matchmaking.sendOffer(event.target.id, handleReceiveMessage)
 
   state.matchmaking.connection = 'offer sent'
+  state.matchmaking.opponentId = event.target.id
+
   clearInterval(state.matchmaking.rollCallInterval)
   m.redraw()
 }
@@ -257,6 +260,8 @@ const handleSendAnswer = (event) => {
   state.matchmaking.player = 1
 
   state.matchmaking.connection = 'match started'
+  state.matchmaking.opponentId = event.target.id
+
   clearInterval(state.matchmaking.rollCallInterval)
   m.route.set('/play')
 }
@@ -269,6 +274,7 @@ const handleReceiveMessage = (event) => {
     }
     console.log('Received message:', event)
     state.matchmaking.messageNumber = event.data.number
+    console.log('message info', state.matchmaking, event.data)
     if (event.data === 'match started') {
       state.matchmaking.connection = event.data
       m.route.set('/play')
