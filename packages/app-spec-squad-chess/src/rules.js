@@ -132,7 +132,8 @@ const createGame = (format) => {
   return {
     position: FORMAT.startingPosition,
     turnNumber: 0,
-    legalTurns: generateTurns(FORMAT.startingPosition, 0)
+    legalTurns: generateTurns(FORMAT.startingPosition, 0),
+    lastTurn: []
   }
 }
 
@@ -204,7 +205,8 @@ const takeTurn = ({ position, turnNumber, legalTurns }, [from, to]) => {
   const newState = {
     position: newPosition,
     turnNumber: turnNumber + 1,
-    legalTurns: generateTurns(newPosition, turnNumber + 1)
+    legalTurns: generateTurns(newPosition, turnNumber + 1),
+    lastTurn: [from, stringToSquare(to)]
   }
   return newState
 }

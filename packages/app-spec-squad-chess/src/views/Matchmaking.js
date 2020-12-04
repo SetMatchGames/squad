@@ -273,17 +273,12 @@ const handleReceiveMessage = (event) => {
       state.matchmaking.connection = event.data
       m.route.set('/play')
     } else {
-      // find difs here in order to highlight last move?
-      console.log('new game state', state.game, event.data)
+      console.log('new game state', event.data.lastTurn)
       state.game = event.data
       checkWinner()
     }
     m.redraw()
   }
-}
-
-function gameStateDifs (ob1, ob2) {
-  const difs = {}
 }
 
 export default Matchmaking
