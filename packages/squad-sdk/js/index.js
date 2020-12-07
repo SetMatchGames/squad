@@ -71,18 +71,28 @@ async function getContributions(type) {
   return results
 }
 
-async function getLicenses(address) {
+async function getContribution (id) {
+  const ethers = curationMarket.getEthers()
+  const contribution = await graphQueries.contributionById(id)
+  const result = Object.assign({}, contribution, {
+    definition: JSON.parse(contribution.definition),
+    feeRate: contribution.feeRate / 100,
+    purchasePrice: ethers.utils.formatEther(contribution.purchasePrice),
+    supply: ethers.utils.formatEther(contribution.supply)
+  })
+  return result
+}
+
+async function getLicenses (address) {
   if (!address) { address = await curationMarket.walletAddress() }
   const licenses = await graphQueries.licensesOf(address)
   const dict = {}
-  const promises = licenses.map(l => {
-    return (async () => {
-      if(!dict[l.contribution.id]) { dict[l.contribution.id] = [] }
-      l.sellAmount = await sellAmount(l.amount, l.contribution.supply, l.contribution.feeRate)
-      dict[l.contribution.id].push(l)
-    })()
-  })
-  await Promise.all(promises)
+  for(let i = 0; i < licenses.length; i++) {
+    const l = licenses[i]
+    if(!dict[l.contribution.id]) { dict[l.contribution.id] = [] }
+    l.sellAmount = await sellAmount(l.amount, l.contribution.supply, l.contribution.feeRate)
+    dict[l.contribution.id].push(l)
+  }
   return dict
 }
 
@@ -105,5 +115,6 @@ module.exports = {
   definition,
   getFormats,
   getComponents,
+  getContribution,
   getLicenses
 }

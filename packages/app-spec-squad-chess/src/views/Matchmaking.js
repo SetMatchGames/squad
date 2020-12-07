@@ -261,6 +261,7 @@ const handleSendAnswer = (event) => {
 
   state.matchmaking.connection = 'match started'
   state.matchmaking.opponentId = event.target.id
+  state.board.matchStatus = `Playing against ${state.matchmaking.opponentId}`
 
   clearInterval(state.matchmaking.rollCallInterval)
   m.route.set('/play')
@@ -277,6 +278,7 @@ const handleReceiveMessage = (event) => {
     console.log('message info', state.matchmaking, event.data)
     if (event.data === 'match started') {
       state.matchmaking.connection = event.data
+      state.board.matchStatus = `Playing against ${state.matchmaking.opponentId}`
       m.route.set('/play')
     } else {
       console.log('new game state', event.data.lastTurn)

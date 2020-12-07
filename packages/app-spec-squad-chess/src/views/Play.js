@@ -13,16 +13,9 @@ const Play = {
       return
     }
 
-    let matchStatus = 'Match not started'
-    if (state.board.matchStatus && state.board.matchStatus !== 'match started') {
-      matchStatus = state.board.matchStatus
-    } else if (state.matchmaking.connection === 'match started') {
-      matchStatus = `Playing against ${state.matchmaking.opponentId}`
-    }
-
     return m(
       '#play.body',
-      m('p#match-status.italics', matchStatus),
+      m('p#match-status.italics', state.board.matchStatus),
       m(Board, {
         format: state.squad.loadedFormat,
         matchStatus: state.matchmaking.connection

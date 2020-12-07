@@ -32,7 +32,6 @@ export const findBoardRange = (variableIndex, startingPosition) => {
 // web3connect(licenses())
 
 export const handleLoadContributions = () => {
-  console.log('connect', state.squad.account)
   if (state.squad.account) {
     loadContributions()
       .then(res => {
@@ -77,6 +76,49 @@ const loadContributions = async () => {
     )
   })
 
+  const params = (new URL(document.location)).searchParams
+  if (params.get('format')) { 
+    state.markets.idToSearch = params.get('format')
+    if (state.squad.rawFormats[state.markets.idToSearch]) {
+      console.log('setting searched format', state.markets.idToSearch)
+      state.markets.searchedFormat = state.markets.idToSearch
+    }
+  }
+
+  m.redraw()
+}
+
+export const handleLoadContribution = (id) => {
+  if (state.squad.account) {
+    loadContribution(id)
+      .then(res => {
+        console.log('loaded contribution', id)
+      })
+      .catch(err => {
+        console.error(err)
+      })
+  } else {
+    web3connection()
+      .then(async () => {
+        await loadContribution(id)
+      })
+      .catch(err => {
+        console.error(err)
+      })
+  }
+}
+
+const loadContribution = async (id) => {
+  state.squad.rawFormats = {}
+  const f = await squad.getContribution(id)
+  if (!f.definition.Format) { return }
+  state.squad.rawFormats[f.id] = Object.assign({},
+    f.definition.Format,
+    { 
+      fee: f.feeRate,
+      purchasePrice: f.purchasePrice
+    }
+  )
   m.redraw()
 }
 

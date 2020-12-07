@@ -25,16 +25,44 @@ const FormatStore = {
     return m(
       '#format-store.body',
       m('h2', 'Choose a Format to Play'),
+      m(FormatSearch),
       m(Labels),
-      state.squad.orderedFormats.map((format, index) => {
-        let order = 'middle'
-        if (index === 0) { order = 'head' }
-        if (index === state.squad.orderedFormats.length - 1) {
-          order = 'foot'
-        }
-        const score = shortenScore(format.supply)
-        return m(FormatCard, { key: format.id, order, score })
-      })
+      state.squad.orderedFormats
+        .filter((format) => {
+          return (!state.markets.searchedFormat || format.id === state.markets.searchedFormat)
+        })
+        .map((format, index) => {
+          let order = 'middle'
+          if (index === 0) { order = 'head' }
+          if (index === state.squad.orderedFormats.length - 1) {
+            order = 'foot'
+          }
+          const score = shortenScore(format.supply)
+          return m(FormatCard, { key: format.id, order, score })
+        })
+    )
+  }
+}
+
+const FormatSearch = {
+  view: () => {
+    return m(
+      '.search-bar',
+      m(
+        'input[type=text]', 
+        { value: state.markets.idToSearch, oninput: handleSaveSearch },
+        'Enter ID'
+      ),
+      m(
+        'button',
+        { onclick: saveSearch },
+        'Find format'
+      ),
+      m(
+        'button',
+        { onclick: resetSearch },
+        'Show all'
+      )
     )
   }
 }
@@ -149,6 +177,27 @@ const handleLinkFactory = (address) => {
     e.preventDefault()
     m.route.set('/matchmaking/:formatAddress', { formatAddress: address })
   }
+}
+
+const handleSaveSearch = (e) => {
+  e.preventDefault()
+  console.log('trying to save search', e.target)
+  state.markets.idToSearch = e.target.value
+}
+
+const saveSearch = (e) => {
+  e.preventDefault()
+  console.log('trying to save search', state.markets.idToSearch, state.squad.rawFormats)
+  // search loaded contributions for that id, then set state.markets.searchedFormat
+  if (state.squad.rawFormats[state.markets.idToSearch]) {
+    console.log('setting searched format', state.markets.idToSearch)
+    state.markets.searchedFormat = state.markets.idToSearch
+  }
+}
+
+const resetSearch = (e) => {
+  e.preventDefault()
+  delete state.markets.searchedFormat
 }
 
 function shortenScore (score) {

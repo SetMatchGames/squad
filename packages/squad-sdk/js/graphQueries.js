@@ -66,7 +66,28 @@ async function contributions () {
   return contributions
 }
 
+async function contributionById (id) {
+  let contribution
+  const query = `{
+    contributions(where: { id: "${id}" }) {
+      id
+      beneficiary
+      feeRate
+      purchasePrice
+      definition
+      supply
+    }
+  }`
+  try {
+    contribution = (await axios.post(url, { query })).data.data.contributions
+  } catch (err) {
+    console.error('Graph query error', err)
+  }
+  return contribution
+}
+
 module.exports = {
+  licensesOf,
   contributions,
-  licensesOf
+  contributionById
 }

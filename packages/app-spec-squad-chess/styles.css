@@ -424,6 +424,7 @@ input.focus-visible {
   box-shadow: none;
   border: none;
   font-weight: bold;
+  margin-top: 36px;
 }
 
 .format-card .info { 
