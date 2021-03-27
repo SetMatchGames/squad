@@ -86,6 +86,7 @@ async function getContribution (id) {
 async function getLicenses (address) {
   if (!address) { address = await curationMarket.walletAddress() }
   const licenses = await graphQueries.licensesOf(address)
+  console.log('licenses raw', licenses)
   const dict = {}
   for(let i = 0; i < licenses.length; i++) {
     const l = licenses[i]
@@ -93,6 +94,7 @@ async function getLicenses (address) {
     l.sellAmount = await sellAmount(l.amount, l.contribution.supply, l.contribution.feeRate)
     dict[l.contribution.id].push(l)
   }
+  console.log('licenses dict', dict)
   return dict
 }
 

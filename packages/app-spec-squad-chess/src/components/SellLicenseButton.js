@@ -21,7 +21,7 @@ const SellLicenseButton = {
             sellLicenseWithAlerts(vnode.attrs.license.id, vnode.attrs.license.sellAmount)
           }
         },
-        `Sell (${Number.parseFloat(vnode.attrs.license.sellAmount).toPrecision(4)} MT)`
+        `Sell (${Number.parseFloat(vnode.attrs.license.sellAmount).toPrecision(4)} XEENUS)`
       )
     )
   }

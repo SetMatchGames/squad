@@ -9,7 +9,8 @@ const query = `{
   }
 }`
 
-const url = 'http://localhost:8000/subgraphs/name/squadgames/subgraph'
+const url = 'https://api.thegraph.com/subgraphs/name/squadgames/squad-chess-ropsten'
+// const url = 'http://localhost:8000/subgraphs/name/squadgames/subgraph'
 
 axios.post(url, { query })
   .then(res => {
@@ -36,6 +37,7 @@ async function licensesOf (address) {
   }`
   try {
     licenses = (await axios.post(url, { query })).data.data.licenses
+    console.log('graph query licenses', licenses)
   } catch (err) {
     console.error('Graph query error', err)
   }

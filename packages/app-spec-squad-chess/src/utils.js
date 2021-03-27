@@ -126,7 +126,7 @@ export const handleLoadLicenses = () => {
   if (state.squad.account) {
     loadLicenses()
       .then(res => {
-        console.log('loaded licenses')
+        console.log('loaded licenses', res)
       })
       .catch(err => {
         console.error(err)
@@ -553,7 +553,7 @@ export const withdrawWithAlerts = async () => {
   )
 }
 
-const handleAlert = (type, text) => {
+export const handleAlert = (type, text) => {
   return () => { alert(type, text) }
 }
 

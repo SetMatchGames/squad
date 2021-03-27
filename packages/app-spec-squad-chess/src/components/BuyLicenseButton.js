@@ -27,7 +27,7 @@ const BuyLicenseButton = {
             buyLicenseWithAlerts(address)
           }
         },
-        `Buy License for ${purchasePrice} MT`
+        `Buy License for ${purchasePrice} XEENUS`
       )
     )
   }

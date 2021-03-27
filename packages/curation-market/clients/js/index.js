@@ -10,23 +10,30 @@ const BondingCurveFactoryJSON = require('./artifacts/BondingCurveFactory.json')
 const ERC20JSON = require('./artifacts/ERC20.json')
 
 /* Ropsten addresses */
+
+const squadControllerAddress = '0xddBc988B7a79915Cf50C8a85a76cd107BC787496'
+const tokenClaimCheckAddress = '0x87Fe1061b0f97A6ea260781647b7704E0f4EA7a2'
+const linearCurveAddress = '0x8907d80aFCA7b80E27f00AFab4c8Ad436Fe67862'
+const bondingCurveFactoryAddress = '0xd2c494178351BB70E051831d160f9D39a59756a5'
+const reserveTokenAddress = '0x7E0480Ca9fD50EB7A3855Cf53c347A1b4d6A2FF5'
+const accountingAddress = '0x013b42567fB46ca97f09F5fd7594a70307DA1700'
 /*
-const squadControllerAddress = '0x998c16377Bf29759C573Aae62ea23bDADba936d3'
-const tokenClaimCheckAddress = '0x917C936370a345E3EC97B134E095F30697524B9d'
-const linearCurveAddress = '0x682e04D70c12e2D4eEeFF82e03e0E0c6EFC97eaf'
-const bondingCurveFactoryAddress = '0x3F3191211352f7b5562D4960f505eF8be77f3b38'
-const reserveTokenAddress = '0x7B16Ef4F69e0858e19294F2c2D9A8530E0a74EBc'
-const accountingAddress = '0x294A2dc8A476dA309Fd6c8C4CB67Dd0cAF769c13'
+ClaimCheck deployed to: 0x87Fe1061b0f97A6ea260781647b7704E0f4EA7a2
+LinearCurve deployed to: 0x8907d80aFCA7b80E27f00AFab4c8Ad436Fe67862
+BondingCurveFactory deployed to: 0xd2c494178351BB70E051831d160f9D39a59756a5
+SquadController deployed to: 0xddBc988B7a79915Cf50C8a85a76cd107BC787496
+Accounting deployed to: 0x013b42567fB46ca97f09F5fd7594a70307DA1700
 */
 
 /* localhost addresses, to be swapped out */
+/*
 const squadControllerAddress = '0x0165878A594ca255338adfa4d48449f69242Eb8F'
 const tokenClaimCheckAddress = '0x5FbDB2315678afecb367f032d93F642f64180aa3'
 const linearCurveAddress = '0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512'
 const bondingCurveFactoryAddress = '0x5FC8d32690cc91D4c39d9d3abcBD16989F875707'
 const reserveTokenAddress = '0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0'
 const accountingAddress = '0x3B02fF1e626Ed7a8fd6eC5299e2C54e1421B626B'
-
+*/
 /*
 const networkIds = {
   'ropsten': 3
@@ -76,7 +83,7 @@ let defaults
 
 let squadController
 let tokenClaimCheck
- let bondingCurveFactory
+let bondingCurveFactory
 let reserveToken
 let accounting
 

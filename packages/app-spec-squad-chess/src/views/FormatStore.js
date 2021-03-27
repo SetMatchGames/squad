@@ -2,6 +2,7 @@ import m from 'mithril'
 import state from '../state.js'
 import Board from '../components/Board.js'
 import Licenses from '../components/Licenses.js'
+import XeenusButton from '../components/XeenusButton.js'
 import { 
   shortHash, 
   handleLoadContributions, 
@@ -24,6 +25,7 @@ const FormatStore = {
     }
     return m(
       '#format-store.body',
+      m(XeenusButton),
       m('h2', 'Choose a Format to Play'),
       m(FormatSearch),
       m(Labels),

@@ -452,7 +452,7 @@ const PurchasePriceField = {
   view: () => {
     return m(
       '.format',
-      'Purchase price (MT): ',
+      'Purchase price (XEENUS): ',
       m(
         'input[type=number][placeholder=0]',
         { oninput: handleSaveFactory('purchasePrice') }

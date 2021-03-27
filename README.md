@@ -69,3 +69,10 @@ In the subgraph, run
 `yarn deploy-local`
 
 To fully shut down, run `docker-compose down` and delete docker/data.
+
+### Deploying to Ropsten
+Xeenus Ropsten address: 0x7E0480Ca9fD50EB7A3855Cf53c347A1b4d6A2FF5
+Send 0 Eth to the Xeenus address to get 1000 Xeenus.
+
+`TREASURY_ADDRESS=[your address] RESERVE_TOKEN_ADDRESS=0x7E0480Ca9fD50EB7A3855Cf53c347A1b4d6A2FF5 ROPSTEN_PRIVATE_KEY=[your Ropsten private key] npm run deploy-ropsten`
+(don't add '0x' to your private key)
