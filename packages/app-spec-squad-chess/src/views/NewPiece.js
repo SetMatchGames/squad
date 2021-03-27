@@ -508,8 +508,12 @@ const handleSubmit = (event) => {
       mechanics[mechanic].push(state.componentForm.mechanics[mechanic][key])
     }
   }
+  console.log('admech', state.componentForm.admechanics)
   Object.keys(state.componentForm.admechanics).forEach(am => {
-    state.componentForm.admechanics[am] = state.componentForm.admechanics[am].split(',')
+    console.log(state.componentForm.admechanics[am], typeof state.componentForm.admechanics[am])
+    if(typeof state.componentForm.admechanics[am] === 'string') {
+      state.componentForm.admechanics[am] = state.componentForm.admechanics[am].split(',')
+    }
   })
   const definition = {
     Component: {
