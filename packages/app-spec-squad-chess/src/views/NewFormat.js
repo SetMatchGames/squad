@@ -454,8 +454,11 @@ const PurchasePriceField = {
       '.format',
       'Purchase price (XEENUS): ',
       m(
-        'input[type=number][placeholder=0]',
-        { oninput: handleSaveFactory('purchasePrice') }
+        'input[type=number]',
+        { 
+          value: state.formatForm.purchasePrice,
+          oninput: handleSaveFactory('purchasePrice') 
+        }
       )
     )
   }
@@ -482,8 +485,11 @@ const FeeField = {
       '.format',
       'Beneficiary fee: ',
       m(
-        'input[type=number][placeholder=0]',
-        { oninput: handleSaveFactory('beneficiaryFee') }
+        'input[type=number]',
+        { 
+          value: state.formatForm.beneficiaryFee,
+          oninput: handleSaveFactory('beneficiaryFee') 
+        }
       ),
       '%'
     )
@@ -542,6 +548,8 @@ function clearForm () {
         white: 2,
         black: 0
       },
+      purchasePrice: '',
+      beneficiaryFee: '',
       initialBuy: 0,
       value: 0,
       boardSize: {}
