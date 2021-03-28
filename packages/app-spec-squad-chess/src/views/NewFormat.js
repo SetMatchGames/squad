@@ -547,6 +547,7 @@ function clearForm () {
       boardSize: {}
     }
   )
+  state.menus.formatFormSquare = ''
 }
 
 const handleSaveFactory = (dataType) => {
