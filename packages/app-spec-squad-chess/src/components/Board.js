@@ -196,17 +196,17 @@ function squareStyle (coordinates, highlighted, lastMove, piece, format, deleted
   if (highlighted === true) {
     // highlighted square styling
     if (piece) {
-      result['background'] = `radial-gradient(${squareColor} 0%, ${squareColor} 80%,  rgb(118,133,40) 80%)`
+      result.background = `radial-gradient(${squareColor} 0%, ${squareColor} 80%,  rgb(118,133,40) 80%)`
     } else {
-      result['background'] = `radial-gradient(rgb(118,133,40) 19%, ${squareColor} 20%)`
+      result.background = `radial-gradient(rgb(118,133,40) 19%, ${squareColor} 20%)`
     }
   } else if (lastMove === true) {
     // styling for last move squares
-    result['filter'] = 'hue-rotate(-20deg)'
+    result.filter = 'hue-rotate(-20deg)'
   } else if (coordinates[0] === state.board.from[0] &&
   coordinates[1] === state.board.from[1]) {
     // styling for selected square
-    result['filter'] = 'hue-rotate(40deg)'
+    result.filter = 'hue-rotate(40deg)'
   }
   return result
 }

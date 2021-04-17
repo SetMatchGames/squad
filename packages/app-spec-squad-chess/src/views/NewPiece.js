@@ -511,7 +511,7 @@ const handleSubmit = (event) => {
   console.log('admech', state.componentForm.admechanics)
   Object.keys(state.componentForm.admechanics).forEach(am => {
     console.log(state.componentForm.admechanics[am], typeof state.componentForm.admechanics[am])
-    if(typeof state.componentForm.admechanics[am] === 'string') {
+    if (typeof state.componentForm.admechanics[am] === 'string') {
       state.componentForm.admechanics[am] = state.componentForm.admechanics[am].split(',')
     }
   })

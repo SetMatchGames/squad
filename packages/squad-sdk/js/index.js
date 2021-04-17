@@ -34,7 +34,7 @@ async function definition (
   confirmationCb,
   opts = {}
 ) {
-  const bondId = '0x'+crypto.createHash('sha256').update(JSON.stringify(definition)).digest('hex')
+  const bondId = '0x' + crypto.createHash('sha256').update(JSON.stringify(definition)).digest('hex')
   await curationMarket.newContribution(
     bondId,
     feeRate,
@@ -47,14 +47,14 @@ async function definition (
 }
 
 async function getFormats () {
-  return await getContributions('Format')
+  return getContributions('Format')
 }
 
 async function getComponents () {
-  return await getContributions('Component')
+  return getContributions('Component')
 }
 
-async function getContributions(type) {
+async function getContributions (type) {
   const ethers = curationMarket.getEthers()
   const contributions = await graphQueries.contributions()
   const results = []
@@ -88,9 +88,9 @@ async function getLicenses (address) {
   const licenses = await graphQueries.licensesOf(address)
   console.log('licenses raw', licenses)
   const dict = {}
-  for(let i = 0; i < licenses.length; i++) {
+  for (let i = 0; i < licenses.length; i++) {
     const l = licenses[i]
-    if(!dict[l.contribution.id]) { dict[l.contribution.id] = [] }
+    if (!dict[l.contribution.id]) { dict[l.contribution.id] = [] }
     l.sellAmount = await sellAmount(l.amount, l.contribution.supply, l.contribution.feeRate)
     dict[l.contribution.id].push(l)
   }

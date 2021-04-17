@@ -6,7 +6,7 @@ import squad, { curationMarket } from '@squad/sdk'
 // import defs from '../scripts/load_development_defs.js'
 
 import state from './state.js'
-import settings from './settings.js'
+// import settings from './settings.js'
 import { stringToSquare } from './rules.js'
 
 export const shortHash = (str) => {
@@ -57,7 +57,7 @@ const loadContributions = async () => {
   state.squad.orderedFormats.forEach(f => {
     state.squad.rawFormats[f.id] = Object.assign({},
       f.definition.Format,
-      { 
+      {
         fee: f.feeRate,
         purchasePrice: f.purchasePrice
       }
@@ -69,7 +69,7 @@ const loadContributions = async () => {
   state.squad.orderedComponents.forEach(c => {
     state.squad.components[c.id] = Object.assign({},
       c.definition.Component,
-      { 
+      {
         fee: c.feeRate,
         purchasePrice: c.purchasePrice
       }
@@ -77,7 +77,7 @@ const loadContributions = async () => {
   })
 
   const params = (new URL(document.location)).searchParams
-  if (params.get('format')) { 
+  if (params.get('format')) {
     state.markets.idToSearch = params.get('format')
     if (state.squad.rawFormats[state.markets.idToSearch]) {
       console.log('setting searched format', state.markets.idToSearch)
@@ -114,7 +114,7 @@ const loadContribution = async (id) => {
   if (!f.definition.Format) { return }
   state.squad.rawFormats[f.id] = Object.assign({},
     f.definition.Format,
-    { 
+    {
       fee: f.feeRate,
       purchasePrice: f.purchasePrice
     }
@@ -148,7 +148,6 @@ const loadLicenses = async () => {
 }
 
 export const refreshSquad = (callback) => {
-
   // skip if we've already connected to Squad
   if (state.squad.account === 'connected') {
     console.log('Skipping on open')
@@ -169,7 +168,7 @@ export const refreshSquad = (callback) => {
         }
 
         // make sure all stored defs and defaults are on Ethereum
-        const localDefs = [/*...defaultDefs,*/ ...storedDefs]
+        const localDefs = [...storedDefs]
         console.log('local defs', localDefs)
         // multiDefinition(localDefs)
 
@@ -328,6 +327,7 @@ async function web3connection () {
   m.redraw()
 }
 
+/*
 async function multiDefinition (defs) {
   // submit the default definitions to make sure they have bonds on ethereum
   await Promise.all(defs.map(async (def) => {
@@ -346,6 +346,7 @@ function refreshLocalStorage (formatDefs, componentDefs) {
   console.log('local Catalog size', localCatalog.length)
   localStorage.setItem('localDefinitions', JSON.stringify(localCatalog))
 }
+*/
 
 export const getMarketInfo = () => {
   refreshSquad(async () => {

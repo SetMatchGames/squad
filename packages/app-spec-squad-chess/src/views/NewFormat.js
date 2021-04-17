@@ -455,9 +455,9 @@ const PurchasePriceField = {
       'Purchase price (XEENUS): ',
       m(
         'input[type=number]',
-        { 
+        {
           value: state.formatForm.purchasePrice,
-          oninput: handleSaveFactory('purchasePrice') 
+          oninput: handleSaveFactory('purchasePrice')
         }
       )
     )
@@ -486,9 +486,9 @@ const FeeField = {
       'Beneficiary fee: ',
       m(
         'input[type=number]',
-        { 
+        {
           value: state.formatForm.beneficiaryFee,
-          oninput: handleSaveFactory('beneficiaryFee') 
+          oninput: handleSaveFactory('beneficiaryFee')
         }
       ),
       '%'

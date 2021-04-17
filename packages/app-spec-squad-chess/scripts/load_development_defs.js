@@ -1,6 +1,6 @@
 /* global process require */
 
-// const { createDefinition } = require('@squad/sdk').metastore
+const { createDefinition } = require('@squad/sdk').metastore
 
 process.on('unhandledRejection', r => console.log(r))
 

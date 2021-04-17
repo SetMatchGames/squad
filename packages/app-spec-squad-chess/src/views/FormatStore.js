@@ -3,11 +3,11 @@ import state from '../state.js'
 import Board from '../components/Board.js'
 import Licenses from '../components/Licenses.js'
 import XeenusButton from '../components/XeenusButton.js'
-import { 
-  shortHash, 
-  handleLoadContributions, 
-  handleLoadLicenses, 
-  previewFormat 
+import {
+  shortHash,
+  handleLoadContributions,
+  handleLoadLicenses,
+  previewFormat
 } from '../utils.js'
 
 const FormatStore = {
@@ -51,7 +51,7 @@ const FormatSearch = {
     return m(
       '.search-bar',
       m(
-        'input[type=text]', 
+        'input[type=text]',
         { value: state.markets.idToSearch, oninput: handleSaveSearch },
         'Enter ID'
       ),

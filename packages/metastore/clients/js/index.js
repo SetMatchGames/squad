@@ -64,7 +64,7 @@ async function getAllDefinitionsOfType (catalogType) {
     { catalog_type: catalogType }
   )
   const definitions = {}
-  for (d in rawDefinitions) {
+  for (const d in rawDefinitions) {
     definitions[`0x${d}`] = rawDefinitions[d]
   }
   return definitions
@@ -77,7 +77,7 @@ async function getDefinitionsFromCatalog (catalogType, catalogName) {
     { catalog_type: catalogType, catalog_name: catalogName }
   )
   const definitions = {}
-  for (d in rawDefinitions) {
+  for (const d in rawDefinitions) {
     definitions[`0x${d}`] = rawDefinitions[d]
   }
   return definitions
