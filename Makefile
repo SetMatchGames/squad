@@ -15,7 +15,7 @@ matchmaking = packages/matchmaking/server
 metastore-shell = cd $(metastore) && nix-shell https://holochain.love --pure --command
 
 .PHONY: ci
-ci: metastore-tests mock-metastore-tests squad-chess-tests sdk-js-tests matchmaking-js-tests matchmaking-tests
+ci: squad-chess-tests sdk-js-tests matchmaking-js-tests matchmaking-tests
 
 .PHONY: squad-games-web
 squad-games-web: build/metastore

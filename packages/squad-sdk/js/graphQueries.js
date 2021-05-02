@@ -20,7 +20,6 @@ axios.post(url, { query })
     console.error('Axios error:', err)
   })
 
-
 async function licensesOf (address) {
   let licenses
   const query = `{
