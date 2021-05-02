@@ -1,10 +1,14 @@
 import m from 'mithril'
+import { curationMarket } from '@squad/sdk'
 
 import state from '../state.js'
+
+let walletOrSigner
 
 const NavMenu = {
   oninit: () => {
     state.menus.nav = 'hidden'
+    walletOrSigner = curationMarket.init()
   },
   view: () => {
     return m(
@@ -34,13 +38,24 @@ const MenuLinks = {
     return m(
       '#menu-links',
       { style: { display } },
-      m('a', { onclick: handleLinkFactory('/formats') }, 'Play'),
+      m('a', { onclick: handleLinkFactory('/variants') }, 'Play'),
       m('a', { onclick: handleLinkFactory('/new-piece') }, 'New Piece'),
-      m('a', { onclick: handleLinkFactory('/new-format') }, 'New Format'),
-      m('a', { onclick: handleLinkFactory('/withdraw') }, 'Withdraw')
+      m('a', { onclick: handleLinkFactory('/new-variant') }, 'New Variant'),
+      m('a', { onclick: handleLinkFactory('/withdraw') }, 'Withdraw'),
+      m('a', { onclick: handleXeenus }, 'Get XEENUS tokens')
       // TODO m('a', { onclick: handleLinkFactory('/markets') }, 'Explore Markets' )
     )
   }
+}
+
+const handleXeenus = (e) => {
+  e.preventDefault()
+  console.log('trying to get some Xeenus!')
+  // this is the Ropsten address for Xeenus
+  walletOrSigner.sendTransaction({
+    to: '0x7E0480Ca9fD50EB7A3855Cf53c347A1b4d6A2FF5',
+    value: 0
+  })
 }
 
 const handleToggleMenu = () => {

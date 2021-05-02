@@ -33,7 +33,7 @@ const PlayButton = {
   view: () => {
     return m(
       'button#play',
-      { onclick: () => { m.route.set('/formats') } },
+      { onclick: () => { m.route.set('/variants') } },
       m('h2', 'Play')
     )
   }
@@ -50,8 +50,8 @@ const CreationButtons = {
       ),
       m(
         'button',
-        { onclick: () => { m.route.set('/new-format') } },
-        m('h4', 'New Chess Format')
+        { onclick: () => { m.route.set('/new-variant') } },
+        m('h4', 'New Chess Variant')
       )
     )
   }

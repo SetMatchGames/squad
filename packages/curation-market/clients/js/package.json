@@ -4,7 +4,7 @@
   "description": "Client-side node library for interacting with squad curation market smart contracts",
   "main": "index.js",
   "scripts": {
-    "test": "jest"
+    "test": "NETWORK=development jest"
   },
   "dependencies": {
     "@truffle/contract": "^4.1.13",

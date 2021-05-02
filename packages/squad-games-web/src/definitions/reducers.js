@@ -9,18 +9,18 @@ import {
 
 import { catalogKey } from './utils'
 
-function newCatalog() {
+function newCatalog () {
   return {
-    name: "",
-    definitionType: "",
+    name: '',
+    definitionType: '',
     waiting: false,
     definitions: [],
-    status: "INITIAL"
+    status: 'INITIAL'
   }
 }
 
-function catalog(state = newCatalog(), action) {
-  function actionInfo(action) {
+function catalog (state = newCatalog(), action) {
+  function actionInfo (action) {
     return {
       name: action.name,
       definitionType: action.definitionType,
@@ -29,58 +29,58 @@ function catalog(state = newCatalog(), action) {
   }
 
   let newState
-  switch(action.type) {
-  case REQUEST_CATALOG:
-    newState = Object.assign({}, state, actionInfo(action), {waiting: true})
-    break
+  switch (action.type) {
+    case REQUEST_CATALOG:
+      newState = Object.assign({}, state, actionInfo(action), { waiting: true })
+      break
 
-  case RECEIVE_CATALOG:
-    console.log("received catalog:", action.definitions)
-    newState = Object.assign(
-      {},
-      state,
-      actionInfo(action),
-      {waiting: false, definitions: action.definitions}
-    )
-    break
+    case RECEIVE_CATALOG:
+      console.log('received catalog:', action.definitions)
+      newState = Object.assign(
+        {},
+        state,
+        actionInfo(action),
+        { waiting: false, definitions: action.definitions }
+      )
+      break
 
-  case CATALOG_FAILURE:
-    newState = Object.assign(
-      {},
-      state,
-      actionInfo(action),
-      {waiting: false, error: action.error}
-    )
-    console.error(action.error)
-    break
+    case CATALOG_FAILURE:
+      newState = Object.assign(
+        {},
+        state,
+        actionInfo(action),
+        { waiting: false, error: action.error }
+      )
+      console.error(action.error)
+      break
 
-  case CREATE_DEFINITION_SUCCESS:
-    console.log("Definition created:", action.definition)
-    newState = Object.assign(
-      {},
-      state,
-      actionInfo(action)
-    )
-    newState.definitions.push({ definition: action.definition, key: action.key})
-    break
+    case CREATE_DEFINITION_SUCCESS:
+      console.log('Definition created:', action.definition)
+      newState = Object.assign(
+        {},
+        state,
+        actionInfo(action)
+      )
+      newState.definitions.push({ definition: action.definition, key: action.key })
+      break
 
-  case CREATE_DEFINITION_FAILURE:
-    console.log("Definition creation failed:", action.error, action.definition)
-    newState = Object.assign(
-      {},
-      state,
-      actionInfo(action)
-    )
-    break
+    case CREATE_DEFINITION_FAILURE:
+      console.log('Definition creation failed:', action.error, action.definition)
+      newState = Object.assign(
+        {},
+        state,
+        actionInfo(action)
+      )
+      break
 
-  default:
-    return state
+    default:
+      return state
   }
   return newState
 }
 
-export function catalogs(state = {}, action) {
-  let key = "Last Action"
+export function catalogs (state = {}, action) {
+  let key = 'Last Action'
   const catActions = [
     CREATE_DEFINITION_SUCCESS,
     CREATE_DEFINITION_FAILURE,
@@ -101,22 +101,22 @@ export function catalogs(state = {}, action) {
   return Object.assign({}, state)
 }
 
-export function definitionForm(state = {}, action) {
-  const fields = ["name"]
-  switch(action.type) {
+export function definitionForm (state = {}, action) {
+  const fields = ['name']
+  switch (action.type) {
     case SWITCH_DEFINITION_FORM:
-      switch(action.definitionType) {
-        case "Game":
-          fields.push("type", "data")
+      switch (action.definitionType) {
+        case 'Game':
+          fields.push('type', 'data')
           break
-        case "Format":
-          fields.push("components")
+        case 'Format':
+          fields.push('components')
           break
-        case "Component":
-          fields.push("type", "data")
+        case 'Component':
+          fields.push('type', 'data')
           break
         default:
-          fields.push("type", "components", "data")
+          fields.push('type', 'components', 'data')
       }
       state = { type: action.definitionType, fields }
       break

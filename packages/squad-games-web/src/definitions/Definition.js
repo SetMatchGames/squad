@@ -1,8 +1,8 @@
 import React from 'react'
 
-import { runGame } from "@squad/sdk"
+import { runGame } from '@squad/sdk'
 
-function DefinitionInfo(props) {
+function DefinitionInfo (props) {
   return (
     <div>
       {Object.keys(props.definition).map((fieldName, n) => {
@@ -20,49 +20,48 @@ function DefinitionInfo(props) {
   )
 }
 
-export function Definition(props) {
-
+export function Definition (props) {
   const handleRunGame = (_) => {
     runGame(props.definition)
   }
 
-  if (props.definition["Game"] !== undefined) {
+  if (props.definition.Game !== undefined) {
     let launchButton = null
-    if (props.definition["Game"]["type_"] === "web-game-v0") {
-      launchButton = <input type="submit" value="Launch" className="Launch-button" onClick={handleRunGame} />
+    if (props.definition.Game.type_ === 'web-game-v0') {
+      launchButton = <input type='submit' value='Launch' className='Launch-button' onClick={handleRunGame} />
     }
 
     return (
-      <div className="Definition" key={props.key}>
+      <div className='Definition' key={props.key}>
         <DefinitionInfo definition={props.definition.Game} address={props.key} />
         {launchButton}
-        <br/>
+        <br />
       </div>
     )
   }
 
-  if (props.definition["Format"] !== undefined) {
+  if (props.definition.Format !== undefined) {
     return (
-      <div className="Definition" key={props.key}>
+      <div className='Definition' key={props.key}>
         <DefinitionInfo definition={props.definition.Format} address={props.key} />
-        <br/>
+        <br />
       </div>
     )
   }
 
-  if (props.definition["Component"] !== undefined) {
+  if (props.definition.Component !== undefined) {
     return (
-      <div className="Definition" key={props.key}>
+      <div className='Definition' key={props.key}>
         <DefinitionInfo definition={props.definition.Component} address={props.key} />
-        <br/>
+        <br />
       </div>
     )
   }
 
   return (
-    <div className="Definition" key={props.key}>
+    <div className='Definition' key={props.key}>
       {JSON.stringify(props)}
-      <br/>
+      <br />
     </div>
   )
 }

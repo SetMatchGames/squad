@@ -1,7 +1,7 @@
 import m from 'mithril'
 
 import state from '../state.js'
-import ConnectButton from  './ConnectButton.js'
+import ConnectButton from './ConnectButton.js'
 
 const ConnectModal = {
   view: () => {

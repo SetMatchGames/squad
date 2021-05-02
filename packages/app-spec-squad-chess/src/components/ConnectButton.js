@@ -1,5 +1,7 @@
+/* global ethereum location */
+
 import m from 'mithril'
-import state from '../state';
+import state from '../state'
 
 import { shortHash } from '../utils.js'
 
@@ -38,14 +40,14 @@ const connectHandler = (event) => {
   event.preventDefault()
   try {
     ethereum.request({ method: 'eth_requestAccounts' })
-    .then(accounts => {
-      state.squad.account = accounts[0]
-      state.squad.connection = 'connected'
-      console.log('Squad Connection:', state.squad.connection)
-      location.reload()
-    })
+      .then(accounts => {
+        state.squad.account = accounts[0]
+        state.squad.connection = 'connected'
+        console.log('Squad Connection:', state.squad.connection)
+        location.reload()
+      })
     state.squad.connection = 'connecting'
-  } catch(e) {
+  } catch (e) {
     console.error('Connection error', e)
     state.squad.connection = 'not connected'
   }

@@ -1,10 +1,10 @@
 import m from 'mithril'
 
 import Home from './views/Home.js'
-import FormatStore from './views/FormatStore.js'
+import VariantStore from './views/VariantStore.js'
 import Matchmaking from './views/Matchmaking.js'
 import Play from './views/Play.js'
-import NewFormat from './views/NewFormat.js'
+import NewVariant from './views/NewVariant.js'
 import NewPiece from './views/NewPiece.js'
 import Withdraw from './views/Withdraw.js'
 
@@ -103,10 +103,10 @@ const hideMenus = () => {
 
 m.route(document.body, '/', {
   '/': { render: () => { return m(LandingPage) } },
-  '/formats': layout(FormatStore),
-  '/matchmaking/:formatAddress': layout(Matchmaking),
+  '/variants': layout(VariantStore),
+  '/matchmaking/:variantAddress': layout(Matchmaking),
   '/play': layout(Play),
   '/new-piece': layout(NewPiece),
-  '/new-format': layout(NewFormat),
+  '/new-variant': layout(NewVariant),
   '/withdraw': layout(Withdraw)
 })

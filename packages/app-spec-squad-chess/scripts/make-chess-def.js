@@ -72,9 +72,9 @@ const TYPES = {
         '7' // reverse negative both
       ]
     }
-    var offsets = []
+    const offsets = []
     rotations.forEach(rotation => {
-      var [a, b] = [...[rise, run]]
+      let [a, b] = [...[rise, run]]
       switch (rotation) {
         case '0': // forward no negative
           break

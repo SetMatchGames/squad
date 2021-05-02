@@ -49,3 +49,30 @@ contributors to Squad as of October, 2019, are:
  We also stream development at
  [twitch.tv/setmatchgames](https://www.twitch.tv/setmatchgames)!
  Streams generally happen every Saturday from 11:30 AM - 2:30 PM EST.
+
+## Dev environment instructions
+`npx hardhat node` in SquadGames/Squad
+- (get info on the graph-compatible hardhat fork here)
+`TREASURY_ADDRESS=0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266 USER_ADDRESS=0x70997970c51812dc3a010c7d01b50e0d17dc79c8 npm run deploy-local` in SquadGames/Squad, 2nd tab
+`make squad-chess`
+
+### Using local subgraph
+Run dev env as above.
+
+Make sure `network` in subgraph manifest is `mainnet`.
+
+Run `docker-compose up`
+
+In the subgraph, run
+`yarn codegen`
+`graph create --node http://localhost:8020/ squadgames/subgraph`
+`yarn deploy-local`
+
+To fully shut down, run `docker-compose down` and delete docker/data.
+
+### Deploying to Ropsten
+Xeenus Ropsten address: 0x7E0480Ca9fD50EB7A3855Cf53c347A1b4d6A2FF5
+Send 0 Eth to the Xeenus address to get 1000 Xeenus.
+
+`TREASURY_ADDRESS=[your address] RESERVE_TOKEN_ADDRESS=0x7E0480Ca9fD50EB7A3855Cf53c347A1b4d6A2FF5 ROPSTEN_PRIVATE_KEY=[your Ropsten private key] npm run deploy-ropsten`
+(don't add '0x' to your private key)

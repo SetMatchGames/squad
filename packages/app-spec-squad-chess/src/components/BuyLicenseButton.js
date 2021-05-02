@@ -5,14 +5,14 @@ import state from '../state.js'
 
 const BuyLicenseButton = {
   oninit: (vnode) => {
-    const purchasePrice = state.squad.rawFormats[vnode.attrs.address].purchasePrice
+    const purchasePrice = state.squad.rawVariants[vnode.attrs.address].purchasePrice
     state.buyingAndSelling[`buyLicense${vnode.attrs.address}`] = purchasePrice
   },
   view: (vnode) => {
     const address = vnode.attrs.address
     const purchasePrice = state.buyingAndSelling[`buyLicense${vnode.attrs.address}`]
     return m(
-      'form.buy-license',
+      '.buy-license',
       /*
       m(
         'input[type=number]',
@@ -27,7 +27,7 @@ const BuyLicenseButton = {
             buyLicenseWithAlerts(address)
           }
         },
-        `Buy License for ${purchasePrice} MT`
+        `Buy copy for ${purchasePrice} XEENUS`
       )
     )
   }

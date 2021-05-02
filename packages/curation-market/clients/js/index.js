@@ -1,25 +1,44 @@
 /* global require module web3 */
 
 const ethers = require('ethers')
-const AutoBondJSON = require("../../app/build/contracts/AutoBond.json")
-const CurveJSON = require("../../app/build/contracts/Curve.json")
-const SimpleLinearCurveJSON = require("../../app/build/contracts/SimpleLinearCurve.json")
-const SquadControllerJSON = require("./artifacts/SquadController.json")
-const TokenClaimCheckJSON = require("./artifacts/TokenClaimCheck.json")
-const AccountingJSON = require("./artifacts/Accounting.json")
-const LinearCurveJSON = require("./artifacts/LinearCurve.json")
-const BondingCurveFactoryJSON = require("./artifacts/BondingCurveFactory.json")
-const ERC20JSON = require("./artifacts/ERC20.json")
-const squadControllerAddress = '0x998c16377Bf29759C573Aae62ea23bDADba936d3'
-const tokenClaimCheckAddress = '0x917C936370a345E3EC97B134E095F30697524B9d'
-const linearCurveAddress = '0x682e04D70c12e2D4eEeFF82e03e0E0c6EFC97eaf'
-const bondingCurveFactoryAddress = '0x3F3191211352f7b5562D4960f505eF8be77f3b38'
-const reserveTokenAddress = '0x7B16Ef4F69e0858e19294F2c2D9A8530E0a74EBc'
-const accountingAddress = '0x294A2dc8A476dA309Fd6c8C4CB67Dd0cAF769c13'
 
+const SquadControllerJSON = require('./artifacts/SquadController.json')
+const TokenClaimCheckJSON = require('./artifacts/TokenClaimCheck.json')
+const AccountingJSON = require('./artifacts/Accounting.json')
+const LinearCurveJSON = require('./artifacts/LinearCurve.json')
+const BondingCurveFactoryJSON = require('./artifacts/BondingCurveFactory.json')
+const ERC20JSON = require('./artifacts/ERC20.json')
+
+/* Ropsten addresses */
+
+const squadControllerAddress = '0xddBc988B7a79915Cf50C8a85a76cd107BC787496'
+const tokenClaimCheckAddress = '0x87Fe1061b0f97A6ea260781647b7704E0f4EA7a2'
+const linearCurveAddress = '0x8907d80aFCA7b80E27f00AFab4c8Ad436Fe67862'
+const bondingCurveFactoryAddress = '0xd2c494178351BB70E051831d160f9D39a59756a5'
+const reserveTokenAddress = '0x7E0480Ca9fD50EB7A3855Cf53c347A1b4d6A2FF5'
+const accountingAddress = '0x013b42567fB46ca97f09F5fd7594a70307DA1700'
+/*
+ClaimCheck deployed to: 0x87Fe1061b0f97A6ea260781647b7704E0f4EA7a2
+LinearCurve deployed to: 0x8907d80aFCA7b80E27f00AFab4c8Ad436Fe67862
+BondingCurveFactory deployed to: 0xd2c494178351BB70E051831d160f9D39a59756a5
+SquadController deployed to: 0xddBc988B7a79915Cf50C8a85a76cd107BC787496
+Accounting deployed to: 0x013b42567fB46ca97f09F5fd7594a70307DA1700
+*/
+
+/* localhost addresses, to be swapped out */
+/*
+const squadControllerAddress = '0x0165878A594ca255338adfa4d48449f69242Eb8F'
+const tokenClaimCheckAddress = '0x5FbDB2315678afecb367f032d93F642f64180aa3'
+const linearCurveAddress = '0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512'
+const bondingCurveFactoryAddress = '0x5FC8d32690cc91D4c39d9d3abcBD16989F875707'
+const reserveTokenAddress = '0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0'
+const accountingAddress = '0x3B02fF1e626Ed7a8fd6eC5299e2C54e1421B626B'
+*/
+/*
 const networkIds = {
   'ropsten': 3
 }
+*/
 
 function bnsqrt (a, precision) {
   precision = precision <= 0 ? 1 : precision
@@ -53,16 +72,13 @@ function linearCurveAmount (s, p) {
   return a.add(precision)
 }
 
-const network = 'ropsten'
+const network = process.env.NETWORK
 const devUrl = 'http://localhost:8545'
 
 let initialized = false
 let provider
 let walletOrSigner
-let autoBond
-let curve, linearCurve // linear curve is the new practical curve
-let autoBondAddress
-let simpleLinearCurveAddress
+let linearCurve
 let defaults
 
 let squadController
@@ -79,24 +95,17 @@ function init (defaults) {
 
   switch (network) {
     case 'development': {
-      // I think this might not be working right -- maybe instead we should be creating a wallet using one of the ganache keys
       provider = new ethers.providers.JsonRpcProvider(devUrl)
       walletOrSigner = provider.getSigner(0)
-      const mostRecentDevnet = Object.keys(AutoBondJSON.networks).pop()
-      autoBondAddress = AutoBondJSON.networks[mostRecentDevnet].address
-      simpleLinearCurveAddress = SimpleLinearCurveJSON.networks[mostRecentDevnet].address
       break
     }
     default: {
       console.log('Trying to make provider...')
       provider = new ethers.providers.Web3Provider(web3.currentProvider)
       walletOrSigner = provider.getSigner()
-      autoBondAddress = AutoBondJSON.networks[networkIds[network]].address
-      simpleLinearCurveAddress = SimpleLinearCurveJSON.networks[networkIds[network]].address
     }
   }
-  autoBond = new ethers.Contract(autoBondAddress, AutoBondJSON.abi, walletOrSigner)
-  curve = new ethers.Contract(simpleLinearCurveAddress, CurveJSON.abi, walletOrSigner)
+
   linearCurve = new ethers.Contract(linearCurveAddress, LinearCurveJSON.abi, walletOrSigner)
   bondingCurveFactory = new ethers.Contract(bondingCurveFactoryAddress, BondingCurveFactoryJSON.abi, walletOrSigner)
   squadController = new ethers.Contract(
@@ -107,7 +116,6 @@ function init (defaults) {
   )
   reserveToken = new ethers.Contract(reserveTokenAddress, ERC20JSON.abi, walletOrSigner)
   accounting = new ethers.Contract(accountingAddress, AccountingJSON.abi, walletOrSigner)
-  
 
   if (defaults === undefined) {
     defaults = {
@@ -124,9 +132,9 @@ function init (defaults) {
 }
 
 class BondAlreadyExists extends Error {
-  constructor(message) {
+  constructor (message) {
     super(message)
-    this.name = "BondAlreadyExists"
+    this.name = 'BondAlreadyExists'
   }
 }
 
@@ -135,24 +143,29 @@ async function networkFeeRate () {
   return await squadController.networkFeeRate()
 }
 
-// Replaces newBond
 async function newContribution (
   contributionId,
   feeRate,
   purchasePrice,
+  metadata,
   submissionCb,
   confirmationCb,
   options
 ) {
   init()
   const walletAddress = await walletOrSigner.getAddress()
-  const fullOptions = Object.assign({}, defaults, options, {gasLimit: 4712357})
+  const fullOptions = Object.assign({}, defaults, options, { gasLimit: 4712357 })
   const name = `Squad Chess ${contributionId}`
   const symbol = `sc${contributionId.substring(0, 3).toUpperCase()}`
   purchasePrice = ethers.utils.parseEther(`${purchasePrice}`)
-  const metadata = JSON.stringify({game: "Squad Chess", experiment: true})
+  metadata = JSON.stringify(metadata)
+  if (await squadController.exists(contributionId)) {
+    // throw new BondAlreadyExists('Contribution ID already exists')
+    console.error('BondAlreadyExists: Contribution ID already exists')
+    return
+  }
   const tx = await squadController.newContribution(
-    ethers.utils.id(contributionId),
+    contributionId,
     walletAddress,
     feeRate,
     purchasePrice,
@@ -165,66 +178,29 @@ async function newContribution (
   return handleConfirmationCallback(tx.hash, confirmationCb)
 }
 
-async function newBond (
-  bondId,
-  initialBuyNumber,
-  submissionCb,
-  confirmationCb,
-  options = {},
-  addressOfCurve
-) {
+async function totalSupplyOf (contributionId) /* returns BigNumber */ {
   init()
-  if (!addressOfCurve || addressOfCurve === '0x0000000000000000000000000000000000000000') {
-    addressOfCurve = simpleLinearCurveAddress
-  }
-  const bondHash = ethers.utils.id(bondId)
-  const fullOptions = Object.assign({}, defaults, options)
-  const curve = await autoBond.getCurve(bondHash)
-  if (curve === '0x0000000000000000000000000000000000000000') {
-    const tx = await autoBond.newBond(
-      addressOfCurve,
-      bondHash,
-      initialBuyNumber,
-      fullOptions
-    )
-    submissionCb(tx)
-    return handleConfirmationCallback(tx.hash, confirmationCb)
-  }
+  return await squadController.totalSupplyOf(contributionId)
 }
 
-// replaces getSupply
-async function totalSupplyOf(contributionId) /* returns BigNumber */ {
-  init()
-  const bytes32Id = ethers.utils.id(contributionId)
-  return await squadController.totalSupplyOf(bytes32Id)
-}
-
-async function getSupply (bondId) {
-  init()
-  const bondHash = ethers.utils.id(bondId)
-  return Number(await autoBond.getSupply(bondHash))
-}
-
-async function getLicenseInfo(licenseId) {
-  const bytes32Id = await squadController.validLicenses(licenseId)
-  // const contributionId = ethers.utils.parseBytes32String(bytes32Id)
-  if (bytes32Id === '') {
+async function getLicenseInfo (licenseId) {
+  const contributionId = await squadController.validLicenses(licenseId)
+  if (contributionId === '') {
     return false
   }
-  const [beneficiary, feeRate, purchasePrice] = await squadController.contributions(bytes32Id)
-  const contribution = {beneficiary, feeRate, purchasePrice}
+  const [beneficiary, feeRate, purchasePrice] = await squadController.contributions(contributionId)
+  const contribution = { beneficiary, feeRate, purchasePrice }
   if (contribution.beneficiary === ethers.constants.AddressZero) {
     return false
   }
   const [token, amount] = await tokenClaimCheck.claims(licenseId)
-  const claim = {token, amount}
+  const claim = { token, amount }
   const sellStrings = (await licenseSellPrice(licenseId, feeRate)).split('.')
-  sellAmount = `${sellStrings[0]}.${sellStrings[1].slice(0, 2)}`
-  // sell amount is not correct! it should always be 10.0 right after buying
+  const sellAmount = `${sellStrings[0]}.${sellStrings[1].slice(0, 2)}`
   if (token === ethers.constants.AddressZero) {
     return false
   }
-  return { licenseId, contributionId: bytes32Id, contribution, claim, sellAmount }
+  return { licenseId, contributionId, contribution, claim, sellAmount }
 }
 
 /**
@@ -235,12 +211,8 @@ async function getLicenseInfo(licenseId) {
  *   contributionId: [licenseInfo]
  * }
  */
-// Rough way to convert metastore addresses to contribution IDs (we don't want this to require a conversion like this)
-function id (metastoreAddress) {
-  return ethers.utils.id(metastoreAddress)
-}
 
-async function getValidLicenses(holderAddress) {
+async function getValidLicenses (holderAddress) {
   init()
   if (!holderAddress) { holderAddress = await walletOrSigner.getAddress() }
   const licenseBalance = parseInt((await tokenClaimCheck.balanceOf(holderAddress)).toString(), 10)
@@ -252,7 +224,7 @@ async function getValidLicenses(holderAddress) {
   const validLicenses = {}
   await Promise.all(licenseIds.map(async (licenseId) => {
     const licenseInfo = await getLicenseInfo(licenseId)
-    if(!licenseInfo) {
+    if (!licenseInfo) {
       // NFT is not a valid squad license
       return
     }
@@ -264,52 +236,42 @@ async function getValidLicenses(holderAddress) {
   return validLicenses
 }
 
-// replaces getBalance
-async function holdsLicenseFor(contributionId, holderAddress) {
+async function holdsLicenseFor (contributionId, holderAddress) {
   init()
+  if (!holderAddress) { holderAddress = await walletOrSigner.getAddress() }
   const validLicenses = (await getValidLicenses(holderAddress))[contributionId] || []
-  for (let i=0; i<validLicenses.length; i++) {
+  for (let i = 0; i < validLicenses.length; i++) {
     const holdsLicense = await squadController.holdsLicense(
-      ethers.utils.id(contributionId),
+      contributionId,
       validLicenses[i].licenseId,
       holderAddress
     )
-    if(holdsLicense) {
+    if (holdsLicense) {
       return true
     }
   }
   return false
 }
 
-async function getBalance (bondId, holderAddress) {
-  init()
-  await window.ethereum.enable()
-  holderAddress = holderAddress ? holderAddress : await walletOrSigner.getAddress()
-  const bondHash = ethers.utils.id(bondId)
-  return (await autoBond.getBalance(bondHash, holderAddress)).toNumber()
-}
-
-// replaces buy
-async function buyLicense(
+async function buyLicense (
   contributionId,
   submissionCb,
   confirmationCb,
-  amount = "auto",
+  amount = 'auto',
   maxPriceBP = 100 // number of basis points max should be above price shown
 ) {
   init()
-  const bytes32Id = ethers.utils.id(contributionId)
   const purchasePrice = (
-    await squadController.contributions(bytes32Id)
+    await squadController.contributions(contributionId)
   ).purchasePrice
   let buyPrice = purchasePrice
   const supply = await totalSupplyOf(contributionId)
-  if (amount === "auto") {
+  if (amount === 'auto') {
     amount = linearCurveAmount(supply, purchasePrice)
   } else {
     buyPrice = await priceOf(contributionId, amount)
     if (buyPrice.lt(purchasePrice)) {
-      throw new Error("amount too low to buy a valid license")
+      throw new Error('amount too low to buy a valid license')
     }
   }
   const maxPriceBuffer = buyPrice.mul(maxPriceBP).div(10000)
@@ -317,29 +279,16 @@ async function buyLicense(
   const approveTx = await reserveToken.approve(bondingCurveFactoryAddress, maxPrice)
   await provider.waitForTransaction(approveTx.hash)
   const tx = await squadController.buyLicense(
-    bytes32Id,
+    contributionId,
     amount,
     maxPrice,
-    {gasLimit: 4000000}
+    { gasLimit: 4000000 }
   )
   submissionCb(tx)
   return handleConfirmationCallback(tx.hash, confirmationCb)
 }
 
-async function buy (units, bondId, submissionCb, confirmationCb, options = {}) {
-  init()
-  const bondHash = ethers.utils.id(bondId)
-  const fullOptions = Object.assign({}, defaults, options)
-  const tx = await autoBond.buy(
-    units,
-    bondHash,
-    fullOptions
-  )
-  submissionCb(tx)
-  return handleConfirmationCallback(tx.hash, confirmationCb)
-}
-
-async function redeemLicense(licenseId, submissionCb, confirmationCb) {
+async function redeemLicense (licenseId, submissionCb, confirmationCb) {
   init()
   const tx = await tokenClaimCheck.redeem(licenseId)
   submissionCb(tx)
@@ -365,14 +314,13 @@ async function sellTokens (
   return handleConfirmationCallback(tx.hash, confirmationCb)
 }
 
-// replaces sell
-async function redeemAndSell(
+async function redeemAndSell (
   licenseId,
   minPrice,
   redeemSubmissionCb,
   redeemConfirmationCb,
   sellSubmissionCb,
-  sellConfirmationCb,
+  sellConfirmationCb
 ) {
   init()
   const claim = await tokenClaimCheck.claims(licenseId)
@@ -380,111 +328,63 @@ async function redeemAndSell(
   await redeemLicense(
     licenseId,
     redeemSubmissionCb,
-    redeemConfirmationCb,
+    redeemConfirmationCb
   )
+  console.log('sell pricing', await sellPriceFor(contributionId, claim.amount, 100))
   await sellTokens(
     contributionId,
     ethers.utils.formatEther(claim.amount),
-    String(minPrice*0.96),
+    String(minPrice * 0.96),
     sellSubmissionCb,
-    sellConfirmationCb,
+    sellConfirmationCb
   )
 }
 
-async function sell (units, bondId, submissionCb, confirmationCb, options = {}) {
+async function purchasePriceOf (contributionId) {
   init()
-  const bondHash = ethers.utils.id(bondId)
-  const fullOptions = Object.assign({}, defaults, options)
-  const tx = await autoBond.sell(
-    units,
-    bondHash,
-    fullOptions
-  )
-  submissionCb(tx)
-  return handleConfirmationCallback(tx.hash, confirmationCb)
-}
-
-// replaces getBuyPrice
-async function purchasePriceOf(contributionId) {
-  init()
-  const bytes32Id = ethers.utils.id(contributionId)
   return ethers.utils.formatEther(
-    (await squadController.contributions(bytes32Id)).purchasePrice
+    (await squadController.contributions(contributionId)).purchasePrice
   )
 }
 
-async function feeOf(contributionId) {
+async function feeOf (contributionId) {
   init()
-  const bytes32Id = ethers.utils.id(contributionId)
-  return (await squadController.contributions(bytes32Id)).feeRate
+  return (await squadController.contributions(contributionId)).feeRate
 }
 
-async function priceOf(contributionId, amount) {
+async function priceOf (contributionId, amount) {
   init()
-  const bytes32Id = ethers.utils.id(contributionId)
-  const supply = await squadController.totalSupplyOf(bytes32Id)
-  return await squadController.priceOf(bytes32Id, supply, amount)
+  const supply = await squadController.totalSupplyOf(contributionId)
+  console.log('real supply:', supply.toString())
+  return await squadController.priceOf(contributionId, supply, amount)
 }
 
-async function getBuyPrice (units, bondId) {
-  init()
-  const bondHash = ethers.utils.id(bondId)
-  return Number(await autoBond.getBuyPrice(units, bondHash))
-}
-
-async function linearCurvePrice(supply, amount) {
+async function linearCurvePrice (supply /* big num */, amount /* big num */) {
   init()
   return ethers.utils.formatEther(await linearCurve.price(supply, amount))
 }
 
-async function getBuyPriceFromCurve (supply, units, curveAddress) {
-  init()
-  if (curveAddress) {
-    curve = new ethers.Contract(curveAddress, CurveJSON.abi, walletOrSigner)
-  }
-  return await curve.buyPrice(supply, units)
-}
-
-// replaces getSellPrice
-async function sellPriceFor(contributionId, amount) {
+async function sellPriceFor (contributionId, amount /* big num */, feeRate) {
   init()
   const supply = await squadController.totalSupplyOf(contributionId)
-  return await linearCurvePrice(supply.sub(amount), amount)
+  let price = await linearCurvePrice(supply.sub(amount), amount)
+  price = ethers.utils.parseEther(price)
+  const fee = price.mul(feeRate).div(10000)
+  price = price.sub(fee)
+  return ethers.utils.formatEther(price)
 }
 
-async function licenseSellPrice(licenseId, feeRate) {
+async function licenseSellPrice (licenseId, feeRate) {
   init()
   const claim = await tokenClaimCheck.claims(licenseId)
-  const bytes32Id = await squadController.validLicenses(licenseId)
-  const amount = claim.amount.sub(claim.amount.mul(feeRate).div(10000))
-  // const contributionId = ethers.utils.parseBytes32String(bytes32Id)
-  return await sellPriceFor(bytes32Id, amount)
+  const contributionId = await squadController.validLicenses(licenseId)
+  return await sellPriceFor(contributionId, claim.amount, feeRate)
 }
 
-async function getSellPrice (units, bondId) {
+async function marketSize (contributionId) {
   init()
-  const bondHash = ethers.utils.id(bondId)
-  return await autoBond.getSellPrice(units, bondHash)
-}
-
-// replaces getMarketCap
-async function marketSize(contributionId) {
-  init()
-  const supply = totalSupplyOf(contributionId)
+  const supply = await totalSupplyOf(contributionId)
   return linearCurvePrice(0, supply)
-}
-
-async function getMarketCap (bondId) {
-  init()
-  const bondHash = ethers.utils.id(bondId)
-  const bond = await autoBond.bonds(bondHash)
-  const curveAddress = bond.curve
-  if (curveAddress == '0x0000000000000000000000000000000000000000') {
-    console.error(`Market for ${bondId} has no curve address set`)
-  }
-  const supply = bond.supply
-  const cap = await getBuyPriceFromCurve(0, supply, curveAddress)
-  return cap.toNumber()
 }
 
 function handleConfirmationCallback (txHash, callback) {
@@ -493,43 +393,39 @@ function handleConfirmationCallback (txHash, callback) {
   })
 }
 
-async function walletAddress() {
+async function walletAddress () {
   return walletOrSigner.getAddress()
 }
 
-function getEthers() {
+function getEthers () {
   init()
   return ethers
 }
 
-async function withdrawAmount () {
+async function withdrawAmount (address) {
   init()
-  const raw = ethers.utils.formatEther(await accounting.accounts(await walletAddress()))
-  console.log('withdraw raw', raw)
+  if (!address) { address = await walletOrSigner.getAddress() }
+  const raw = ethers.utils.formatEther(await accounting.accounts(address))
   return parseFloat(Number(raw)).toPrecision(4)
 }
 
 async function withdraw (submissionCb, confirmationCb) {
   init()
-  const tx = await squadController.withdraw(await walletAddress())
+  const tx = await squadController.withdraw(await walletOrSigner.getAddress())
   submissionCb(tx)
   return handleConfirmationCallback(tx.hash, confirmationCb)
 }
 
+async function reserveBalanceOf (address) {
+  init()
+  if (!address) { address = await walletOrSigner.getAddress() }
+  const rawBalance = await reserveToken.balanceOf(address)
+  return ethers.utils.formatEther(rawBalance)
+}
+
 module.exports = {
   init,
-  newBond,
-  getSupply,
-  getBalance,
-  getBuyPrice,
-  getBuyPriceFromCurve,
-  getSellPrice,
-  getMarketCap,
-  buy,
-  sell,
   BondAlreadyExists,
-
-  id,
   walletAddress,
   newContribution,
   networkFeeRate,
@@ -545,9 +441,11 @@ module.exports = {
   getEthers,
   getValidLicenses,
   linearCurveAmount,
+  linearCurvePrice,
   purchasePriceOf,
   feeOf,
   licenseSellPrice,
   withdrawAmount,
-  withdraw
+  withdraw,
+  reserveBalanceOf
 }

@@ -1,12 +1,11 @@
-/* global URL setTimeout localStorage */
+/* global localStorage ethereum */
 
 import m from 'mithril'
-import squad, { metastore, curationMarket } from '@squad/sdk'
+import squad, { curationMarket } from '@squad/sdk'
 
-import defs from '../scripts/load_development_defs.js'
+// import defs from '../scripts/load_development_defs.js'
 
 import state from './state.js'
-import settings from './settings.js'
 import { stringToSquare } from './rules.js'
 
 export const shortHash = (str) => {
@@ -27,64 +26,188 @@ export const findBoardRange = (variableIndex, startingPosition) => {
   }
 }
 
-export const connectSquad = (callback) => {
-  metastore.webSocketConnection(settings.metastoreWs)
+// functions required
+// web3connect(contributions())
+// web3connect(licenses())
 
-  metastore.on('open', async () => {
-    // skip if we've already connected to Squad
-    if (state.squad.account === 'connected') {
-      console.log('Skipping on open')
-    } else {
-      // check ethereum connection
-      await web3connection()
-
-      test()
-
-      // load up the default definitions (only relevant with the temporary metastore)
-      const defaultDefs = await defs()
-
-      // load up the local storage definitions along with the defaults (for now)
-      let storedDefs = JSON.parse(localStorage.getItem('localDefinitions'))
-      if (!storedDefs) {
-        storedDefs = []
-      }
-
-      // make sure all stored defs and defaults are on Ethereum
-      const localDefs = [...defaultDefs, ...storedDefs]
-      console.log('local defs', localDefs)
-      // await multiDefinition(localDefs)
-
-      // get all the game's formats and components
-      const formatDefs = await metastore.getGameFormats(settings.gameAddress)
-      const componentDefs = await metastore.getGameComponents(settings.gameAddress)
-
-      // restore everything in local storage
-      refreshLocalStorage(formatDefs, componentDefs)
-
-      // for each format
-      for (const address in formatDefs) {
-        // take out the extra 'Format' part of the object
-        formatDefs[address] = formatDefs[address].Format
-      }
-      state.squad.rawFormats = formatDefs
-
-      // for each component
-      for (const address in componentDefs) {
-        // take out the extra 'Component' part of the object
-        componentDefs[address] = componentDefs[address].Component
-      }
-      state.squad.components = componentDefs
-
-      // state.squad.connection = 'connected'
-      // console.log('Squad Connection:', state.squad.connection)
-    }
-
-    if (callback) { await callback() }
-
-    m.redraw()
-  })
+export const handleLoadContributions = () => {
+  if (state.squad.account) {
+    loadContributions()
+      .then(res => {
+        console.log('loaded contributions')
+      })
+      .catch(err => {
+        console.error(err)
+      })
+  } else {
+    web3connection()
+      .then(async () => {
+        await loadContributions()
+      })
+      .catch(err => {
+        console.error(err)
+      })
+  }
 }
 
+const loadContributions = async () => {
+  state.squad.rawVariants = {}
+  state.squad.orderedVariants = await squad.getFormats()
+  state.squad.orderedVariants.forEach(f => {
+    state.squad.rawVariants[f.id] = Object.assign({},
+      f.definition.Format,
+      {
+        fee: f.feeRate,
+        purchasePrice: f.purchasePrice
+      }
+    )
+  })
+
+  state.squad.components = {}
+  state.squad.orderedComponents = await squad.getComponents()
+  state.squad.orderedComponents.forEach(c => {
+    state.squad.components[c.id] = Object.assign({},
+      c.definition.Component,
+      {
+        fee: c.feeRate,
+        purchasePrice: c.purchasePrice
+      }
+    )
+  })
+
+  const params = (new URL(document.location)).searchParams
+  if (params.get('variant')) {
+    state.markets.idToSearch = params.get('variant')
+    if (state.squad.rawVariants[state.markets.idToSearch]) {
+      console.log('setting searched variant', state.markets.idToSearch)
+      state.markets.searchedVariant = state.markets.idToSearch
+    }
+  }
+
+  m.redraw()
+}
+
+export const handleLoadContribution = (id) => {
+  if (state.squad.account) {
+    loadContribution(id)
+      .then(res => {
+        console.log('loaded contribution', id)
+      })
+      .catch(err => {
+        console.error(err)
+      })
+  } else {
+    web3connection()
+      .then(async () => {
+        await loadContribution(id)
+      })
+      .catch(err => {
+        console.error(err)
+      })
+  }
+}
+
+const loadContribution = async (id) => {
+  state.squad.rawVariants = {}
+  const f = await squad.getContribution(id)
+  if (!f.definition.Variant) { return }
+  state.squad.rawVariants[f.id] = Object.assign({},
+    f.definition.Variant,
+    {
+      fee: f.feeRate,
+      purchasePrice: f.purchasePrice
+    }
+  )
+  m.redraw()
+}
+
+export const handleLoadLicenses = () => {
+  if (state.squad.account) {
+    loadLicenses()
+      .then(res => {
+        console.log('loaded licenses', res)
+      })
+      .catch(err => {
+        console.error(err)
+      })
+  } else {
+    web3connection()
+      .then(async () => {
+        await loadLicenses()
+      })
+      .catch(err => {
+        console.error(err)
+      })
+  }
+}
+
+const loadLicenses = async () => {
+  state.licenses = await squad.getLicenses(state.squad.address)
+  m.redraw()
+}
+
+export const refreshSquad = (callback) => {
+  // skip if we've already connected to Squad
+  if (state.squad.account === 'connected') {
+    console.log('Skipping on open')
+  } else {
+    // check ethereum connection
+    web3connection()
+      .then(r => {
+        // test()
+
+        // load up the default definitions (only relevant with the temporary metastore)
+        // const defaultDefs = await defs()
+
+        // load up the local storage definitions along with the defaults (for now)
+        let storedDefs = JSON.parse(localStorage.getItem('localDefinitions'))
+        console.log('stored defs', storedDefs)
+        if (!storedDefs) {
+          storedDefs = []
+        }
+
+        // make sure all stored defs and defaults are on Ethereum
+        const localDefs = [...storedDefs]
+        console.log('local defs', localDefs)
+        // multiDefinition(localDefs)
+
+        state.squad.rawVariants = {}
+        squad.getFormats()
+          .then(variants => {
+            console.log('got variants', variants)
+            state.squad.orderedVariants = variants
+            state.squad.orderedVariants.forEach(f => {
+              state.squad.rawVariants[f.id] = f.definition.Format
+            })
+            m.redraw()
+          })
+          .catch(e => {
+            console.error('getVariants error:', e)
+          })
+
+        state.squad.components = {}
+        squad.getComponents()
+          .then(components => {
+            console.log('got compoentns', components)
+            state.squad.orderedComponents = components
+            state.squad.orderedComponents.forEach(c => {
+              state.squad.components[c.id] = c.definition.Component
+            })
+            m.redraw()
+          })
+          .catch(e => {
+            console.error('getComponents error:', e)
+          })
+
+        if (typeof callback === 'function') { callback() }
+      })
+      .catch(e => {
+        console.error('Web3 connection error:', e)
+      })
+  }
+}
+
+/*
 let tested = false
 async function test () {
   const params = (new URL(document.location)).searchParams
@@ -127,7 +250,7 @@ async function test () {
   await curationMarket.buyLicense(contributionId, testLog, finish)
   testLog()
   wait()
-  */
+
   done = false
   const supply = await curationMarket.totalSupplyOf(contributionId)
   const amount = curationMarket.linearCurveAmount(supply, purchasePrice.mul(10))
@@ -166,47 +289,54 @@ async function test () {
   testLog('PurchasePriceOf       ', (await curationMarket.purchasePriceOf(contributionId)).toString())
   testLog('PurchasePriceOf XYa123', (await curationMarket.purchasePriceOf('XYa123')).toString())
 }
-
+*/
 async function web3connection () {
   const connection = curationMarket.init()
   let address
   try {
     address = await connection.getAddress()
+    state.squad.account = address
   } catch (e) {
     address = e
   }
-  console.log(connection, connection.provider)
-  let one = (typeof address === 'string')
+  console.log(connection, connection.provider, (await connection.provider.getNetwork()).chainId)
+  const one = (typeof address === 'string')
   let two
   try {
-    (await connection.provider.getNetwork()).chainId === 3
-    two = true
+    const network = await connection.provider.getNetwork()
+    if (network.chainId === 3) {
+      two = true
+    } else {
+      console.error('Wrong network', network)
+      two = true
+    }
   } catch (e) {
     console.error('Two error', e)
     two = false
   }
-  let three = !!ethereum.selectedAddress
+  const three = !!ethereum.selectedAddress
   console.log(one, two, three)
   if (one && two && three) {
     state.connectModal = false
+    state.squad.connection = 'connected'
   } else {
     state.connectModal = true
     state.squad.connection = 'not connected'
   }
   m.redraw()
 }
-
+/*
 async function multiDefinition (defs) {
   // submit the default definitions to make sure they have bonds on ethereum
-  defs.forEach(async (def) => {
-    await squad.definition(def, [settings.gameAddress], 100, 10)
-  })
+  await Promise.all(defs.map(async (def) => {
+    return squad.definition(def, [settings.gameAddress], 100, 10)
+  }))
 }
 
-function refreshLocalStorage (formatDefs, componentDefs) {
+function refreshLocalStorage (variantDefs, componentDefs) {
   const localCatalog = []
-  for (const key in formatDefs) {
-    localCatalog.push(formatDefs[key])
+  for (const key in variantDefs) {
+    localCatalog.push(variantDefs[key])
   }
   for (const key in componentDefs) {
     localCatalog.push(componentDefs[key])
@@ -214,17 +344,17 @@ function refreshLocalStorage (formatDefs, componentDefs) {
   console.log('local Catalog size', localCatalog.length)
   localStorage.setItem('localDefinitions', JSON.stringify(localCatalog))
 }
-
+*/
 export const getMarketInfo = () => {
-  connectSquad(async () => {
+  refreshSquad(async () => {
     // get the logged in user's available withdraw amount
     state.withdrawAmount = await squad.curationMarket.withdrawAmount()
     // get the users licenses
     state.licenses = await squad.curationMarket.getValidLicenses()
-    // for each format
-    for (const address in state.squad.rawFormats) {
+    // for each variant
+    for (const address in state.squad.rawVariants) {
       try {
-        // see if the current user owns the format
+        // see if the current user owns the variant
         // await getOwned(address)
         // get the market cap
         await getMarketCap(address)
@@ -233,8 +363,8 @@ export const getMarketInfo = () => {
         await getBeneficiaryFee(address)
         m.redraw()
       } catch (e) {
-        console.error('Invalid contribution', state.squad.components[address], e)
-        delete state.squad.rawFormats[address]
+        console.error('Invalid contribution', address, state.squad.rawVariants[address], e)
+        delete state.squad.rawVariants[address]
         // remove invalid contributions
       }
     }
@@ -262,67 +392,81 @@ async function getOwned (address) {
 async function getMarketCap (address) {
   const marketCap = await curationMarket.marketSize(address)
   state.marketCaps[address] = marketCap
+  console.log('Market cap', address, marketCap)
 }
 
 async function getPurchasePrice (address) {
   const purchasePrice = await curationMarket.purchasePriceOf(address)
-  state.squad.rawFormats[address].purchasePrice = purchasePrice
+  state.squad.rawVariants[address].purchasePrice = purchasePrice
+  console.log('Purchase price', address, purchasePrice)
 }
 
 async function getBeneficiaryFee (address) {
   const fee = await curationMarket.feeOf(address)
-  state.squad.rawFormats[address].fee = Number(fee) / 100
+  state.squad.rawVariants[address].fee = Number(fee) / 100
+  console.log('Fee', address, Number(fee) / 100)
 }
 
-export const loadFormat = (address) => {
-  connectSquad(async () => {
-    // get the format
-    const rawFormat = state.squad.rawFormats[address]
-
-    // load the format
-    if (rawFormat) {
-      await getMarketInfo()
-      if (!state.licenses[curationMarket.id(address)]) {
-        m.route.set('/formats')
-        console.log('Must purchase rights to use a format before using. Current tokens owned:', state.owned[address])
-        // TODO Notification asking them to buy the format
-      } else {
-        state.squad.loadedFormat = getFullFormat(rawFormat, address)
-        console.log('Loaded format:', state.squad.loadedFormat)
-      }
-      m.redraw()
+export const loadVariant = async (address) => {
+  // check if we've already connected to web3
+  if (!state.squad.account) {
+    await web3connection()
+  }
+  // check if we've already loaded this address
+  if (!state.squad.rawVariants || !state.squad.rawVariants[address]) {
+    // if not, load contributions
+    await loadContributions()
+  }
+  // check if we've already loaded a license for this address and account
+  if (!state.licenses || !state.licenses[address]) {
+    // if not, load licenses
+    await loadLicenses()
+  }
+  // then, load the variant
+  const rawVariant = state.squad.rawVariants[address]
+  if (rawVariant) {
+    console.log('raw variant found and loading')
+    if (!state.licenses[address]) {
+      m.route.set('/variants')
+      console.log('Must purchase rights to use a variant before using. Current tokens owned:', state.owned[address])
+      // TODO Notification asking them to buy the variant
+    } else {
+      state.squad.loadedVariant = getFullVariant(rawVariant, address)
+      console.log('Loaded variant:', state.squad.loadedVariant)
     }
-  })
+    m.redraw()
+  }
 }
 
-export const previewFormat = (address) => {
-  const rawFormat = state.squad.rawFormats[address]
-  state.markets.previewedFormat = getFullFormat(rawFormat, address)
-  console.log('Previewing format:', state.markets.previewedFormat)
+export const previewVariant = (address) => {
+  const rawVariant = state.squad.rawVariants[address]
+  state.markets.previewedVariant = getFullVariant(rawVariant, address)
+  console.log('Previewing variant:', state.markets.previewedVariant)
 }
 
-export const getFullFormat = (rawFormat, address) => {
+export const getFullVariant = (rawVariant, address) => {
   // get the pieces
   const pieces = {}
-  rawFormat.components.forEach(address => {
+  console.log(rawVariant, 'rawVariant')
+  rawVariant.components.forEach(address => {
     const piece = state.squad.components[address]
     pieces[address] = Object.assign({},
       { name: piece.name },
       JSON.parse(piece.data)
     )
   })
-  const fullFormat = Object.assign(JSON.parse(rawFormat.data), {
+  const fullVariant = Object.assign(JSON.parse(rawVariant.data), {
     pieces,
     address,
-    name: rawFormat.name
+    name: rawVariant.name
   })
 
   // Get the X and Y ranges of the board
-  const x = findBoardRange(0, fullFormat.startingPosition)
-  const y = findBoardRange(1, fullFormat.startingPosition)
-  fullFormat.boardSize = { x, y }
+  const x = findBoardRange(0, fullVariant.startingPosition)
+  const y = findBoardRange(1, fullVariant.startingPosition)
+  fullVariant.boardSize = { x, y }
 
-  return fullFormat
+  return fullVariant
 }
 
 export const checkWinner = () => {
@@ -408,13 +552,16 @@ export const withdrawWithAlerts = async () => {
   )
 }
 
-const handleAlert = (type, text) => {
+export const handleAlert = (type, text) => {
   return () => { alert(type, text) }
 }
 
-const alert = (type, text) => {
+export const alert = (type, text) => {
   console.log('Creating alert', type, text)
   const alert = { type, text }
   state.alerts.push(alert)
-  getMarketInfo()
+  console.log('current alerts', state.alerts)
+  handleLoadContributions()
+  handleLoadLicenses()
+  // getMarketInfo()
 }

@@ -15,7 +15,7 @@ matchmaking = packages/matchmaking/server
 metastore-shell = cd $(metastore) && nix-shell https://holochain.love --pure --command
 
 .PHONY: ci
-ci: metastore-tests mock-metastore-tests squad-chess-tests sdk-js-tests matchmaking-js-tests matchmaking-tests
+ci: squad-chess-tests sdk-js-tests matchmaking-js-tests matchmaking-tests
 
 .PHONY: squad-games-web
 squad-games-web: build/metastore
@@ -26,6 +26,9 @@ squad-chess: build/matchmaking build/metastore
 	cd $(squad-chess) && npm run start &
 	cd $(squad-chess) && npx http-server -c-1
 	cd $(squad-chess) && echo "open localhost:8080 in your browser"
+
+.PHONY: squad-chess-dev
+squad-chess-dev: build/matchmaking build/metastore 
 
 .PHONY: squad-chess-alpha-server
 squad-chess-alpha-server: build/metastore
@@ -105,12 +108,12 @@ build/development-curation-market: build/devnet build/bootstrap
 	touch build/development-curation-market
 
 build/metastore: build/bootstrap
-ifeq ($(MOCK_METASTORE), true)
+# ifeq ($(MOCK_METASTORE), true)
 	cd $(mock-metastore) && { npm run start & echo $$! > PID; }
 	mv $(mock-metastore)/PID build/metastore
-else
-	$(metastore-shell) 'hc package && hc run --logging'
-endif
+# else
+# 	$(metastore-shell) 'hc package && hc run --logging'
+# endif
 
 build/devnet:
 	mkdir -p build

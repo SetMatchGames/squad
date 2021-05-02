@@ -108,6 +108,14 @@ button:disabled {
   cursor: auto;
 }
 
+.inline-button {
+  margin: 0 8px 0 8px;
+}
+
+.inline-button:hover {
+  cursor: pointer;
+}
+
 input[type=checkbox] {
   margin: 8px;
   height: 16px;
@@ -291,7 +299,6 @@ input.focus-visible {
   z-index: 1;
   bottom: 40px;
   left: 40px;
-  width: 400px;
   display: flex;
   flex-direction: column;
 }
@@ -393,14 +400,14 @@ input.focus-visible {
   align-items: center;
 }
 
-/* Format Store */
-#format-selector {
+/* Variant Store */
+#variant-selector {
   display: flex;
   flex-direction: column;
   justify-content: space-around;
 }
 
-.format-card {
+.variant-card {
   align-items: center;
   box-shadow: #fffcf7 1px 1px 0px inset;
   border: 1px solid #ebddc3;
@@ -409,56 +416,59 @@ input.focus-visible {
   flex: 1 1 0%;
 }
 
-.format-card.head {
+.variant-card.head {
   margin-top: 8px;
   border: 1px solid #ebddc3;
   border-radius: 12px 12px 0 0;
 }
 
-.format-card.foot {
+.variant-card.foot {
   margin-bottom: 8px;
   border-radius: 0 0 12px 12px;
 }
 
-.format-card.labels {
+.variant-card.labels {
   box-shadow: none;
   border: none;
   font-weight: bold;
+  margin-top: 36px;
 }
 
-.format-card .info { 
+.variant-card .info { 
   width: 100%;
 }
 
-.format-card.info-row div, form {
+.variant-card.info-row div, form {
   padding: 6px 0 6px 0;
 }
 
-.format-card form {
+.variant-card form {
   text-align: right;
   padding-right: 2vw;
 }
 
-.format-card.labels div {
+.variant-card.labels div {
   border: none;
 }
 
-.format-card .offset {
+.variant-card .offset {
   padding: 24px 0 6px 8px;
 }
 
-.format-card.labels .offset {
+.variant-card.labels .offset {
   padding: 0 0 0 8px;
 }
 
-.format-card .score {
+.variant-card .score {
   width: 20%;
   border-right: 1px solid #ebddc3;
   font-weight: bold;
 }
 
-.format-card .name {
+.variant-card .name {
   width: 40%;
+  display: flex;
+  flex-direction: row;
 }
 
 .info .name {
@@ -466,7 +476,7 @@ input.focus-visible {
   border-image: initial;
 }
 
-.format-card .button-section {
+.variant-card .button-section {
   width: 40%;
   display: flex;
   flex-direction: row;
@@ -474,21 +484,21 @@ input.focus-visible {
 }
 
 @media screen and (max-width: 600px) {
-  .format-card .button-section {
+  .variant-card .button-section {
     flex-direction: column;
     align-items: space-evenly;
   }
 
-  .format-card .loader {
+  .variant-card .loader {
     padding-bottom: 0;
   }
 
-  .format-card .details-toggle {
+  .variant-card .details-toggle {
     padding-top: 0;
   }
 }
 
-.format-card .details {
+.variant-card .details {
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -503,12 +513,12 @@ input.focus-visible {
 .details .row {
   box-sizing: border-box;
   width: 100%;
-  padding: 4px 0 4px 20%;
+  padding: 4px 0 4px 0;
+  justify-content: center;
 }
 
 .details .row label {
   font-weight: bold;
-  width: 20%;
   text-align: left;
   box-sizing: border-box;
   padding-left: 8px;
@@ -523,7 +533,7 @@ input.focus-visible {
   width: 80px;
 }
 
-.details .buy-license, .details .buy-definition, .details .sell-definition {
+.details .buy-definition, .details .sell-definition {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -537,12 +547,26 @@ input.focus-visible {
 
 .details .board-row {
   justify-content: center;
-  padding: 16px 16px 24px 16px;
+  padding: 16px 16px 0 16px;
 }
 
 .details .board {
   width: 30vw;
   height: 30vw;
+}
+
+@media screen and (max-width: 800px) {
+  .details .board {
+    width: 45vw;
+    height: 45vw;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .details .board {
+    width: 60vw;
+    height: 60vw;
+  }
 }
 
 /* License Cards */
@@ -555,7 +579,7 @@ input.focus-visible {
 }
 
 .license-card {
-  width: 400px;
+  min-width: 210px;
   margin: 8px;
   padding: 12px 12px 8px 12px;
   border: 1px solid #ebddc3;
@@ -613,22 +637,22 @@ button.submit {
   margin-top: 24px;
 }
 
-/* Format Form */
-.format.components {
+/* Variant Form */
+.variant.components {
   display: flex;
   flex-direction: column;
 }
 
-.format.position {
+.variant.position {
   position: relative;
   margin: 2vw 0 2vw 0;
 }
 
-.format.square {
+.variant.square {
   font-size: 12px;
 }
 
-.format.square select {
+.variant.square select {
   font-size: 10px;
 }
 

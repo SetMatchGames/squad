@@ -16,12 +16,14 @@ const Board = {
     let position = state.game.position
     if (vnode.attrs.position) { position = vnode.attrs.position }
 
-    const xRange = vnode.attrs.format.boardSize.x.range + 1
-    const yRange = vnode.attrs.format.boardSize.y.range + 1
+    const xRange = vnode.attrs.variant.boardSize.x.range + 1
+    const yRange = vnode.attrs.variant.boardSize.y.range + 1
     let max = xRange
     if (xRange < yRange) { max = yRange }
     const width = 100 * xRange / max + '%'
     const height = 100 * yRange / max + '%'
+    console.log('highlighted squares', state.board.highlightedSquares)
+    console.log('current state', state.game)
     const board = m(
       '.board-squares',
       {
@@ -37,9 +39,11 @@ const Board = {
         // if there is a piece, grab links to piece images
         let graphics
         if (content) {
-          // console.log(vnode.attrs.format.pieces, content, squareId)
-          graphics = vnode.attrs.format.pieces[content.pieceId].graphics
+          // console.log(vnode.attrs.variant.pieces, content, squareId)
+          graphics = vnode.attrs.variant.pieces[content.pieceId].graphics
         }
+        // if the square has been deleted
+        const deleted = position[squareId].deleted
         // add the square to the board
         return m(
           BoardSquare,
@@ -47,8 +51,9 @@ const Board = {
             key: squareId,
             content,
             graphics,
-            format: vnode.attrs.format,
-            position: position
+            variant: vnode.attrs.variant,
+            position: position,
+            deleted
           }
         )
       })
@@ -68,7 +73,7 @@ function resetBoardState (vnode) {
 
   // set initial game state
   try {
-    state.game = chess.createGame(vnode.attrs.format)
+    state.game = chess.createGame(vnode.attrs.variant)
   } catch (e) {
     console.error(e)
   }
@@ -83,6 +88,8 @@ function resetBoardState (vnode) {
       matchStatus: vnode.attrs.matchStatus
     }
   )
+
+  clearTimeout(matchmaking.messageTimeout)
 }
 
 function queueDeselect () {
@@ -124,10 +131,13 @@ const BoardSquare = {
     const coordinates = chess.stringToSquare(vnode.key)
     // highlight square
     const highlighted = squareInArray(coordinates, state.board.highlightedSquares)
+    const lastMove = squareInArray(coordinates, state.game.lastTurn)
     let squareContent
     let onclick
+    let piece = false
     // if the square holds a piece, set the properties
-    if (vnode.attrs.content) {
+    if (vnode.attrs.content && !vnode.attrs.deleted) {
+      piece = true
       // get the link to the piece graphic
       let imgLink
       let pieceColor = 'white'
@@ -151,7 +161,7 @@ const BoardSquare = {
     return m(
       `.square#${vnode.key}`,
       {
-        style: squareStyle(coordinates, highlighted, vnode.attrs.format),
+        style: squareStyle(coordinates, highlighted, lastMove, piece, vnode.attrs.variant, vnode.attrs.deleted),
         ondrop: handleTurn(),
         onclick
       },
@@ -160,20 +170,21 @@ const BoardSquare = {
   }
 }
 
-function squareStyle (coordinates, highlighted, format) {
+function squareStyle (coordinates, highlighted, lastMove, piece, variant, deleted) {
   // get rid of extra space
   coordinates = [
-    coordinates[0] - format.boardSize.x.min,
-    coordinates[1] - format.boardSize.y.min
+    coordinates[0] - variant.boardSize.x.min,
+    coordinates[1] - variant.boardSize.y.min
   ]
 
   // create the checkerboard color pattern
   let squareColor = BOARD_CONFIG.squares.lightColor
   if ((coordinates[0] + coordinates[1]) % 2 === 1) { squareColor = BOARD_CONFIG.squares.darkColor }
+  if (deleted) { squareColor = '' }
 
   // spacing and size
-  const xRange = format.boardSize.x.range + 1
-  const yRange = format.boardSize.y.range + 1
+  const xRange = variant.boardSize.x.range + 1
+  const yRange = variant.boardSize.y.range + 1
   const result = {
     right: 100 * coordinates[0] / xRange + '%',
     top: 100 * coordinates[1] / yRange + '%',
@@ -184,7 +195,18 @@ function squareStyle (coordinates, highlighted, format) {
 
   if (highlighted === true) {
     // highlighted square styling
-    result['box-shadow'] = 'inset 0px 0px 0px 3px yellow'
+    if (piece) {
+      result.background = `radial-gradient(${squareColor} 0%, ${squareColor} 80%,  rgb(118,133,40) 80%)`
+    } else {
+      result.background = `radial-gradient(rgb(118,133,40) 19%, ${squareColor} 20%)`
+    }
+  } else if (lastMove === true) {
+    // styling for last move squares
+    result.filter = 'hue-rotate(-20deg)'
+  } else if (coordinates[0] === state.board.from[0] &&
+  coordinates[1] === state.board.from[1]) {
+    // styling for selected square
+    result.filter = 'hue-rotate(40deg)'
   }
   return result
 }
@@ -233,10 +255,12 @@ function handleTurn () {
     const to = e.target.id
     // attempt to take the turn
     const newState = chess.takeTurn(state.game, [from, to])
+    console.log('handling turn', newState)
     // update the state if takeTurn doesn't throw
     state.game = newState
-    sendMessage(state.game)
     state.board.highlightedSquares = []
+    state.board.from = []
+    sendMessage(state.game)
     // if no legal turns, the game is over
     checkWinner()
   }
@@ -255,7 +279,7 @@ function sendMessage (message) {
   }
   console.log('Sending message:', message)
   matchmaking.sendMessage(message)
-  setTimeout(() => {
+  matchmaking.messageTimeout = setTimeout(() => {
     console.log('resending message number', message.number)
     sendMessage(message)
   }, 3000)

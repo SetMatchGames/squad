@@ -5,25 +5,26 @@ import { matchmaking } from '@squad/sdk'
 import crypto from 'crypto'
 import settings from '../settings.js'
 import state from '../state.js'
-import { loadFormat, checkWinner } from '../utils.js'
+import { loadVariant, checkWinner } from '../utils.js'
 
 const Matchmaking = {
   oninit: (vnode) => {
-    loadFormat(vnode.attrs.formatAddress)
+    loadVariant(vnode.attrs.variantAddress)
 
-    state.matchmaking.id = crypto.randomBytes(16).toString('hex')
-    console.log(`Our matchmaking Id: ${state.matchmaking.id}`)
+    state.matchmaking.id = (state.squad.account || crypto.randomBytes(16).toString('hex')).toLowerCase()
+    console.log(`Our matchmaking ID: ${state.matchmaking.id}`)
 
     state.matchmaking.room = ''
     state.matchmaking.peers = []
     state.matchmaking.offers = {}
     state.matchmaking.player = 0
     state.matchmaking.connection = 'not connected'
+    state.matchmaking.messageNumber = 0
   },
   view: () => {
-    let name = '[ format loading... ]'
-    if (state.squad.loadedFormat) {
-      name = state.squad.loadedFormat.name
+    let name = '[ variant loading... ]'
+    if (state.squad.loadedVariant) {
+      name = state.squad.loadedVariant.name
     }
     return m(
       '#matchmaking.body',
@@ -200,7 +201,7 @@ const Offer = {
 // handlers
 const handleSaveRoom = (event) => {
   event.preventDefault()
-  state.matchmaking.room = `${event.target.value}-${state.squad.loadedFormat.address}`
+  state.matchmaking.room = `${event.target.value}-${state.squad.loadedVariant.address}`
 }
 
 const handleConnect = (event) => {
@@ -244,6 +245,8 @@ const handleSendOffer = (event) => {
   matchmaking.sendOffer(event.target.id, handleReceiveMessage)
 
   state.matchmaking.connection = 'offer sent'
+  state.matchmaking.opponentId = event.target.id
+
   clearInterval(state.matchmaking.rollCallInterval)
   m.redraw()
 }
@@ -257,6 +260,9 @@ const handleSendAnswer = (event) => {
   state.matchmaking.player = 1
 
   state.matchmaking.connection = 'match started'
+  state.matchmaking.opponentId = event.target.id
+  state.board.matchStatus = `Playing against ${state.matchmaking.opponentId}`
+
   clearInterval(state.matchmaking.rollCallInterval)
   m.route.set('/play')
 }
@@ -269,10 +275,13 @@ const handleReceiveMessage = (event) => {
     }
     console.log('Received message:', event)
     state.matchmaking.messageNumber = event.data.number
+    console.log('message info', state.matchmaking, event.data)
     if (event.data === 'match started') {
       state.matchmaking.connection = event.data
+      state.board.matchStatus = `Playing against ${state.matchmaking.opponentId}`
       m.route.set('/play')
     } else {
+      console.log('new game state', event.data.lastTurn)
       state.game = event.data
       checkWinner()
     }
