@@ -16,8 +16,8 @@ const Board = {
     let position = state.game.position
     if (vnode.attrs.position) { position = vnode.attrs.position }
 
-    const xRange = vnode.attrs.format.boardSize.x.range + 1
-    const yRange = vnode.attrs.format.boardSize.y.range + 1
+    const xRange = vnode.attrs.variant.boardSize.x.range + 1
+    const yRange = vnode.attrs.variant.boardSize.y.range + 1
     let max = xRange
     if (xRange < yRange) { max = yRange }
     const width = 100 * xRange / max + '%'
@@ -39,8 +39,8 @@ const Board = {
         // if there is a piece, grab links to piece images
         let graphics
         if (content) {
-          // console.log(vnode.attrs.format.pieces, content, squareId)
-          graphics = vnode.attrs.format.pieces[content.pieceId].graphics
+          // console.log(vnode.attrs.variant.pieces, content, squareId)
+          graphics = vnode.attrs.variant.pieces[content.pieceId].graphics
         }
         // if the square has been deleted
         const deleted = position[squareId].deleted
@@ -51,7 +51,7 @@ const Board = {
             key: squareId,
             content,
             graphics,
-            format: vnode.attrs.format,
+            variant: vnode.attrs.variant,
             position: position,
             deleted
           }
@@ -73,7 +73,7 @@ function resetBoardState (vnode) {
 
   // set initial game state
   try {
-    state.game = chess.createGame(vnode.attrs.format)
+    state.game = chess.createGame(vnode.attrs.variant)
   } catch (e) {
     console.error(e)
   }
@@ -161,7 +161,7 @@ const BoardSquare = {
     return m(
       `.square#${vnode.key}`,
       {
-        style: squareStyle(coordinates, highlighted, lastMove, piece, vnode.attrs.format, vnode.attrs.deleted),
+        style: squareStyle(coordinates, highlighted, lastMove, piece, vnode.attrs.variant, vnode.attrs.deleted),
         ondrop: handleTurn(),
         onclick
       },
@@ -170,11 +170,11 @@ const BoardSquare = {
   }
 }
 
-function squareStyle (coordinates, highlighted, lastMove, piece, format, deleted) {
+function squareStyle (coordinates, highlighted, lastMove, piece, variant, deleted) {
   // get rid of extra space
   coordinates = [
-    coordinates[0] - format.boardSize.x.min,
-    coordinates[1] - format.boardSize.y.min
+    coordinates[0] - variant.boardSize.x.min,
+    coordinates[1] - variant.boardSize.y.min
   ]
 
   // create the checkerboard color pattern
@@ -183,8 +183,8 @@ function squareStyle (coordinates, highlighted, lastMove, piece, format, deleted
   if (deleted) { squareColor = '' }
 
   // spacing and size
-  const xRange = format.boardSize.x.range + 1
-  const yRange = format.boardSize.y.range + 1
+  const xRange = variant.boardSize.x.range + 1
+  const yRange = variant.boardSize.y.range + 1
   const result = {
     right: 100 * coordinates[0] / xRange + '%',
     top: 100 * coordinates[1] / yRange + '%',
@@ -196,17 +196,17 @@ function squareStyle (coordinates, highlighted, lastMove, piece, format, deleted
   if (highlighted === true) {
     // highlighted square styling
     if (piece) {
-      result['background'] = `radial-gradient(${squareColor} 0%, ${squareColor} 80%,  rgb(118,133,40) 80%)`
+      result.background = `radial-gradient(${squareColor} 0%, ${squareColor} 80%,  rgb(118,133,40) 80%)`
     } else {
-      result['background'] = `radial-gradient(rgb(118,133,40) 19%, ${squareColor} 20%)`
+      result.background = `radial-gradient(rgb(118,133,40) 19%, ${squareColor} 20%)`
     }
   } else if (lastMove === true) {
     // styling for last move squares
-    result['filter'] = 'hue-rotate(-20deg)'
+    result.filter = 'hue-rotate(-20deg)'
   } else if (coordinates[0] === state.board.from[0] &&
   coordinates[1] === state.board.from[1]) {
     // styling for selected square
-    result['filter'] = 'hue-rotate(40deg)'
+    result.filter = 'hue-rotate(40deg)'
   }
   return result
 }

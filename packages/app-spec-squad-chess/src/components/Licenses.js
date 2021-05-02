@@ -13,14 +13,20 @@ const Licenses = {
       licenses = state.licenses[id].map(license => {
         return m(LicenseCard, { license, address: vnode.attrs.address })
       })
+    } else {
+      return [
+        m(
+          '.licenses.column',
+          m(BuyLicenseButton, { address: vnode.attrs.address })
+        )
+      ]
     }
     return [
-      m('.row', m('label', 'Licenses:')),
+      m('.row', m('label', 'Owned copies:')),
       m(
         '.licenses.column',
         licenses,
-        m(BuyLicenseButton, { address: vnode.attrs.address }),
-        `Beneficiary fee: ${state.squad.rawFormats[vnode.attrs.address].fee}%`
+        m(BuyLicenseButton, { address: vnode.attrs.address })
       )
     ]
   }
@@ -28,19 +34,20 @@ const Licenses = {
 
 const LicenseCard = {
   view: (vnode) => {
-    const name = state.squad.rawFormats[vnode.attrs.address].name
+    const name = state.squad.rawVariants[vnode.attrs.address].name
     return m(
       '.license-card.column',
-      m('.row.left', `License ${vnode.attrs.license.id}`),
+      m('.row.center', name), // TODO make full ID copiable
       m('.row.center', m(
         '.column',
-        m('div', name),
-        m('div', `ID: ${shortHash(vnode.attrs.license.contribution.id)}`)
+        m('div', `Copy: ${Number(vnode.attrs.license.id)}`),
+        m('div', `Owner: ${shortHash(state.squad.account)}`)
       )),
       m(
-        '.row.right',
+        '.row.center',
         m(SellLicenseButton, { address: vnode.attrs.address, license: vnode.attrs.license })
       )
+      // TODO button that takes you to view the NFT on opensea
     )
   }
 }

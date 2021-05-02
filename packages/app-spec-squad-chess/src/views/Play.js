@@ -5,11 +5,11 @@ import Board from '../components/Board.js'
 
 const Play = {
   view: () => {
-    // Redirect if no format is included
-    if (!state.squad.loadedFormat) {
-      m.route.set('/formats')
-      // TODO Notification asking them to load a format
-      console.log('Format required to play a match. Current format:', state.squad.loadedFormat)
+    // Redirect if no variant is included
+    if (!state.squad.loadedVariant) {
+      m.route.set('/variants')
+      // TODO Notification asking them to load a variant
+      console.log('Variant required to play a match. Current variant:', state.squad.loadedVariant)
       return
     }
 
@@ -17,7 +17,7 @@ const Play = {
       '#play.body',
       m('p#match-status.italics', state.board.matchStatus),
       m(Board, {
-        format: state.squad.loadedFormat,
+        variant: state.squad.loadedVariant,
         matchStatus: state.matchmaking.connection
       }),
       m(PlayAgainButton)
@@ -29,7 +29,7 @@ const PlayAgainButton = {
   view: () => {
     return m(
       'button',
-      { onclick: () => { m.route.set(`/matchmaking/${state.squad.loadedFormat.address}`) } },
+      { onclick: () => { m.route.set(`/matchmaking/${state.squad.loadedVariant.address}`) } },
       'Play Again'
     )
   }

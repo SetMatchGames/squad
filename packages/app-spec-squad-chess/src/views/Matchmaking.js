@@ -5,11 +5,11 @@ import { matchmaking } from '@squad/sdk'
 import crypto from 'crypto'
 import settings from '../settings.js'
 import state from '../state.js'
-import { loadFormat, checkWinner } from '../utils.js'
+import { loadVariant, checkWinner } from '../utils.js'
 
 const Matchmaking = {
   oninit: (vnode) => {
-    loadFormat(vnode.attrs.formatAddress)
+    loadVariant(vnode.attrs.variantAddress)
 
     state.matchmaking.id = (state.squad.account || crypto.randomBytes(16).toString('hex')).toLowerCase()
     console.log(`Our matchmaking ID: ${state.matchmaking.id}`)
@@ -22,9 +22,9 @@ const Matchmaking = {
     state.matchmaking.messageNumber = 0
   },
   view: () => {
-    let name = '[ format loading... ]'
-    if (state.squad.loadedFormat) {
-      name = state.squad.loadedFormat.name
+    let name = '[ variant loading... ]'
+    if (state.squad.loadedVariant) {
+      name = state.squad.loadedVariant.name
     }
     return m(
       '#matchmaking.body',
@@ -201,7 +201,7 @@ const Offer = {
 // handlers
 const handleSaveRoom = (event) => {
   event.preventDefault()
-  state.matchmaking.room = `${event.target.value}-${state.squad.loadedFormat.address}`
+  state.matchmaking.room = `${event.target.value}-${state.squad.loadedVariant.address}`
 }
 
 const handleConnect = (event) => {

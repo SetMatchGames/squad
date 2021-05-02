@@ -86,7 +86,7 @@ const MECHANIC_FNS = {
  * Use admechanics when you need a mechanic that modifies all of a piece's other mechanics.
  */
 const ADMECHANICS = {
-  randomPromotion: 'If a turn ends with this piece on an allied promotion square, promote it to a random piece from the same format.'
+  randomPromotion: 'If a turn ends with this piece on an allied promotion square, promote it to a random piece from the same variant.'
 }
 
 const ADMECHANIC_FNS = {
@@ -127,8 +127,8 @@ const ADMECHANIC_FNS = {
 
 let FORMAT
 
-const createGame = (format) => {
-  FORMAT = format
+const createGame = (variant) => {
+  FORMAT = variant
   return {
     position: FORMAT.startingPosition,
     turnNumber: 0,

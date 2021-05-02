@@ -2,63 +2,62 @@ import m from 'mithril'
 import state from '../state.js'
 import Board from '../components/Board.js'
 import Licenses from '../components/Licenses.js'
-import XeenusButton from '../components/XeenusButton.js'
-import { 
-  shortHash, 
-  handleLoadContributions, 
-  handleLoadLicenses, 
-  previewFormat 
+import CopyButton from '../components/CopyButton.js'
+import {
+  shortHash,
+  handleLoadContributions,
+  handleLoadLicenses,
+  previewVariant
 } from '../utils.js'
 
-const FormatStore = {
+const VariantStore = {
   oninit: () => {
     handleLoadContributions()
     handleLoadLicenses()
-    state.markets.previewedFormats = {}
+    state.markets.previewedVariants = {}
   },
   view: () => {
-    if (!state.squad.orderedFormats) {
+    if (!state.squad.orderedVariants) {
       return m(
-        '#format-store.body',
-        'Loading formats...'
+        '#variant-store.body',
+        'Loading variants...'
       )
     }
     return m(
-      '#format-store.body',
-      m(XeenusButton),
-      m('h2', 'Choose a Format to Play'),
-      m(FormatSearch),
+      '#variant-store.body',
+      m('h2', 'Choose a Variant to Play'),
+      m(VariantSearch),
       m(Labels),
-      state.squad.orderedFormats
-        .filter((format) => {
-          return (!state.markets.searchedFormat || format.id === state.markets.searchedFormat)
+      state.squad.orderedVariants
+        .filter((variant) => {
+          return (!state.markets.searchedVariant || variant.id === state.markets.searchedVariant)
         })
-        .map((format, index) => {
+        .map((variant, index) => {
           let order = 'middle'
           if (index === 0) { order = 'head' }
-          if (index === state.squad.orderedFormats.length - 1) {
+          if (index === state.squad.orderedVariants.length - 1) {
             order = 'foot'
           }
-          const score = shortenScore(format.supply)
-          return m(FormatCard, { key: format.id, order, score })
+          const score = shortenScore(variant.supply)
+          return m(VariantCard, { key: variant.id, order, score })
         })
     )
   }
 }
 
-const FormatSearch = {
+const VariantSearch = {
   view: () => {
     return m(
       '.search-bar',
       m(
-        'input[type=text]', 
+        'input[type=text]',
         { value: state.markets.idToSearch, oninput: handleSaveSearch },
         'Enter ID'
       ),
       m(
         'button',
         { onclick: saveSearch },
-        'Find format'
+        'Find variant by ID'
       ),
       m(
         'button',
@@ -72,7 +71,7 @@ const FormatSearch = {
 const Labels = {
   view: () => {
     return m(
-      '.format-card.labels.row',
+      '.variant-card.labels.row',
       m('.score.offset', 'Market Score'),
       m('.name.offset', 'Name'),
       m('.loader'),
@@ -82,16 +81,16 @@ const Labels = {
   }
 }
 
-const FormatCard = {
+const VariantCard = {
   view: (vnode) => {
-    if (!state.squad.rawFormats[vnode.key]) { return }
-    const name = state.squad.rawFormats[vnode.key].name
+    if (!state.squad.rawVariants[vnode.key]) { return }
+    const name = state.squad.rawVariants[vnode.key].name
     return m(
-      `.format-card.column.${vnode.attrs.order}`,
+      `.variant-card.column.${vnode.attrs.order}`,
       m(
         '.info.row',
         m('.score.offset', vnode.attrs.score),
-        m('.name.offset', name),
+        m('.name.offset', name, m(CopyButton, { text: vnode.key, textName: 'variant ID' })),
         m(
           '.button-section',
           m(Loader, { address: vnode.key }),
@@ -107,8 +106,8 @@ const DetailsToggle = {
   view: (vnode) => {
     const address = vnode.attrs.address
     let content = 'Details'
-    if (state.markets.previewedFormat &&
-    state.markets.previewedFormat.address === address) {
+    if (state.markets.previewedVariant &&
+    state.markets.previewedVariant.address === address) {
       content = 'Hide'
     }
     return m(
@@ -125,21 +124,27 @@ const DetailsToggle = {
 const Details = {
   view: (vnode) => {
     const address = vnode.attrs.address
-    if (!state.markets.previewedFormat ||
-    state.markets.previewedFormat.address !== address) {
+    if (!state.markets.previewedVariant ||
+    state.markets.previewedVariant.address !== address) {
       return
     }
-    const description = state.markets.previewedFormat.description || ''
-    return m(
-      '.details',
+    const content = [
       m('.board-row.row', m(Board, {
-        format: state.markets.previewedFormat,
-        position: state.markets.previewedFormat.startingPosition,
+        variant: state.markets.previewedVariant,
+        position: state.markets.previewedVariant.startingPosition,
         matchStatus: 'no match'
       })),
-      m('.row', m('label', 'Description: '), m('.data', description)),
-      m('.row', m('label', 'ID: '), m('.data', shortHash(address))),
+      m('.row', m('label', 'ID: '), m('.data', shortHash(address)), m(CopyButton, { text: address, textName: 'variant ID' })),
+      m('.row', m('label', 'Refund rate: '), m('.data', `${100 - state.squad.rawVariants[vnode.attrs.address].fee}%`)), // TODO tooltip explaining this
       m(Licenses, { address })
+    ]
+    if (state.markets.previewedVariant.description) {
+      const description = state.markets.previewedVariant.description
+      content.splice(1, 0, m('.row', m('label', 'Description: '), m('.data', description)))
+    }
+    return m(
+      '.details',
+      content
     )
   }
 }
@@ -165,11 +170,11 @@ const Loader = {
 const handleToggleDetailsFactory = (address) => {
   return (e) => {
     e.preventDefault()
-    if (state.markets.previewedFormat &&
-    state.markets.previewedFormat.address === address) {
-      state.markets.previewedFormat = null
+    if (state.markets.previewedVariant &&
+    state.markets.previewedVariant.address === address) {
+      state.markets.previewedVariant = null
     } else {
-      previewFormat(address)
+      previewVariant(address)
     }
   }
 }
@@ -177,7 +182,7 @@ const handleToggleDetailsFactory = (address) => {
 const handleLinkFactory = (address) => {
   return (e) => {
     e.preventDefault()
-    m.route.set('/matchmaking/:formatAddress', { formatAddress: address })
+    m.route.set('/matchmaking/:variantAddress', { variantAddress: address })
   }
 }
 
@@ -189,17 +194,17 @@ const handleSaveSearch = (e) => {
 
 const saveSearch = (e) => {
   e.preventDefault()
-  console.log('trying to save search', state.markets.idToSearch, state.squad.rawFormats)
-  // search loaded contributions for that id, then set state.markets.searchedFormat
-  if (state.squad.rawFormats[state.markets.idToSearch]) {
-    console.log('setting searched format', state.markets.idToSearch)
-    state.markets.searchedFormat = state.markets.idToSearch
+  console.log('trying to save search', state.markets.idToSearch, state.squad.rawVariants)
+  // search loaded contributions for that id, then set state.markets.searchedVariant
+  if (state.squad.rawVariants[state.markets.idToSearch]) {
+    console.log('setting searched variant', state.markets.idToSearch)
+    state.markets.searchedVariant = state.markets.idToSearch
   }
 }
 
 const resetSearch = (e) => {
   e.preventDefault()
-  delete state.markets.searchedFormat
+  delete state.markets.searchedVariant
 }
 
 function shortenScore (score) {
@@ -232,4 +237,4 @@ function shortenScore (score) {
   return result
 }
 
-export default FormatStore
+export default VariantStore

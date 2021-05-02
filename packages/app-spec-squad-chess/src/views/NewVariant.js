@@ -10,20 +10,20 @@ import { stringToSquare } from '../rules.js'
 import {
   shortHash,
   getMarketInfo,
-  getFullFormat,
+  getFullVariant,
   definitionWithAlerts
 } from '../utils.js'
 
-const FormatForm = {
+const VariantForm = {
   oninit: () => {
     getMarketInfo()
     clearForm()
   },
   view: () => {
     const form = m(
-      'form#format-form',
+      'form#variant-form',
       m(Explanation),
-      m(FormatPreloader),
+      m(VariantPreloader),
       m(DefinitionFields),
       m(LicenseFields),
       m(
@@ -33,8 +33,8 @@ const FormatForm = {
       )
     )
     return m(
-      '#format-form.body',
-      m('h2', 'New Format'),
+      '#variant-form.body',
+      m('h2', 'New Variant'),
       form
     )
   }
@@ -44,22 +44,23 @@ const Explanation = {
   view: () => {
     return m(
       'p',
-      'Create a new format and set the price players must pay to play it. {TODO}% of the payments will go to the makers of Squad Chess as a network tax.'
+      'Create a new variant and set the price players must pay to play it. {TODO}% of the payments will go to the makers of Squad Chess as a network tax.'
     )
   }
 }
 
-const FormatPreloader = {
+const VariantPreloader = {
   view: () => {
     let content = 'Loading...'
-    if (state.squad.rawFormats) {
+    if (state.squad.rawVariants) {
+      console.log('variants atm', state.squad.rawVariants)
       content = m(
-        '.format.form-field',
-        m('h3', 'Load an existing format'),
-        Object.keys(state.squad.rawFormats).map(key => {
-          return m(FormatButton, {
+        '.variant.form-field',
+        m('h3', 'Load an existing variant'),
+        Object.keys(state.squad.rawVariants).map(key => {
+          return m(VariantButton, {
             key,
-            name: `${state.squad.rawFormats[key].name} (${shortHash(key)})`
+            name: `${state.squad.rawVariants[key].name} (${shortHash(key)})`
           })
         }),
         m(
@@ -73,11 +74,11 @@ const FormatPreloader = {
   }
 }
 
-const FormatButton = {
+const VariantButton = {
   view: (vnode) => {
     return m(
       'button',
-      { value: vnode.key, onclick: handleLoadFormat },
+      { value: vnode.key, onclick: handleLoadVariant },
       vnode.attrs.name
     )
   }
@@ -86,52 +87,52 @@ const FormatButton = {
 const DefinitionFields = {
   view: () => {
     return m(
-      '.format.definition',
-      m(FormatBasicsFields),
-      m(FormatComponentsList),
-      m(FormatDataFields)
+      '.variant.definition',
+      m(VariantBasicsFields),
+      m(VariantComponentsList),
+      m(VariantDataFields)
     )
   }
 }
 
-const FormatBasicsFields = {
+const VariantBasicsFields = {
   view: () => {
     return m(
-      '.format.form-field',
+      '.variant.form-field',
       m('h3', 'Basics'),
-      m(FormatNameField),
-      m(FormatDescriptionField)
+      m(VariantNameField),
+      m(VariantDescriptionField)
     )
   }
 }
 
-const FormatNameField = {
+const VariantNameField = {
   view: () => {
     return m(
-      '.format',
+      '.variant',
       'Name: ',
       m(
         'input[type=text]',
-        { value: state.formatForm.name, oninput: handleSaveFactory('name') }
+        { value: state.variantForm.name, oninput: handleSaveFactory('name') }
       )
     )
   }
 }
 
-const FormatDescriptionField = {
+const VariantDescriptionField = {
   view: () => {
     return m(
-      '.format',
+      '.variant',
       'Description: ',
       m(
         'input[type=text]',
-        { value: state.formatForm.description, oninput: handleSaveFactory('description') }
+        { value: state.variantForm.description, oninput: handleSaveFactory('description') }
       )
     )
   }
 }
 
-const FormatComponentsList = {
+const VariantComponentsList = {
   view: () => {
     let componentBoxes = 'Loading...'
     if (state.squad.components) {
@@ -145,7 +146,7 @@ const FormatComponentsList = {
           description = ''
         }
         let checked = false
-        if (state.formatForm.components.includes(address)) { checked = true }
+        if (state.variantForm.components.includes(address)) { checked = true }
         componentBoxes = componentBoxes.concat([
           m(
             `label[for=${name}]`,
@@ -160,42 +161,42 @@ const FormatComponentsList = {
       }
     }
     return m(
-      '.format.form-field',
+      '.variant.form-field',
       m('h3', 'Pieces'),
-      m('.format.components', componentBoxes)
+      m('.variant.components', componentBoxes)
     )
   }
 }
 
-const FormatDataFields = {
+const VariantDataFields = {
   view: () => {
     return m(
-      '.format.form-field',
+      '.variant.form-field',
       m('h3', 'Board'),
-      m(FormatStartingPosition),
-      m(FormatOrientation)
+      m(VariantStartingPosition),
+      m(VariantOrientation)
     )
   }
 }
 
-const FormatStartingPosition = {
+const VariantStartingPosition = {
   oninit: () => {
     document.body.addEventListener('click', handleRenderSquareMenu)
   },
   view: () => {
     updatePosition()
     let board
-    if (Object.keys(state.formatForm.startingPosition).length) {
-      const format = getFullFormat(cleanDefinition({ deletedSquares: true }).Format, null)
+    if (Object.keys(state.variantForm.startingPosition).length) {
+      const variant = getFullVariant(cleanDefinition({ deletedSquares: true }).Variant, null)
       board = m(Board, {
-        format,
-        position: format.startingPosition,
+        variant,
+        position: variant.startingPosition,
         matchStatus: 'not connected'
       })
     }
     return [
       m(StartingPositionDimensions),
-      m(SquareMenu, { id: state.menus.formatFormSquare }),
+      m(SquareMenu, { id: state.menus.variantFormSquare }),
       board
     ]
   },
@@ -207,7 +208,7 @@ const FormatStartingPosition = {
 const handleRenderSquareMenu = (event) => {
   if (event.target.classList[0] === 'square') {
     const id = event.target.id
-    state.menus.formatFormSquare = id
+    state.menus.variantFormSquare = id
     state.board.highlightedSquares = [stringToSquare(id)]
     m.redraw()
   }
@@ -216,7 +217,7 @@ const handleRenderSquareMenu = (event) => {
 const StartingPositionDimensions = {
   view: () => {
     return m(
-      '.format',
+      '.variant',
       m(
         'p',
         'Width: ',
@@ -252,28 +253,28 @@ const SquareMenu = {
 
 const PieceOption = {
   view: (vnode) => {
-    if (state.formatForm.startingPosition[vnode.attrs.square].deleted === true) {
+    if (state.variantForm.startingPosition[vnode.attrs.square].deleted === true) {
       return
     }
 
     const id = `piece${vnode.attrs.square}`
     const options = { None: 'None' }
-    state.formatForm.components.forEach(address => {
+    state.variantForm.components.forEach(address => {
       options[address] = state.squad.components[address].name
     })
     let currentSelection = 'None'
-    if (state.formatForm.startingPosition[vnode.attrs.square].content) {
-      currentSelection = state.formatForm.startingPosition[vnode.attrs.square].content.pieceId
+    if (state.variantForm.startingPosition[vnode.attrs.square].content) {
+      currentSelection = state.variantForm.startingPosition[vnode.attrs.square].content.pieceId
     }
     const callback = (value) => {
-      if (state.formatForm.startingPosition[vnode.attrs.square].content) {
+      if (state.variantForm.startingPosition[vnode.attrs.square].content) {
         if (value === 'None') {
-          state.formatForm.startingPosition[vnode.attrs.square].content = null
+          state.variantForm.startingPosition[vnode.attrs.square].content = null
         } else {
-          state.formatForm.startingPosition[vnode.attrs.square].content.pieceId = value
+          state.variantForm.startingPosition[vnode.attrs.square].content.pieceId = value
         }
       } else {
-        state.formatForm.startingPosition[vnode.attrs.square].content = { pieceId: value, player: 0 }
+        state.variantForm.startingPosition[vnode.attrs.square].content = { pieceId: value, player: 0 }
       }
     }
 
@@ -292,20 +293,20 @@ const PieceOption = {
 
 const PieceColorOption = {
   view: (vnode) => {
-    if (state.formatForm.startingPosition[vnode.attrs.square].deleted === true) {
+    if (state.variantForm.startingPosition[vnode.attrs.square].deleted === true) {
       return
     }
-    if (!state.formatForm.startingPosition[vnode.attrs.square].content) {
+    if (!state.variantForm.startingPosition[vnode.attrs.square].content) {
       return
     }
 
     const id = `pieceColor${vnode.attrs.square}`
     let currentSelection = 0
-    if (state.formatForm.startingPosition[vnode.attrs.square].content) {
-      currentSelection = state.formatForm.startingPosition[vnode.attrs.square].content.player
+    if (state.variantForm.startingPosition[vnode.attrs.square].content) {
+      currentSelection = state.variantForm.startingPosition[vnode.attrs.square].content.player
     }
     const callback = (value) => {
-      state.formatForm.startingPosition[vnode.attrs.square].content.player = Number(value)
+      state.variantForm.startingPosition[vnode.attrs.square].content.player = Number(value)
     }
 
     return m(
@@ -326,7 +327,7 @@ const PieceColorOption = {
 
 const PromotionOption = {
   view: (vnode) => {
-    if (state.formatForm.startingPosition[vnode.attrs.square].deleted === true) {
+    if (state.variantForm.startingPosition[vnode.attrs.square].deleted === true) {
       return
     }
 
@@ -337,12 +338,12 @@ const PromotionOption = {
       1: 'Black'
     }
     let currentSelection = 'None'
-    if (state.formatForm.startingPosition[vnode.attrs.square].promotion === 0 ||
-      state.formatForm.startingPosition[vnode.attrs.square].promotion === 1) {
-      currentSelection = state.formatForm.startingPosition[vnode.attrs.square].promotion
+    if (state.variantForm.startingPosition[vnode.attrs.square].promotion === 0 ||
+      state.variantForm.startingPosition[vnode.attrs.square].promotion === 1) {
+      currentSelection = state.variantForm.startingPosition[vnode.attrs.square].promotion
     }
     const callback = (value) => {
-      state.formatForm.startingPosition[vnode.attrs.square].promotion = Number(value)
+      state.variantForm.startingPosition[vnode.attrs.square].promotion = Number(value)
     }
 
     return m(
@@ -366,14 +367,14 @@ const DeleteOption = {
       true: 'Yes'
     }
     let currentSelection = 'false'
-    if (state.formatForm.startingPosition[vnode.attrs.square].deleted) {
+    if (state.variantForm.startingPosition[vnode.attrs.square].deleted) {
       currentSelection = 'true'
     }
     const callback = (value) => {
       if (value === 'true') {
-        state.formatForm.startingPosition[vnode.attrs.square].deleted = true
+        state.variantForm.startingPosition[vnode.attrs.square].deleted = true
       } else {
-        state.formatForm.startingPosition[vnode.attrs.square].deleted = false
+        state.variantForm.startingPosition[vnode.attrs.square].deleted = false
       }
     }
 
@@ -390,17 +391,17 @@ const DeleteOption = {
   }
 }
 
-const FormatOrientation = {
+const VariantOrientation = {
   view: () => {
-    const whiteSelection = state.formatForm.orientation.white
-    const blackSelection = state.formatForm.orientation.black
+    const whiteSelection = state.variantForm.orientation.white
+    const blackSelection = state.variantForm.orientation.black
     const callbackFactory = (color) => {
       return (value) => {
-        state.formatForm.orientation[color] = Number(value)
+        state.variantForm.orientation[color] = Number(value)
       }
     }
     return m(
-      '.format.orientation',
+      '.variant.orientation',
       m(
         'p',
         m('label', 'Direction for white pieces: '),
@@ -438,7 +439,7 @@ const FormatOrientation = {
 const LicenseFields = {
   view: () => {
     return m(
-      '.format.form-field',
+      '.variant.form-field',
       m('h3', 'License Settings'),
       m('p', 'Choose the price and the percentage fee you will receive on all purchases of this contribution.'),
       m(PurchasePriceField),
@@ -451,13 +452,13 @@ const LicenseFields = {
 const PurchasePriceField = {
   view: () => {
     return m(
-      '.format',
+      '.variant',
       'Purchase price (XEENUS): ',
       m(
         'input[type=number]',
-        { 
-          value: state.formatForm.purchasePrice,
-          oninput: handleSaveFactory('purchasePrice') 
+        {
+          value: state.variantForm.purchasePrice,
+          oninput: handleSaveFactory('purchasePrice')
         }
       )
     )
@@ -468,7 +469,7 @@ const PurchasePriceField = {
 const BeneficiaryField = {
   view: () => {
     return m(
-      '.format',
+      '.variant',
       'Beneficiary address: ',
       m(
         `input[type=text][value=${state.address}]`,
@@ -482,13 +483,13 @@ const BeneficiaryField = {
 const FeeField = {
   view: () => {
     return m(
-      '.format',
+      '.variant',
       'Beneficiary fee: ',
       m(
         'input[type=number]',
-        { 
-          value: state.formatForm.beneficiaryFee,
-          oninput: handleSaveFactory('beneficiaryFee') 
+        {
+          value: state.variantForm.beneficiaryFee,
+          oninput: handleSaveFactory('beneficiaryFee')
         }
       ),
       '%'
@@ -500,7 +501,7 @@ const FeeField = {
 const InitialBuyField = {
   view: () => {
     return m(
-      '.format',
+      '.variant',
       'Tokens to buy: ',
       m(
         'input[type=number][placeholder=0]',
@@ -513,22 +514,22 @@ const InitialBuyField = {
 */
 
 // handlers
-const handleLoadFormat = (event) => {
+const handleLoadVariant = (event) => {
   event.preventDefault()
-  const format = state.squad.rawFormats[event.target.value]
-  const data = JSON.parse(format.data)
-  state.formatForm = Object.assign(state.formatForm, {
+  const variant = state.squad.rawVariants[event.target.value]
+  const data = JSON.parse(variant.data)
+  state.variantForm = Object.assign(state.variantForm, {
     startingPosition: data.startingPosition,
     orientation: Object.assign(
       { white: 2, black: 0 },
       data.orientation
     ),
-    name: format.name,
+    name: variant.name,
     description: data.description,
-    components: [...format.components]
+    components: [...variant.components]
   })
 
-  state.formatForm.loadedStartingPosition = Object.assign({}, data.startingPosition)
+  state.variantForm.loadedStartingPosition = Object.assign({}, data.startingPosition)
 }
 
 const handleClearForm = (event) => {
@@ -537,7 +538,7 @@ const handleClearForm = (event) => {
 }
 
 function clearForm () {
-  state.formatForm = Object.assign(
+  state.variantForm = Object.assign(
     {},
     {
       name: '',
@@ -555,30 +556,30 @@ function clearForm () {
       boardSize: {}
     }
   )
-  state.menus.formatFormSquare = ''
+  state.menus.variantFormSquare = ''
 }
 
 const handleSaveFactory = (dataType) => {
   return (event) => {
-    state.formatForm[dataType] = event.target.value
-    console.log(state.formatForm)
+    state.variantForm[dataType] = event.target.value
+    console.log(state.variantForm)
   }
 }
 
 const handleAddOrRemoveComponent = (event) => {
   const address = event.target.value
-  if (state.formatForm.components.includes(address)) {
-    const index = state.formatForm.components.indexOf(address)
-    state.formatForm.components.splice(index, 1)
+  if (state.variantForm.components.includes(address)) {
+    const index = state.variantForm.components.indexOf(address)
+    state.variantForm.components.splice(index, 1)
   } else {
-    state.formatForm.components.push(address)
+    state.variantForm.components.push(address)
   }
 }
 /*
 const handleSaveInitialBuy = (event) => {
-  state.formatForm.initialBuy = event.target.value
-  squad.curationMarket.getBuyPriceFromCurve(0, state.formatForm.initialBuy).then(res => {
-    state.formatForm.value = res
+  state.variantForm.initialBuy = event.target.value
+  squad.curationMarket.getBuyPriceFromCurve(0, state.variantForm.initialBuy).then(res => {
+    state.variantForm.value = res
     m.redraw()
   })
 }
@@ -589,35 +590,35 @@ const handleSubmit = (event) => {
   const localDefs = JSON.parse(localStorage.getItem('localDefinitions'))
   localStorage.setItem('localDefinitions', JSON.stringify([...localDefs, definition]))
   // convert  percent to basis points
-  const feeRate = parseInt(state.formatForm.beneficiaryFee * 100)
+  const feeRate = parseInt(state.variantForm.beneficiaryFee * 100)
   console.log(
     'Definition being submitted',
     definition,
-    state.formatForm
+    state.variantForm
   )
   // make sure we get the right value before submitting, if not enough time has already passed
   definitionWithAlerts(
     definition,
     [settings.gameAddress],
     feeRate,
-    parseInt(state.formatForm.purchasePrice)
+    parseInt(state.variantForm.purchasePrice)
   )
 }
 
 // helpers
 
 function cleanDefinition ({ deletedSquares }) {
-  const description = state.formatForm.description
-  let startingPosition = state.formatForm.startingPosition
+  const description = state.variantForm.description
+  let startingPosition = state.variantForm.startingPosition
   if (!deletedSquares) {
     startingPosition = cleanStartingPosition(startingPosition)
   }
 
-  const orientation = state.formatForm.orientation
+  const orientation = state.variantForm.orientation
   return {
-    Format: {
-      name: state.formatForm.name,
-      components: state.formatForm.components,
+    Variant: {
+      name: state.variantForm.name,
+      components: state.variantForm.components,
       data: JSON.stringify({
         description,
         startingPosition,
@@ -639,10 +640,10 @@ function cleanStartingPosition (sp) {
 }
 
 function updatePosition () {
-  const oldSquares = Object.keys(state.formatForm.startingPosition)
+  const oldSquares = Object.keys(state.variantForm.startingPosition)
   const newSquares = []
-  for (let w = 0; w < state.formatForm.startingPositionWidth; w++) {
-    for (let h = 0; h < state.formatForm.startingPositionHeight; h++) {
+  for (let w = 0; w < state.variantForm.startingPositionWidth; w++) {
+    for (let h = 0; h < state.variantForm.startingPositionHeight; h++) {
       const square = `${w},${h}`
       newSquares.push(square)
     }
@@ -657,19 +658,19 @@ function updatePosition () {
   })
   oldNotShared.forEach(square => {
     // for keys only in old keys, delete the key and value
-    delete state.formatForm.startingPosition[square]
+    delete state.variantForm.startingPosition[square]
   })
-  // if we've preloaded a format, add that back in
-  if (state.formatForm.loadedStartingPosition) {
-    state.formatForm.startingPosition = Object.assign(
-      state.formatForm.startingPosition,
-      state.formatForm.loadedStartingPosition
+  // if we've preloaded a variant, add that back in
+  if (state.variantForm.loadedStartingPosition) {
+    state.variantForm.startingPosition = Object.assign(
+      state.variantForm.startingPosition,
+      state.variantForm.loadedStartingPosition
     )
   }
   newNotShared.forEach(square => {
     // for keys only in new keys, add default values
-    state.formatForm.startingPosition[square] = { content: null, deleted: false }
+    state.variantForm.startingPosition[square] = { content: null, deleted: false }
   })
 }
 
-export default FormatForm
+export default VariantForm

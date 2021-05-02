@@ -1,14 +1,15 @@
 import m from 'mithril'
 
 import { sellLicenseWithAlerts } from '../utils.js'
-import state from '../state.js'
 
-const licensePrice = 10
+// const licensePrice = 10
 
 const SellLicenseButton = {
+  /*
   oninit: (vnode) => {
     state.buyingAndSelling[`sellLicense${vnode.attrs.address}`] = licensePrice
   },
+  */
   view: (vnode) => {
     return m(
       '.sell-license',
@@ -21,7 +22,7 @@ const SellLicenseButton = {
             sellLicenseWithAlerts(vnode.attrs.license.id, vnode.attrs.license.sellAmount)
           }
         },
-        `Sell (${Number.parseFloat(vnode.attrs.license.sellAmount).toPrecision(4)} XEENUS)`
+        `Refund (${Number.parseFloat(vnode.attrs.license.sellAmount).toPrecision(4)} XEENUS)`
       )
     )
   }

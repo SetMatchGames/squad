@@ -6,7 +6,6 @@ import squad, { curationMarket } from '@squad/sdk'
 // import defs from '../scripts/load_development_defs.js'
 
 import state from './state.js'
-import settings from './settings.js'
 import { stringToSquare } from './rules.js'
 
 export const shortHash = (str) => {
@@ -52,12 +51,12 @@ export const handleLoadContributions = () => {
 }
 
 const loadContributions = async () => {
-  state.squad.rawFormats = {}
-  state.squad.orderedFormats = await squad.getFormats()
-  state.squad.orderedFormats.forEach(f => {
-    state.squad.rawFormats[f.id] = Object.assign({},
+  state.squad.rawVariants = {}
+  state.squad.orderedVariants = await squad.getFormats()
+  state.squad.orderedVariants.forEach(f => {
+    state.squad.rawVariants[f.id] = Object.assign({},
       f.definition.Format,
-      { 
+      {
         fee: f.feeRate,
         purchasePrice: f.purchasePrice
       }
@@ -69,7 +68,7 @@ const loadContributions = async () => {
   state.squad.orderedComponents.forEach(c => {
     state.squad.components[c.id] = Object.assign({},
       c.definition.Component,
-      { 
+      {
         fee: c.feeRate,
         purchasePrice: c.purchasePrice
       }
@@ -77,11 +76,11 @@ const loadContributions = async () => {
   })
 
   const params = (new URL(document.location)).searchParams
-  if (params.get('format')) { 
-    state.markets.idToSearch = params.get('format')
-    if (state.squad.rawFormats[state.markets.idToSearch]) {
-      console.log('setting searched format', state.markets.idToSearch)
-      state.markets.searchedFormat = state.markets.idToSearch
+  if (params.get('variant')) {
+    state.markets.idToSearch = params.get('variant')
+    if (state.squad.rawVariants[state.markets.idToSearch]) {
+      console.log('setting searched variant', state.markets.idToSearch)
+      state.markets.searchedVariant = state.markets.idToSearch
     }
   }
 
@@ -109,12 +108,12 @@ export const handleLoadContribution = (id) => {
 }
 
 const loadContribution = async (id) => {
-  state.squad.rawFormats = {}
+  state.squad.rawVariants = {}
   const f = await squad.getContribution(id)
-  if (!f.definition.Format) { return }
-  state.squad.rawFormats[f.id] = Object.assign({},
-    f.definition.Format,
-    { 
+  if (!f.definition.Variant) { return }
+  state.squad.rawVariants[f.id] = Object.assign({},
+    f.definition.Variant,
+    {
       fee: f.feeRate,
       purchasePrice: f.purchasePrice
     }
@@ -148,7 +147,6 @@ const loadLicenses = async () => {
 }
 
 export const refreshSquad = (callback) => {
-
   // skip if we've already connected to Squad
   if (state.squad.account === 'connected') {
     console.log('Skipping on open')
@@ -169,22 +167,22 @@ export const refreshSquad = (callback) => {
         }
 
         // make sure all stored defs and defaults are on Ethereum
-        const localDefs = [/*...defaultDefs,*/ ...storedDefs]
+        const localDefs = [...storedDefs]
         console.log('local defs', localDefs)
         // multiDefinition(localDefs)
 
-        state.squad.rawFormats = {}
+        state.squad.rawVariants = {}
         squad.getFormats()
-          .then(formats => {
-            console.log('got formats', formats)
-            state.squad.orderedFormats = formats
-            state.squad.orderedFormats.forEach(f => {
-              state.squad.rawFormats[f.id] = f.definition.Format
+          .then(variants => {
+            console.log('got variants', variants)
+            state.squad.orderedVariants = variants
+            state.squad.orderedVariants.forEach(f => {
+              state.squad.rawVariants[f.id] = f.definition.Format
             })
             m.redraw()
           })
           .catch(e => {
-            console.error('getFormats error:', e)
+            console.error('getVariants error:', e)
           })
 
         state.squad.components = {}
@@ -327,7 +325,7 @@ async function web3connection () {
   }
   m.redraw()
 }
-
+/*
 async function multiDefinition (defs) {
   // submit the default definitions to make sure they have bonds on ethereum
   await Promise.all(defs.map(async (def) => {
@@ -335,10 +333,10 @@ async function multiDefinition (defs) {
   }))
 }
 
-function refreshLocalStorage (formatDefs, componentDefs) {
+function refreshLocalStorage (variantDefs, componentDefs) {
   const localCatalog = []
-  for (const key in formatDefs) {
-    localCatalog.push(formatDefs[key])
+  for (const key in variantDefs) {
+    localCatalog.push(variantDefs[key])
   }
   for (const key in componentDefs) {
     localCatalog.push(componentDefs[key])
@@ -346,17 +344,17 @@ function refreshLocalStorage (formatDefs, componentDefs) {
   console.log('local Catalog size', localCatalog.length)
   localStorage.setItem('localDefinitions', JSON.stringify(localCatalog))
 }
-
+*/
 export const getMarketInfo = () => {
   refreshSquad(async () => {
     // get the logged in user's available withdraw amount
     state.withdrawAmount = await squad.curationMarket.withdrawAmount()
     // get the users licenses
     state.licenses = await squad.curationMarket.getValidLicenses()
-    // for each format
-    for (const address in state.squad.rawFormats) {
+    // for each variant
+    for (const address in state.squad.rawVariants) {
       try {
-        // see if the current user owns the format
+        // see if the current user owns the variant
         // await getOwned(address)
         // get the market cap
         await getMarketCap(address)
@@ -365,8 +363,8 @@ export const getMarketInfo = () => {
         await getBeneficiaryFee(address)
         m.redraw()
       } catch (e) {
-        console.error('Invalid contribution', address, state.squad.rawFormats[address], e)
-        delete state.squad.rawFormats[address]
+        console.error('Invalid contribution', address, state.squad.rawVariants[address], e)
+        delete state.squad.rawVariants[address]
         // remove invalid contributions
       }
     }
@@ -399,23 +397,23 @@ async function getMarketCap (address) {
 
 async function getPurchasePrice (address) {
   const purchasePrice = await curationMarket.purchasePriceOf(address)
-  state.squad.rawFormats[address].purchasePrice = purchasePrice
+  state.squad.rawVariants[address].purchasePrice = purchasePrice
   console.log('Purchase price', address, purchasePrice)
 }
 
 async function getBeneficiaryFee (address) {
   const fee = await curationMarket.feeOf(address)
-  state.squad.rawFormats[address].fee = Number(fee) / 100
+  state.squad.rawVariants[address].fee = Number(fee) / 100
   console.log('Fee', address, Number(fee) / 100)
 }
 
-export const loadFormat = async (address) => {
+export const loadVariant = async (address) => {
   // check if we've already connected to web3
   if (!state.squad.account) {
     await web3connection()
   }
   // check if we've already loaded this address
-  if (!state.squad.rawFormats || !state.squad.rawFormats[address]) {
+  if (!state.squad.rawVariants || !state.squad.rawVariants[address]) {
     // if not, load contributions
     await loadContributions()
   }
@@ -424,50 +422,51 @@ export const loadFormat = async (address) => {
     // if not, load licenses
     await loadLicenses()
   }
-  // then, load the format
-  const rawFormat = state.squad.rawFormats[address]
-  if (rawFormat) {
-    console.log('raw format found and loading')
+  // then, load the variant
+  const rawVariant = state.squad.rawVariants[address]
+  if (rawVariant) {
+    console.log('raw variant found and loading')
     if (!state.licenses[address]) {
-      m.route.set('/formats')
-      console.log('Must purchase rights to use a format before using. Current tokens owned:', state.owned[address])
-      // TODO Notification asking them to buy the format
+      m.route.set('/variants')
+      console.log('Must purchase rights to use a variant before using. Current tokens owned:', state.owned[address])
+      // TODO Notification asking them to buy the variant
     } else {
-      state.squad.loadedFormat = getFullFormat(rawFormat, address)
-      console.log('Loaded format:', state.squad.loadedFormat)
+      state.squad.loadedVariant = getFullVariant(rawVariant, address)
+      console.log('Loaded variant:', state.squad.loadedVariant)
     }
     m.redraw()
   }
 }
 
-export const previewFormat = (address) => {
-  const rawFormat = state.squad.rawFormats[address]
-  state.markets.previewedFormat = getFullFormat(rawFormat, address)
-  console.log('Previewing format:', state.markets.previewedFormat)
+export const previewVariant = (address) => {
+  const rawVariant = state.squad.rawVariants[address]
+  state.markets.previewedVariant = getFullVariant(rawVariant, address)
+  console.log('Previewing variant:', state.markets.previewedVariant)
 }
 
-export const getFullFormat = (rawFormat, address) => {
+export const getFullVariant = (rawVariant, address) => {
   // get the pieces
   const pieces = {}
-  rawFormat.components.forEach(address => {
+  console.log(rawVariant, 'rawVariant')
+  rawVariant.components.forEach(address => {
     const piece = state.squad.components[address]
     pieces[address] = Object.assign({},
       { name: piece.name },
       JSON.parse(piece.data)
     )
   })
-  const fullFormat = Object.assign(JSON.parse(rawFormat.data), {
+  const fullVariant = Object.assign(JSON.parse(rawVariant.data), {
     pieces,
     address,
-    name: rawFormat.name
+    name: rawVariant.name
   })
 
   // Get the X and Y ranges of the board
-  const x = findBoardRange(0, fullFormat.startingPosition)
-  const y = findBoardRange(1, fullFormat.startingPosition)
-  fullFormat.boardSize = { x, y }
+  const x = findBoardRange(0, fullVariant.startingPosition)
+  const y = findBoardRange(1, fullVariant.startingPosition)
+  fullVariant.boardSize = { x, y }
 
-  return fullFormat
+  return fullVariant
 }
 
 export const checkWinner = () => {
@@ -557,7 +556,7 @@ export const handleAlert = (type, text) => {
   return () => { alert(type, text) }
 }
 
-const alert = (type, text) => {
+export const alert = (type, text) => {
   console.log('Creating alert', type, text)
   const alert = { type, text }
   state.alerts.push(alert)
