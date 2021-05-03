@@ -7,7 +7,7 @@ import { shortHash } from '../utils.js'
 
 const ConnectButton = {
   view: () => {
-    if (ethereum.selectedAddress) {
+    if (window.ethereum && window.ethereum.selectedAddress) {
       state.squad.account = ethereum.selectedAddress
       state.squad.connection = 'connected'
     }

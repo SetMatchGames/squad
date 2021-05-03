@@ -153,7 +153,7 @@ const Loader = {
   view: (vnode) => {
     const address = vnode.attrs.address
     let owned = false
-    if (state.licenses[address]) {
+    if (state.licenses && state.licenses[address]) {
       owned = true
     }
     return m(

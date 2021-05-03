@@ -101,6 +101,7 @@ function init (defaults) {
     }
     default: {
       console.log('Trying to make provider...')
+      if (!window.web3) { return }
       provider = new ethers.providers.Web3Provider(web3.currentProvider)
       walletOrSigner = provider.getSigner()
     }
