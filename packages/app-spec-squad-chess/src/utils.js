@@ -292,6 +292,12 @@ async function test () {
 */
 async function web3connection () {
   const connection = curationMarket.init()
+  if (!connection) {
+    state.connectModal = true
+    state.squad.connection = 'not connected'
+    m.redraw()
+    return
+  }
   let address
   try {
     address = await connection.getAddress()
@@ -299,7 +305,7 @@ async function web3connection () {
   } catch (e) {
     address = e
   }
-  console.log(connection, connection.provider, (await connection.provider.getNetwork()).chainId)
+  // console.log(connection, connection.provider, (await connection.provider.getNetwork()).chainId)
   const one = (typeof address === 'string')
   let two
   try {

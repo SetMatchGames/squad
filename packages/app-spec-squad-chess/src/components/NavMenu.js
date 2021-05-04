@@ -1,5 +1,6 @@
 import m from 'mithril'
 import { curationMarket } from '@squad/sdk'
+import { handleLoadContributions, handleLoadLicenses } from '../utils.js'
 
 import state from '../state.js'
 
@@ -7,8 +8,9 @@ let walletOrSigner
 
 const NavMenu = {
   oninit: () => {
+    handleLoadContributions()
+    handleLoadLicenses()
     state.menus.nav = 'hidden'
-    walletOrSigner = curationMarket.init()
   },
   view: () => {
     return m(
@@ -52,6 +54,7 @@ const handleXeenus = (e) => {
   e.preventDefault()
   console.log('trying to get some Xeenus!')
   // this is the Ropsten address for Xeenus
+  walletOrSigner = curationMarket.init()
   walletOrSigner.sendTransaction({
     to: '0x7E0480Ca9fD50EB7A3855Cf53c347A1b4d6A2FF5',
     value: 0

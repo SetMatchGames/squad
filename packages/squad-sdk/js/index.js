@@ -84,7 +84,14 @@ async function getContribution (id) {
 }
 
 async function getLicenses (address) {
-  if (!address) { address = await curationMarket.walletAddress() }
+  if (!address) {
+    try {
+      address = await curationMarket.walletAddress()
+    } catch (e) {
+      console.log("Couldn't get address:", e)
+      return
+    }
+  }
   const licenses = await graphQueries.licensesOf(address)
   console.log('licenses raw', licenses)
   const dict = {}
