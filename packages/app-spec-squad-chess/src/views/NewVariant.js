@@ -187,7 +187,7 @@ const VariantStartingPosition = {
     updatePosition()
     let board
     if (Object.keys(state.variantForm.startingPosition).length) {
-      const variant = getFullVariant(cleanDefinition({ deletedSquares: true }).Variant, null)
+      const variant = getFullVariant(cleanDefinition({ deletedSquares: true }).Format, null)
       board = m(Board, {
         variant,
         position: variant.startingPosition,
@@ -482,6 +482,8 @@ const BeneficiaryField = {
 
 const FeeField = {
   view: () => {
+    if (state.variantForm.beneficiaryFee > 100) { state.variantForm.beneficiaryFee = 100 }
+    if (state.variantForm.beneficiaryFee < 0) { state.variantForm.beneficiaryFee = 0 }
     return m(
       '.variant',
       'Beneficiary fee: ',
@@ -587,8 +589,8 @@ const handleSaveInitialBuy = (event) => {
 const handleSubmit = (event) => {
   event.preventDefault()
   const definition = cleanDefinition({ deletedSquares: false })
-  const localDefs = JSON.parse(localStorage.getItem('localDefinitions'))
-  localStorage.setItem('localDefinitions', JSON.stringify([...localDefs, definition]))
+  // const localDefs = JSON.parse(localStorage.getItem('localDefinitions'))
+  // localStorage.setItem('localDefinitions', JSON.stringify([...localDefs, definition]))
   // convert  percent to basis points
   const feeRate = parseInt(state.variantForm.beneficiaryFee * 100)
   console.log(
@@ -616,7 +618,7 @@ function cleanDefinition ({ deletedSquares }) {
 
   const orientation = state.variantForm.orientation
   return {
-    Variant: {
+    Format: {
       name: state.variantForm.name,
       components: state.variantForm.components,
       data: JSON.stringify({

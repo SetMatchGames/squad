@@ -179,6 +179,7 @@ const PieceMechanic = {
 const MechanicOffset = {
   view: (vnode) => {
     const instance = state.componentForm.mechanics[vnode.attrs.mechanic][vnode.key]
+    if (instance.steps < 1) { instance.steps = 1 }
     return m(
       '.piece.mechanic-params.indented',
       m(
@@ -533,9 +534,8 @@ const handleSubmit = (event) => {
     }
   }
 
-  const localDefs = JSON.parse(localStorage.getItem('localDefinitions'))
-  console.log('local components', localDefs)
-  localStorage.setItem('localDefinitions', JSON.stringify([...localDefs, definition]))
+  // const localDefs = JSON.parse(localStorage.getItem('localDefinitions'))
+  // localStorage.setItem('localDefinitions', JSON.stringify([...localDefs, definition]))
 
   console.log('Submitting definition:', definition)
 
