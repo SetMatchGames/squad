@@ -1,0 +1,12 @@
+{{ define "main" }}
+{{ range where site.RegularPages "Type" "in" site.Params.homepageContentTypes | first 10 }}
+<div class="flowline">
+  <div class="left-margin">  </div>
+  <div class="content home">
+    <h1><a href={{ .Permalink }}>{{ .Title }}</a></h1>
+    <p>{{ .Content }}</p>
+  </div>
+  <div class="margin-right"></div>
+</div>
+{{ end }}
+{{ end }}

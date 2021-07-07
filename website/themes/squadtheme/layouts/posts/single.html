@@ -1,0 +1,22 @@
+{{ define "header" }}
+<header>
+  <div class="left-margin"></div>
+  <div class="small">
+    <a href={{ .Site.BaseURL }}><h1>Squad Games</h1></a>
+    <h2>BUILt AND OWNEd<br>BY PLaYERS</h2>
+  </div>
+  <div class="right-margin"></div>
+</header>
+{{ end }}
+
+{{ define "main" }}
+<div class="left-margin"></div>
+
+<div class="content">
+  <time>{{ .Date.Format "January 02, 2006" }}</time>
+  <h1>{{ .Title }}</h1>
+  {{ .Content }}
+</div>
+
+<div class="right-margin"></div>
+{{ end }}

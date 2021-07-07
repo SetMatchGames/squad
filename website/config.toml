@@ -1,0 +1,8 @@
+baseURL = "http://www.squad.games/"
+languageCode = "en-us"
+title = "Squad Games"
+theme = "squadtheme"
+
+[Params]
+homepageContentTypes = ["posts"]
+gaTrackingID = "todo-update-in-config-toml"
